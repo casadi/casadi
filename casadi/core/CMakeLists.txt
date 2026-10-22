@@ -210,6 +210,7 @@ set(CASADI_INTERNAL
   linsol.cpp              linsol_internal.hpp  linsol_internal.cpp
   rootfinder_impl.hpp     rootfinder.cpp
   integrator_impl.hpp     integrator.cpp
+  runtime_integrator.hpp  runtime_integrator.cpp
   nlpsol.hpp              nlpsol_impl.hpp        nlpsol.cpp
   onnx_function.hpp       onnx_function_impl.hpp onnx_function.cpp
   conic_impl.hpp          conic.cpp

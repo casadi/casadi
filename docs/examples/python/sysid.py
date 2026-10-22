@@ -32,7 +32,7 @@ import numpy
 # This form is well-suited for the Gauss-Newton Hessian approximation.
 
 ############ SETTINGS #####################
-N = 2000  # Number of samples
+N = 10000  # Number of samples
 fs = 610.1 # Sampling frequency [hz]
 
 param_truth = ca.DM([5.625e-6,2.3e-4,1,4.69])

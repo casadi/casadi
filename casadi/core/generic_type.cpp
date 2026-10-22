@@ -788,6 +788,8 @@ namespace casadi {
         return IntType::deserialize(s);
       case OT_BOOL:
         return BoolType::deserialize(s);
+      case OT_BOOLVECTOR:
+        return BoolVectorType::deserialize(s);
       case OT_DOUBLEVECTOR:
         return DoubleVectorType::deserialize(s);
       case OT_DOUBLEVECTORVECTOR:

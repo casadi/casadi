@@ -168,15 +168,19 @@ def scheme_operand(text):
         return ['literal', json.loads(text)]
     if re.fullmatch(r'-?\d+', text):
         return ['literal', int(text)]
-    for token, op in [('||', 'or'), ('&&', 'and'), ('==', 'equal'), ('!=', 'not_equal'), ('+', 'concat')]:
+    for token, op in [('||', 'or'), ('&&', 'and'), ('==', 'equal'), ('!=', 'not_equal'),
+                      ('>=', 'greater_equal'), ('<=', 'less_equal'), ('>', 'greater'), ('<', 'less'),
+                      ('+', 'concat')]:
         # Do not split operators inside string literals.
         quoted = escaped = False
         for i, char in enumerate(text):
             if escaped: escaped = False; continue
             if char == '\\' and quoted: escaped = True; continue
             if char == '"': quoted = not quoted
-            if not quoted and text.startswith(token, i):
-                return [op, scheme_operand(text[:i]), scheme_operand(text[i+len(token):])]
+            if quoted or not text.startswith(token, i): continue
+            # A lone < or > is neither part of <=, >=, -> nor of a two-character operator.
+            if token in ('<', '>') and (text[i+1:i+2] == '=' or text[i-1:i] in '-<>='): continue
+            return [op, scheme_operand(text[:i]), scheme_operand(text[i+len(token):])]
     if text.startswith('!'):
         return ['not', scheme_operand(text[1:])]
     if re.fullmatch(r'[\w.]+(?:\(\))?', text):
@@ -269,6 +273,8 @@ def lower_scheme_operands(data):
             op = step['op']
             if op == 'field' and step.get('bind'):
                 scope[step['bind']] = field_operand(step, scope)
+            elif op == 'version' and step.get('bind'):
+                scope[step['bind']] = ['version', step['name']]
             elif op == 'call' and step['layout'] not in seen:
                 collect(raw['layouts'].get(step['layout'], []), scope, (*seen, step['layout']))
             elif op in ('if', 'repeat'):
@@ -297,6 +303,14 @@ def lower_scheme_operands(data):
             if op == 'field':
                 bind = step.pop('bind', None)
                 if bind: scope[bind] = field_operand(original, scope)
+            elif op == 'version':
+                bind = step.pop('bind', None)
+                if bind: scope[bind] = ['version', step['name']]
+            elif op == 'assign':
+                # A default the deserializer sets in place of an absent field, read by a later condition.
+                target = scope.get(step.pop('bind'))
+                if not target or target[0] != 'field' or not isinstance(target[1], str): continue
+                step['name'] = target[1]
             elif op == 'select':
                 step['value'] = resolve(scheme_operand(step.pop('bind')), scope)
                 step['cases'] = {key: program(body, dict(scope)) for key,body in original['cases'].items()}
@@ -307,11 +321,36 @@ def lower_scheme_operands(data):
             result.append(step)
         return result
 
-    data['layouts'] = {name: program(steps, dict(initial)) for name, steps in raw['layouts'].items()}
+    data['layouts'] = {name: tidy(program(steps, dict(initial))) for name, steps in raw['layouts'].items()}
+    if 'writer_layouts' in raw:
+        data['writer_layouts'] = {name: tidy(program(steps, dict(initial))) for name, steps in raw['writer_layouts'].items()}
     for name, definition in data['types'].items():
         definition['body'] = program(raw['types'][name]['body'], dict(initial))
     data['version'] = 1
     return data
+
+
+def unbound(value):
+    """A layout without its source bindings, to compare what two layouts read."""
+    if isinstance(value, list): return [unbound(v) for v in value]
+    if isinstance(value, dict): return {k: unbound(v) for k, v in value.items() if k != 'bind'}
+    return value
+
+
+def tidy(steps):
+    """Drop branches left without decoding steps."""
+    result = []
+    for step in steps:
+        if step['op'] in ('if', 'repeat'):
+            step = {**step, 'body': tidy(step['body'])}
+            if 'else' in step:
+                step['else'] = tidy(step['else'])
+                if not step['else']: del step['else']
+            if step['op'] == 'if' and not step['body'] and not step.get('else'): continue
+        elif step['op'] == 'select':
+            step = {**step, 'cases': {k: tidy(v) for k, v in step['cases'].items()}}
+        result.append(step)
+    return result
 
 
 def generate(root):
@@ -399,9 +438,12 @@ def generate(root):
     release = '.'.join(re.search(r'set\(CASADI_'+part+r'_VERSION (\d+)\)', cmake)[1]
                        for part in ('MAJOR', 'MINOR', 'PATCH'))
     reader = generate_layouts(root, texts, layouts, contracts,
-                              operations(texts[source/'calculus.hpp']))
+                              operations(texts[source/'calculus.hpp']),
+                              {name: (min(v), max(v)) for name, v in readable_versions.items()})
+    reader = lower_scheme_operands(reader)
+    check_readers(reader, reader.pop('writer_layouts'), versions)
     return {
-        'reader': lower_scheme_operands(reader),
+        'reader': reader,
         'format': 'casadi_serialization_scheme', 'version': 1, 'casadi_version': release,
         'wire': {'protocol': int(re.search(r'serialization_protocol_version\s*=\s*(\d+)', stream)[1]),
                  'magic': int(re.search(r'serialization_check\s*=\s*(\d+)', stream)[1]),
@@ -411,11 +453,12 @@ def generate(root):
                           'can_defer_payload': True}},
         'class_versions': {name: sorted(v) for name, v in sorted(versions.items())},
         'readable_class_versions': {name: sorted(v) for name, v in sorted(readable_versions.items())},
+        'field_versions': field_versions(reader, {name: sorted(v) for name, v in readable_versions.items()}),
         'operations': operations(texts[source/'calculus.hpp']),
     }
 
 
-def generate_layouts(root, texts, indexed, contracts, ops):
+def generate_layouts(root, texts, indexed, contracts, ops, readable):
     """Lower serializers into decoding rules; unsupported constructs fail explicitly."""
     layouts, parents, records = {}, {}, {}
     def make_record(body, decls, stream):
@@ -485,9 +528,15 @@ def generate_layouts(root, texts, indexed, contracts, ops):
                 if not args[1].startswith('"'): continue
                 step['params']={records[callee]['helper']:json.loads(args[1])}
             events.append((m.start(),step))
-        for m in re.finditer(r'\b(?!(?:if|for|while|switch)\b)[\w:]+(?:\.\w+|->\w+)?\s*\([^;]*?\bs\b[^;]*?\)\s*;', body):
+        return lower_body(body, unlowered(body, events, 's'))
+
+    def unlowered(body, events, stream):
+        for m in re.finditer(r'\b(?!(?:if|for|while|switch)\b)[\w:]+(?:\.\w+|->\w+)?\s*\([^;]*?\b'+stream+r'\b[^;]*?\)\s*;', body):
             if not any(body.rfind(';', 0, m.start())+1 <= position < m.end() for position, _ in events):
                 events.append((m.start(), {'op':'unsupported','reason':'unlowered serialization call'}))
+        return events
+
+    def lower_body(body, events):
         ranges=[]
         alternatives={}
         for m in re.finditer(r'\b(if|for|while|switch)\s*\(',body):
@@ -511,6 +560,9 @@ def generate_layouts(root, texts, indexed, contracts, ops):
                 other = alternatives.get(p)
                 alternate = region(other[0]+1,other[1]) if other else []
                 if not inner and not alternate: continue  # Computation without serialized output.
+                if kind=='if' and alternate and unbound(inner)==unbound(alternate):
+                    # Both branches read the same: the condition does not shape the stream.
+                    ordered.extend((p, x) for x in inner); continue
                 if kind=='if':
                     step={'op':'if','condition':condition,'body':inner}
                     if alternate: step['else']=alternate
@@ -524,6 +576,9 @@ def generate_layouts(root, texts, indexed, contracts, ops):
                     count={'n_in_':'sparsity_in_.size()',
                            'n_out_':'sparsity_out_.size()'}.get(count,count)
                     step={'op':'repeat','count':count,'body':inner}
+                elif kind=='for' and re.fullmatch(r'[^;]*;\s*\w+\s*<\s*[^;]+;\s*(?:\+\+\w+|\w+\+\+)\s*', condition):
+                    # Counted loops in deserializers: the bound is a field read before the loop.
+                    step={'op':'repeat','count':re.search(r';\s*\w+\s*<\s*([^;]+?)\s*;', condition)[1],'body':inner}
                 else:step={'op':'unsupported','reason':'unlowered '+kind+' loop or branch'}
                 ordered.append((p,step))
             return [s for _,s in sorted(ordered,key=lambda x:x[0])]
@@ -533,8 +588,66 @@ def generate_layouts(root, texts, indexed, contracts, ops):
             return [{'op':'unsupported','reason':'unlowered else branch'}]
         return result
 
+    def deserializer(cls, body, init, stream, decls):
+        """Events of a deserializing constructor, named after the writer layouts they mirror."""
+        events=[]
+        for m in re.finditer(r'([\w:]+(?:<[^(){};]*>)?)\s*\(\s*'+stream+r'\s*\)', init or ''):
+            events.append((0, {'op':'call','layout':normalize(m[1])+'::serialize_body'}))
+        for m in re.finditer(r'\b'+stream+r'\.(unpack|version)\s*\(',body):
+            args=split_args(body[m.end():balanced(body,m.end()-1,'(',')')])
+            if not re.fullmatch(r'"[^"\\]*"', args[0]):
+                events.append((m.start(), {'op':'unsupported','reason':'computed field name'})); continue
+            name=json.loads(args[0])
+            if m[1]=='version':
+                step={'op':'version','name':name,'value':int(args[-1]),'minimum':int(args[1])}
+                local=re.search(r'\b(\w+)\s*=\s*$', body[:m.start()])
+                if local: step['bind']=local[1]
+            else:
+                scope={**decls, **declarations(body[:m.start()])}
+                step={'op':'field','name':name,'type':resolve_type({'name':name,'cpp_type':infer_type(args[1], scope)}),
+                      'bind':args[1]}
+            events.append((m.start(), step))
+        for m in re.finditer(r'([\w:<>, ]+?)::delayed_deserialize_members\s*\(\s*'+stream+r'\s*\)', body):
+            events.append((m.start(), {'op':'call','layout':normalize(m[1])+'::delayed_serialize_members'}))
+        # Helpers reading on behalf of the class mirror a writer helper: deserialize/unpack -> serialize/pack.
+        for m in re.finditer(r'\b((?:[\w]+::)*)(deserialize|unpack)(\w*)\s*\(\s*'+stream+r'\s*,', body):
+            helper=normalize(m[1]+{'deserialize':'serialize','unpack':'pack'}[m[2]]+m[3])
+            if helper not in records and normalize(cls+'::'+helper) in records: helper=normalize(cls+'::'+helper)
+            if 'helper' not in records.get(helper,{}): continue
+            step={'op':'call','layout':helper}
+            if records[helper]['helper']:
+                opening=body.index('(',m.start())
+                args=split_args(body[opening+1:balanced(body,opening,'(',')')])
+                if not args[1].startswith('"'): continue
+                step['params']={records[helper]['helper']:json.loads(args[1])}
+            events.append((m.start(), step))
+        for m in re.finditer(r'\bcasadi_error\s*\(\s*("(?:\\.|[^"\\])*")', body):
+            events.append((m.start(), {'op':'unsupported','reason':json.loads(m[1])}))
+        # Defaults set in place of fields that older versions lack; kept if a condition reads them.
+        for m in re.finditer(r'(?<![\w.>])([A-Za-z_]\w*)\s*=\s*("(?:\\.|[^"\\])*"|-?\d+|true|false)\s*;', body):
+            events.append((m.start(), {'op':'assign','bind':m[1],'value':json.loads(m[2])}))
+        return unlowered(body, events, stream)
+
+    multi={name for name,(first,last) in readable.items() if first<last}
+    derived={}
+    for path, text in texts.items():
+        for m in re.finditer(r'\b([A-Za-z_]\w*(?:<[^;{}()]*?>)?)\s*::\s*([A-Za-z_]\w*)\s*\(\s*DeserializingStream\s*&\s*(\w+)\s*\)\s*(:[^{;]*)?\{', text):
+            cls=m[2]
+            if re.sub(r'<.*>','',m[1])!=cls or cls not in multi: continue
+            body=text[m.end():balanced(text,m.end()-1)]
+            if not re.search(r'\b'+m[3]+r'\.version\(\s*"'+cls+'"', body): continue
+            stem=path.stem.removesuffix('_impl')
+            header=texts.get(path.with_name(stem+'.hpp'),'')+texts.get(path.with_name(stem+'_impl.hpp'),'')
+            owner=re.search(r'\bclass\s+(?:CASADI(?:_\w+)?_EXPORT\s+)?'+cls+r'\b(?:\s*:[^{;]+)?\s*\{', header)
+            decls={**declarations(header), **(declarations(header[owner.end():balanced(header,owner.end()-1)]) if owner else {})}
+            derived[cls+'::serialize_body']=lower_body(body, deserializer(cls, body, m[4], m[3], decls))
+
+    writer={}
     for key, record in records.items():
         layouts[key]=compile_record(key, record)
+        if key in derived:
+            writer[key]=layouts[key]
+            layouts[key]=derived[key]
     functions={}
     text=texts[root/'casadi/core/function_internal.cpp']
     for name,cls in re.findall(r'\{"([^"]+)",\s*(\w+)::deserialize\}',text):functions[name]=cls
@@ -581,7 +694,7 @@ def generate_layouts(root, texts, indexed, contracts, ops):
             programs[match[1]]['shared']='shared_pack' in body
             if decoration:programs[match[1]]['decoration']=decoration[1]
     materialize_layouts(layouts, parents, programs)
-    result = {'file_types': {'0':'Sparsity','2':'DM','4':'Linsol','5':'Function','6':'GenericType','7':'casadi_int','8':'double','9':'std::string','10':'std::vector<Sparsity>','12':'std::vector<DM>','15':'std::vector<Function>','16':'std::vector<GenericType>','17':'std::vector<casadi_int>','18':'std::vector<double>','19':'std::vector<std::string>'}, 'types': programs, 'version':1,'layouts':dict(sorted(layouts.items()))}
+    result = {'writer_layouts': writer, 'file_types': {'0':'Sparsity','2':'DM','4':'Linsol','5':'Function','6':'GenericType','7':'casadi_int','8':'double','9':'std::string','10':'std::vector<Sparsity>','12':'std::vector<DM>','15':'std::vector<Function>','16':'std::vector<GenericType>','17':'std::vector<casadi_int>','18':'std::vector<double>','19':'std::vector<std::string>'}, 'types': programs, 'version':1,'layouts':dict(sorted(layouts.items()))}
     # Expression files store ordered dependencies before the expression root(s).
     for tag, kind, prefix in [(1, 'MX', 'Function'), (3, 'SX', 'Function'),
                               (11, 'std::vector<MX>', 'Function'),
@@ -654,7 +767,99 @@ def compact_bindings(reader):
         bind = field.get('bind')
         if bind and not any(bind in expression for expression in expressions):
             del field['bind']
+    def defaults(value):
+        if isinstance(value, list):
+            value[:] = [v for v in value if not (isinstance(v, dict) and v.get('op') == 'assign'
+                        and not any(re.search(r'\b'+re.escape(v['bind'])+r'\b', e) for e in expressions))]
+            for item in value: defaults(item)
+        elif isinstance(value, dict):
+            for item in value.values(): defaults(item)
+    defaults(reader)
     return reader
+
+
+def at_version(steps, versions):
+    """Specialize a layout to fixed class versions, dropping defaults and untaken branches."""
+    def value(operand):
+        op = operand[0]
+        if op == 'literal': return operand[1]
+        if op == 'version': return versions.get(operand[1])
+        if op in ('field', 'parameter', 'length', 'concat', 'next'): return None
+        args = [value(a) for a in operand[1:]]
+        if op == 'not': return None if args[0] is None else not args[0]
+        if op == 'and' and False in args or op == 'or' and True in args: return op == 'or'
+        if None in args: return None
+        a, b = args
+        return {'and': lambda: a and b, 'or': lambda: a or b, 'equal': lambda: a == b,
+                'not_equal': lambda: a != b, 'less': lambda: a < b, 'less_equal': lambda: a <= b,
+                'greater': lambda: a > b, 'greater_equal': lambda: a >= b}[op]()
+    result = []
+    for step in steps:
+        op = step['op']
+        if op == 'assign': continue
+        if op == 'version':
+            result.append({k: v for k, v in step.items() if k != 'minimum'})
+        elif op == 'if':
+            taken = value(step['condition'])
+            if taken is None:
+                result.append({**step, 'body': at_version(step['body'], versions),
+                               **({'else': at_version(step['else'], versions)} if 'else' in step else {})})
+            else:
+                result += at_version(step['body'] if taken else step.get('else', []), versions)
+        elif op == 'repeat':
+            result.append({**step, 'body': at_version(step['body'], versions)})
+        elif op == 'select':
+            result.append({**step, 'cases': {k: at_version(v, versions) for k, v in step['cases'].items()}})
+        else:
+            result.append(step)
+    return tidy(result)
+
+
+def check_readers(reader, writers, class_versions):
+    """A layout derived from a deserializer must read exactly what the writer writes today."""
+    current = {name: max(v) for name, v in class_versions.items()}
+    mismatches = [name for name, steps in writers.items()
+                  if at_version(reader['layouts'][name], current) != steps]
+    if mismatches:
+        raise ValueError('Deserializer and serializer disagree at the current version: '+', '.join(sorted(mismatches)))
+    # A layout may only branch on the versions it reads itself.
+    def visit(value, own, layout):
+        if isinstance(value, dict):
+            if value.get('op') == 'version': own.add(value['name'])
+            for item in value.values(): visit(item, own, layout)
+        elif isinstance(value, list):
+            if len(value) == 2 and value[0] == 'version' and value[1] not in own:
+                raise ValueError(layout+' branches on the version of '+value[1])
+            for item in value: visit(item, own, layout)
+    for name, steps in reader['layouts'].items():
+        visit(steps, set(), name)
+
+
+def field_versions(reader, readable):
+    """Fields of versioned layouts that only some readable versions carry, for tools; readers ignore it."""
+    def fields(value, out):
+        if isinstance(value, dict):
+            if value.get('op') == 'field' and value.get('name'): out.add(value['name'])
+            for item in value.values(): fields(item, out)
+        elif isinstance(value, list):
+            for item in value: fields(item, out)
+        return out
+    result = {}
+    for cls, versions in readable.items():
+        steps = reader['layouts'].get(cls+'::serialize_body')
+        if len(versions) < 2 or steps is None: continue
+        present = {}
+        for v in versions:
+            specialized = at_version(steps, {cls: v})
+            # A version the deserializer refuses carries no fields.
+            if any(step['op'] == 'unsupported' for step in specialized): continue
+            present[v] = fields(specialized, set())
+        readable_versions = sorted(present)
+        partial = {name: [v for v in readable_versions if name in present[v]]
+                   for name in set().union(*present.values())}
+        partial = {name: vs for name, vs in partial.items() if vs != readable_versions}
+        if partial: result[cls] = dict(sorted(partial.items()))
+    return result
 
 
 def extract_record(body, decls, stream):
@@ -767,6 +972,12 @@ def type_programs(layouts, parents, functions, mx, sx, generic, ops, plugins):
                 cases[key] = body(layout.removesuffix('::serialize_type'))
         if not cases: raise ValueError('No serializer variants for '+op)
         mx_cases[str(ops[op])] = [field(name,field_type,'subtype'), select('subtype',cases)]
+    # Before 3.8, Multiplication wrote a bool and no BLAS field; Multiplication::deserialize
+    # tells the formats apart by the upcoming field (debug) or a bool-valued next byte.
+    mx_cases[str(ops['OP_MTIMES'])] = [{'op':'if',
+        'condition':['next',['literal','Multiplication::dense'],['literal','bool']],
+        'body':[field('Multiplication::dense','bool'), call('MXNode::serialize_body')],
+        'else':mx_cases[str(ops['OP_MTIMES'])]}]
     constants={str(ord(c)):[call('MXNode::serialize_body')] for c in ['0','1','m']}
     constants[str(ord('z'))]=[]
     for char,typ in [('D','double'),('I','casadi_int')]:

@@ -147,7 +147,7 @@ function(wasmjs_finalize_plugins wasm_dir)
 
   # Built-in plugins have no additional platform requirements.
   foreach(_entry
-      "integrator::rk" "integrator::collocation"
+      "integrator::rk" "integrator::collocation" "integrator::rosenbrock" "integrator::erk"
       "conic::qrqp" "conic::ipqp" "conic::nlpsol"
       "nlpsol::sqpmethod" "nlpsol::qrsqp" "nlpsol::scpgen" "nlpsol::feasiblesqpmethod"
       "linsol::qr" "linsol::ldl" "linsol::tridiag" "linsol::lsqr" "linsol::symbolicqr"

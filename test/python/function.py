@@ -1417,6 +1417,29 @@ class Functiontests(casadiTestCase):
       if r is not None:
         self.checkarray(m,r)
 
+  def test_bspline_even_degree(self):
+    # issue #3449
+    import scipy.interpolate
+    x = np.linspace(0,3,12)
+    y = np.sin(x)
+    ref = scipy.interpolate.make_interp_spline(x, y, k=2)
+    LUT = ca.interpolant('LUT','bspline',[x],y,{"degree":[2]})
+    for xe in [0,0.1,0.33,1.7,2.95,3]:
+      self.checkarray(LUT(xe), ref(xe), digits=10)
+    self.check_codegen(LUT, [0.2])
+    for k in [4,6]:
+      LUT = ca.interpolant('LUT','bspline',[x],y,{"degree":[k]})
+      self.checkarray(LUT(ca.DM(x).T), ca.DM(y).T, digits=10)
+      self.checkarray(LUT(1.234), np.sin(1.234), digits=4)
+    # 2D, mixed even/odd degrees
+    xg = np.linspace(0,1,6)
+    yg = np.linspace(0,2,7)
+    [X,Y] = np.meshgrid(xg,yg,indexing='ij')
+    V = np.cos(X)*Y
+    LUT = ca.interpolant('LUT','bspline',[xg,yg],V.ravel(order='F'),{"degree":[2,3]})
+    for i,j in [(0,0),(2,3),(5,6),(4,1)]:
+      self.checkarray(LUT(ca.vertcat(xg[i],yg[j])), V[i,j], digits=10)
+
   def test_Callback_Jacobian(self):
     x = ca.MX.sym("x")
     y = ca.MX.sym("y")
@@ -2122,6 +2145,24 @@ class Functiontests(casadiTestCase):
     self.check_serialize(f,inputs=[0.2,0.333])
 
 
+  def test_bspline_repeated_knots(self):
+    # issue #3643: evaluation exactly at a repeated interior knot
+    import scipy.interpolate
+    np.random.seed(0)
+    for degree, knots in [(3, [0,0,0,0,1,1,2,3,3,3,4,4,4,4]), (2, [0,0,0,1,1,2,2,3,3,3])]:
+      n = len(knots)-degree-1
+      c = np.random.random(n)
+      ref = scipy.interpolate.BSpline(np.array(knots,dtype=float), c, degree)
+      x = ca.MX.sym("x")
+      C = ca.MX.sym("C",n)
+      f = ca.Function('f',[x],[ca.bspline(x,ca.DM(c),[knots],[degree],1)])
+      F = ca.Function('F',[x,C],[ca.bspline(x,C,[knots],[degree],1)])
+      for xe in np.arange(0,knots[-1]+0.25,0.5):
+        self.checkarray(f(xe), ref(xe), digits=12)
+        self.checkarray(F(xe,c), ref(xe), digits=12)
+      self.check_codegen(f,inputs=[2])
+      self.check_codegen(F,inputs=[3,c])
+
   def test_parametric_bspline(self):
     knots = [[0,0,0,0,0.2,0.5,0.8,1,1,1,1],[0,0,0,0.1,0.5,0.9,1,1,1]]
     x=ca.MX.sym("x",2)
@@ -2509,6 +2550,18 @@ class Functiontests(casadiTestCase):
     cg.add(ca.Function("other", [x], [2*x]))
     self.assertIn("wrapper", cg.dump())
 
+  @requires_nlpsol("ipopt")
+  @requiresPlugin(ca.Importer,"shell")
+  def test_generate_dependencies_jit(self):
+    if not args.run_slow: return
+    x = ca.MX.sym("x",2)
+    solver = ca.nlpsol("solver","ipopt",{"x":x,"f":ca.sumsqr(x),"g":x[0]+x[1]-10},
+                       {"jit":True,"compiler":"shell","print_time":False,"ipopt.print_level":0})
+    solver.generate_dependencies("generate_dependencies_jit.c")
+    compiler = ca.Importer("generate_dependencies_jit.c", "shell")
+    for name in ["nlp_f","nlp_g"]:
+      self.checkfunction_light(solver.get_function(name), ca.external(name, compiler), inputs=[ca.DM([1,2]),0])
+
   @requiresPlugin(ca.Importer,"shell")
   def test_jit_directory(self):
   
@@ -2812,8 +2865,18 @@ class Functiontests(casadiTestCase):
           records = [json.loads(line) for line in stream]
         self.assertEqual(records[-2]["values"], [["inf"], ["-inf"], ["nan"]])
 
+  def graph_bundle(self, path):
+    import json
+    with open(path) as stream:
+      text = stream.read()
+    if path.endswith(".html"):
+      match = re.search(r'<script id="graph-data" type="application/json">(.*?)</script>', text, re.S)
+      assert match is not None
+      text = match.group(1)
+    return json.loads(text)
+
   def test_export_graph(self):
-    self.message("HTML graph export preserves instruction dependencies despite work-slot reuse")
+    self.message("HTML graph export embeds the serialized Function, consistent with dump_trace")
     import json
     for X in [ca.SX, ca.MX]:
       with tempfile.TemporaryDirectory() as directory:
@@ -2822,36 +2885,36 @@ class Functiontests(casadiTestCase):
                         {"dump_trace": True, "dump_dir": directory})
         path = os.path.join(directory, "graph.html")
         f.export_graph(path)
-        with open(path) as stream:
-          html = stream.read()
-        match = re.search(r'<script id="graph-data" type="application/json">(.*?)</script>', html, re.S)
-        assert match is not None
-        model = json.loads(match.group(1))
-        self.assertEqual(model["name"], "graph")
-        self.assertEqual(model["type"], X.__name__ + "Function")
-        self.assertEqual(len(model["nodes"]), f.n_instructions())
-        by_op = {n["op"]: n["id"] for n in model["nodes"]}
-        self.assertEqual({(e["from"], e["to"]) for e in model["edges"]},
-                         {(by_op[ca.OP_INPUT], by_op[ca.OP_SQ]),
-                          (by_op[ca.OP_INPUT], by_op[ca.OP_ADD]),
-                          (by_op[ca.OP_SQ], by_op[ca.OP_ADD]),
-                          (by_op[ca.OP_ADD], by_op[ca.OP_OUTPUT])})
+        bundle = self.graph_bundle(path)
+        self.assertEqual(bundle["format"], "casadi_viz")
+        self.assertEqual(bundle["version"], 1)
+        self.assertEqual(bundle["view"], "function")
+        self.assertEqual(bundle["casadi_version"], ca.CasadiMeta.version())
+        self.assertNotIn("nodes", bundle)
+        restored = ca.StringDeserializer(bundle["source"]).unpack()
+        self.assertEqual(restored.name(), "graph")
+        self.assertEqual(restored.class_name(), X.__name__ + "Function")
+        self.assertEqual(restored.name_in(), ["state"])
+        self.assertEqual(restored.name_out(), ["result"])
+        self.assertEqual([restored.instruction_id(k) for k in range(restored.n_instructions())],
+                         [f.instruction_id(k) for k in range(f.n_instructions())])
         f(3)
         with open(os.path.join(directory, "graph.000000.trace.jsonl")) as stream:
           records = [json.loads(line) for line in stream]
+        self.assertEqual(records[0]["function"], restored.name())
+        self.assertEqual(records[0]["type"], restored.class_name())
         for record in records:
           if "instruction" not in record: continue
-          node = model["nodes"][record["instruction"]]
-          self.assertEqual(record["op"], node["op"])
-          self.assertEqual(len(record["values"]), len(node[record["phase"]]))
+          self.assertEqual(record["op"], restored.instruction_id(record["instruction"]))
         self.assertEqual(records[-2]["values"], [[12]])
+        with open(path) as stream:
+          html = stream.read()
         match = re.search(r'<script id="viz-config" type="application/json">(.*?)</script>', html, re.S)
         assert match is not None
         config = json.loads(match.group(1))
         self.assertEqual(config["viewer_url"], 'https://unpkg.com/@casadi/casadi-viz@'
                          + '.'.join(ca.CasadiMeta.version().split('.')[:2]) + '/dist/index.js')
         self.assertIsNone(config["runtime"])
-        self.assertEqual(model["casadi_version"], ca.CasadiMeta.version())
 
         with self.assertInException("Invalid export_graph direction"):
           f.export_graph(path, {"direction": "sideways"})
@@ -2859,7 +2922,7 @@ class Functiontests(casadiTestCase):
           f.export_graph(path, {"unknown": True})
 
   def test_export_graph_calls(self):
-    self.message("HTML graph export preserves multi-output call ports and sparse metadata")
+    self.message("Graph exports keep called Functions, by identity, and sparse metadata")
     import json
     for X in [ca.SX, ca.MX]:
       with tempfile.TemporaryDirectory() as directory:
@@ -2869,62 +2932,76 @@ class Functiontests(casadiTestCase):
         f = ca.Function("calls", [x], [a*b])
         path = os.path.join(directory, "calls.html")
         f.export_graph(path, {"direction": "TB"})
-        with open(path) as stream:
-          html = stream.read()
-        match = re.search(r'<script id="graph-data" type="application/json">(.*?)</script>', html, re.S)
-        assert match is not None
-        model = json.loads(match.group(1))
-        call = next(n for n in model["nodes"] if n["op"] == ca.OP_CALL)
-        self.assertEqual(call["label"], "pair")
-        self.assertEqual(model["functions"][call["callee"]-1]["name"], "pair")
-        self.assertEqual(model["direction"], "TB")
-        self.assertEqual({e["output"] for e in model["edges"] if e["from"] == call["id"]}, {0, 1})
+        bundle = self.graph_bundle(path)
+        self.assertEqual(bundle["direction"], "TB")
+        restored = ca.StringDeserializer(bundle["source"]).unpack()
+        self.assertEqual(restored.get_function(), ["pair"])
+        self.checkarray(restored(3), f(3))
+        first = ca.Function("inner", [x], [x+1], {"never_inline": True})
+        second = ca.Function("inner", [x], [x-2], {"never_inline": True})
+        middle = ca.Function("middle", [x], [first(x)+second(x)], {"never_inline": True})
+        f = ca.Function("nested", [x], [middle(x)+first(x+3)])
+        restored = ca.StringDeserializer(json.loads(f.export_graph())["source"]).unpack()
+        self.assertEqual(sorted(g.name() for g in restored.find_functions()), ["inner", "inner", "middle"])
+        self.checkarray(restored(1.5), f(1.5))
         x = X.sym("x", ca.Sparsity.lower(3))
         f = ca.Function("sparse_graph", [x], [2*x])
         f.export_graph(path)
-        with open(path) as stream:
-          match = re.search(r'<script id="graph-data" type="application/json">(.*?)</script>', stream.read(), re.S)
-          assert match is not None
-          model = json.loads(match.group(1))
-        sp = model["inputs"][0]["sparsity"]
-        self.assertEqual(sp["shape"], [3, 3])
-        self.assertEqual(sp["colind"], [0, 3, 5, 6])
-        self.assertEqual(sp["row"], [0, 1, 2, 1, 2, 2])
+        restored = ca.StringDeserializer(self.graph_bundle(path)["source"]).unpack()
+        self.assertTrue(restored.sparsity_in(0) == ca.Sparsity.lower(3))
+
+  def test_export_graph_helpers(self):
+    self.message("Graph exports accept any serializable Function, with its helper Functions")
+    with tempfile.TemporaryDirectory() as directory:
+      x, p = ca.MX.sym("x", 2), ca.MX.sym("p")
+      solver = ca.nlpsol("solver", "sqpmethod", {"x": x, "p": p, "f": (x[0]-p)**2+x[1]**2,
+                         "g": x[0]+x[1]}, {"qpsol": "qrqp", "print_header": False,
+                         "print_iteration": False, "print_time": False,
+                         "qpsol_options": {"print_iter": False, "print_header": False}})
+      s = ca.SX.sym("s")
+      mapped = ca.Function("f", [s], [ca.sin(s)*s]).map(4)
+      for f in [solver, mapped]:
+        for extension in [".html", ".casadi_viz"]:
+          path = os.path.join(directory, "helpers"+extension)
+          f.export_graph(path)
+          bundle = self.graph_bundle(path)
+          self.assertEqual(bundle["view"], "function")
+          restored = ca.StringDeserializer(bundle["source"]).unpack()
+          self.assertEqual(restored.class_name(), f.class_name())
+          self.assertEqual(restored.get_function(), f.get_function())
+        with self.assertInException("DOT export requires an SXFunction or MXFunction"):
+          f.export_graph(os.path.join(directory, "helpers.dot"))
+      self.assertIn("nlp_hess_l", solver.get_function())
 
   def test_export_graph_expressions(self):
-    self.message("SX/MX expressions and lists export with expression view by default")
-    import json
+    self.message("Expression and Function exports default to expression and function views")
     with tempfile.TemporaryDirectory() as directory:
       path = os.path.join(directory, "expressions.html")
-      def model():
-        with open(path) as stream:
-          match = re.search(r'<script id="graph-data" type="application/json">(.*?)</script>', stream.read(), re.S)
-          assert match is not None
-          return json.loads(match.group(1))
       for X in [ca.SX, ca.MX]:
         x, y = X.sym("actual_x", 2), X.sym("actual_y", 2)
         for expressions in [x+y, [x+y, x-y], [x[0], y[0]], [X(7), X.zeros(0, 2)]]:
           ca.export_graph(expressions, path)
-          graph = model()
-          self.assertEqual(graph["view"], "expression")
+          self.assertEqual(self.graph_bundle(path)["view"], "expression")
         ca.export_graph([x+y, x-y], path, {"view": "function"})
-        self.assertEqual(model()["view"], "function")
+        self.assertEqual(self.graph_bundle(path)["view"], "function")
         f = ca.Function("renamed", [x, y], [x+y, x-y], ["left", "right"], ["sum", "difference"])
         f.export_graph(path)
-        graph = model()
-        self.assertEqual(graph["view"], "function")
-        self.assertEqual([p["name"] for p in graph["inputs"]], ["left", "right"])
-        self.assertEqual([p["name"] for p in graph["outputs"]], ["sum", "difference"])
-        symbols = {n["symbol"] for n in graph["nodes"] if n["kind"] == "input"}
-        self.assertEqual(symbols, {"actual_x_0", "actual_x_1", "actual_y_0", "actual_y_1"} if X is ca.SX else {"actual_x", "actual_y"})
+        bundle = self.graph_bundle(path)
+        self.assertEqual(bundle["view"], "function")
+        restored = ca.StringDeserializer(bundle["source"]).unpack()
+        self.assertEqual(restored.name_in(), ["left", "right"])
+        self.assertEqual(restored.name_out(), ["sum", "difference"])
+        inputs = restored.sx_in() if X is ca.SX else restored.mx_in()
+        self.assertEqual({str(v) for v in ca.symvar(ca.veccat(*inputs))},
+                         {"actual_x_0", "actual_x_1", "actual_y_0", "actual_y_1"} if X is ca.SX else {"actual_x", "actual_y"})
         f.export_graph(path, {"view": "expression"})
-        self.assertEqual(model()["view"], "expression")
+        self.assertEqual(self.graph_bundle(path)["view"], "expression")
         with self.assertInException("Invalid export_graph view"):
           ca.export_graph(x, path, {"view": "other"})
       ca.export_graph([], path)
 
   def test_export_graph_string(self):
-    self.message("Filename-free graph exports return the same JSON bundle as file exports")
+    self.message("Filename-free graph exports return the same bundle as file exports")
     import json
     for X in [ca.SX, ca.MX]:
       with tempfile.TemporaryDirectory() as directory:
@@ -2935,15 +3012,16 @@ class Functiontests(casadiTestCase):
         self.assertIsInstance(default, str)
         self.assertEqual(default, f.export_graph({}))
         self.assertEqual(json.loads(default)["view"], "function")
-        self.assertEqual(len(json.loads(default)["functions"]), 1)
         for opts in [{}, {"include_functions": False, "view": "expression", "direction": "LR"}]:
           text = f.export_graph(opts)
           path = os.path.join(directory, "graph.casadi_viz")
           f.export_graph(path, opts)
           with open(path) as stream:
             self.assertEqual(text+"\n", stream.read())
-          model = json.loads(text)
-          self.assertEqual(len(model["functions"]), 1 if opts.get("include_functions", True) else 0)
+          bundle = json.loads(text)
+          self.assertEqual(bundle["include_functions"], opts.get("include_functions", True))
+          self.assertEqual(bundle["direction"], opts.get("direction", "TB"))
+          self.assertEqual(bundle["source"], json.loads(default)["source"])
         self.assertEqual(default, f.export_graph({"viz_js": "not-needed.js"}))
         for expressions in [x, [x], [x[0]+x[1], x[0]-x[1]], [X(2)], []]:
           text = ca.export_graph(expressions)
@@ -2959,8 +3037,7 @@ class Functiontests(casadiTestCase):
           f.export_graph({"unknown": True})
 
   def test_export_graph_formats(self):
-    self.message("Graph formats preserve metadata and optionally include called functions")
-    import json
+    self.message("HTML embeds the .casadi_viz bundle; DOT stays a standalone instruction graph")
     import shutil
     import subprocess
     for X in [ca.SX, ca.MX]:
@@ -2970,31 +3047,16 @@ class Functiontests(casadiTestCase):
         f = ca.Function("root", [x], [child(x)/x], ["a"], ["result"])
         base = os.path.join(directory, "graph")
         f.export_graph(base+".html")
-        with open(base+".html") as stream:
-          match = re.search(r'<script id="graph-data" type="application/json">(.*?)</script>', stream.read(), re.S)
-          assert match is not None
-          embedded = json.loads(match.group(1))
+        embedded = self.graph_bundle(base+".html")
         f.export_graph(base+".casadi_viz", {"viz_js": "not-needed.js"})
-        with open(base+".casadi_viz") as stream:
-          bundle = json.load(stream)
+        bundle = self.graph_bundle(base+".casadi_viz")
         self.assertEqual(bundle, embedded)
-        self.assertEqual(bundle["format"], "casadi_viz")
         self.assertEqual(bundle["casadi_version"], ca.CasadiMeta.version())
-        self.assertEqual(len(bundle["functions"]), 1)
         for extension in [".html", ".casadi_viz"]:
           f.export_graph(base+extension, {"include_functions": False})
-          with open(base+extension) as stream:
-            text = stream.read()
-          if extension == ".html":
-            match = re.search(r'<script id="graph-data" type="application/json">(.*?)</script>', text, re.S)
-            assert match is not None
-            text = match.group(1)
-          reduced = json.loads(text)
-          self.assertEqual(reduced["functions"], [])
-          calls = [n for n in reduced["nodes"] if n["kind"] == "call"]
-          self.assertTrue(calls)
-          self.assertTrue(all("callee" not in n for n in calls))
-          self.assertEqual(reduced["edges"], bundle["edges"])
+          reduced = self.graph_bundle(base+extension)
+          self.assertFalse(reduced["include_functions"])
+          self.assertEqual(reduced["source"], bundle["source"])
         for view in ["function", "expression"]:
           f.export_graph(base+".dot", {"view": view, "viz_js": "not-needed.js"})
           with open(base+".dot") as stream:
@@ -3014,94 +3076,15 @@ class Functiontests(casadiTestCase):
           with self.assertInException("Supported extensions: .html, .dot, .casadi_viz"):
             f.export_graph(base+extension)
         ca.export_graph([x[0]+x[1], x[0]-x[1]], base+".casadi_viz")
-        with open(base+".casadi_viz") as stream:
-          self.assertEqual(json.load(stream)["view"], "expression")
-
-  def test_export_graph_nested(self):
-    self.message("Nested graph exports deduplicate shared functions by identity, preserving namesakes")
-    import json
-    for X in [ca.SX, ca.MX]:
-      with tempfile.TemporaryDirectory() as directory:
-        x = X.sym("x")
-        first = ca.Function("inner", [x], [x+1], {"never_inline": True})
-        second = ca.Function("inner", [x], [x-2], {"never_inline": True})
-        middle = ca.Function("middle", [x], [first(x)+second(x)], {"never_inline": True})
-        f = ca.Function("nested", [x], [middle(x)+first(x+3)])
-        path = os.path.join(directory, "nested.html")
-        f.export_graph(path)
-        with open(path) as stream:
-          match = re.search(r'<script id="graph-data" type="application/json">(.*?)</script>', stream.read(), re.S)
-          assert match is not None
-          model = json.loads(match.group(1))
-        graphs = [model]+model["functions"]
-        self.assertEqual(len(graphs), 4)
-        self.assertEqual([g["name"] for g in graphs].count("inner"), 2)
-        root_calls = [n for n in model["nodes"] if n["kind"] == "call"]
-        mid = next(g for g in graphs if g["name"] == "middle")
-        mid_calls = [n["callee"] for n in mid["nodes"] if n["kind"] == "call"]
-        self.assertEqual(len(set(mid_calls)), 2)
-        shared = next(n["callee"] for n in root_calls if n["display"] == "inner")
-        self.assertIn(shared, mid_calls)
-        self.assertEqual({tuple(n["constants"]) for i in mid_calls for n in graphs[i]["nodes"] if n["kind"] == "constant"},
-                         {("1",), ("2",)})
+        self.assertEqual(self.graph_bundle(base+".casadi_viz")["view"], "expression")
         free = X.sym("free")
         f = ca.Function("free_graph", [x], [x+free], {"allow_free": True})
-        f.export_graph(path)
-        with open(path) as stream:
-          match = re.search(r'<script id="graph-data" type="application/json">(.*?)</script>', stream.read(), re.S)
-          assert match is not None
-          model = json.loads(match.group(1))
-        self.assertEqual([n["display"] for n in model["nodes"] if n["kind"] == "symbol"], ["free"])
-
-  def test_export_graph_details(self):
-    self.message("Graph metadata distinguishes operators, constants, matrix entries, and indexing")
-    import json
-    with tempfile.TemporaryDirectory() as directory:
-      path = os.path.join(directory, "graph.html")
-      def exported(f):
-        f.export_graph(path)
-        with open(path) as stream:
-          match = re.search(r'<script id="graph-data" type="application/json">(.*?)</script>', stream.read(), re.S)
-          assert match is not None
-          return json.loads(match.group(1))
-      for X in [ca.SX, ca.MX]:
-        x, y = X.sym("x"), X.sym("y")
-        model = exported(ca.Function("details", [x, y], [(x-y)/(x+y)+7]))
-        self.assertEqual(model["direction"], "TB")
-        nodes = {n["op"]: n for n in model["nodes"]}
-        self.assertEqual(nodes[ca.OP_SUB]["display"], "-")
-        self.assertTrue(nodes[ca.OP_SUB]["binary"])
-        self.assertTrue(nodes[ca.OP_DIV]["binary"])
-        self.assertTrue(nodes[ca.OP_SUB]["ordered"])
-        self.assertFalse(nodes[ca.OP_ADD]["ordered"])
-        self.assertEqual(nodes[ca.OP_CONST]["constants"], ["7"])
-        self.assertEqual(nodes[ca.OP_CONST]["display"], "7")
-        x = X.sym("x", ca.Sparsity.lower(3))
-        model = exported(ca.Function("matrix_details", [x], [x*x]))
-        if X is ca.SX:
-          for kind in ["input", "output"]:
-            self.assertEqual({(n["io_index"], n["io_offset"]) for n in model["nodes"] if n["kind"] == kind},
-                             {(0, k) for k in range(6)})
-      x = ca.MX.sym("x", ca.Sparsity.lower(3))
-      model = exported(ca.Function("index_details", [x], [x.nz[[4, 0, 2]]]))
-      node = next(n for n in model["nodes"] if n["op"] == ca.OP_GETNONZEROS)
-      self.assertEqual(node["mapping"], [4, 0, 2])
-      self.assertEqual(node["mapping_kind"], "extract")
-      self.assertEqual(node["display"], "getnonzeros")
-      self.assertEqual(node["input_names"], ["source"])
-      self.assertEqual(node["outputs"][0]["shape"], [3, 1])
-      values = ca.MX.sym("values", 2)
-      assigned = ca.MX(x)
-      assigned.nz[[4, 0]] = values
-      model = exported(ca.Function("assign_details", [x, values], [assigned]))
-      node = next(n for n in model["nodes"] if n["op"] == ca.OP_SETNONZEROS)
-      self.assertEqual(node["mapping_kind"], "assign")
-      self.assertEqual(node["mapping"], [4, 0])
-      self.assertEqual(node["display"], "setnonzeros")
-      self.assertEqual(node["input_names"], ["base", "values"])
+        f.export_graph(base+".casadi_viz")
+        restored = ca.StringDeserializer(self.graph_bundle(base+".casadi_viz")["source"]).unpack()
+        self.assertEqual([str(v) for v in (restored.free_sx() if X is ca.SX else restored.free_mx())], ["free"])
 
   def test_export_graph_escaping(self):
-    self.message("Graph metadata and optional local Viz.js stay safely embedded in HTML")
+    self.message("Serialized graphs and optional local Viz.js stay safely embedded in HTML")
     import json
     with tempfile.TemporaryDirectory() as directory:
       x = ca.MX.sym("x")
@@ -3116,15 +3099,11 @@ class Functiontests(casadiTestCase):
       with open(path) as stream:
         html = stream.read()
       self.assertNotIn(name, html)
-      match = re.search(r'<script id="graph-data" type="application/json">(.*?)</script>', html, re.S)
-      assert match is not None
-      model = json.loads(match.group(1))
+      restored = ca.StringDeserializer(self.graph_bundle(path)["source"]).unpack()
       match = re.search(r'<script id="viz-config" type="application/json">(.*?)</script>', html, re.S)
       assert match is not None
       config = json.loads(match.group(1))
-      self.assertEqual(model["inputs"][0]["name"], name)
-      self.assertEqual(config["runtime"]["source"], source)
-      self.assertEqual(config["viewer_url"], "https://example.com/viewer.js?a=</script>")
+      self.assertEqual(restored.name_in(0), name)
 
   def test_print(self):
     import re

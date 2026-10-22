@@ -62,6 +62,47 @@ integrators.append(("collocation",["dae","ode"],{"rootfinder":"newton","number_o
 
 integrators.append(("rk",["ode"],{"number_of_finite_elements": 1000,"simplify":True}))
 
+integrators.append(("rosenbrock",["dae","ode"],{"abstol": 1e-12,"reltol":1e-12}))
+
+# Integrators with zero-crossing events (option transition), by feature: events at all, of
+# DAEs (also sensitivities), adjoints, code generation; digits of the results. The event
+# handling of Integrator (cvodes, idas, rk, collocation) gets forward sensitivities through
+# events of a DAE wrong: the rates after the transition use inconsistent algebraic states
+event_integrators = []
+
+for plugin in ["cvodes", "idas"]:
+  try:
+    ca.load_integrator(plugin)
+  except:
+    continue
+  event_integrators.append((plugin, {"abstol": 1e-12, "reltol": 1e-12, "quad_err_con": True,
+    "max_event_iter": 20}, {"events": True, "events_dae": False,
+    "events_adjoint": False, "codegen": False, "digits": 5}))
+
+event_integrators.append(("rk", {"number_of_finite_elements": 100, "max_event_iter": 20},
+  {"events": True, "events_dae": False, "events_adjoint": False, "codegen": False, "digits": 7}))
+
+event_integrators.append(("collocation", {"number_of_finite_elements": 20, "max_event_iter": 20},
+  {"events": True, "events_dae": False, "events_adjoint": False, "codegen": False, "digits": 7}))
+
+for plugin, options in [("erk", {}), ("erk", {"method": "rk4", "step_size": 0.002}),
+                        ("rosenbrock", {}), ("rosenbrock", {"step_size": 0.002})]:
+  event_integrators.append((plugin, dict(options, abstol=1e-11, reltol=1e-11, max_tape_steps=600),
+    {"events": True, "events_dae": plugin == "rosenbrock", "events_adjoint": True,
+     "codegen": True, "digits": 8}))
+
+def bounce_transition(nz=0):
+  # Bouncing ball: the velocity is reversed and scaled by the restitution p; z passes through
+  x, z, p = ca.SX.sym("x", 2), ca.SX.sym("z", nz), ca.SX.sym("p")
+  index, t, u = ca.SX.sym("index"), ca.SX.sym("t"), ca.SX(0, 1)
+  return ca.Function("transition", [index, t, x, z, p, u], [ca.vertcat(x[0], -p*x[1]), z],
+    ["index", "t", "x", "z", "p", "u"], ["post_x", "post_z"])
+
+def fd_jacobian(G, v0, h=1e-6):
+  # Central differences of the first output of G at v0
+  v0 = ca.DM(v0)
+  f = lambda v: (lambda r: r[0] if isinstance(r, (list, tuple)) else r)(G(v))
+  return ca.horzcat(*[(f(v0 + h*e) - f(v0 - h*e))/(2*h) for e in ca.horzsplit(ca.DM.eye(v0.numel()))])
 
 print("Will test these integrators:")
 for cl, t, options in integrators:
@@ -1544,6 +1585,37 @@ class Integrationtests(casadiTestCase):
     self.assertTrue(integrator.get_function('jacF').is_a("SXFunction"))
     self.checkarray(integrator.get_function('jacF')(x=1)["jac_ode_x"],1)
 
+  @requires_integrator("idas")
+  def test_idas_adjoint_zf_p(self):
+    # issue #4063: direct dependence of zf on p and u in reverse mode
+    x = ca.MX.sym('x'); z = ca.MX.sym('z'); p = ca.MX.sym('p'); u = ca.MX.sym('u')
+    for alg in [z-p*x-u**2, z-p*x]:
+      for ode, grid in [(-x, [1]), (-x+u, [1])]:
+        dae = {'x':x,'z':z,'p':p,'u':u,'ode':ode,'alg':alg}
+        F = ca.integrator('F','idas',dae,0,grid,{'abstol':1e-12,'reltol':1e-12})
+        P = ca.MX.sym('P'); U = ca.MX.sym('U',1,len(grid))
+        out = F(x0=2,z0=0,p=P,u=U)
+        e = ca.vertcat(ca.vec(out['zf']), ca.vec(out['xf']))
+        w = ca.vertcat(P,ca.vec(U))
+        J_fwd = ca.Function('J_fwd',[w],[ca.jacobian(e,w,{"helper_options":{"ad_weight":0}})])
+        J_rev = ca.Function('J_rev',[w],[ca.jacobian(e,w,{"helper_options":{"ad_weight":1}})])
+        v = ca.DM([0.5,0.3,0.7][:1+len(grid)])
+        self.checkarray(J_fwd(v), J_rev(v), digits=6)
+
+  @requires_integrator("cvodes")
+  def test_jit_fwd_factory(self):
+    # issue #4061
+    if not args.run_slow: return
+    x = ca.MX.sym('x')
+    dae = {'x': x, 'ode': -x}
+    opts = {'abstol':1e-10,'reltol':1e-10,'jit':True,'compiler':'shell'}
+    F = ca.integrator('F','cvodes',dae,0,[0.5,1],opts)
+    self.assertTrue(F.get_function('jacF').is_a('External'))
+    I_fwd = F.factory('I_fwd',['x0','fwd:x0'],['xf','fwd:xf'])
+    [xf, fwd_xf] = I_fwd(2.0,1.0)
+    self.checkarray(xf, 2*np.exp(-ca.DM([[0.5,1]])), digits=7)
+    self.checkarray(fwd_xf, np.exp(-ca.DM([[0.5,1]])), digits=7)
+
   def test_issue3371(self):
     # Regression test for https://github.com/casadi/casadi/issues/3371
     # FixedStepIntegrator::advance_noevent / impulseB used the trailing nz_
@@ -1635,6 +1707,646 @@ class Integrationtests(casadiTestCase):
       {"fwd_p": ca.DM([1.0])},
     ]
     cross_check(Iadj, base, seeds, "fwd-of-reverse-of-collocation")
+
+  def check_jacobian(self, out, v, v0, digits):
+    # Forward and adjoint Jacobians of out(v) at v0 agree
+    J_fwd = ca.Function("J", [v], [ca.jtimes(out, v, ca.MX.eye(v.numel()))])(v0)
+    J_adj = ca.Function("J", [v], [ca.jtimes(out, v, ca.MX.eye(out.numel()), True).T])(v0)
+    self.checkarray(J_fwd, J_adj, "fwd vs adj", digits=digits)
+
+  def check_hessian(self, obj, v, v0, digits):
+    # Hessian of obj(v) at v0: forward and adjoint mode over the forward and adjoint gradients
+    n = v.numel()
+    g_fwd = ca.jtimes(obj, v, ca.MX.eye(n)).T
+    g_adj = ca.jtimes(obj, v, ca.MX.ones(1, 1), True)
+    H = [ca.Function("H", [v], [h])(v0) for h in [ca.jtimes(g_fwd, v, ca.MX.eye(n)),
+         ca.jtimes(g_adj, v, ca.MX.eye(n)), ca.jtimes(g_fwd, v, ca.MX.eye(n), True).T,
+         ca.jtimes(g_adj, v, ca.MX.eye(n), True).T]]
+    for h in H[1:]: self.checkarray(H[0], h, "Hessian", digits=digits)
+    return H[0]
+
+  def test_reverse_grid_directions(self):
+    self.message("Several adjoint directions with several output times")
+    x = ca.SX.sym("x", 2)
+    p = ca.SX.sym("p")
+    dae = {"x": x, "p": p, "ode": ca.vertcat(x[1], -p*x[0]**3), "quad": x[0]**2}
+    for plugin, opts in [("cvodes", {"reltol": 1e-10, "abstol": 1e-10}),
+                         ("idas", {"reltol": 1e-10, "abstol": 1e-10}),
+                         ("rosenbrock", {"step_size": 0.125}),
+                         ("erk", {"method": "rk45", "reltol": 1e-8, "abstol": 1e-8})]:
+      if not ca.has_integrator(plugin): continue
+      F = ca.integrator("F", plugin, dae, 0, [0.5, 1.0], opts)
+      inputs = [ca.DM([0.3, -0.2]), ca.DM(), ca.DM(0.7), ca.DM(1, 0)]
+      inputs += [ca.DM(F.sparsity_in(i)) for i in range(4, F.n_in())]
+      outputs = list(F(*inputs))
+      seeds = [[ca.DM(F.sparsity_out(i), numpy.random.default_rng(10*d+i).random(F.nnz_out(i)))
+                for i in range(F.n_out())] for d in range(2)]
+      adj2 = F.reverse(2)(*(inputs + outputs + [ca.horzcat(seeds[0][i], seeds[1][i])
+                                               for i in range(F.n_out())]))
+      for d in range(2):
+        adj1 = F.reverse(1)(*(inputs + outputs + seeds[d]))
+        for i in range(F.n_in()):
+          if F.nnz_in(i) == 0: continue
+          self.checkarray(adj1[i], ca.horzsplit_n(adj2[i], 2)[d], plugin, digits=8)
+
+  @memory_heavy()
+  def test_events_sparsity(self):
+    self.message("zero-crossing events: dependencies through the transition")
+    g = 9.81
+    x = ca.SX.sym("x", 2)
+    p = ca.SX.sym("p")
+    # Bouncing ball: the restitution p enters the transition only, which also couples h and v
+    dae = {"x": x, "p": p, "ode": ca.vertcat(x[1], -g), "zero": x[0]}
+    grid = list(numpy.linspace(0.1, 4, 40))
+    for plugin, opts in [("rk", {"number_of_finite_elements": 100}),
+                         ("cvodes", {"abstol": 1e-12, "reltol": 1e-12})]:
+      if not ca.has_integrator(plugin): continue
+      F = ca.integrator("F", plugin, dae, 0, grid, dict(opts, transition=bounce_transition(),
+        event_tol=1e-12, max_event_iter=20))
+      v = ca.MX.sym("v", 3)
+      xf = F(x0=v[:2], p=v[2])["xf"][:, -1]
+      G = ca.Function("G", [v], [xf, ca.jacobian(xf, v)])
+      self.assertTrue(G.sparsity_out(1).is_dense())
+      v0 = ca.DM([2, 0.3, 0.8])
+      self.checkarray(G(v0)[1], fd_jacobian(G, v0), plugin, digits=5)
+
+  @memory_heavy()
+  @requires_integrator("idas")
+  def test_events_idas(self):
+    self.message("idas: zero-crossing events, also of a DAE")
+    g = 9.81
+    x = ca.SX.sym("x", 2)
+    z = ca.SX.sym("z")
+    p = ca.SX.sym("p")
+    # A single bounce from height 2 at rest, at sqrt(2*2/g), restitution p
+    grid = list(numpy.linspace(0.1, 1.5, 15))
+    tb = numpy.sqrt(4/g)
+    ub = 0.8*g*tb
+    h = [2 - g*tt**2/2 if tt < tb else ub*(tt - tb) - g*(tt - tb)**2/2 for tt in grid]
+    v = [-g*tt if tt < tb else ub - g*(tt - tb) for tt in grid]
+    ode = {"x": x, "p": p, "ode": ca.vertcat(x[1], -g), "zero": x[0]}
+    dae = {"x": x, "z": z, "p": p, "ode": ca.vertcat(z, -g), "alg": z - x[1], "zero": x[0]}
+    for problem, transition in [(ode, bounce_transition()), (dae, bounce_transition(1))]:
+      F = ca.integrator("F", "idas", problem, 0, grid, {"transition": transition,
+        "abstol": 1e-12, "reltol": 1e-12, "event_tol": 1e-12, "max_event_iter": 20})
+      r = F(x0=[2, 0], z0=0, p=0.8)
+      self.checkarray(r["xf"], ca.DM([h, v]), "xf", digits=7)
+
+  def test_reverse_over_adjoint_directions(self):
+    self.message("Derivatives of adjoint sensitivities with several directions (#3293)")
+    x = ca.SX.sym("x", 3)
+    p = ca.SX.sym("p", 2)
+    dae = {"x": x, "p": p, "ode": ca.vertcat(-p[0]*x[0], -p[1]*x[1]*x[0], -p[1]*x[2]**2),
+           "quad": x[0]*x[2]}
+    rng = numpy.random.default_rng(1)
+    rand = lambda sp: ca.DM(sp, rng.random(sp.nnz()))
+    for plugin, opts, digits in [("cvodes", {"reltol": 1e-12, "abstol": 1e-12}, 7),
+                                 ("idas", {"reltol": 1e-12, "abstol": 1e-12}, 7),
+                                 ("rosenbrock", {"step_size": 1./6}, 12),
+                                 ("rosenbrock", {"reltol": 1e-6, "abstol": 1e-6}, 11),
+                                 ("erk", {"step_size": 0.2}, 12),
+                                 ("erk", {"method": "rk45", "reltol": 1e-6, "abstol": 1e-6}, 11)]:
+      if not ca.has_integrator(plugin): continue
+      for grid in [[1.0], [0.5, 1.0]]:
+        F = ca.integrator("F", plugin, dae, 0, grid, opts)
+        # Adjoint sensitivities with two directions, and their derivatives
+        B = F.reverse(2)
+        inputs = [rand(B.sparsity_in(i)) for i in range(B.n_in())]
+        outputs = list(B(*inputs))
+        v = [rand(B.sparsity_in(i)) for i in range(B.n_in())]
+        w = [[rand(B.sparsity_out(i)) for i in range(B.n_out())] for d in range(2)]
+        fwd = B.forward(1)(*(inputs + outputs + v))
+        adj2 = B.reverse(2)(*(inputs + outputs + [ca.horzcat(w[0][i], w[1][i])
+                                                 for i in range(B.n_out())]))
+        for d in range(2):
+          adj = B.reverse(1)(*(inputs + outputs + w[d]))
+          self.checkarray(sum(float(ca.dot(w[d][i], fwd[i])) for i in range(B.n_out())),
+                          sum(float(ca.dot(adj[i], v[i])) for i in range(B.n_in())),
+                          plugin + " duality", digits=digits)
+          for i in range(B.n_in()):
+            if B.nnz_in(i) > 0:
+              self.checkarray(adj[i], ca.horzsplit_n(adj2[i], 2)[d], plugin, digits=digits)
+        # Jacobian, relying on the sparsity pattern, vs dense forward directional derivatives
+        vin = ca.MX.sym("v", sum(B.nnz_in(i) for i in range(B.n_in())))
+        args = ca.vertsplit(vin, [int(e) for e in numpy.cumsum([0] + [B.nnz_in(i) for i in range(B.n_in())])])
+        res = B(*[ca.MX(B.sparsity_in(i), args[i]) for i in range(B.n_in())])
+        vout = ca.vertcat(*[ca.vec(r.nz[:]) for r in res])
+        J = ca.Function("J", [vin], [ca.jacobian(vout, vin),
+                                     ca.jtimes(vout, vin, ca.MX.eye(vin.numel()))])
+        J_sp, J_dense = J(numpy.concatenate([e.nonzeros() for e in inputs]))
+        self.checkarray(J_dense, J_sp, plugin + " sparsity", digits=digits)
+
+  @memory_heavy()
+  def test_rosenbrock_order(self):
+    self.message("rosenbrock: order 5 on fixed meshes, ODE and index-1 DAE")
+    t = ca.SX.sym("t")
+    x = ca.SX.sym("x", 2)
+    z = ca.SX.sym("z")
+    dae = {"t": t, "x": x, "z": z, "ode": ca.vertcat(-z + 0.5*x[1], -x[0]*z + ca.sin(t)),
+           "alg": z**3 + z - x[0]**2*(1 + 0.5*ca.cos(t)), "quad": z*x[1]}
+    ref = ca.integrator("ref", "idas", dae, 0, 2, {"reltol": 1e-14, "abstol": 1e-14})(x0=[1, 0.5], z0=0.6)
+    err = []
+    for N in [8, 16, 32]:
+      F = ca.integrator("F", "rosenbrock", dae, 0, 2, {"step_size": 2./N})
+      r = F(x0=[1, 0.5], z0=0.6)
+      err.append(max(float(ca.norm_inf(r[k] - ref[k])) for k in ["xf", "zf", "qf"]))
+    for e0, e1 in zip(err[:-1], err[1:]):
+      self.assertGreater(numpy.log2(e0/e1), 4.6)
+
+  @memory_heavy()
+  def test_rosenbrock_ind(self):
+    self.message("rosenbrock: derivatives are exact derivatives of the scheme")
+    t = ca.SX.sym("t")
+    x = ca.SX.sym("x", 2)
+    z = ca.SX.sym("z")
+    p = ca.SX.sym("p", 2)
+    u = ca.SX.sym("u")
+    dae = {"t": t, "x": x, "z": z, "p": p, "u": u,
+           "ode": ca.vertcat(-z + p[0]*x[1] + u, -x[0]*z + p[1]*ca.sin(t)),
+           "alg": z**3 + z - x[0]**2*(1 + 0.5*ca.cos(t)), "quad": z*x[1] + p[1]*x[0]**2}
+    # Including an output at t0, with a seed on the consistent algebraic state there
+    for opts, grid in [(o, g) for o in [{"step_size": 0.1}, {"reltol": 1e-6, "abstol": 1e-6}]
+                       for g in [[0.5, 1, 2], [0, 1, 2]]]:
+      F = ca.integrator("F", "rosenbrock", dae, 0, grid, opts)
+      v = ca.MX.sym("v", 7)
+      r = F(x0=v[:2], z0=0.5, p=v[2:4], u=v[4:].T)
+      out = ca.vertcat(ca.vec(r["xf"]), ca.vec(r["zf"]), ca.vec(r["qf"]))
+      obj = ca.sumsqr(out)
+      v0 = [1, 0.5, 0.5, 0.3, 0.1, -0.2, 0.3]
+      # Forward and adjoint sensitivities agree to machine precision, to second order
+      self.check_jacobian(out, v, v0, 12)
+      H = self.check_hessian(obj, v, v0, 12)
+      self.checkarray(H, H.T, "Hessian symmetry", digits=12)
+
+  @memory_heavy()
+  def test_rosenbrock_dense_output(self):
+    self.message("rosenbrock: outputs inside steps")
+    t = ca.SX.sym("t")
+    x = ca.SX.sym("x", 2)
+    z = ca.SX.sym("z")
+    p = ca.SX.sym("p", 2)
+    u = ca.SX.sym("u")
+    dae = {"t": t, "x": x, "z": z, "p": p, "u": u,
+           "ode": ca.vertcat(-z + p[0]*x[1] + u, -x[0]*z + p[1]*ca.sin(t)),
+           "alg": z**3 + z - x[0]**2*(1 + 0.5*ca.cos(t)) - u, "quad": z*x[1] + p[1]*x[0]**2}
+    ode = {"t": t, "x": x, "p": p, "u": u, "ode": ca.vertcat(x[1] + p[0]*u, -p[1]*x[0] + ca.sin(t)),
+           "quad": x[0]*x[1]**2}
+    for sys, ref_plugin in [(ode, "cvodes"), (dae, "idas")]:
+      if not ca.has_integrator(ref_plugin): continue
+      args = {"x0": [1, 0.5], "p": [0.5, 0.3]}
+      # Consistent z0 for the reference: z^3 + z = 1.5 x0^2 - u
+      if "z" in sys: args["z0"] = float(min(numpy.roots([1, 0, 1, -1.3]), key=lambda r: abs(r.imag)).real)
+      for opts in [{"step_size": 0.04}, {"reltol": 1e-6, "abstol": 1e-6}]:
+        # Within a control group, the number of steps does not depend on the number of outputs,
+        # accuracy inside steps
+        n_steps = []
+        for grid in [[2.], list(numpy.linspace(0.002, 2, 1000))]:
+          F = ca.integrator("F", "rosenbrock", sys, 0, grid,
+                            dict(opts, control_group_size=[len(grid)]))
+          r = F(u=0.2, **args)
+          n_steps.append(F.stats()["n_steps"])
+          ref = ca.integrator("ref", ref_plugin, sys, 0, grid,
+            {"reltol": 1e-10, "abstol": 1e-10})(u=0.2, **args)
+          for k in ["xf", "zf", "qf"]:
+            self.checkarray(ref[k], r[k], k, digits=5)
+        self.assertTrue(n_steps[1] <= n_steps[0] + 2)
+        # Derivatives are exact, with constant controls and with a step in the controls
+        grid = [0.13, 0.31, 0.37, 0.52, 0.9, 1.15, 1.2, 1.71, 2.0]
+        for u0 in [[0.1] * 9, [0.1] * 4 + [0.3] * 5]:
+          F = ca.integrator("F", "rosenbrock", sys, 0, grid, opts)
+          v = ca.MX.sym("v", 13)
+          r = F(x0=v[:2], z0=0.5, p=v[2:4], u=v[4:].T) if "z" in sys else F(x0=v[:2], p=v[2:4],
+            u=v[4:].T)
+          out = ca.vertcat(ca.vec(r["xf"]), ca.vec(r["zf"]), ca.vec(r["qf"]))
+          v0 = [1, 0.5, 0.5, 0.3] + u0
+          self.check_jacobian(out, v, v0, 12)
+          self.check_hessian(ca.sumsqr(out), v, v0, 10)
+
+  @memory_heavy()
+  def test_rosenbrock_codegen(self):
+    self.message("rosenbrock: code generation, including derivatives")
+    x = ca.SX.sym("x", 2)
+    z = ca.SX.sym("z")
+    p = ca.SX.sym("p")
+    dae = {"x": x, "z": z, "p": p, "ode": ca.vertcat(x[1], -p*z), "alg": z**3 + z - x[0],
+           "quad": x[0]**2}
+    for opts, grid in [({"reltol": 1e-8, "abstol": 1e-8, "max_tape_steps": 1000}, [0.5, 1]),
+                       ({"step_size": 0.05}, [0.5, 1]),
+                       ({"step_size": 0.03}, list(numpy.linspace(0.07, 1, 15))),
+                       ({"reltol": 1e-6, "abstol": 1e-6, "max_tape_steps": 1000},
+                        list(numpy.linspace(0.07, 1, 15)))]:
+      F = ca.integrator("F", "rosenbrock", dae, 0, grid, opts)
+      v = ca.MX.sym("v", 3)
+      r = F(x0=v[:2], p=v[2])
+      obj = ca.sumsqr(r["xf"]) + ca.sumsqr(r["qf"])
+      outs = [r["xf"], r["zf"], r["qf"], ca.gradient(obj, v)]
+      # Forward over forward: steps replayed from a nominal integration
+      if len(grid) > 2: outs.append(ca.jtimes(ca.jtimes(obj, v, ca.MX.eye(3)).T, v, ca.MX.eye(3)))
+      G = ca.Function("G", [v], outs)
+      self.check_codegen(G, inputs=[ca.DM([0.4, -0.3, 2])], digits=12)
+
+  @memory_heavy()
+  def test_erk(self):
+    self.message("erk: order 4, dense output, steps independent of the outputs")
+    t = ca.SX.sym("t")
+    x = ca.SX.sym("x", 2)
+    p = ca.SX.sym("p")
+    u = ca.SX.sym("u")
+    dae = {"t": t, "x": x, "p": p, "u": u, "ode": ca.vertcat(x[1], -p*x[0] + u*ca.cos(t)),
+           "quad": x[0]**2}
+    # Harmonic oscillator: error at the end and inside a step
+    w = 1.3
+    exact = lambda tt: ca.DM([numpy.cos(w*tt), -w*numpy.sin(w*tt)])
+    err = []
+    for h in [0.1, 0.05, 0.025]:
+      r = ca.integrator("F", "erk", dae, 0, [0.37, 2.0], {"method": "rk4", "step_size": h})(x0=[1, 0],
+        p=w**2)
+      err.append([float(ca.norm_inf(r["xf"][:, 1] - exact(2.0))),
+                  float(ca.norm_inf(r["xf"][:, 0] - exact(0.37)))])
+    for e0, e1 in zip(err[:-1], err[1:]):
+      self.assertGreater(numpy.log2(e0[0]/e1[0]), 3.8)
+      self.assertGreater(numpy.log2(e0[1]/e1[1]), 3.4)
+    # Same steps as rk when the output times are on the mesh
+    args = {"x0": [1, 0.2], "p": 2, "u": ca.DM([[0.3, -0.1]])}
+    r = ca.integrator("F", "erk", dae, 0, [0.5, 1.0], {"method": "rk4", "step_size": 0.1})(**args)
+    ref = ca.integrator("F", "rk", dae, 0, [0.5, 1.0], {"number_of_finite_elements": 10})(**args)
+    for k in ["xf", "qf"]: self.checkarray(ref[k], r[k], k, digits=14)
+    # Within a control group, the number of steps does not depend on the number of outputs
+    for n in [10, 1000]:
+      F = ca.integrator("F", "erk", dae, 0, list(numpy.linspace(0, 10, n)),
+                        {"step_size": 0.05, "control_group_size": [n]})
+      F(x0=[1, 0], p=w**2)
+      self.assertEqual(F.stats()["n_steps"], 200)
+
+  @memory_heavy()
+  def test_erk_derivatives(self):
+    self.message("erk: derivatives are exact derivatives of the scheme")
+    t = ca.SX.sym("t")
+    x = ca.SX.sym("x", 2)
+    p = ca.SX.sym("p")
+    u = ca.SX.sym("u")
+    dae = {"t": t, "x": x, "p": p, "u": u, "ode": ca.vertcat(x[1], -p*x[0]**3 + u*ca.cos(t)),
+           "quad": x[0]**2 + u*x[1]}
+    # Outputs inside steps, at t0, and controls that change or not
+    grid = [0, 0.13, 0.31, 0.37, 1.0, 1.15, 2.0]
+    for u0 in [[0.1] * 7, [0.1] * 3 + [0.3] * 4, list(numpy.linspace(0.1, 0.4, 7))]:
+      F = ca.integrator("F", "erk", dae, 0, grid, {"step_size": 0.1})
+      v = ca.MX.sym("v", 10)
+      r = F(x0=v[:2], p=v[2], u=v[3:].T)
+      out = ca.vertcat(ca.vec(r["xf"]), ca.vec(r["qf"]))
+      v0 = [1, 0.5, 1.7] + u0
+      self.check_jacobian(out, v, v0, 13)
+      obj = ca.sumsqr(out)
+      self.check_hessian(obj, v, v0, 12)
+      # Finite differences, also for controls of equal value
+      g = ca.Function("g", [v], [ca.gradient(obj, v)])(v0)
+      self.checkarray(g, fd_jacobian(ca.Function("f", [v], [obj]), v0).T, "FD", digits=7)
+
+  @memory_heavy()
+  def test_erk_codegen(self):
+    self.message("erk: code generation, including derivatives")
+    x = ca.SX.sym("x", 2)
+    p = ca.SX.sym("p")
+    u = ca.SX.sym("u")
+    dae = {"x": x, "p": p, "u": u, "ode": ca.vertcat(x[1], -p*ca.sin(x[0]) + u),
+           "quad": x[0]**2}
+    for grid, opts in [([0.5, 1], {"step_size": 0.04}),
+                       (list(numpy.linspace(0.07, 1, 15)), {"step_size": 0.04}),
+                       (list(numpy.linspace(0.07, 1, 15)), {"method": "rk4", "step_size": 0.1}),
+                       (list(numpy.linspace(0.07, 1, 15)),
+                        {"method": "rk45", "reltol": 1e-6, "abstol": 1e-6, "max_tape_steps": 200})]:
+      F = ca.integrator("F", "erk", dae, 0, grid, opts)
+      v = ca.MX.sym("v", 3 + len(grid))
+      r = F(x0=v[:2], p=v[2], u=v[3:].T)
+      obj = ca.sumsqr(r["xf"]) + ca.sumsqr(r["qf"])
+      # Forward over forward in a few directions: all of them make a large file to compile
+      S = ca.DM.eye(v.numel())[:, [0, 2, 3]]
+      outs = [r["xf"], r["qf"], ca.gradient(obj, v), ca.jtimes(ca.jtimes(obj, v, S).T, v, S)]
+      G = ca.Function("G", [v], outs)
+      v0 = [0.4, -0.3, 2] + [0.1 * (i % 3) for i in range(len(grid))]
+      self.check_codegen(G, inputs=[ca.DM(v0)], digits=14)
+
+  @memory_heavy()
+  def test_control_groups(self):
+    self.message("erk, rosenbrock: one control per control group, derivatives for each control")
+    t = ca.SX.sym("t")
+    x = ca.SX.sym("x", 2)
+    z = ca.SX.sym("z")
+    p = ca.SX.sym("p")
+    u = ca.SX.sym("u")
+    ode = {"t": t, "x": x, "p": p, "u": u, "ode": ca.vertcat(x[1], -p*x[0]**3 + u*ca.cos(t)),
+           "quad": x[0]**2 + u*x[1]}
+    dae = {"t": t, "x": x, "z": z, "p": p, "u": u, "ode": ca.vertcat(x[1], -p*x[0] + u*z),
+           "alg": z**3 + z - u - 0.5*x[0], "quad": x[0]**2 + u*z}
+    # Output times on the mesh of fixed steps
+    grid = [0.2, 0.3, 0.5, 1.0, 1.2, 2.0]
+    for plugin, opts in [("erk", {"method": "rk4", "step_size": 0.1}),
+                         ("rosenbrock", {"step_size": 0.1}),
+                         ("erk", {"reltol": 1e-10, "abstol": 1e-10, "max_tape_steps": 500}),
+                         ("rosenbrock", {"reltol": 1e-10, "abstol": 1e-10, "max_tape_steps": 500})]:
+      d = dae if plugin == "rosenbrock" else ode
+      # Repeated controls and their control groups agree, up to the restarts between outputs
+      args = {"x0": [1, 0.5], "p": 1.7}
+      r = ca.integrator("F", plugin, d, 0, grid, opts)(u=ca.DM([[0.1, 0.1, 0.3, 0.2, 0.2, 0.2]]),
+                                                      **args)
+      F = ca.integrator("F", plugin, d, 0, grid, dict(opts, control_group_size=[2, 1, 3]))
+      r_group = F(u=ca.DM([[0.1, 0.3, 0.2]]), **args)
+      for k in ["xf", "zf", "qf"]: self.checkarray(r[k], r_group[k], k, digits=6)
+      # Controls of equal value: each has its own sensitivities
+      for cgs in [None, [2, 1, 3]]:
+        F = ca.integrator("F", plugin, d, 0, grid, dict(opts, control_group_size=cgs or [1] * 6))
+        n = 3 + F.size2_in(3)
+        v = ca.MX.sym("v", n)
+        r = F(x0=v[:2], p=v[2], u=v[3:].T)
+        out = ca.vertcat(ca.vec(r["xf"]), ca.vec(r["zf"]), ca.vec(r["qf"]))
+        G = ca.Function("G", [v], [out, ca.jtimes(out, v, ca.MX.eye(n)),
+                                   ca.jtimes(out, v, ca.MX.eye(out.numel()), True).T])
+        v0 = numpy.array([1, 0.5, 1.7] + [0.2] * (n - 3))
+        _, J_fwd, J_adj = G(v0)
+        J_fd = fd_jacobian(G, v0)
+        self.checkarray(J_fd, J_fwd, "fwd vs FD", digits=7)
+        self.checkarray(J_fd, J_adj, "adj vs FD", digits=7)
+        if cgs: self.check_codegen(G, inputs=[ca.DM(v0)], digits=14)
+        # States depend on the controls of their group and earlier ones, forward and reverse
+        start = numpy.cumsum([0] + (cgs or [1] * 6))
+        for w in [0, 1]:
+          J = ca.Function("J", [v], [out], {"ad_weight_sp": w}).jac_sparsity(0, 0)
+          dep = numpy.array(ca.DM(J, 1))[:12, 3:] != 0
+          for k in range(6):
+            for j in range(n - 3):
+              self.assertEqual(bool(dep[2*k:2*k+2, j].any()), bool(start[j] <= k))
+    with self.assertInException("must sum to the number of output times"):
+      ca.integrator("F", "erk", ode, 0, grid, {"control_group_size": [2, 1]})
+
+  @memory_heavy()
+  def test_erk_rk45(self):
+    self.message("erk: pair of order 5(4), fixed and adaptive steps")
+    t = ca.SX.sym("t")
+    x = ca.SX.sym("x", 2)
+    p = ca.SX.sym("p")
+    dae = {"t": t, "x": x, "p": p, "ode": ca.vertcat(x[1], -p*x[0]), "quad": x[0]**2}
+    w = 1.3
+    exact = lambda tt: numpy.array([numpy.cos(w*tt), -w*numpy.sin(w*tt)])
+    # Fixed steps: order 5
+    err = []
+    for h in [0.1, 0.05, 0.025]:
+      r = ca.integrator("F", "erk", dae, 0, 2, {"method": "rk45", "step_size": h})(x0=[1, 0], p=w**2)
+      err.append(numpy.max(numpy.abs(numpy.array(r["xf"]).ravel() - exact(2.0))))
+    for e0, e1 in zip(err[:-1], err[1:]):
+      self.assertGreater(numpy.log2(e0/e1), 4.7)
+    # Adaptive steps: error follows the tolerance; the last stage is the first of the next step
+    grid = list(numpy.linspace(0.1, 10, 50))
+    for tol in [1e-6, 1e-9]:
+      F = ca.integrator("F", "erk", dae, 0, grid, {"method": "rk45", "reltol": tol, "abstol": tol})
+      r = F(x0=[1, 0], p=w**2)
+      e = numpy.max(numpy.abs(numpy.array(r["xf"]) - numpy.array([exact(tt) for tt in grid]).T))
+      self.assertLess(e, 10*tol)
+      self.assertGreater(e, 0.01*tol)
+      st = F.stats()
+      self.assertEqual(st["n_rhs"], 1 + 6*(st["n_steps"] + st["n_reject"]))
+    # Rejected steps: a fast transient with a large initial step
+    dae2 = {"x": x, "ode": ca.vertcat(-50*(x[0] - ca.cos(x[1])), 1)}
+    F = ca.integrator("F", "erk", dae2, 0, 1, {"method": "rk45", "step0": 0.5})
+    r = F(x0=[0, 0])
+    ref = ca.integrator("F", "cvodes", dae2, 0, 1, {"reltol": 1e-12, "abstol": 1e-12})(x0=[0, 0])
+    self.checkarray(ref["xf"], r["xf"], "rejections", digits=5)
+    self.assertGreater(F.stats()["n_reject"], 0)
+    with self.assertInException("unknown method"):
+      ca.integrator("F", "erk", dae, 0, 1, {"method": "rk5"})
+
+  @memory_heavy()
+  def test_erk_rk45_derivatives(self):
+    self.message("erk: adaptive steps, derivatives of the scheme on the nominal mesh")
+    t = ca.SX.sym("t")
+    x = ca.SX.sym("x", 2)
+    p = ca.SX.sym("p")
+    u = ca.SX.sym("u")
+    dae = {"t": t, "x": x, "p": p, "u": u, "ode": ca.vertcat(x[1], -p*x[0]**3 + u*ca.cos(t)),
+           "quad": x[0]**2 + u*x[1]}
+    grid = [0, 0.13, 0.31, 0.37, 1.0, 1.15, 2.0]
+    for u0 in [[0.1] * 7, [0.1] * 3 + [0.3] * 4]:
+      F = ca.integrator("F", "erk", dae, 0, grid, {"method": "rk45", "reltol": 1e-5,
+                                                   "abstol": 1e-5})
+      v = ca.MX.sym("v", 10)
+      r = F(x0=v[:2], p=v[2], u=v[3:].T)
+      out = ca.vertcat(ca.vec(r["xf"]), ca.vec(r["qf"]))
+      v0 = [1, 0.5, 1.7] + u0
+      self.check_jacobian(out, v, v0, 13)
+      # Forward over forward replays the nominal steps
+      self.check_hessian(ca.sumsqr(out), v, v0, 11)
+
+  @memory_heavy()
+  def test_events_bouncing_ball(self):
+    self.message("zero-crossing events: values, forward sensitivities, code generation")
+    g = 9.81
+    x = ca.SX.sym("x", 2)
+    p = ca.SX.sym("p")
+    dae = {"x": x, "p": p, "ode": ca.vertcat(x[1], -g), "quad": x[0], "zero": x[0]}
+    transition = bounce_transition()
+    def exact(h0, p0, tt):
+      # Height, velocity and integral of the height
+      tb, ub, q = 0., None, 0.
+      h, v = h0, 0.
+      while True:
+        tau = numpy.sqrt(2*h/g) if ub is None else 2*ub/g
+        if tb + tau > tt: break
+        q += h*tau - g*tau**3/6 if ub is None else ub*tau**2/2 - g*tau**3/6
+        v = (-g*tau if ub is None else ub - g*tau)
+        tb, ub, h = tb + tau, -p0*v, 0.
+      tau = tt - tb
+      u0 = 0. if ub is None else ub
+      return [h + u0*tau - g*tau**2/2, u0 - g*tau], q + h*tau + u0*tau**2/2 - g*tau**3/6
+    grid = list(numpy.linspace(0.1, 4, 40))
+    h0, p0 = 2., 0.8
+    xf_ref = numpy.array([exact(h0, p0, tt)[0] for tt in grid]).T
+    qf_ref = numpy.array([exact(h0, p0, tt)[1] for tt in grid])
+    for plugin, opts, features in event_integrators:
+      if not features["events"]: continue
+      F = ca.integrator("F", plugin, dae, 0, grid, dict(opts, transition=transition,
+        event_tol=1e-12))
+      r = F(x0=[h0, 0], p=p0)
+      self.checkarray(r["xf"], ca.DM(xf_ref), plugin, digits=features["digits"])
+      self.checkarray(r["qf"], ca.DM(qf_ref).T, plugin, digits=features["digits"])
+      if "n_events" in F.stats(): self.assertEqual(F.stats()["n_events"], 5)
+      # Forward sensitivities through the events, against finite differences
+      v = ca.MX.sym("v", 3)
+      rv = F(x0=v[:2], p=v[2])
+      out = ca.vertcat(rv["xf"][:, -1], rv["qf"][-1])
+      G = ca.Function("G", [v], [out, ca.jacobian(out, v)])
+      v0 = ca.DM([h0, 0.3, p0])
+      self.checkarray(G(v0)[1], fd_jacobian(G, v0), plugin, digits=min(6, features["digits"]))
+      if features["codegen"]: self.check_codegen(G, inputs=[v0], digits=12)
+
+  @memory_heavy()
+  def test_events_multiple(self):
+    self.message("zero-crossing events: several functions, transition by event index")
+    g, ceiling = 9.81, 1.5
+    x = ca.SX.sym("x", 2)
+    p = ca.SX.sym("p")
+    index = ca.SX.sym("index")
+    t = ca.SX.sym("t")
+    # Ball between a floor (event 0, restitution p) and a ceiling (event 1, elastic)
+    dae = {"x": x, "p": p, "ode": ca.vertcat(x[1], -g), "zero": ca.vertcat(x[0], ceiling - x[0])}
+    transition = ca.Function("transition", [index, t, x, ca.SX(0, 1), p, ca.SX(0, 1)],
+      [ca.vertcat(x[0], ca.if_else(index == 0, -p, -1)*x[1]), ca.SX(0, 1)],
+      ["index", "t", "x", "z", "p", "u"], ["post_x", "post_z"])
+    def exact(v0, tt):
+      # Piecewise parabolas: the first crossing of the floor or the ceiling ends each one
+      t0, h, v = 0., float(v0[0]), float(v0[1])
+      while True:
+        taus = []
+        for level, sign in [(0., -1), (ceiling, 1)]:
+          # h + v tau - g tau^2 / 2 = level, crossing in the direction sign
+          disc = v*v - 2*g*(level - h)
+          if disc < 0: continue
+          for tau in [(v - numpy.sqrt(disc))/g, (v + numpy.sqrt(disc))/g]:
+            if tau > 1e-12 and sign*(v - g*tau) > 0: taus.append((tau, level))
+        tau, level = min(taus)
+        if t0 + tau > tt: break
+        v = (v - g*tau)*(-float(v0[2]) if level == 0 else -1)
+        t0, h = t0 + tau, level
+      tau = tt - t0
+      return [h + v*tau - g*tau**2/2, v - g*tau]
+    grid = list(numpy.linspace(0.1, 3, 30))
+    v0 = ca.DM([1, 4, 0.8])
+    xf_ref = ca.DM(numpy.array([exact(v0, tt) for tt in grid]).T)
+    for plugin, opts, features in event_integrators:
+      if not features["events"]: continue
+      F = ca.integrator("F", plugin, dae, 0, grid, dict(opts, transition=transition,
+        event_tol=1e-12))
+      v = ca.MX.sym("v", 3)
+      xf = F(x0=v[:2], p=v[2])["xf"]
+      G = ca.Function("G", [v], [ca.vec(xf), ca.jacobian(ca.vec(xf), v)])
+      self.checkarray(G(v0)[0], ca.vec(xf_ref), plugin, digits=features["digits"])
+      self.checkarray(G(v0)[1], fd_jacobian(G, v0), plugin, digits=min(6, features["digits"]))
+      if features["codegen"]: self.check_codegen(G, inputs=[v0], digits=12)
+
+  @memory_heavy()
+  def test_events_dae(self):
+    self.message("zero-crossing events of a DAE, algebraic states consistent after the transition")
+    g = 9.81
+    x = ca.SX.sym("x", 2)
+    z = ca.SX.sym("z")
+    p = ca.SX.sym("p")
+    dae = {"x": x, "z": z, "p": p, "ode": ca.vertcat(z, -g), "alg": z - x[1], "zero": x[0]}
+    # The transition leaves z inconsistent
+    transition = bounce_transition(1)
+    # Several bounces, outputs between an event and the end of the step that contains it
+    grid = list(numpy.linspace(0.1, 3, 30))
+    ref = ca.integrator("ref", "erk", {"x": x, "p": p, "ode": ca.vertcat(x[1], -g), "zero": x[0]},
+      0, grid, {"transition": bounce_transition(), "event_tol": 1e-12, "abstol": 1e-11,
+      "reltol": 1e-11})
+    v0 = ca.DM([2, 0.3, 0.8])
+    xf_ref = ref(x0=v0[:2], p=v0[2])["xf"]
+    for plugin, opts, features in event_integrators:
+      if not features["events_dae"]: continue
+      F = ca.integrator("F", plugin, dae, 0, grid, dict(opts, transition=transition,
+        event_tol=1e-12))
+      v = ca.MX.sym("v", 3)
+      r = F(x0=v[:2], z0=v[1], p=v[2])
+      out = ca.vertcat(ca.vec(r["xf"]), ca.vec(r["zf"]))
+      G = ca.Function("G", [v], [out, ca.jacobian(out, v)])
+      self.checkarray(G(v0)[0], ca.vertcat(ca.vec(xf_ref), xf_ref[1, :].T), plugin,
+        digits=features["digits"])
+      # Sensitivities through the events, with the rates after the transition
+      self.checkarray(G(v0)[1], fd_jacobian(G, v0), plugin, digits=min(6, features["digits"]))
+      if features["codegen"]: self.check_codegen(G, inputs=[v0], digits=12)
+
+  @memory_heavy()
+  def test_events_breaking_spring(self):
+    self.message("zero-crossing events with controls and parameters")
+    x = ca.SX.sym("x", 3)
+    p = ca.SX.sym("p", 3)
+    u = ca.SX.sym("u")
+    index = ca.SX.sym("index")
+    t = ca.SX.sym("t")
+    # States v, position, broken; parameters mass, stiffness, damping; control disturbance
+    f = ca.if_else(x[2] < 0.5, -p[1]*x[1] + u, 0)
+    dae = {"x": x, "p": p, "u": u, "ode": ca.vertcat((f - p[2]*x[0])/p[0], x[0], 0),
+           "zero": 2 - x[1]}
+    transition = ca.Function("transition", [index, t, x, ca.SX(0, 1), p, u],
+      [ca.vertcat(x[0], x[1], 1), ca.SX(0, 1)], ["index", "t", "x", "z", "p", "u"],
+      ["post_x", "post_z"])
+    grid = list(numpy.linspace(0.04, 4, 100))
+    d = numpy.zeros(100)
+    d[20:30] = -5
+    d[40:50] = 15
+    x0, p0 = [-5, -1, 0], ca.DM([1, 2, 0.1])
+    v = ca.MX.sym("v", 3)
+    def outputs(F):
+      xf = F(x0=x0, p=v, u=d)["xf"]
+      return ca.Function("G", [v], [xf, ca.jacobian(xf, v)])
+    ref = outputs(ca.integrator("ref", "erk", dae, 0, grid, {"transition": transition,
+      "event_tol": 1e-12, "abstol": 1e-12, "reltol": 1e-12}))(p0)
+    for plugin, opts, features in event_integrators:
+      if not features["events"]: continue
+      F = ca.integrator("F", plugin, dae, 0, grid, dict(opts, transition=transition,
+        event_tol=1e-12))
+      G = outputs(F)
+      r = G(p0)
+      self.checkarray(r[0], ref[0], plugin, digits=features["digits"] - 1)
+      self.checkarray(r[1], ref[1], plugin, digits=features["digits"] - 2)
+      F(x0=x0, p=p0, u=d)
+      if "n_events" in F.stats(): self.assertEqual(F.stats()["n_events"], 1)
+      if features["codegen"]: self.check_codegen(G, inputs=[p0], digits=12)
+    # Every event counts towards max_events
+    F = ca.integrator("F", "erk", dae, 0, grid, {"transition": transition, "max_events": 0})
+    with self.assertInException("max_events"):
+      F(x0=x0, p=p0, u=d)
+
+  @memory_heavy()
+  def test_events_adjoint(self):
+    self.message("zero-crossing events: adjoint and forward-over-adjoint sensitivities")
+    g = 9.81
+    x = ca.SX.sym("x", 2)
+    z = ca.SX.sym("z")
+    p = ca.SX.sym("p")
+    # Bouncing ball with restitution p, as an ODE and as a DAE with z the velocity
+    ode = {"x": x, "p": p, "ode": ca.vertcat(x[1], -g), "quad": x[0], "zero": x[0]}
+    dae = {"x": x, "z": z, "p": p, "ode": ca.vertcat(z, -g), "alg": z - x[1], "quad": x[0],
+           "zero": x[0]}
+    # Outputs before, at and after the events, also inside steps cut short by them
+    grid = list(numpy.linspace(0.1, 3, 30))
+    wts = ca.DM(numpy.random.default_rng(0).uniform(0.5, 1.5, (2, 30)))
+    for plugin, opts, features in event_integrators:
+      if not features["events_adjoint"]: continue
+      for problem, transition in [(ode, bounce_transition())] + ([(dae, bounce_transition(1))]
+          if features["events_dae"] else []):
+        F = ca.integrator("F", plugin, problem, 0, grid, dict(opts, transition=transition,
+          event_tol=1e-12))
+        v = ca.MX.sym("v", 3)
+        r = F(x0=v[:2], z0=v[1], p=v[2])
+        obj = ca.sum1(ca.sum2(wts * r["xf"])) + ca.sumsqr(r["qf"])
+        G = ca.Function("G", [v], [ca.jtimes(obj, v, ca.MX.ones(1, 1), True),
+          ca.jtimes(obj, v, ca.MX.eye(3)).T, ca.hessian(obj, v)[0]])
+        v0 = ca.DM([2, 0.3, 0.8])
+        # Adjoint as forward sensitivities
+        grad_adj, grad_fwd, H = G(v0)
+        self.checkarray(grad_adj, grad_fwd, plugin, digits=9)
+        # Forward-over-adjoint: central differences of the gradient, Richardson extrapolated
+        fd = lambda h: fd_jacobian(G, v0, h)
+        self.checkarray(H, (4*fd(1e-4) - fd(2e-4))/3, plugin, digits=6)
+        if features["codegen"]: self.check_codegen(G, inputs=[v0], digits=11)
+
+  @memory_heavy()
+  def test_erk_tape(self):
+    self.message("erk: adaptive steps and adjoints, bounded tape")
+    x = ca.SX.sym("x", 2)
+    dae = {"x": x, "ode": ca.vertcat(x[1], -x[0])}
+    for n_tape in [0, 3, 1000]:
+      F = ca.integrator("F", "erk", dae, 0, 10, {"method": "rk45", "max_tape_steps": n_tape})
+      x0 = ca.MX.sym("x0", 2)
+      G = ca.Function("G", [x0], [ca.jtimes(ca.sumsqr(F(x0=x0)["xf"]), x0, ca.MX.ones(1, 1), True)])
+      if n_tape == 3:
+        # More steps than the tape holds
+        with self.assertInException("increase max_tape_steps"):
+          G([1, 0.5])
+      else:
+        self.checkarray(G([1, 0.5]), ca.DM([2, 1]), "adjoint", digits=5)
+      if n_tape == 0:
+        # The tape grows in the virtual machine only
+        with self.assertInException("need max_tape_steps for code generation"):
+          ca.CodeGenerator("tape_cg.c").add(G)
 
 if __name__ == '__main__':
     unittest.main()

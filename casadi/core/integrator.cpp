@@ -309,28 +309,31 @@ Sparsity Integrator::get_sparsity_out(casadi_int i) {
   return Sparsity();
 }
 
-bool Integrator::grid_in(casadi_int i) {
+casadi_int Integrator::n_grid_in(casadi_int i) const {
   switch (static_cast<IntegratorInput>(i)) {
     case INTEGRATOR_U:
+      // A plugin may hold the controls over several output intervals
+      return size2_in(INTEGRATOR_U) / (1 + nfwd_);
     case INTEGRATOR_ADJ_XF:
     case INTEGRATOR_ADJ_ZF:
     case INTEGRATOR_ADJ_QF:
-      return true;
+      return nt();
     default: break;
   }
-  return false;
+  return 1;
 }
 
-bool Integrator::grid_out(casadi_int i) {
+casadi_int Integrator::n_grid_out(casadi_int i) const {
   switch (static_cast<IntegratorOutput>(i)) {
     case INTEGRATOR_XF:
     case INTEGRATOR_ZF:
     case INTEGRATOR_QF:
+      return nt();
     case INTEGRATOR_ADJ_U:
-      return true;
+      return n_grid_in(INTEGRATOR_U);
     default: break;
   }
-  return false;
+  return 1;
 }
 
 casadi_int Integrator::adjmap_out(casadi_int i) {
@@ -801,6 +804,7 @@ void Integrator::init(const Dict& opts) {
   ntmp_ = nx_ + nz_;
   ntmp_ = std::max(ntmp_, nrx_ + nrz_);
   ntmp_ = std::max(ntmp_, ne_);
+  ntmp_ = std::max(ntmp_, nrq_ + nuq_);
 
   // Call the base class method
   OracleFunction::init(opts);
@@ -1017,8 +1021,8 @@ int Integrator::fdae_sp_forward(SpForwardMem* m, const bvec_t* x,
     m->arg[DYN_NUM_IN + DAE_NUM_OUT + DYN_T] = nullptr;  // fwd:t
     m->arg[DYN_NUM_IN + DAE_NUM_OUT + DYN_X] = x + (i + 1) * nx1_;  // fwd:x
     m->arg[DYN_NUM_IN + DAE_NUM_OUT + DYN_Z] = nullptr;  // fwd:z
-    m->arg[DYN_NUM_IN + DAE_NUM_OUT + DYN_P] = p + (i + 1) * np1_;  // fwd:p
-    m->arg[DYN_NUM_IN + DAE_NUM_OUT + DYN_U] = u + (i + 1) * nu1_;  // fwd:u
+    m->arg[DYN_NUM_IN + DAE_NUM_OUT + DYN_P] = p ? p + (i + 1) * np1_ : nullptr;  // fwd:p
+    m->arg[DYN_NUM_IN + DAE_NUM_OUT + DYN_U] = u ? u + (i + 1) * nu1_ : nullptr;  // fwd:u
     m->res[DAE_ODE] = ode + (i + 1) * nx1_;  // fwd:ode
     m->res[DAE_ALG] = alg + (i + 1) * nz1_;  // fwd:alg
     if (calc_sp_forward(forward_name("daeF", 1), m->arg, m->res, m->iw, m->w)) return 1;
@@ -1042,8 +1046,8 @@ int Integrator::fquad_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t*
     m->arg[DYN_NUM_IN + QUAD_NUM_OUT + DYN_T] = nullptr;  // fwd:t
     m->arg[DYN_NUM_IN + QUAD_NUM_OUT + DYN_X] = x + (i + 1) * nx1_;  // fwd:x
     m->arg[DYN_NUM_IN + QUAD_NUM_OUT + DYN_Z] = z + (i + 1) * nz1_;  // fwd:z
-    m->arg[DYN_NUM_IN + QUAD_NUM_OUT + DYN_P] = p + (i + 1) * np1_;  // fwd:p
-    m->arg[DYN_NUM_IN + QUAD_NUM_OUT + DYN_U] = u + (i + 1) * nu1_;  // fwd:u
+    m->arg[DYN_NUM_IN + QUAD_NUM_OUT + DYN_P] = p ? p + (i + 1) * np1_ : nullptr;  // fwd:p
+    m->arg[DYN_NUM_IN + QUAD_NUM_OUT + DYN_U] = u ? u + (i + 1) * nu1_ : nullptr;  // fwd:u
     m->res[QUAD_QUAD] = quad + (i + 1) * nq1_;  // fwd:quad
     if (calc_sp_forward(forward_name("quadF", 1), m->arg, m->res, m->iw, m->w)) return 1;
   }
@@ -1077,8 +1081,8 @@ int Integrator::bdae_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t* 
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_T] = nullptr;  // fwd:t
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_X] = x + (i + 1) * nx1_;  // fwd:x
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_Z] = z + (i + 1) * nz1_;  // fwd:z
-    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_P] = p + (i + 1) * np1_;  // fwd:p
-    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_U] = u + (i + 1) * nu1_;  // fwd:u
+    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_P] = p ? p + (i + 1) * np1_ : nullptr;  // fwd:p
+    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_U] = u ? u + (i + 1) * nu1_ : nullptr;  // fwd:u
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_OUT_ODE] = nullptr;  // fwd:out_ode
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_OUT_ALG] = nullptr;  // fwd:out_alg
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_OUT_QUAD] = nullptr;  // fwd:out_quad
@@ -1124,8 +1128,8 @@ int Integrator::bquad_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t*
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_T] = nullptr;  // fwd:t
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_X] = x + (i + 1) * nx1_;  // fwd:x
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_Z] = z + (i + 1) * nz1_;  // fwd:z
-    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_P] = p + (i + 1) * np1_;  // fwd:p
-    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_U] = u + (i + 1) * nu1_;  // fwd:u
+    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_P] = p ? p + (i + 1) * np1_ : nullptr;  // fwd:p
+    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_U] = u ? u + (i + 1) * nu1_ : nullptr;  // fwd:u
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_OUT_ODE] = nullptr;  // fwd:out_ode
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_OUT_ALG] = nullptr;  // fwd:out_alg
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_OUT_QUAD] = nullptr;  // fwd:out_quad
@@ -1147,6 +1151,8 @@ int Integrator::bquad_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t*
 int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
     casadi_int* iw, bvec_t* w, void* mem) const {
   if (verbose_) casadi_message(name_ + "::sp_forward");
+  // Events couple all states and parameters: dense dependencies
+  if (ne_ > 0) return FunctionInternal::sp_forward(arg, res, iw, w, mem);
 
   // Inputs
   const bvec_t* x0 = arg[INTEGRATOR_X0];
@@ -1155,6 +1161,13 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
   const bvec_t* adj_xf = arg[INTEGRATOR_ADJ_XF];
   const bvec_t* adj_qf = arg[INTEGRATOR_ADJ_QF];
   arg += n_in_;
+
+  // Non-differentiable inputs do not propagate
+  if (!is_diff_in_[INTEGRATOR_X0]) x0 = nullptr;
+  if (!is_diff_in_[INTEGRATOR_P]) p = nullptr;
+  if (!is_diff_in_[INTEGRATOR_U]) u = nullptr;
+  if (!is_diff_in_[INTEGRATOR_ADJ_XF]) adj_xf = nullptr;
+  if (!is_diff_in_[INTEGRATOR_ADJ_QF]) adj_qf = nullptr;
 
   // Outputs
   bvec_t* xf = res[INTEGRATOR_XF];
@@ -1179,7 +1192,11 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
   SpForwardMem m = {arg, res, iw, w};
 
   // Copy initial guess to x
-  std::copy_n(x0, nx_, x);
+  if (x0) {
+    std::copy_n(x0, nx_, x);
+  } else {
+    std::fill_n(x, nx_, 0);
+  }
 
   // Propagate forward
   for (casadi_int k = 0; k < nt(); ++k) {
@@ -1252,7 +1269,7 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
       }
 
       // Update tmp2
-      std::copy_n(adj_x, nx_, tmp2);
+      std::copy_n(adj_x, nrx_, tmp2);
     }
 
     // Get adj_x0 at initial time
@@ -1278,8 +1295,8 @@ int Integrator::fdae_sp_reverse(SpReverseMem* m, bvec_t* x,
     m->arg[DYN_NUM_IN + DAE_NUM_OUT + DYN_T] = nullptr;  // fwd:t
     m->arg[DYN_NUM_IN + DAE_NUM_OUT + DYN_X] = x + (i + 1) * nx1_;  // fwd:x
     m->arg[DYN_NUM_IN + DAE_NUM_OUT + DYN_Z] = nullptr;  // fwd:z
-    m->arg[DYN_NUM_IN + DAE_NUM_OUT + DYN_P] = p + (i + 1) * np1_;  // fwd:p
-    m->arg[DYN_NUM_IN + DAE_NUM_OUT + DYN_U] = u + (i + 1) * nu1_;  // fwd:u
+    m->arg[DYN_NUM_IN + DAE_NUM_OUT + DYN_P] = p ? p + (i + 1) * np1_ : nullptr;  // fwd:p
+    m->arg[DYN_NUM_IN + DAE_NUM_OUT + DYN_U] = u ? u + (i + 1) * nu1_ : nullptr;  // fwd:u
     if (calc_sp_reverse(forward_name("daeF", 1), m->arg, m->res, m->iw, m->w)) return 1;
   }
   // Propagate through nondifferentiated
@@ -1304,8 +1321,8 @@ int Integrator::fquad_sp_reverse(SpReverseMem* m, bvec_t* x, bvec_t* z,
     m->arg[DYN_NUM_IN + QUAD_NUM_OUT + DYN_T] = nullptr;  // fwd:t
     m->arg[DYN_NUM_IN + QUAD_NUM_OUT + DYN_X] = x + (i + 1) * nx1_;  // fwd:x
     m->arg[DYN_NUM_IN + QUAD_NUM_OUT + DYN_Z] = z + (i + 1) * nz1_;  // fwd:z
-    m->arg[DYN_NUM_IN + QUAD_NUM_OUT + DYN_P] = p + (i + 1) * np1_;  // fwd:p
-    m->arg[DYN_NUM_IN + QUAD_NUM_OUT + DYN_U] = u + (i + 1) * nu1_;  // fwd:u
+    m->arg[DYN_NUM_IN + QUAD_NUM_OUT + DYN_P] = p ? p + (i + 1) * np1_ : nullptr;  // fwd:p
+    m->arg[DYN_NUM_IN + QUAD_NUM_OUT + DYN_U] = u ? u + (i + 1) * nu1_ : nullptr;  // fwd:u
     if (calc_sp_reverse(forward_name("quadF", 1), m->arg, m->res, m->iw, m->w)) return 1;
   }
   // Propagate through nondifferentiated
@@ -1340,8 +1357,8 @@ int Integrator::bdae_sp_reverse(SpReverseMem* m, bvec_t* x, bvec_t* z,
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_T] = nullptr;  // fwd:t
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_X] = x + (i + 1) * nx1_;  // fwd:x
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_Z] = z + (i + 1) * nz1_;  // fwd:z
-    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_P] = p + (i + 1) * np1_;  // fwd:p
-    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_U] = u + (i + 1) * nu1_;  // fwd:u
+    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_P] = p ? p + (i + 1) * np1_ : nullptr;  // fwd:p
+    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_U] = u ? u + (i + 1) * nu1_ : nullptr;  // fwd:u
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_OUT_ODE] = nullptr;  // fwd:out_ode
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_OUT_ALG] = nullptr;  // fwd:out_alg
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_OUT_QUAD] = nullptr;  // fwd:out_quad
@@ -1387,8 +1404,8 @@ int Integrator::bquad_sp_reverse(SpReverseMem* m, bvec_t* x, bvec_t* z,
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_T] = nullptr;  // fwd:t
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_X] = x + (i + 1) * nx1_;  // fwd:x
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_Z] = z + (i + 1) * nz1_;  // fwd:z
-    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_P] = p + (i + 1) * np1_;  // fwd:p
-    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_U] = u + (i + 1) * nu1_;  // fwd:u
+    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_P] = p ? p + (i + 1) * np1_ : nullptr;  // fwd:p
+    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_U] = u ? u + (i + 1) * nu1_ : nullptr;  // fwd:u
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_OUT_ODE] = nullptr;  // fwd:out_ode
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_OUT_ALG] = nullptr;  // fwd:out_alg
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_OUT_QUAD] = nullptr;  // fwd:out_quad
@@ -1412,6 +1429,8 @@ int Integrator::bquad_sp_reverse(SpReverseMem* m, bvec_t* x, bvec_t* z,
 int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
     casadi_int* iw, bvec_t* w, void* mem) const {
   if (verbose_) casadi_message(name_ + "::sp_reverse");
+  // Events couple all states and parameters: dense dependencies
+  if (ne_ > 0) return FunctionInternal::sp_reverse(arg, res, iw, w, mem);
 
   // Inputs
   bvec_t* x0 = arg[INTEGRATOR_X0];
@@ -1420,6 +1439,13 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
   bvec_t* adj_xf = arg[INTEGRATOR_ADJ_XF];
   bvec_t* adj_qf = arg[INTEGRATOR_ADJ_QF];
   arg += n_in_;
+
+  // Non-differentiable inputs do not propagate
+  if (!is_diff_in_[INTEGRATOR_X0]) x0 = nullptr;
+  if (!is_diff_in_[INTEGRATOR_P]) p = nullptr;
+  if (!is_diff_in_[INTEGRATOR_U]) u = nullptr;
+  if (!is_diff_in_[INTEGRATOR_ADJ_XF]) adj_xf = nullptr;
+  if (!is_diff_in_[INTEGRATOR_ADJ_QF]) adj_qf = nullptr;
 
   // Outputs
   bvec_t* xf = res[INTEGRATOR_XF];
@@ -1606,17 +1632,18 @@ Function Integrator::get_forward(casadi_int nfwd, const std::string& name,
   // Call the augmented integrator
   std::vector<MX> integrator_in(INTEGRATOR_NUM_IN);
   for (casadi_int i = 0; i < INTEGRATOR_NUM_IN; ++i) {
-    if (size1_in(i) > 0 && grid_in(i) && nt() > 1) {
+    casadi_int n_grid = n_grid_in(i);
+    if (size1_in(i) > 0 && n_grid > 1) {
       // Split nondifferentiated input by grid point
-      std::vector<MX> ret_in_split = horzsplit_n(ret_in[i], nt());
+      std::vector<MX> ret_in_split = horzsplit_n(ret_in[i], n_grid);
       // Split augmented input by grid point
       std::vector<std::vector<MX>> aug_in_split(nfwd);
       for (casadi_int d = 0; d < nfwd; ++d) {
-        aug_in_split[d] = horzsplit_n(aug_in[i][d], nt());
+        aug_in_split[d] = horzsplit_n(aug_in[i][d], n_grid);
       }
       // Reorder columns
       v.clear();
-      for (casadi_int k = 0; k < nt(); ++k) {
+      for (casadi_int k = 0; k < n_grid; ++k) {
         v.push_back(ret_in_split.at(k));
         for (casadi_int d = 0; d < nfwd; ++d) {
           v.push_back(aug_in_split[d].at(k));
@@ -1627,9 +1654,9 @@ Function Integrator::get_forward(casadi_int nfwd, const std::string& name,
       v = aug_in[i];
       v.insert(v.begin(), ret_in[i]);
     }
-    // Flatten all elements
+    // Flatten all elements; blocks of adjoint seeds have one column per adjoint direction
     for (MX& e : v) e = vec(e);
-    integrator_in[i] = horzcat(v);
+    integrator_in[i] = reshape(vertcat(v), aug_int.size_in(i));
   }
   std::vector<MX> integrator_out = aug_int(integrator_in);
 
@@ -1638,7 +1665,7 @@ Function Integrator::get_forward(casadi_int nfwd, const std::string& name,
   ret_out.reserve(INTEGRATOR_NUM_OUT);
   for (casadi_int i = 0; i < INTEGRATOR_NUM_OUT; ++i) {
     // Split return by grid points and sensitivities
-    casadi_int n_grid = grid_out(i) ? nt() : 1;
+    casadi_int n_grid = n_grid_out(i);
     std::vector<casadi_int> offset = {0};
     for (casadi_int k = 0; k < n_grid; ++k) {
       for (casadi_int d = 0; d <= nfwd; ++d) {
@@ -1660,6 +1687,8 @@ Function Integrator::get_forward(casadi_int nfwd, const std::string& name,
 
   Dict options = opts;
   options["allow_duplicate_io_names"] = true;
+  // The wrapper calls a non-codegenable integrator, which jits its own dependencies
+  options["jit"] = false;
 
   // Create derivative function and return
   return Function(name, ret_in, ret_out, inames, onames, options);
@@ -1671,8 +1700,8 @@ Function Integrator::get_reverse(casadi_int nadj, const std::string& name,
     const Dict& opts) const {
   if (verbose_) casadi_message(name_ + "::get_reverse");
 
-  // Events not implemented
-  casadi_assert(ne_ == 0, "Event support not implemented for  Integrator::get_reverse");
+  // Events not implemented by all plugins
+  casadi_assert(has_reverse(nadj), "Event support not implemented for Integrator::get_reverse");
 
   // Integrator options
   Dict aug_opts = getDerivativeOptions(false);
@@ -1683,6 +1712,12 @@ Function Integrator::get_reverse(casadi_int nadj, const std::string& name,
   // Get the current oracle, augmented with any existing forward sensitivity equations
   Function this_dae = augmented_dae();
 
+  // With a backward problem, reformulate as forward-over-reverse: one forward direction
+  // (d, a) for each adjoint seed d and adjoint direction a of this integrator
+  casadi_int na = nrx_ == 0 ? 1 : nadj_;
+  casadi_assert(na == 1 || nfwd_ == 0, "Reverse mode of forward sensitivities of an integrator "
+    "with several adjoint directions is not implemented");
+
   // Create integrator for augmented DAE
   std::string aug_prefix = "asens" + str(nadj) + "_";
   aug_opts["derivative_of"] = self();
@@ -1692,7 +1727,7 @@ Function Integrator::get_reverse(casadi_int nadj, const std::string& name,
     aug_opts["nfwd"] = 0;
   } else {
     // Reformulate as forward-over-reverse
-    aug_opts["nfwd"] = nadj;
+    aug_opts["nfwd"] = nadj * na;
     aug_opts["nadj"] = nadj_;
   }
   Function aug_int = integrator(aug_prefix + name_, plugin_name(),
@@ -1729,16 +1764,18 @@ Function Integrator::get_reverse(casadi_int nadj, const std::string& name,
     // Output index contributing to adjoint seeds
     casadi_int j = adjmap_out(i);
     // Number of grid points for this integrator input
-    casadi_int n_grid = grid_in(i) ? nt() : 1;
+    casadi_int n_grid = n_grid_in(i);
     // Split input and seeds by grid points, if necessary
     std::vector<MX> ret_in_split;
     std::vector<std::vector<MX>> aug_in_split(nadj);
-    if (size1_in(i) > 0 && grid_in(i) && n_grid > 1) {
-      // Split nondifferentiated input by grid point
-      ret_in_split = horzsplit_n(ret_in[i], nt());
+    if (n_grid > 1) {
+      // Split nondifferentiated input by grid point; it is empty without a backward problem,
+      // but the seeds still need to be ordered by grid point
+      ret_in_split = ret_in[i].size2() > 0 ? horzsplit_n(ret_in[i], n_grid)
+        : std::vector<MX>(n_grid, MX(size1_in(i), 0));
       // Split augmented input by grid point
       for (casadi_int d = 0; d < nadj; ++d) {
-        aug_in_split[d] = horzsplit_n(aug_in[j][d], nt());
+        aug_in_split[d] = horzsplit_n(aug_in[j][d], n_grid);
       }
     } else {
       // No reordering necessary
@@ -1756,7 +1793,17 @@ Function Integrator::get_reverse(casadi_int nadj, const std::string& name,
     for (casadi_int k = 0; k < ret_in_split.size(); ++k) {
       v.push_back(ret_in_split.at(k));
       for (casadi_int d = 0; d < nadj; ++d) {
-        v.push_back(aug_in_split[d].at(k));
+        if (na == 1) {
+          v.push_back(aug_in_split[d].at(k));
+        } else if (i < INTEGRATOR_ADJ_XF) {
+          // Seed of an adjoint output: direction (d, a) gets the part of adjoint direction a
+          for (const MX& e : vertsplit_n(aug_in_split[d].at(k), na)) v.push_back(e);
+        } else {
+          // Seed of a forward output: first adjoint direction of (d, 0) only, counted once
+          casadi_int n = numel_in(i) / n_grid, n_seed = aug_in_split[d].at(k).numel();
+          v.push_back(vertcat(aug_in_split[d].at(k), MX(n - n_seed, 1)));
+          for (casadi_int a = 1; a < na; ++a) v.push_back(MX(n, 1));
+        }
       }
     }
     integrator_in[i] = reshape(vertcat(v), aug_int.size_in(i));
@@ -1769,12 +1816,13 @@ Function Integrator::get_reverse(casadi_int nadj, const std::string& name,
   for (casadi_int i = 0; i < INTEGRATOR_NUM_IN; ++i) {
     casadi_int j = adjmap_out(i);
     // Split return by grid points and sensitivities
-    casadi_int n_grid = grid_out(j) ? nt() : 1;
+    casadi_int n_grid = n_grid_out(j);
+    casadi_int n_dir = nadj * na, n_block = (na == 1 ? numel_in(i) : numel_out(j)) / n_grid;
     std::vector<casadi_int> offset = {0};
     for (casadi_int k = 0; k < n_grid; ++k) {
       offset.push_back(offset.back() + numel_out(j) / n_grid);
-      for (casadi_int d = 0; d < nadj; ++d) {
-        offset.push_back(offset.back() + numel_in(i) / n_grid);
+      for (casadi_int d = 0; d < n_dir; ++d) {
+        offset.push_back(offset.back() + n_block);
       }
     }
     std::vector<MX> integrator_out_split = vertsplit(vec(integrator_out[j]), offset);
@@ -1783,8 +1831,24 @@ Function Integrator::get_reverse(casadi_int nadj, const std::string& name,
     ret_out_split.reserve(n_grid * nadj);
     for (casadi_int d = 0; d < nadj; ++d) {
       for (casadi_int k = 0; k < n_grid; ++k) {
-        ret_out_split.push_back(reshape(integrator_out_split.at((nadj + 1) * k + d + 1),
-          size1_in(i), size2_in(i) / n_grid));
+        // Block of direction (d, a)
+        auto block = [&](casadi_int a) -> MX {
+          return integrator_out_split.at((n_dir + 1) * k + d * na + a + 1);
+        };
+        MX s;
+        if (na == 1) {
+          s = block(0);
+        } else if (i < INTEGRATOR_ADJ_XF) {
+          // Adjoint output: sum of the parts of adjoint direction a over directions (d, a)
+          s = MX(numel_in(i) / n_grid, 1);
+          for (casadi_int a = 0; a < na; ++a) s += vertsplit_n(block(a), na).at(a);
+        } else {
+          // Forward output: direction (d, a) gives the part of adjoint direction a
+          std::vector<MX> parts;
+          for (casadi_int a = 0; a < na; ++a) parts.push_back(block(a));
+          s = vertcat(parts);
+        }
+        ret_out_split.push_back(reshape(s, size1_in(i), size2_in(i) / n_grid));
       }
     }
     ret_out.push_back(horzcat(ret_out_split));
@@ -1792,6 +1856,8 @@ Function Integrator::get_reverse(casadi_int nadj, const std::string& name,
 
   Dict options = opts;
   options["allow_duplicate_io_names"] = true;
+  // The wrapper calls a non-codegenable integrator, which jits its own dependencies
+  options["jit"] = false;
 
   // Create derivative function and return
   return Function(name, ret_in, ret_out, inames, onames, options);

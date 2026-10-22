@@ -131,7 +131,7 @@ namespace casadi {
     alloc_w(casadi_ipqp_sz_w(&p_), true);
     // Memory for KKT formation
     alloc_w(kkt_.nnz(), true);
-    alloc_iw(A_.size2());
+    alloc_iw(na_);
     alloc_w(nx_ + na_);
     // KKT solver
     linsol_ = Linsol("linsol", linear_solver_, kkt_, linear_solver_options_);

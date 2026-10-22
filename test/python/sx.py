@@ -459,6 +459,41 @@ class SXtests(casadiTestCase):
         f_out = f.call(f_in)
         self.checkarray(f_out[0],ca.DM([T1 and T2,T1 or T2,not T1]),"bool(%d,%d): %s" % (t1,t2,str(f_out[0])))
 
+  def test_not_not(self):
+    x = ca.SX.sym("x")
+    y = ca.SX.sym("y")
+    # !!x is only x when x is 0 or 1
+    f = ca.Function("f", [x], [ca.logic_not(ca.logic_not(x))])
+    self.checkarray(f(3), ca.DM(1))
+    self.checkarray(f(0), ca.DM(0))
+    # Boolean argument: double negation folds away
+    for b in [x<y, x<=y, x==y, x!=y, ca.logic_not(x), ca.logic_and(x,y), ca.logic_or(x,y)]:
+      self.assertTrue(ca.is_equal(ca.logic_not(ca.logic_not(b)), b))
+    self.assertFalse(ca.is_equal(ca.logic_not(ca.logic_not(x)), x))
+
+  def test_is_nonnegative_binary(self):
+    x = ca.SX.sym("x")
+    y = ca.SX.sym("y")
+    # fabs(e) -> e for nonnegative e, binary operations included
+    for e in [x<y, x<=y, x==y, x!=y, ca.logic_and(x,y), ca.logic_or(x,y), ca.hypot(x,y), ca.sqrt(x)]:
+      self.assertTrue(ca.is_equal(ca.fabs(e), e))
+    for e in [x+y, x*y, x-y]:
+      self.assertFalse(ca.is_equal(ca.fabs(e), e))
+
+  def test_chained_inequality_kept(self):
+    y = ca.SX.sym("y")
+    # On-the-fly simplification keeps chained inequalities, explicit simplification folds them
+    for e in [0<=(y<=1), (1>=y)>=0]:
+      self.assertFalse(e.is_constant())
+      f = ca.Function("f",[y],[e]).transform([["simplify",0,"ref_count"]])
+      self.assertTrue(f.call([y],True,False)[0].is_one())
+
+  def test_and_zero(self):
+    for X in [ca.SX.sym("x"), ca.MX.sym("x")]:
+      self.assertTrue(ca.logic_and(X, 0).is_zero())
+      self.assertTrue(ca.logic_and(0, X).is_zero())
+    self.assertTrue(ca.logic_and(ca.SX(0), ca.SX(0)).is_zero())
+
   def test_SXineq(self):
     self.message("SX ineq")
 

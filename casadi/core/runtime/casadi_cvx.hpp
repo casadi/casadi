@@ -42,7 +42,8 @@ T1 casadi_cvx_house(T1* v, T1* beta, casadi_int nv) {
     // Note: third edition has *beta = 0
     // Note: fourth edition has *beta = -2*(v0<0)
     *beta = 2*(v0<0);
-    v[0] = 1;
+    // Zero v encodes the identity (beta=0), see casadi_cvx_beta
+    v[0] = v0<0;
   } else {
     if (v0<=0) {
       v0 = v0 - s;
@@ -123,10 +124,9 @@ void casadi_cvx_house_apply_symm(casadi_int n, casadi_int k, T1* A, T1* p, T1* v
 //
 // Reference: Golub & Van Loan, Alg. 8.3.1
 template<typename T1>
-void casadi_cvx_tri(T1* A, casadi_int n, T1* beta, T1* p) {
-  T1 pp[1000];
+void casadi_cvx_tri(T1* A, casadi_int n, T1* p) {
   casadi_int k, N;
-  T1 *A_base, *v;
+  T1 *A_base, *v, beta;
   for (k=0;k<n-2;++k) {
     A_base = A+k+1+n*k; // A(k+1)
     N = n-k-1;
@@ -137,11 +137,18 @@ void casadi_cvx_tri(T1* A, casadi_int n, T1* beta, T1* p) {
     casadi_copy(A_base, N, v);
 
     // Assign 2-norm
-    *A_base = casadi_cvx_house(v, &beta[k], N);
+    *A_base = casadi_cvx_house(v, &beta, N);
 
-    casadi_cvx_house_apply_symm(n, k, A, pp, v, beta[k]);
+    casadi_cvx_house_apply_symm(n, k, A, p, v, beta);
 
   }
+}
+
+// SYMBOL "cvx_beta"
+// Recover Householder beta from v (v[0] is 1, or 0 for the identity)
+template<typename T1>
+T1 casadi_cvx_beta(const T1* v, casadi_int nv) {
+  return v[0]==0 ? 0 : 2/casadi_dot(nv, v, v);
 }
 
 
@@ -388,9 +395,8 @@ int casadi_cvx(casadi_int n, T1 *A, T1 epsilon, T1 tol, casadi_int reflect, casa
     T1* w, casadi_int* iw) {
   casadi_int i, j, k, n_iter, nn, p, trace_offset;
   casadi_int *t_meta;
-  T1 c, s, t_off0;
+  T1 c, s, t_off0, beta;
   T1 *cs, *t_diag, *t_off;
-  T1 beta[100];
 
   // Short-circuit for empty matrices
   if (n==0) return 0;
@@ -401,7 +407,7 @@ int casadi_cvx(casadi_int n, T1 *A, T1 epsilon, T1 tol, casadi_int reflect, casa
     return 0;
   }
 
-  casadi_cvx_tri(A, n, beta, w);
+  casadi_cvx_tri(A, n, w);
 
   for (i=0;i<n;++i) {
     for (j=0;j<n;++j) {
@@ -457,8 +463,9 @@ int casadi_cvx(casadi_int n, T1 *A, T1 epsilon, T1 tol, casadi_int reflect, casa
   for (k = n-3; k>=0; --k) {
     casadi_int N = n-k-1;
     T1 *v = A+N*n;
-    casadi_cvx_house_apply_symm(n, k, A, w, v, beta[k]);
-    casadi_cvx_house_apply(k+1, N, n, A+k+1, w, v, beta[k]);
+    beta = casadi_cvx_beta(v, N);
+    casadi_cvx_house_apply_symm(n, k, A, w, v, beta);
+    casadi_cvx_house_apply(k+1, N, n, A+k+1, w, v, beta);
   }
 
   return 0;

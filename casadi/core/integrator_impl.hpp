@@ -301,9 +301,9 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, void* mem) const override;
 
   ///@{
-  /// Is the class able to propagate seeds through the algorithm?
-  bool has_spfwd() const override { return true;}
-  bool has_sprev() const override { return true;}
+  /// Is the class able to propagate seeds through the algorithm? Not through events
+  bool has_spfwd() const override { return ne_ == 0;}
+  bool has_sprev() const override { return ne_ == 0;}
   ///@}
 
   ///@{
@@ -478,11 +478,11 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
       \identifier{1mg} */
   std::string serialize_base_function() const override { return "Integrator"; }
 
-  /// Is an input repeated for each grid point?
-  static bool grid_in(casadi_int i);
+  /// Number of grid points for which an input is repeated: output times or columns of u
+  casadi_int n_grid_in(casadi_int i) const;
 
-  /// Is an output repeated for each grid point?
-  static bool grid_out(casadi_int i);
+  /// Number of grid points for which an output is repeated
+  casadi_int n_grid_out(casadi_int i) const;
 
   /// Which output is used to calculate a given input in adjoint sensitivity analysis
   static casadi_int adjmap_out(casadi_int i);

@@ -7,16 +7,18 @@ include(joinpath(@__DIR__, "casadi.jl"))
 using .casadi
 
 const C = casadi
-export SX, MX, DM, Sparsity, sym, nlpsol, vertcat, jacobian, hessian
+import LinearAlgebra: dot, cross, norm, det, tr
+export SX, MX, DM, Sparsity, sym, nlpsol, jacobian, hessian
 # P1-3: high-value builders that live as C.* but were unreachable via `using`
 # (`reshape` is deliberately NOT exported: we extend Base.reshape, so a bare
 #  `reshape` resolves to Base with our methods; exporting would shadow it. P2-1)
-export horzcat, blockcat, diagcat, sum1, sum2, repmat, dot, cross,
+export blockcat, diagcat, sum1, sum2, repmat, dot, cross, norm, det, tr,
     mtimes, gradient, jtimes, substitute, simplify,
     qpsol, conic, integrator, rootfinder, CodeGenerator, codegen,
     external, generate, save
-# horzcat/vertcat/blockcat/diagcat/dot/gradient get typed/convenience wrappers below
-for _n in (:sum1, :sum2, :repmat, :reshape, :cross, :mtimes, :jtimes,
+# blockcat/diagcat/dot/gradient get typed/convenience wrappers below; concatenation
+# itself is [a b] / [a; b] (no horzcat/vertcat in the Julia API)
+for _n in (:sum1, :sum2, :repmat, :reshape, :mtimes, :jtimes,
            :substitute, :simplify)
     @eval const $_n = C.$_n
 end
@@ -46,26 +48,58 @@ C.MX(m::AbstractMatrix{<:Real}) = size(m, 1) == 0 ? _emptycols(MX, size(m, 2)) :
 C.MX(v::AbstractVector{<:Real}) = C.MX(C.DM(collect(Float64, v)))
 
 # ---- conversion (promotion by DM < SX < MX rank); generated ctors handle reals ----
-Base.convert(::Type{SX}, v::Union{Real,DM}) = C.SX(v isa Real ? Float64(v) : v)
-Base.convert(::Type{MX}, v::Union{Real,DM}) = C.MX(v isa Real ? Float64(v) : v)
-Base.convert(::Type{DM}, v::Real) = C.DM(Float64(v))
+# Julia numbers and arrays promote exactly like DM (`_Num`).
+const _Num = Union{Real,DM,AbstractArray{<:Real}}
+Base.convert(::Type{SX}, v::_Num) = C.SX(v isa Real ? Float64(v) : v)
+Base.convert(::Type{MX}, v::_Num) = C.MX(v isa Real ? Float64(v) : v)
+Base.convert(::Type{DM}, v::Union{Real,AbstractArray{<:Real}}) = C.DM(v isa Real ? Float64(v) : v)
 
 # ---- operators ----
-for (op, fn) in ((:+, :plus), (:-, :minus), (:*, :mtimes), (:/, :rdivide), (:^, :power))
+for (op, fn) in ((:+, :plus), (:-, :minus), (:*, :mtimes))
     @eval begin
         Base.$op(a::SX, b::SX) = C.$fn(a, b)
         Base.$op(a::MX, b::MX) = C.$fn(a, b)
         Base.$op(a::DM, b::DM) = C.$fn(a, b)
-        # promotion: scalars and DM promote to the symbolic side
-        Base.$op(a::SX, b::Union{Real,DM}) = C.$fn(a, convert(SX, b))
-        Base.$op(a::Union{Real,DM}, b::SX) = C.$fn(convert(SX, a), b)
-        Base.$op(a::MX, b::Union{Real,DM}) = C.$fn(a, convert(MX, b))
-        Base.$op(a::Union{Real,DM}, b::MX) = C.$fn(convert(MX, a), b)
-        Base.$op(a::DM, b::Real) = C.$fn(a, convert(DM, b))
-        Base.$op(a::Real, b::DM) = C.$fn(convert(DM, a), b)
+        # promotion: numbers, Julia arrays and DM promote to the symbolic side
+        Base.$op(a::SX, b::_Num) = C.$fn(a, convert(SX, b))
+        Base.$op(a::_Num, b::SX) = C.$fn(convert(SX, a), b)
+        Base.$op(a::MX, b::_Num) = C.$fn(a, convert(MX, b))
+        Base.$op(a::_Num, b::MX) = C.$fn(convert(MX, a), b)
+        Base.$op(a::DM, b::Union{Real,AbstractArray{<:Real}}) = C.$fn(a, convert(DM, b))
+        Base.$op(a::Union{Real,AbstractArray{<:Real}}, b::DM) = C.$fn(convert(DM, a), b)
     end
 end
 Base.:-(a::Union{SX,MX,DM}) = C.times(a, typeof(a) === DM ? C.DM(-1.0) : convert(typeof(a), -1))
+
+# Where Julia gives an array operation a meaning (A/B, A^n, matrix functions, max of
+# arrays), a casadi matrix does the same or throws; never an elementwise surprise.
+# Elementwise is spelled with dots (./ .^ sin.), as in Julia.
+_scal(x::Union{SX,MX,DM}) = C.numel(x) == 1
+_scal(x::Real) = true
+_scal(x) = false
+_shape(x) = "$(C.size1(x))×$(C.size2(x))"
+Base.:/(a::Union{SX,MX,DM}, b::Union{SX,MX,DM,Real,AbstractArray{<:Real}}) = _div(a, b)
+Base.:/(a::Union{Real,AbstractArray{<:Real}}, b::Union{SX,MX,DM}) = _div(a, b)
+function _div(a, b)
+    T = _catpromote((a, b))
+    _scal(b) && return C.rdivide(_ascat(T, a), _ascat(T, b))
+    _scal(a) && Base.throw(ArgumentError("x / A with a matrix A has no meaning in Julia; use x ./ A"))
+    C.mrdivide(_ascat(T, a), _ascat(T, b))
+end
+Base.:^(a::Union{SX,MX,DM}, b::Union{SX,MX,DM,Real}) = _pow(a, b)
+Base.:^(a::Real, b::Union{SX,MX,DM}) = _pow(a, b)
+function _pow(a, b)
+    T = _catpromote((a, b))
+    _scal(a) && _scal(b) && return C.power(_ascat(T, a), _ascat(T, b))
+    p = b isa DM && _scal(b) ? Float64(b) : b
+    if a isa _Cat && p isa Real && Base.isinteger(p)                  # A^n: casadi's mpower
+        C.size1(a) == C.size2(a) || Base.throw(DimensionMismatch("matrix is not square: dimensions are $(_shape(a))"))
+        n = Int(p)
+        return n >= 0 ? C.mpower(a, n) : C.mpower(C.inv(a), -n)
+    end
+    Base.throw(ArgumentError("A^p of a matrix needs an integer p (matrix power); use .^ for " *
+        "elementwise, or a Julia Matrix(A) for Julia's A^p and p^A"))
+end
 
 # ---- broadcasting (P0-2): casadi ops are already elementwise on matrices, so
 # every `.op` / `f.(x)` short-circuits to the matrix-wide elementwise casadi op ----
@@ -90,12 +124,29 @@ _coerce(::Type{T}, a) where {T} = a   # ops, Refs, Val: pass through untouched
 # the applied op: unwrap literal_pow (x.^2) into a plain casadi power
 _apply(f, args...) = f(args...)
 _apply(::typeof(Base.literal_pow), ::Base.RefValue{typeof(^)}, x, ::Base.RefValue{Val{n}}) where {n} =
-    x ^ convert(typeof(x), n)
-# broadcast op -> ELEMENTWISE casadi op: `*`/`/`/`^` must NOT be mtimes/solve/mpower
-_bcop(f) = f                       # +,-,math funcs are already elementwise
+    C.power(x, n)
+# f.(args) with a known f: one whole-matrix casadi op (elementwise); `nothing`: unknown f
+_bcop(f) = nothing
+_bcop(::typeof(+)) = +
+_bcop(::typeof(-)) = -
 _bcop(::typeof(*)) = C.times
 _bcop(::typeof(/)) = C.rdivide
 _bcop(::typeof(^)) = C.power
+_bcop(::typeof(<)) = C.lt
+_bcop(::typeof(<=)) = C.le
+_bcop(::typeof(>)) = C.gt
+_bcop(::typeof(>=)) = C.ge
+_bcop(::typeof(==)) = C.eq
+_bcop(::typeof(!=)) = C.ne
+_bcop(::typeof(Base.max)) = C.fmax
+_bcop(::typeof(Base.min)) = C.fmin
+_bcop(::typeof(Base.hypot)) = C.hypot
+_bcop(::typeof(Base.atan)) = (a...) -> Base.length(a) == 2 ? C.atan2(a...) : C.atan(a...)
+_bcop(::typeof(Base.ifelse)) = C.if_else
+for fn in (:sin, :cos, :tan, :exp, :log, :sqrt, :abs, :tanh, :sinh, :cosh, :asin, :acos,
+           :floor, :ceil, :sign, :log10, :log1p, :expm1, :asinh, :acosh, :atanh)
+    @eval _bcop(::typeof(Base.$fn)) = C.$fn
+end
 
 # materialize by recursively walking the (unflattened) tree, so nested `.* ` inside a
 # fused chain still maps to elementwise times rather than Base.:* (mtimes).
@@ -108,8 +159,17 @@ function _bceval(bc::Base.Broadcast.Broadcasted{CasadiStyle})
     if Base.length(args) == 1 && bc.f isa Type{<:Number} && args[1] isa _Cat
         return bc.f.(Base.collect(args[1]))
     end
+    op = _bcop(bc.f)
+    op === nothing && return _bcelem(bc.f, args)
     T = _castype(args...)
-    _bcop(bc.f)(map(a -> _coerce(T, a), args)...)
+    op(map(a -> _coerce(T, a), args)...)
+end
+# any other f is applied to each element, with Julia's broadcast shape rules
+function _bcelem(f, args)
+    r = Base.broadcast(f, map(a -> a isa _Cat ? Base.collect(a) : a, args)...)
+    r isa AbstractArray || return r
+    T = _catpromote(Base.vec(r))
+    _restore(T, C.reshape(C._vertcat(_cvec(Base.vec(r))), Base.size(r, 1), Base.size(r, 2)))
 end
 Base.copy(bc::Base.Broadcast.Broadcasted{CasadiStyle}) = _bceval(bc)
 
@@ -118,32 +178,43 @@ const _Cat = Union{SX,MX,DM}
 _catpromote(xs) = Base.any(x -> x isa MX, xs) ? MX : Base.any(x -> x isa SX, xs) ? SX : DM
 _ascat(::Type{T}, x::T) where {T<:_Cat} = x                 # same type: identity
 _ascat(::Type{T}, x::_Cat) where {T} = convert(T, x)        # promote DM->SX/MX etc.
-_ascat(T, x::Real) = convert(T, x)
-_ascat(T, x::AbstractArray{<:Real}) = T(x)
+_ascat(T, x::Number) = convert(T, x)
+_ascat(T, x::AbstractArray) = T(x)
 _cvec(xs) = (T = _catpromote(xs); [_ascat(T, x) for x in xs])
-# generated vertcat/horzcat always return MX; restore the DM type for numeric cats
+# generated _vertcat/_horzcat always return MX; restore the DM type for numeric cats
 _restore(::Type{DM}, r) = C.evalf(r)
 _restore(::Type{T}, r) where {T} = r
-# Anchor on the first arg being a casadi type so all-Real cats never reach here.
-Base.vcat(x::_Cat, xs::Union{_Cat,Real}...) = _restore(_catpromote((x, xs...)), C.vertcat(_cvec((x, xs...))))
-Base.hcat(x::_Cat, xs::Union{_Cat,Real}...) = _restore(_catpromote((x, xs...)), C.horzcat(_cvec((x, xs...))))
-# Leading Julia scalar + a casadi type later: keeps `[0; x; 0]`, `[c; x]`, `[c x]` from
-# silently building a Vector{Any}. (A purely-scalar prefix like `[1; 2; x]` still escapes
-# to Base; reach for the free `vertcat(...)` there.) (P1-2)
-Base.vcat(a::Real, x::_Cat, xs::Union{_Cat,Real}...) = _restore(_catpromote((a, x, xs...)), C.vertcat(_cvec((a, x, xs...))))
-Base.hcat(a::Real, x::_Cat, xs::Union{_Cat,Real}...) = _restore(_catpromote((a, x, xs...)), C.horzcat(_cvec((a, x, xs...))))
+_cat(builder, xs) = _restore(_catpromote(xs), builder(_cvec(xs)))
+# One vararg method per bracket form, over casadi values, numbers and Julia arrays:
+# a casadi operand may sit anywhere ([0; 0; v], [1 2 x], [A x; y' 0], vcat(w...)).
+# Calls without one keep reaching Base, whose Number/AbstractArray methods are
+# strictly more specific (this is why the union says Number, not Real); the
+# fallbacks below only guard odd mixes Base has no specific method for.  (P1-2)
+const _CatArg = Union{_Cat,Number,AbstractArray}
+_hascat(xs) = Base.any(x -> x isa _Cat, xs)
+# The pieces become a Vector{Any} at once: passing the tuple on would compile
+# every helper anew for each length of a splatted vcat(w...).
+Base.vcat(@nospecialize(xs::_CatArg...)) = _vcat(Any[xs...])
+Base.hcat(@nospecialize(xs::_CatArg...)) = _hcat(Any[xs...])
+Base.hvcat(rows::Tuple{Vararg{Int}}, @nospecialize(xs::_CatArg...)) = _hvcat_any(rows, Any[xs...])
+_vcat(v::Vector{Any}) = _hascat(v) ? _cat(C._vertcat, v) : Base.cat(v...; dims = 1)
+_hcat(v::Vector{Any}) = _hascat(v) ? _cat(C._horzcat, v) : Base.cat(v...; dims = 2)
+_hvcat_any(rows, v::Vector{Any}) = _hascat(v) ? _hvcat(rows, v) :
+    Base.invoke(Base.hvcat, Tuple{Tuple{Vararg{Int}},Vararg{Any}}, rows, v...)
+# reduce(vcat, w) over a vector of casadi values: one vertcat, not a pairwise fold
+Base.reduce(::typeof(vcat), v::AbstractVector{<:_Cat}) = _cat(C._vertcat, v)
+Base.reduce(::typeof(hcat), v::AbstractVector{<:_Cat}) = _cat(C._horzcat, v)
 # [a b; c d] -> rows of horzcat, then vertcat
-function Base.hvcat(rows::Tuple{Vararg{Int}}, x::_Cat, ys::Union{_Cat,Real}...)
-    xs = (x, ys...)
+function _hvcat(rows, xs)
     T = _catpromote(xs)
     cv = [_ascat(T, x) for x in xs]
     blocks = Any[]
     k = 0
     for ncol in rows
-        Base.push!(blocks, C.horzcat(cv[(k + 1):(k + ncol)]))
+        Base.push!(blocks, C._horzcat(cv[(k + 1):(k + ncol)]))
         k += ncol
     end
-    _restore(T, C.vertcat(blocks))
+    _restore(T, C._vertcat(blocks))
 end
 
 # ---- typed function-form cat/dot (R3): preserve DM/SX, MX otherwise ----
@@ -157,40 +228,97 @@ function _typedcat(builder, args...)
     T = _catpromote(xs)
     _restore(T, builder([_ascat(T, x) for x in xs]))
 end
-horzcat(args::Union{_Cat,Real}...) = _typedcat(C.horzcat, args...)
-horzcat(v::AbstractVector) = _typedcat(C.horzcat, v)
-vertcat(args::Union{_Cat,Real}...) = _typedcat(C.vertcat, args...)
-vertcat(v::AbstractVector) = _typedcat(C.vertcat, v)
-diagcat(args::Union{_Cat,Real}...) = _typedcat(C.diagcat, args...)
+# Varargs may mix casadi values, numbers and Julia arrays; a single Julia vector
+# is the list form (its elements are the pieces), as in Python.
+diagcat(args::_CatArg...) = _typedcat(C.diagcat, args...)
 diagcat(v::AbstractVector) = _typedcat(C.diagcat, v)
 # blockcat takes a 2-D matrix-of-blocks; lower it to vertcat-of-horzcats
 function blockcat(rows::AbstractVector{<:AbstractVector})
     xs = Base.collect(Base.Iterators.flatten(rows))
     T = _catpromote(xs)
-    _restore(T, C.vertcat([C.horzcat([_ascat(T, x) for x in r]) for r in rows]))
+    _restore(T, C._vertcat([C._horzcat([_ascat(T, x) for x in r]) for r in rows]))
 end
 blockcat(A::_Cat, B::_Cat, C_::_Cat, D::_Cat) =
     blockcat([[A, B], [C_, D]])
 # dot: promote both sides to a common type, then the matching generated method
-function dot(a::Union{_Cat,Real}, b::Union{_Cat,Real})
+function dot(a::_Cat, b::_CatArg)
     T = _catpromote((a, b))
     _restore(T, C.dot(_ascat(T, a), _ascat(T, b)))
 end
+dot(a::Union{Real,AbstractArray{<:Real}}, b::_Cat) = dot(b, a)
+cross(a::T, b::T, dim::Integer...) where {T<:_Cat} = C.cross(a, b, dim...)
 # MATLAB-style backslash solve `A \ b` (linear solve), distinct from elementwise
-function Base.:\(a::_Cat, b::Union{_Cat,Real})
+function Base.:\(a::_Cat, b::_CatArg)
     T = _catpromote((a, b))
     _restore(T, C.solve(_ascat(T, a), _ascat(T, b)))
 end
+Base.:\(a::AbstractMatrix{<:Real}, b::_Cat) = convert(typeof(b), a) \ b
 
 # ---- Base math extensions (no shadowing: extend Base methods) ----
-for fn in (:sin, :cos, :tan, :exp, :log, :sqrt, :abs, :tanh, :sinh, :cosh,
-           :asin, :acos, :atan, :floor, :ceil, :sign)
+# Julia's sin(A), exp(A), ... of a square matrix are matrix functions, which casadi does
+# not compute: a non-scalar throws (use sin.(A)).  Scalars (1×1) are plain casadi ops.
+for fn in (:sin, :cos, :tan, :exp, :log, :sqrt, :tanh, :sinh, :cosh,
+           :asin, :acos, :atan, :asinh, :acosh, :atanh)
+    @eval Base.$fn(x::Union{SX,MX,DM}) = _scal(x) ? C.$fn(x) : Base.throw(ArgumentError(
+        "$($(QuoteNode(fn)))(A) of a $(_shape(x)) $(typeof(x)): in Julia a matrix function of a " *
+        "square A, undefined otherwise; use $($(QuoteNode(fn))).(A) for elementwise, or a Julia Matrix(A)"))
+end
+# no array meaning in Julia for these: elementwise, as casadi
+for fn in (:abs, :floor, :ceil, :sign, :log10, :log1p, :expm1)
+    @eval Base.$fn(x::Union{SX,MX,DM}) = C.$fn(x)
+end
+
+# Reductions and binary math with Julia's own names and semantics (sum, diff,
+# cumsum, maximum, max, norm, inv, det, tr, atan(y, x), hypot), so Julia code
+# reads like Matlab's.  Results keep the casadi type.  `Base.` is spelled out:
+# inside this module the generated casadi exports clash with Base's names.
+_dims(x, dims, what) = dims !== nothing ? Int(dims) :
+    C.size2(x) == 1 ? 1 : C.size1(x) == 1 ? 2 :
+    Base.throw(ArgumentError("$what of a matrix needs dims, e.g. $what(A; dims=1)"))
+function Base.sum(x::_Cat; dims = :)
+    dims === Colon() && return C.sum2(C.sum1(x))       # all elements, as for Julia arrays
+    dims == 1 ? C.sum1(x) : dims == 2 ? C.sum2(x) : x
+end
+Base.diff(x::_Cat; dims::Union{Integer,Nothing} = nothing) = C.diff(x, 1, _dims(x, dims, "diff") - 1)
+Base.cumsum(x::_Cat; dims::Union{Integer,Nothing} = nothing) = C.cumsum(x, _dims(x, dims, "cumsum") - 1)
+Base.maximum(x::_Cat) = C.mmax(x)
+Base.minimum(x::_Cat) = C.mmin(x)
+Base.inv(x::_Cat) = C.inv(x)
+det(x::_Cat) = C.det(x)
+tr(x::_Cat) = C.trace(x)
+# Julia's norm: a vector's p-norm, or entrywise for a matrix (Frobenius for p = 2)
+function norm(x::_Cat, p::Real = 2)
+    isvec = C.size1(x) == 1 || C.size2(x) == 1
+    p == 2 ? (isvec ? C.norm_2(x) : C.norm_fro(x)) :
+    p == 1 ? (isvec ? C.norm_1(x) : Base.sum(Base.abs(x))) :
+    p == Inf ? (isvec ? C.norm_inf(x) : Base.maximum(Base.abs(x))) :
+    Base.throw(ArgumentError("norm(x, p) of a casadi value supports p = 1, 2 or Inf"))
+end
+# Elementwise two-argument functions; the generated overloads pick MX/SX/DM from
+# the argument types, so numbers and Julia arrays mix in as anywhere else.
+const _Native = Union{Real,AbstractArray{<:Real}}
+# atan(y, x) and hypot have no array meaning in Julia: elementwise.  max/min of arrays
+# do (a lexicographic pick of vectors), so they take scalars only.
+for (fn, cfn) in ((:atan, :atan2), (:hypot, :hypot))
     @eval begin
-        Base.$fn(x::SX) = C.$fn(x)
-        Base.$fn(x::MX) = C.$fn(x)
-        Base.$fn(x::DM) = C.$fn(x)
+        Base.$fn(a::_Cat, b::_Cat) = C.$cfn(a, b)
+        Base.$fn(a::_Cat, b::_Native) = C.$cfn(a, b)
+        Base.$fn(a::_Native, b::_Cat) = C.$cfn(a, b)
     end
 end
+for (fn, cfn) in ((:max, :fmax), (:min, :fmin))
+    @eval begin
+        Base.$fn(a::_Cat, b::Union{_Cat,_Native}) = _maxmin(Base.$fn, C.$cfn, a, b)
+        Base.$fn(a::_Native, b::_Cat) = _maxmin(Base.$fn, C.$cfn, a, b)
+    end
+end
+function _maxmin(f, cf, a, b)
+    _scal(a) && _scal(b) && return cf(a, b)
+    Base.throw(ArgumentError("$f(A, B) of arrays is a lexicographic pick in Julia; use $f.(A, B) for elementwise"))
+end
+
+# ifelse(c, a, b) on a casadi condition is casadi's if_else
+Base.ifelse(c::_Cat, a, b) = C.if_else(c, a, b)
 
 # ---- transpose: MATLAB-style `A'` and `transpose(A)` ----
 Base.transpose(x::Union{SX,MX,DM}) = C.transpose(x)
@@ -290,12 +418,13 @@ Base.eltype(::Type{DM}) = Float64
 # kept for back-compat: structural nonzeros (column-major), ignores shape/sparsity
 Base.Vector{Float64}(d::DM) = C.nonzeros(d)
 
-# ---- scalar zero/one (so zeros(SX,m,n)/ones(...) and zero(x)/one(x) work) ----
+# ---- zero/one: scalar for the type (so zeros(SX,m,n) works), shaped for a value ----
 for T in (:SX, :MX, :DM)
     @eval Base.zero(::Type{$T}) = C.$T(0.0)
     @eval Base.one(::Type{$T})  = C.$T(1.0)
-    @eval Base.zero(::$T) = C.$T(0.0)
-    @eval Base.one(::$T)  = C.$T(1.0)
+    @eval Base.zero(x::$T) = C.zeros($T, C.size1(x), C.size2(x))
+    @eval Base.one(x::$T) = C.size1(x) == C.size2(x) ? C.eye($T, C.size1(x)) :
+        Base.throw(DimensionMismatch("multiplicative identity defined only for square matrices"))
 end
 
 # ---- Float64 of a CONSTANT scalar SX/MX (DM already has Float64 above) ----
@@ -319,6 +448,9 @@ Base.collect(x::SX) = _to_matrix(x)
 Base.collect(x::MX) = _to_matrix(x)
 Base.Array(x::SX) = _to_matrix(x)
 Base.Array(x::MX) = _to_matrix(x)
+# a row or column -> Vector of scalar elements
+Base.Vector(x::Union{SX,MX}) = C.size1(x) == 1 || C.size2(x) == 1 ? Base.vec(_to_matrix(x)) :
+    Base.throw(DimensionMismatch("Vector of a $(C.size1(x))×$(C.size2(x)) matrix; use vec(x) or collect(x)"))
 
 # ---- Base bridges to casadi free functions (typed: preserve DM/SX/MX) ----
 Base.vec(x::Union{SX,MX,DM}) = C.vec(x)
@@ -332,7 +464,8 @@ Base.reshape(x::Union{SX,MX,DM}, nrow::Integer, ncol::Integer) = C.reshape(x, In
 Base.reshape(x::Union{SX,MX,DM}, dims::Tuple{Integer,Integer}) = C.reshape(x, Int(dims[1]), Int(dims[2]))
 
 # ---- functor: f(args...) like Python ----
-function (f::CasadiFunction)(args::Vararg{Union{Real,DM,SX,MX}})
+# Julia arrays pass through as-is: the wrapper converts them like DM (`[]` -> empty).
+function (f::CasadiFunction)(args::Vararg{Union{Real,DM,SX,MX,AbstractArray}})
     ins = Any[a isa Real ? C.DM(Float64(a)) : a for a in args]
     r = C.call(f, ins)
     Base.length(r) == 1 ? r[1] : Base.Tuple(r)
@@ -344,8 +477,7 @@ function (f::CasadiFunction)(; kwargs...)
         r = C.call(f, Any[])
         return Base.length(r) == 1 ? r[1] : Base.Tuple(r)
     end
-    C.call(f, Dict{String,Any}(Base.string(k) => (v isa Real ? C.DM(Float64(v)) :
-                                                  v isa AbstractVector{<:Real} ? C.DM(collect(Float64, v)) : v)
+    C.call(f, Dict{String,Any}(Base.string(k) => (v isa Real ? C.DM(Float64(v)) : v)
                                for (k, v) in kwargs))
 end
 
@@ -367,14 +499,28 @@ _optdict(opts) = Dict{String,Any}(Base.string(k) => v for (k, v) in opts)
 const codegen = C.CodeGenerator   # short alias; CodeGenerator(name[, opts]) opts-defaulted
 export interpolant, generate_dependencies
 
-# ---- comparisons -> symbolic constraints ----
-for (op, fn) in ((:<, :lt), (:<=, :le), (:>=, :ge), (:(==), :eq))
+# ---- comparisons: elementwise, in the casadi type (SX/MX constraints, DM 0/1 values) ----
+const _Real = Union{Real,AbstractArray{<:Real}}
+for (op, fn) in ((:<, :lt), (:<=, :le), (:>=, :ge), (:(==), :eq), (:(!=), :ne))
     @eval begin
         Base.$op(a::T, b::T) where {T<:Union{SX,MX}} = C.$fn(a, b)
-        Base.$op(a::T, b::Union{Real,DM}) where {T<:Union{SX,MX}} = C.$fn(a, convert(T, b))
-        Base.$op(a::Union{Real,DM}, b::T) where {T<:Union{SX,MX}} = C.$fn(convert(T, a), b)
+        Base.$op(a::T, b::_Num) where {T<:Union{SX,MX}} = C.$fn(a, convert(T, b))
+        Base.$op(a::_Num, b::T) where {T<:Union{SX,MX}} = C.$fn(convert(T, a), b)
+        Base.$op(a::DM, b::DM) = C.$fn(a, b)
+        Base.$op(a::DM, b::_Real) = C.$fn(a, convert(DM, b))
+        Base.$op(a::_Real, b::DM) = C.$fn(convert(DM, a), b)
     end
 end
+# isequal/hash/iszero stay Bool (Dict keys): structural identity, casadi's is_equal at depth 0
+Base.isequal(a::T, b::T) where {T<:Union{SX,MX}} = C.is_equal(a, b)
+Base.hash(x::MX, h::UInt) = Base.hash(C.__hash__(x), h)
+Base.hash(x::SX, h::UInt) = C.numel(x) == 1 && C.nnz(x) == 1 ?
+    Base.hash(C.element_hash(x), h) : Base.hash(Base.size(x), h)
+Base.iszero(x::Union{SX,MX}) = C.is_zero(x)
+# a DM is a value: equal when shape and entries are
+Base.isequal(a::DM, b::DM) = Base.isequal(Base.Matrix{Float64}(a), Base.Matrix{Float64}(b))
+Base.hash(x::DM, h::UInt) = Base.hash(Base.Matrix{Float64}(x), h)
+Base.iszero(x::DM) = Base.iszero(Base.Matrix{Float64}(x))
 
 # ---- Opti conveniences ----
 # variable/parameter/subject_to need no wrappers: they reach the generated Opti
@@ -388,17 +534,11 @@ bounded(lb, ex::MX, ub) = C.bounded(C.Opti, convert(MX, lb), ex, convert(MX, ub)
 solver!(o::Opti, plugin::AbstractString, plugin_opts=Dict{String,Any}(), solver_opts=Dict{String,Any}()) =
     C.solver(o, plugin, plugin_opts, solver_opts)
 solve!(o::Opti) = C.solve(o)
-# Return the solution as native Julia: scalar Float64, column -> Vector, else Matrix.
-# (P1-3: the old hard Float64() cast made vector/matrix decision vars unreadable.)
-function _dm_native(d::DM)
-    (C.size1(d) == 1 && C.size2(d) == 1) && return Float64(d)
-    M = Base.Matrix{Float64}(d)
-    C.size2(d) == 1 ? M[:, 1] : M
-end
-value(sol, x) = _dm_native(C.value(sol, x, MX[]))
+# value() comes back as native Julia from the wrapper itself (native_DM typemap):
+# scalar Float64, row or column -> Vector, else Matrix -- also via `sol.value(x)`.
+value(sol, x) = C.value(sol, x)
 export set_initial
-set_initial(o::Opti, x, v) =
-    C.set_initial(o, x, v isa Union{MX,DM} ? v : C.DM(Float64(v)))
+set_initial(o::Opti, x, v) = C.set_initial(o, x, v)
 
 # ---- 1-based indexing: Julia ranges -> casadi Slice (0-based stop-exclusive) ----
 # Reject i < 1 (Julia/MATLAB are 1-based; never Python-style negative wraparound).
@@ -414,17 +554,42 @@ _slice(::Colon) = C.Slice()
 _ckhi(x, i::Integer, n) = i <= n ? i : Base.throw(BoundsError(x, i))
 _ckhi(x, r::AbstractRange, n) = (Base.isempty(r) || Base.last(r) <= n || Base.throw(BoundsError(x, r)); r)
 _ckhi(x, ::Colon, n) = nothing
-Base.getindex(x::Union{SX,MX,DM}, i::Union{Integer,AbstractRange,Colon}) =
-    (_ckhi(x, i, C.numel(x)); C.get(x, false, _slice(i)))
-Base.getindex(x::Union{SX,MX,DM}, i::Union{Integer,AbstractRange,Colon},
-              j::Union{Integer,AbstractRange,Colon}) =
-    (_ckhi(x, i, C.size1(x)); _ckhi(x, j, C.size2(x)); C.get(x, false, _slice(i), _slice(j)))
-Base.setindex!(x::Union{SX,MX,DM}, v, i::Union{Integer,AbstractRange,Colon}) =
-    (C.set(x, _asval(typeof(x), v), false, _slice(i)); x)
-# 2-D setindex! mirrors the 2-index getindex; coerce Real/array v to the matrix type
-Base.setindex!(x::Union{SX,MX,DM}, v, i::Union{Integer,AbstractRange,Colon},
-               j::Union{Integer,AbstractRange,Colon}) =
-    (C.set(x, _asval(typeof(x), v), false, _slice(i), _slice(j)); x)
+# Integers, ranges and `:` index through a casadi Slice; integer vectors and Bool or DM masks
+# through explicit 0-based indices (on both axes, once either is a vector).
+const _Ind = Union{Integer,AbstractRange,Colon}
+const _AnyInd = Union{_Ind,AbstractVector{<:Integer},AbstractArray{Bool},DM}
+_imask(x, i, n) = (Base.length(i) == n || Base.throw(BoundsError(x, i)); Base.findall(Base.vec(i)) .- 1)
+_ivec(x, i::AbstractArray{Bool}, n) = _imask(x, i, n)
+_ivec(x, i::AbstractVector{Bool}, n) = _imask(x, i, n)
+_ivec(x, i::DM, n) = _imask(x, Base.Matrix{Float64}(i) .!= 0, n)   # e.g. x[x .> 0]: a mask
+_ivec(x, i::AbstractVector{<:Integer}, n) = (Base.all(k -> 1 <= k <= n, i) || Base.throw(BoundsError(x, i)); Int.(i) .- 1)
+_ivec(x, i::Integer, n) = _ivec(x, [i], n)
+_ivec(x, ::Colon, n) = Base.collect(0:n-1)
+# Shapes follow casadi (as in its Python/MATLAB and SciML CasADi.jl), not Julia's dropped
+# dimensions: A[i, :] is a 1×n row and x[range] keeps a vector's orientation.
+Base.getindex(x::Union{SX,MX,DM}, i::_AnyInd) = i isa _Ind ?
+    (_ckhi(x, i, C.numel(x)); C.get(x, false, _slice(i))) :
+    C.get(x, false, _ivec(x, i, C.numel(x)))
+function Base.getindex(x::Union{SX,MX,DM}, i::_AnyInd, j::_AnyInd)
+    i isa _Ind && j isa _Ind ?
+        (_ckhi(x, i, C.size1(x)); _ckhi(x, j, C.size2(x)); C.get(x, false, _slice(i), _slice(j))) :
+        C.get(x, false, _ivec(x, i, C.size1(x)), _ivec(x, j, C.size2(x)))
+end
+# setindex! mirrors getindex; coerce Real/array v to the matrix type, a column into a row slot
+_fitrow(v) = v isa _Cat && C.size2(v) == 1 && C.size1(v) != 1 ? C.transpose(v) : v
+function Base.setindex!(x::Union{SX,MX,DM}, v, i::_AnyInd)
+    w = _asval(typeof(x), v)
+    C.size1(x) == 1 && (w = _fitrow(w))
+    i isa _Ind ? C.set(x, w, false, _slice(i)) : C.set(x, w, false, _ivec(x, i, C.numel(x)))
+    x
+end
+function Base.setindex!(x::Union{SX,MX,DM}, v, i::_AnyInd, j::_AnyInd)
+    w = _asval(typeof(x), v)
+    i isa Integer && !(j isa Integer) && (w = _fitrow(w))
+    i isa _Ind && j isa _Ind ? C.set(x, w, false, _slice(i), _slice(j)) :
+        C.set(x, w, false, _ivec(x, i, C.size1(x)), _ivec(x, j, C.size2(x)))
+    x
+end
 # value coercion for set(): scalar Real / native array -> the matrix type, else pass through
 _asval(::Type{T}, v::Real) where {T} = convert(T, v)
 _asval(::Type{T}, v::AbstractArray{<:Real}) where {T} = T(v)
@@ -516,7 +681,22 @@ casadi_deserialize(str::AbstractString) = unpack(StringDeserializer(str))
 # `callback(obj; name=...)` to get a normal casadi `Function` whose evaluation
 # dispatches into your Julia `cb_eval`.
 export CasadiCallback, callback, cb_eval, cb_n_in, cb_n_out,
-    cb_sparsity_in, cb_sparsity_out, cb_name_in, cb_name_out
+    cb_sparsity_in, cb_sparsity_out, cb_name_in, cb_name_out,
+    cb_init, cb_finalize, cb_has_jacobian, cb_get_jacobian,
+    cb_has_forward, cb_get_forward, cb_has_reverse, cb_get_reverse,
+    cb_has_jac_sparsity, cb_get_jac_sparsity
+"""
+    CasadiCallback
+
+Supertype of a Julia-defined casadi Callback; `callback(obj; name, opts...)` makes it a Function.
+Define `cb_eval(obj, args::Vector{DM})` returning a vector of outputs, and optionally
+`cb_n_in`, `cb_n_out`, `cb_sparsity_in`, `cb_sparsity_out`, `cb_name_in`, `cb_name_out`
+(1-based indices), `cb_init`, `cb_finalize`, and the derivative hooks
+`cb_has_jacobian`/`cb_get_jacobian(obj, name, inames, onames, opts)`,
+`cb_has_forward`/`cb_get_forward(obj, nfwd, name, inames, onames, opts)`,
+`cb_has_reverse`/`cb_get_reverse(obj, nadj, name, inames, onames, opts)` and
+`cb_has_jac_sparsity`/`cb_get_jac_sparsity(obj, oind, iind, symmetric)`.
+"""
 abstract type CasadiCallback end
 
 # Defaults mirroring casadi's Callback base: scalar dense I/O, override as needed.
@@ -528,6 +708,12 @@ cb_name_in(::CasadiCallback, i)  = "i$(i)"
 cb_name_out(::CasadiCallback, i) = "o$(i)"
 # cb_eval has no default: a callback must compute something.
 function cb_eval end
+# Optional hooks, as in casadi's Callback; unimplemented ones fall back to the C++ base.
+const _NO = C._swig_director_no_override
+for f in (:cb_init, :cb_finalize, :cb_has_jacobian, :cb_get_jacobian, :cb_has_forward,
+          :cb_get_forward, :cb_has_reverse, :cb_get_reverse, :cb_has_jac_sparsity, :cb_get_jac_sparsity)
+    @eval $f(::CasadiCallback, args...) = _NO
+end
 
 # Route the SWIG director generic functions (invoked from C++) to the user's
 # CasadiCallback methods.  Defined once on the abstract type; no ambiguity.
@@ -539,6 +725,29 @@ C.Callback_get_sparsity_out(self::CasadiCallback, i) = cb_sparsity_out(self, Int
 C.Callback_get_name_in(self::CasadiCallback, i)      = cb_name_in(self, Int(i) + 1)
 C.Callback_get_name_out(self::CasadiCallback, i)     = cb_name_out(self, Int(i) + 1)
 C.Callback_eval(self::CasadiCallback, arg)           = collect(DM, cb_eval(self, collect(DM, arg)))
+C.Callback_init(self::CasadiCallback)     = cb_init(self)
+C.Callback_finalize(self::CasadiCallback) = cb_finalize(self)
+C.Callback_has_jacobian(self::CasadiCallback) = cb_has_jacobian(self)
+C.Callback_get_jacobian(self::CasadiCallback, name, inames, onames, opts) =
+    _asfunction(cb_get_jacobian(self, name, inames, onames, opts))
+C.Callback_has_forward(self::CasadiCallback, nfwd) = cb_has_forward(self, Int(nfwd))
+C.Callback_get_forward(self::CasadiCallback, nfwd, name, inames, onames, opts) =
+    _asfunction(cb_get_forward(self, Int(nfwd), name, inames, onames, opts))
+C.Callback_has_reverse(self::CasadiCallback, nadj) = cb_has_reverse(self, Int(nadj))
+C.Callback_get_reverse(self::CasadiCallback, nadj, name, inames, onames, opts) =
+    _asfunction(cb_get_reverse(self, Int(nadj), name, inames, onames, opts))
+C.Callback_has_jac_sparsity(self::CasadiCallback, oind, iind) =
+    cb_has_jac_sparsity(self, Int(oind) + 1, Int(iind) + 1)
+C.Callback_get_jac_sparsity(self::CasadiCallback, oind, iind, symmetric) =
+    cb_get_jac_sparsity(self, Int(oind) + 1, Int(iind) + 1, symmetric)
+# A Callback handed back to casadi (e.g. a Jacobian) must outlive its Julia proxy.
+const _kept_callbacks = Base.IdSet{Any}()
+_asfunction(r) = r
+_asfunction(r::C.Callback) = (Base.push!(_kept_callbacks, r); CasadiFunction(r))
+
+# opti.callback(f): the director calls back with the iteration index.
+C.OptiCallback_call(f::Base.Function, i) = (f(Int(i)); nothing)
+callback(o::Opti, args...) = C.callback(o, args...)
 
 """
     callback(obj::CasadiCallback; name="callback", opts...) -> Function
@@ -553,20 +762,13 @@ function callback(obj::CasadiCallback; name::AbstractString="callback", opts...)
     proxy
 end
 
-# A constructed Callback proxy is a casadi Function; evaluate it like one.
-# Pin the plain DM-vector call slot (the generated overloads collapse to one
-# Julia signature, last-wins picks the wrong dict form).
-function (cb::C.Callback)(args::Vararg{Union{Real,DM,SX,MX}})
-    ins = Any[a isa Real ? C.DM(Float64(a)) : a for a in args]
-    r = GC.@preserve cb C._check(ccall((:_swig_Function_Function_call__SWIG_0, C._lib),
-            Any, (Any, Any, Any, Any), cb, ins, false, false))
-    length(r) == 1 ? r[1] : Tuple(r)
-end
 # Let a Callback be used wherever a casadi Function is expected (nlpsol, graphs).
 # The Function copy-ctor accepts the Callback proxy via the SWIG cast chain.
 CasadiFunction(cb::C.Callback) = C.Function(C._check(ccall((:_swig_Function_new_Function__SWIG_8,
         C._lib), Ptr{Cvoid}, (Any,), cb)))
 Base.convert(::Type{CasadiFunction}, cb::C.Callback) = CasadiFunction(cb)
+# A constructed Callback proxy is a casadi Function; call it like one (numeric or symbolic).
+(cb::C.Callback)(args...; kwargs...) = CasadiFunction(cb)(args...; kwargs...)
 
 # ---- full-surface qualified access ----
 # `import CasADiNative as ca` -> `ca.<name>` for the ENTIRE generated surface, including

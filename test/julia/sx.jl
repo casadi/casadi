@@ -38,7 +38,7 @@ end
     @test Base.string(v[1:2:5]) == "[10, 30, 50]"
     @test Float64(v[end]) == 50.0
     m = sym(SX, "m", 2, 3)
-    @test Base.size(m[1, :]) == (1, 3)
+    @test Base.size(m[1, :]) == (1, 3)                 # a row, as in casadi (Julia would give a Vector)
     @test Base.size(m[:, 2]) == (2, 1)
     w = DM([0.0, 0.0, 0.0])
     w[2] = 9.0
@@ -69,9 +69,9 @@ end
 
 @testset "vectors and dicts across the boundary" begin
     x = sym(SX, "x"); y = sym(SX, "y")
-    w = vertcat(x, y)
+    w = [x; y]
     @test Base.size(w) == (2, 1)
-    w2 = vertcat([x, y])
+    w2 = vcat([x, y]...)
     @test Base.size(w2) == (2, 1)
     f = C.Function("f", [x], [x + 1], Dict{String,Any}())
     @test C.name_out(f, 0) == "o0"

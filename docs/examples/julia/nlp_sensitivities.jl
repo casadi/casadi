@@ -66,11 +66,11 @@ T = 10.0
 # Declare model variables
 x1 = ca.SX.sym("x1")
 x2 = ca.SX.sym("x2")
-x = ca.vertcat(x1, x2)
+x = [x1; x2]
 u = ca.SX.sym("u")
 
 # Model equations
-xdot = ca.vertcat((1 - x2^2) * x1 - x2 + u, x1)
+xdot = [((1 - x2^2) * x1 - x2 + u); x1]
 
 # Objective term
 L = x1^2 + x2^2 + u^2
@@ -134,7 +134,7 @@ function build(P)
         push!(g, Xk_end - Xk); append!(lbg, [0, 0]); append!(ubg, [0, 0])
     end
 
-    (ca.vertcat(w), J, ca.vertcat(g), w0, lbw, ubw, lbg, ubg)
+    (vcat(w...), J, vcat(g...), w0, lbw, ubw, lbg, ubg)
 end
 
 function main()
@@ -171,13 +171,12 @@ function main()
     fwd_p = [ca.zeros(ca.GenDM, spP) for _ in 1:nfwd]
     fwd_p[1][1] = 1
     fwd_p[2][2] = 1
-    # Typed horzcat keeps the all-DM seed stacks numeric.
-    z(sp) = ca.horzcat([ca.zeros(ca.GenDM, sp) for _ in 1:nfwd])
+    z(sp) = hcat([ca.zeros(ca.GenDM, sp) for _ in 1:nfwd]...)
 
     sol_fwd = fwd_solver(out_x = sol["x"], out_lam_g = sol["lam_g"], out_lam_x = sol["lam_x"],
                          out_f = sol["f"], out_g = sol["g"], lbx = lbw, ubx = ubw, lbg = lbg, ubg = ubg,
                          fwd_lbx = z(spx), fwd_ubx = z(spx), fwd_lbg = z(spg), fwd_ubg = z(spg),
-                         p = 0, fwd_p = ca.horzcat(fwd_p))
+                         p = 0, fwd_p = hcat(fwd_p...))
 
     # Same thing via finite differences
     hfd = 1e-3

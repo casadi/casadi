@@ -45,7 +45,7 @@ function main()
 
     # Evaluate serially, the old-fashioned way (vertcat of N scalar calls)
     X = ca.MX.sym("x", N)
-    Y = ca.vertcat([f0(X[k]) for k in 1:N])
+    Y = vcat([f0(X[k]) for k in 1:N]...)
     fNaiveParallel = ca.Function("fParallel", [X], [Y])
 
     println("evaluating naive parallel function...")

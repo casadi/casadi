@@ -93,7 +93,7 @@ function main()
                 push!(g, Z[i + 1, 1] - rhs)
             end
         end
-        gg = ca.vertcat(g)
+        gg = vcat(g...)
 
         # NLP
         nlp = Dict("x" => x, "f" => x[1]^2, "g" => gg)

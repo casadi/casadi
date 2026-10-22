@@ -642,216 +642,217 @@ class ADtests(casadiTestCase):
      ]:
       fun = ca.Function("fun", inputs,[out])
       out_eval_mx = fun.call([e+1e-300 for e in inputs],True,False)[0] 
-      for out in [out,out_eval_mx]:
-          self.check_eval_mx(out)
-          fun = ca.Function("fun", inputs,[out,jac])
+      with self.codegen_batch():
+        for out in [out,out_eval_mx]:
+            self.check_eval_mx(out)
+            fun = ca.Function("fun", inputs,[out,jac])
 
-          fun_ad = [ca.Function("fun", inputs,[out,jac], {'ad_weight':w, 'ad_weight_sp':w}) for w in [0,1]]
-
-
-          fun_out = fun.call(values)
+            fun_ad = [ca.Function("fun", inputs,[out,jac], {'ad_weight':w, 'ad_weight_sp':w}) for w in [0,1]]
 
 
-          if with_sx:
-            funsx = fun.expand("expand_fun")
-            funsx_ad = [f.expand('expand_'+f.name()) for f in fun_ad]
-            funsx_out = funsx.call(values)
-            self.checkarray(fun_out[0],funsx_out[0])
-            self.checkarray(fun_out[1],funsx_out[1])
-          else:
-            funsx_ad = None
-          if "pow" in str(out) and os.name=='nt':
-            pass # Known bug #3038
-          else:
-            self.check_codegen(fun,inputs=values,std=std,digits=codegen_check_digits)
-          self.check_serialize(fun,inputs=values)
+            fun_out = fun.call(values)
 
-          J_ = fun_out[1]
 
-          def vec(l):
-            ret = []
-            for i in l:
-              ret.extend(i)
-            return ret
+            if with_sx:
+              funsx = fun.expand("expand_fun")
+              funsx_ad = [f.expand('expand_'+f.name()) for f in fun_ad]
+              funsx_out = funsx.call(values)
+              self.checkarray(fun_out[0],funsx_out[0])
+              self.checkarray(fun_out[1],funsx_out[1])
+            else:
+              funsx_ad = None
+            if "pow" in str(out) and os.name=='nt':
+              pass # Known bug #3038
+            else:
+              self.check_codegen(fun,inputs=values,std=std,digits=codegen_check_digits)
+            self.check_serialize(fun,inputs=values)
 
-          storage2 = {}
-          storage = {}
+            J_ = fun_out[1]
 
-          vf_mx = None
+            def vec(l):
+              ret = []
+              for i in l:
+                ret.extend(i)
+              return ret
 
-          for f in [fun] + ([fun.expand('expand_'+fun.name())] if with_sx else []):
-            d1 = f.forward(ndir)
-            d2 = f.reverse(ndir)
+            storage2 = {}
+            storage = {}
 
-            num_in = f.n_in()
-            num_out = f.n_out()
+            vf_mx = None
 
-            # evalThings
-            for sym in [ca.MX.sym, ca.SX.sym]:
-              if f.is_a('MXFunction') and sym==ca.SX.sym: continue
-              if f.is_a('SXFunction') and sym==ca.MX.sym: continue
+            for f in [fun] + ([fun.expand('expand_'+fun.name())] if with_sx else []):
+              d1 = f.forward(ndir)
+              d2 = f.reverse(ndir)
 
-              # dense
-              for spmod,spmod2 in itertools.product(spmods,repeat=2):
-                fseeds = [[sym("f",spmod(f.sparsity_in(i))) for i in range(f.n_in())]  for d in range(ndir)]
-                aseeds = [[sym("a",spmod2(f.sparsity_out(i)))  for i in range(f.n_out())] for d in range(ndir)]
-                inputss = [sym("i",f.sparsity_in(i)) for i in range(f.n_in())]
+              num_in = f.n_in()
+              num_out = f.n_out()
 
-                res = f.call(inputss,not f.is_a("SXFunction"))
-                fwdsens = ca.forward(res,inputss,fseeds,dict(always_inline=not f.is_a("SXFunction")))
-                adjsens = ca.reverse(res,inputss,aseeds,dict(always_inline=not f.is_a("SXFunction")))
+              # evalThings
+              for sym in [ca.MX.sym, ca.SX.sym]:
+                if f.is_a('MXFunction') and sym==ca.SX.sym: continue
+                if f.is_a('SXFunction') and sym==ca.MX.sym: continue
 
-                fseed = [ca.DM(fseeds[d][0].sparsity(),random.random(fseeds[d][0].nnz())) for d in range(ndir) ]
-                aseed = [ca.DM(aseeds[d][0].sparsity(),random.random(aseeds[d][0].nnz())) for d in range(ndir) ]
-                vf = ca.Function("vf", inputss+vec([fseeds[i]+aseeds[i] for i in range(ndir)]),list(res) + vec([list(fwdsens[i])+list(adjsens[i]) for i in range(ndir)]))
+                # dense
+                for spmod,spmod2 in itertools.product(spmods,repeat=2):
+                  fseeds = [[sym("f",spmod(f.sparsity_in(i))) for i in range(f.n_in())]  for d in range(ndir)]
+                  aseeds = [[sym("a",spmod2(f.sparsity_out(i)))  for i in range(f.n_out())] for d in range(ndir)]
+                  inputss = [sym("i",f.sparsity_in(i)) for i in range(f.n_in())]
 
-                vf_in = list(values)
-                offset = len(inputss)
+                  res = f.call(inputss,not f.is_a("SXFunction"))
+                  fwdsens = ca.forward(res,inputss,fseeds,dict(always_inline=not f.is_a("SXFunction")))
+                  adjsens = ca.reverse(res,inputss,aseeds,dict(always_inline=not f.is_a("SXFunction")))
 
-                for d in range(ndir):
-                  vf_in.append(fseed[d])
-                  for i in range(len(values)-1):
+                  fseed = [ca.DM(fseeds[d][0].sparsity(),random.random(fseeds[d][0].nnz())) for d in range(ndir) ]
+                  aseed = [ca.DM(aseeds[d][0].sparsity(),random.random(aseeds[d][0].nnz())) for d in range(ndir) ]
+                  vf = ca.Function("vf", inputss+vec([fseeds[i]+aseeds[i] for i in range(ndir)]),list(res) + vec([list(fwdsens[i])+list(adjsens[i]) for i in range(ndir)]))
+
+                  vf_in = list(values)
+                  offset = len(inputss)
+
+                  for d in range(ndir):
+                    vf_in.append(fseed[d])
+                    for i in range(len(values)-1):
+                      vf_in.append(0)
+
+                    vf_in.append(aseed[d])
                     vf_in.append(0)
 
-                  vf_in.append(aseed[d])
-                  vf_in.append(0)
-
-                vf_out = vf.call(vf_in)
-                if sym is ca.MX.sym:
-                    self.check_eval_mx([ca.vvcat(e) for e in fwdsens])
-                    self.check_eval_mx([ca.vvcat(e) for e in adjsens])
-                if "pow" in str(out) and os.name=='nt':
-                  pass # Known bug #3038
-                else:
-                  self.check_codegen(vf,inputs=vf_in,std=std,digits=codegen_check_digits)
-                self.check_serialize(vf,inputs=vf_in)
-
-                offset = len(res)
-                for d in range(ndir):
-                  seed = array(fseed[d].T).ravel()
-                  sens = array(vf_out[offset+0].T).ravel()
-                  offset+=len(inputss)
-                  self.checkarray(sens,J_ @ seed,"eval Fwd %d %s" % (d,str(type(f))+str(sym)))
-
-                  seed = array(aseed[d].T).ravel()
-                  sens = array(vf_out[offset+0].T).ravel()
-                  offset+=len(inputss)
-
-                  self.checkarray(sens,J_.T @ seed,"eval Adj %d %s" % (d,str([vf_out[i] for i in range(vf.n_out())])))
-
-
-                assert(offset==vf.n_out())
-
-                # Complete random seeding
-                random.seed(1)
-                vf_in = []
-                for i in range(vf.n_in()):
-                  vf_in.append(ca.DM(vf.sparsity_in(i),random.random(vf.nnz_in(i))))
-
-                vf_out = vf.call(vf_in)
-                if "pow" in str(out) and os.name=='nt':
-                  pass # Known bug #3038
-                else:
-                  self.check_codegen(vf,inputs=vf_in,std=std,digits=codegen_check_digits)
-                self.check_serialize(vf,inputs=vf_in)
-                storagekey = (spmod,spmod2)
-                if not(storagekey in storage):
-                  storage[storagekey] = []
-                storage[storagekey].append(vf_out)
-
-                # Added to make sure that the same seeds are used for SX and MX
-                if sym is ca.MX.sym:
-                  vf_mx = vf
-
-              # Second order sensitivities
-              for sym2 in [ca.MX.sym, ca.SX.sym]:
-
-                if vf.is_a('MXFunction') and sym2==ca.SX.sym: continue
-                if vf.is_a('MXFunction') and sym2==ca.MX.sym: continue
-
-                for spmod_2,spmod2_2 in itertools.product(spmods,repeat=2):
-                  fseeds2 = [[sym2("f",vf_mx.sparsity_in(i)) for i in range(vf.n_in())] for d in range(ndir)]  # pyright: ignore[reportOptionalMemberAccess]
-                  aseeds2 = [[sym2("a",vf_mx.sparsity_out(i))  for i in range(vf.n_out()) ] for d in range(ndir)]  # pyright: ignore[reportOptionalMemberAccess]
-                  inputss2 = [sym2("i",vf_mx.sparsity_in(i)) for i in range(vf.n_in())]  # pyright: ignore[reportOptionalMemberAccess]
-
-                  res2 = vf.call(inputss2,not vf.is_a("SXFunction"))
-                  fwdsens2 = ca.forward(res2,inputss2,fseeds2,dict(always_inline=not vf.is_a("SXFunction")))
-                  adjsens2 = ca.reverse(res2,inputss2,aseeds2,dict(always_inline=not vf.is_a("SXFunction")))
-
-                  if sym2 is ca.MX.sym:
-                      self.check_eval_mx([ca.vvcat(e) for e in fwdsens2])
-                      self.check_eval_mx([ca.vvcat(e) for e in adjsens2])
-
-                  vf2 = ca.Function("vf2", inputss2+vec([fseeds2[i]+aseeds2[i] for i in range(ndir)]),list(res2) + vec([list(fwdsens2[i])+list(adjsens2[i]) for i in range(ndir)]))
-
-                  random.seed(1)
-                  vf2_in = []
-                  for i in range(vf2.n_in()):
-                    vf2_in.append(ca.DM(vf2.sparsity_in(i),random.random(vf2.nnz_in(i))))
-
-                  vf2_out = vf2.call(vf2_in)
+                  vf_out = vf.call(vf_in)
+                  if sym is ca.MX.sym:
+                      self.check_eval_mx([ca.vvcat(e) for e in fwdsens])
+                      self.check_eval_mx([ca.vvcat(e) for e in adjsens])
                   if "pow" in str(out) and os.name=='nt':
                     pass # Known bug #3038
                   else:
-                    self.check_codegen(vf2,inputs=vf2_in,std=std,digits=codegen_check_digits)
-                  self.check_serialize(vf2,inputs=vf2_in)
+                    self.check_codegen(vf,inputs=vf_in,std=std,digits=codegen_check_digits)
+                  self.check_serialize(vf,inputs=vf_in)
+
+                  offset = len(res)
+                  for d in range(ndir):
+                    seed = array(fseed[d].T).ravel()
+                    sens = array(vf_out[offset+0].T).ravel()
+                    offset+=len(inputss)
+                    self.checkarray(sens,J_ @ seed,"eval Fwd %d %s" % (d,str(type(f))+str(sym)))
+
+                    seed = array(aseed[d].T).ravel()
+                    sens = array(vf_out[offset+0].T).ravel()
+                    offset+=len(inputss)
+
+                    self.checkarray(sens,J_.T @ seed,"eval Adj %d %s" % (d,str([vf_out[i] for i in range(vf.n_out())])))
+
+
+                  assert(offset==vf.n_out())
+
+                  # Complete random seeding
+                  random.seed(1)
+                  vf_in = []
+                  for i in range(vf.n_in()):
+                    vf_in.append(ca.DM(vf.sparsity_in(i),random.random(vf.nnz_in(i))))
+
+                  vf_out = vf.call(vf_in)
+                  if "pow" in str(out) and os.name=='nt':
+                    pass # Known bug #3038
+                  else:
+                    self.check_codegen(vf,inputs=vf_in,std=std,digits=codegen_check_digits)
+                  self.check_serialize(vf,inputs=vf_in)
                   storagekey = (spmod,spmod2)
-                  if not(storagekey in storage2):
-                    storage2[storagekey] = []
-                  storage2[storagekey].append(vf2_out)
+                  if not(storagekey in storage):
+                    storage[storagekey] = []
+                  storage[storagekey].append(vf_out)
 
-          # Remainder of eval testing
-          for store,order in [(storage,"first-order"),(storage2,"second-order")]:
-            for stk,st in list(store.items()):
-              for i in range(len(st)-1):
-                for k,(a,b) in enumerate(zip(st[0],st[i+1])):
-                  if b.numel()==0 and ca.sparsify(a).nnz()==0: continue
-                  if a.numel()==0 and ca.sparsify(b).nnz()==0: continue
-                  self.checkarray(ca.sparsify(a),ca.sparsify(b),("%s, output(%d)" % (order,k)))
+                  # Added to make sure that the same seeds are used for SX and MX
+                  if sym is ca.MX.sym:
+                    vf_mx = vf
 
-          for expand in [False] + ([True] if with_sx else []):
-            #  jacobian()
-            for mode in ["forward","reverse"]:
-              ind = 0 if mode=='forward' else 1
-              f = funsx_ad[ind] if expand else fun_ad[ind]  # pyright: ignore[reportOptionalSubscript]
+                # Second order sensitivities
+                for sym2 in [ca.MX.sym, ca.SX.sym]:
 
-              Jf = jacobian_old(f, 0, 0)
-              Jf_out = Jf.call(values)
+                  if vf.is_a('MXFunction') and sym2==ca.SX.sym: continue
+                  if vf.is_a('MXFunction') and sym2==ca.MX.sym: continue
 
-              if "pow" in str(out) and os.name=='nt':
-                pass # Known bug #3038
-              else:
-                self.check_codegen(Jf,inputs=values,std=std,digits=codegen_check_digits)
-              self.check_serialize(Jf,inputs=values)
-              self.checkarray(Jf_out[0],J_)
-              self.checkarray(ca.DM.ones(Jf.sparsity_out(0)),ca.DM.ones(J_.sparsity()),str(out)+str(mode))
-              self.checkarray(ca.DM.ones(f.jac_sparsity(0, 0)),ca.DM.ones(J_.sparsity()))
+                  for spmod_2,spmod2_2 in itertools.product(spmods,repeat=2):
+                    fseeds2 = [[sym2("f",vf_mx.sparsity_in(i)) for i in range(vf.n_in())] for d in range(ndir)]  # pyright: ignore[reportOptionalMemberAccess]
+                    aseeds2 = [[sym2("a",vf_mx.sparsity_out(i))  for i in range(vf.n_out()) ] for d in range(ndir)]  # pyright: ignore[reportOptionalMemberAccess]
+                    inputss2 = [sym2("i",vf_mx.sparsity_in(i)) for i in range(vf.n_in())]  # pyright: ignore[reportOptionalMemberAccess]
 
-          # Scalarized
-          if out.is_empty(): continue
-          s_i  = out.sparsity().row()[0]
-          s_j  = out.sparsity().get_col()[0]
-          s_k = s_i*out.size2()+s_j
-          H_ = None
+                    res2 = vf.call(inputss2,not vf.is_a("SXFunction"))
+                    fwdsens2 = ca.forward(res2,inputss2,fseeds2,dict(always_inline=not vf.is_a("SXFunction")))
+                    adjsens2 = ca.reverse(res2,inputss2,aseeds2,dict(always_inline=not vf.is_a("SXFunction")))
 
-          for expand in [False] + ([True] if with_sx else []):
-            for mode in ["forward","reverse"]:
-              w = 0 if mode=='forward' else 1
-              f = ca.Function("fun", inputs,[out[s_i,s_j],jac[s_k,:].T], {'ad_weight':w, 'ad_weight_sp':w})
-              if expand: f=f.expand('expand_'+f.name())
-              f_out = f.call(values)
-              J_ = f_out[1]
+                    if sym2 is ca.MX.sym:
+                        self.check_eval_mx([ca.vvcat(e) for e in fwdsens2])
+                        self.check_eval_mx([ca.vvcat(e) for e in adjsens2])
 
-              Hf = hessian_old(f, 0, 0)
-              Hf_out = Hf.call(values)
-              if "pow" in str(out) and os.name=='nt':
-                pass # Known bug #3038
-              else:
-                self.check_codegen(Hf,inputs=values,std=std,digits=codegen_check_digits)
-              self.check_serialize(Hf,inputs=values)
-              if H_ is None:
-                H_ = Hf_out[0]
-              self.checkarray(Hf_out[0],H_,failmessage=("mode: %s" % mode))
+                    vf2 = ca.Function("vf2", inputss2+vec([fseeds2[i]+aseeds2[i] for i in range(ndir)]),list(res2) + vec([list(fwdsens2[i])+list(adjsens2[i]) for i in range(ndir)]))
+
+                    random.seed(1)
+                    vf2_in = []
+                    for i in range(vf2.n_in()):
+                      vf2_in.append(ca.DM(vf2.sparsity_in(i),random.random(vf2.nnz_in(i))))
+
+                    vf2_out = vf2.call(vf2_in)
+                    if "pow" in str(out) and os.name=='nt':
+                      pass # Known bug #3038
+                    else:
+                      self.check_codegen(vf2,inputs=vf2_in,std=std,digits=codegen_check_digits)
+                    self.check_serialize(vf2,inputs=vf2_in)
+                    storagekey = (spmod,spmod2)
+                    if not(storagekey in storage2):
+                      storage2[storagekey] = []
+                    storage2[storagekey].append(vf2_out)
+
+            # Remainder of eval testing
+            for store,order in [(storage,"first-order"),(storage2,"second-order")]:
+              for stk,st in list(store.items()):
+                for i in range(len(st)-1):
+                  for k,(a,b) in enumerate(zip(st[0],st[i+1])):
+                    if b.numel()==0 and ca.sparsify(a).nnz()==0: continue
+                    if a.numel()==0 and ca.sparsify(b).nnz()==0: continue
+                    self.checkarray(ca.sparsify(a),ca.sparsify(b),("%s, output(%d)" % (order,k)))
+
+            for expand in [False] + ([True] if with_sx else []):
+              #  jacobian()
+              for mode in ["forward","reverse"]:
+                ind = 0 if mode=='forward' else 1
+                f = funsx_ad[ind] if expand else fun_ad[ind]  # pyright: ignore[reportOptionalSubscript]
+
+                Jf = jacobian_old(f, 0, 0)
+                Jf_out = Jf.call(values)
+
+                if "pow" in str(out) and os.name=='nt':
+                  pass # Known bug #3038
+                else:
+                  self.check_codegen(Jf,inputs=values,std=std,digits=codegen_check_digits)
+                self.check_serialize(Jf,inputs=values)
+                self.checkarray(Jf_out[0],J_)
+                self.checkarray(ca.DM.ones(Jf.sparsity_out(0)),ca.DM.ones(J_.sparsity()),str(out)+str(mode))
+                self.checkarray(ca.DM.ones(f.jac_sparsity(0, 0)),ca.DM.ones(J_.sparsity()))
+
+            # Scalarized
+            if out.is_empty(): continue
+            s_i  = out.sparsity().row()[0]
+            s_j  = out.sparsity().get_col()[0]
+            s_k = s_i*out.size2()+s_j
+            H_ = None
+
+            for expand in [False] + ([True] if with_sx else []):
+              for mode in ["forward","reverse"]:
+                w = 0 if mode=='forward' else 1
+                f = ca.Function("fun", inputs,[out[s_i,s_j],jac[s_k,:].T], {'ad_weight':w, 'ad_weight_sp':w})
+                if expand: f=f.expand('expand_'+f.name())
+                f_out = f.call(values)
+                J_ = f_out[1]
+
+                Hf = hessian_old(f, 0, 0)
+                Hf_out = Hf.call(values)
+                if "pow" in str(out) and os.name=='nt':
+                  pass # Known bug #3038
+                else:
+                  self.check_codegen(Hf,inputs=values,std=std,digits=codegen_check_digits)
+                self.check_serialize(Hf,inputs=values)
+                if H_ is None:
+                  H_ = Hf_out[0]
+                self.checkarray(Hf_out[0],H_,failmessage=("mode: %s" % mode))
 
   def test_repmat(self):
     X = ca.MX.sym("x",2,2)

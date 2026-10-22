@@ -961,11 +961,12 @@ namespace casadi {
         \identifier{1x2} */
     std::string serialize(const Dict& opts=Dict()) const;
 
-    /** \brief Export an SX/MX instruction graph as .html, .dot, or .casadi_viz.
+    /** \brief Export a Function graph as .html, .dot, or .casadi_viz.
      *
-     * The extension selects HTML, standalone Graphviz DOT, or a JSON graph bundle.
-     * include_functions (default true) includes called graphs in HTML/JSON exports.
-     * DOT displays the root graph only. DOT options show_matrix_contents and
+     * HTML and .casadi_viz embed the serialized Function, decoded by the browser viewer;
+     * any serializable Function works, and helpers such as nlp_hess_l can be explored.
+     * include_functions (default true) shows called and helper Functions in the viewer.
+     * DOT is standalone Graphviz of an SX/MX root graph only. Options show_matrix_contents and
      * show_matrix_sizes (both default true) control matrix detail and dimensions.
      * Load dump_trace JSONL files in the viewer to replay numerical evaluation.
      * Options: view (function, expression; default function),

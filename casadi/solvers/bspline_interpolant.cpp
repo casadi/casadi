@@ -92,10 +92,12 @@ namespace casadi {
       for (casadi_int i=0;i<x.size()-2*m-2;++i) ret.push_back(x[m+1+i]);
       for (casadi_int i=0;i<k+1;++i) ret.push_back(x[x.size()-1]);
     } else {
-      casadi_error("Not implemented");
-      //for (casadi_int i=0;i<k+1;++i) ret.push_back(x[0]);
-      //for (casadi_int i=0;i<x.size()-2*m-2;++i) ret.push_back(x[m+1+i]);
-      //for (casadi_int i=0;i<k+1;++i) ret.push_back(x[x.size()-1]);
+      // Even degree: interior knots at midpoints (scipy's choice for k=2)
+      casadi_int m = k/2;
+      casadi_assert(x.size()>=2*m+1, "Need more data points");
+      for (casadi_int i=0;i<k+1;++i) ret.push_back(x[0]);
+      for (casadi_int i=m;i<x.size()-1-m;++i) ret.push_back((x[i]+x[i+1])/2);
+      for (casadi_int i=0;i<k+1;++i) ret.push_back(x[x.size()-1]);
     }
     return ret;
   }

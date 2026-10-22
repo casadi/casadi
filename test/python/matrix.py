@@ -1072,6 +1072,25 @@ class Matrixtests(casadiTestCase):
     with self.assertInException("CasADi matrices are not iterable"):
       iter(a)
 
+    # issue #2756: iteration protocol expects TypeError for non-iterables
+    for x in [a, ca.SX.sym("x",2), ca.MX.sym("x",2)]:
+      with self.assertRaises(TypeError):
+        iter(x)
+
+  def test_toarray(self):
+    # issue #2951: toarray avoids a transpose; check layout and values
+    A = ca.DM([[1,2,0],[0,4,5]])
+    for a in [A, ca.sparsify(A), ca.tril(ca.DM([[1,2],[3,4]])), ca.DM([1,2,3]), ca.DM([1,2,3]).T, ca.DM(3), ca.DM(3,0), ca.DM(0,3)]:
+      r = a.toarray()
+      assert isinstance(r, np.ndarray)
+      self.assertTrue(r.flags["C_CONTIGUOUS"])
+      self.assertEqual(r.shape, a.shape)
+      self.checkarray(r, np.array(a.full()))
+    v = ca.DM([1,2,3]).toarray(True)
+    assert isinstance(v, np.ndarray)
+    self.assertEqual(v.shape, (3,))
+    self.assertEqual(ca.DM(3).toarray(True), 3.0)
+
   def test_from_file(self):
     a = ca.sparsify(ca.DM([[1,0,-6,5,0],[4,0,-4e-301,9.3e-18,0]]))
 

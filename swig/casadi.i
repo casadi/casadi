@@ -480,6 +480,11 @@ def DM_from_csc(m, check_only=True):
 %feature("customdoc:protoline:style_group", "  $proto");
 
 %feature("customdoc:group", "\n.......\n\n::\n\n$group\n$main\n\n.............\n\n");
+#ifdef SWIGJULIA
+// Julia docstrings are Markdown: prototypes go in code fences
+%feature("customdoc:main", "$brief\n\n```\n$overview```\n$main");
+%feature("customdoc:group", "\n---\n\n```\n$group```\n$main\n");
+#endif
 
 // append works for strings
 
@@ -984,6 +989,11 @@ namespace std {
       // Treat Null
       if (is_null(p)) return false;
 
+#ifdef SWIGJULIA
+      // SWIG_AsVal(bool) accepts any whole number; only Bool is a bool
+      if (!jl_typeis(p, jl_bool_type)) return false;
+#endif // SWIGJULIA
+
       // Standard typemaps
       if (SWIG_IsOK(SWIG_AsVal(bool)(p, m ? *m : 0))) return true;
 
@@ -1350,6 +1360,17 @@ namespace std {
       // Treat Null
       if (is_null(p)) return false;
 #ifdef SWIGJULIA
+      if (!jl_is_array(p)) {
+        // Other AbstractVectors (ranges, views, ...): collect, then retry
+        jl_value_t* av = jl_get_global(jl_base_module, jl_symbol("AbstractVector"));
+        if (!av || !jl_isa(p, av)) return false;
+        jl_value_t* c = 0;
+        JL_GC_PUSH1(&c);
+        c = jl_call1(jl_get_function(jl_base_module, "collect"), p);
+        bool ok = c && jl_is_array(c) && to_ptr(c, m);
+        JL_GC_POP();
+        return ok;
+      }
       if (jl_is_array(p)) {
         jl_array_t* a = (jl_array_t*)p;
         size_t n = jl_array_len(a);
@@ -1544,10 +1565,15 @@ namespace std {
     };
 #endif
 
+#ifdef SWIGJULIA
+    // Element type of the Julia array a std::vector<M> becomes (boxed types only)
+    template<typename M> jl_value_t* julia_vector_eltype() { return (jl_value_t*)jl_any_type; }
+    template<> jl_value_t* julia_vector_eltype<std::string>() { return (jl_value_t*)jl_string_type; }
+#endif
     template<typename M> GUESTOBJECT* from_ptr(const std::vector<M> *a) {
 #ifdef SWIGJULIA
       {
-        jl_value_t* atype = jl_apply_array_type((jl_value_t*)jl_any_type, 1);
+        jl_value_t* atype = jl_apply_array_type(julia_vector_eltype<M>(), 1);
         jl_array_t* arr = jl_alloc_array_1d(atype, a->size());
         JL_GC_PUSH1(&arr);
         for (size_t i = 0; i < a->size(); ++i) {
@@ -1687,6 +1713,12 @@ namespace std {
         return true;
       }
 #endif // SWIGPYTHON
+#ifdef SWIGJULIA
+      if (p && jl_is_nothing(p)) {
+        if (m) **m=GenericType();
+        return true;
+      }
+#endif // SWIGJULIA
 
       // Treat Null
       if (is_null(p)) return false;
@@ -1754,6 +1786,11 @@ namespace std {
 #ifdef SWIGMATLAB
       case OT_VOIDPTR:
         return mxCreateDoubleScalar(0);
+#endif
+#ifdef SWIGJULIA
+      case OT_NULL:
+      case OT_VOIDPTR:
+        return jl_nothing;
 #endif
       default: return 0;
       }
@@ -2324,6 +2361,45 @@ namespace std {
 
 %fragment("casadi_dmatrix", "header", fragment="casadi_aux") {
   namespace casadi {
+#ifdef SWIGJULIA
+    // Julia AbstractArray{<:Real} with at most two dimensions -> dense DM.
+    // A vector becomes a column, a matrix keeps its shape; ranges, adjoints,
+    // Int/Bool arrays go through convert(Array{Float64,N}, p), which is
+    // column-major just like DM.  An empty array of any eltype (e.g. `[]`)
+    // is an empty DM.
+    bool DM_from_julia_array(GUESTOBJECT *p, DM** m) {
+      jl_value_t* aa = jl_get_global(jl_base_module, jl_symbol("AbstractArray"));
+      if (!aa || !jl_isa(p, aa)) return false;
+      jl_value_t *et = 0, *sz = 0, *arr = 0, *atype = 0;
+      JL_GC_PUSH4(&et, &sz, &arr, &atype);
+      et = jl_call1(jl_get_function(jl_base_module, "eltype"), p);
+      sz = jl_call1(jl_get_function(jl_base_module, "size"), p);
+      size_t nd = sz && jl_is_tuple(sz) ? jl_nfields(sz) : 3;
+      bool ok = et && nd <= 2;
+      casadi_int dims[2] = {1, 1};
+      for (size_t i = 0; ok && i < nd; ++i) dims[i] = jl_unbox_int64(jl_fieldref(sz, i));
+      bool real = ok && jl_is_type(et)
+        && jl_subtype(et, jl_get_global(jl_base_module, jl_symbol("Real")));
+      if (ok && !real) {
+        // `[]` has eltype Any: accept it as an empty DM, reject anything else
+        ok = dims[0] * dims[1] == 0;
+        if (ok && m) **m = DM(0, 0);
+      } else if (ok && m) {
+        atype = jl_apply_array_type((jl_value_t*)jl_float64_type, nd);
+        arr = jl_call2(jl_get_function(jl_base_module, "convert"), atype, p);
+        jl_value_t* ptr = arr ? jl_call1(jl_get_function(jl_base_module, "pointer"), arr) : 0;
+        ok = ptr != 0;
+        if (ok) {
+          const double* d = static_cast<const double*>(jl_unbox_voidpointer(ptr));
+          **m = DM::zeros(dims[0], dims[1]);
+          std::copy(d, d + dims[0] * dims[1], (*m)->ptr());
+        }
+      }
+      JL_GC_POP();
+      return ok;
+    }
+#endif // SWIGJULIA
+
     bool to_ptr(GUESTOBJECT *p, DM** m) {
       // Treat Null
       if (is_null(p)) return false;
@@ -2352,6 +2428,10 @@ namespace std {
           return true;
         }
       }
+
+#ifdef SWIGJULIA
+      if (DM_from_julia_array(p, m)) return true;
+#endif // SWIGJULIA
 
 #ifdef SWIGPYTHON
       // Object has __DM__ method.  A returned None means "I am explicitly
@@ -3009,11 +3089,24 @@ namespace std {
 }
 #endif
 
+#ifdef SWIGJULIA
+  #define L_INT "Int"
+  #define L_BOOL "Bool"
+  #define LPAIR(A,B) "Tuple{" A "," B "}"
+  #define L_DOUBLE "Float64"
+  #define L_DICT "Dict"
+  #define LDICT(ARG) "Dict{String," ARG "}"
+  #define LL "Vector{"
+  #define LR "}"
+  #define L_STR "String"
+#else
 #define L_INT "int"
 #define L_BOOL "bool"
 #define LPAIR(A,B) "(" A "," B ")"
+#endif
 
-#if defined(SWIGMATLAB) || defined(SWIGOCTAVE)
+#ifdef SWIGJULIA
+#elif defined(SWIGMATLAB) || defined(SWIGOCTAVE)
   #define L_DOUBLE "double"
   #define L_DICT "struct"
   #define LDICT(ARG) L_DICT ":" ARG
@@ -3396,6 +3489,18 @@ class ArrayInterfaceMX(ArrayInterface[MX]):
 
 
 %julia_convention_repair()
+
+#ifdef SWIGJULIA
+// Julia argument annotations for the matrix types: a DM parameter takes
+// everything to_ptr(DM) converts from (numbers, Julia arrays, ranges), and SX/MX
+// parameters additionally take DM, as in Python.  The unions nest (DM-like is a
+// subset of SX-like and MX-like), so Julia's most-specific-method rule picks the
+// overload Python's typecheck precedence picks: fmax(x::MX, 0) -> MX,
+// fmax(DM, 0) -> DM, fmax(0, 0) -> double.
+%typemap(jlparam) casadi::Matrix<double>, const casadi::Matrix<double>& "Union{DM,Real,AbstractArray{<:Real}}"
+%typemap(jlparam) casadi::Matrix<casadi::SXElem>, const casadi::Matrix<casadi::SXElem>& "Union{SX,DM,Real,AbstractArray{<:Real}}"
+%typemap(jlparam) casadi::MX, const casadi::MX& "Union{MX,DM,Real,AbstractArray{<:Real}}"
+#endif // SWIGJULIA
 
 #ifdef SWIGWASMJS
 // ----------------------------------------------------------------------------
@@ -3880,6 +3985,13 @@ inf: float
 #endif
 %rename(to_DM) operator Matrix<double>;
 
+#ifdef SWIGJULIA
+// Julia spells concatenation [a b] / [a; b] (Base.hcat/vcat, extended by the
+// ergonomics layer); the builders stay reachable for it as _horzcat/_vertcat.
+%rename(_vertcat) casadi_vertcat;
+%rename(_horzcat) casadi_horzcat;
+#endif // SWIGJULIA
+
 #ifdef SWIGPYTHON
 %ignore T;
 
@@ -4098,7 +4210,7 @@ class NZproxy:
           return self.get(False, s)
 
     def __iter__(self):
-      raise Exception("""CasADi matrices are not iterable by design.
+      raise TypeError("""CasADi matrices are not iterable by design.
                       Did you mean to iterate over m.nz, with m IM/DM/SX?
                       Did you mean to iterate over horzsplit(m,1)/vertsplit(m,1) with m IM/DM/SX/MX?
                       Did you expect numpy behaviour (looping over rows)? Use ca.array().
@@ -4588,6 +4700,7 @@ SPARSITY_INTERFACE_FUN(DECL, (FLAG | IS_SX), Matrix<SXElem>)
     SPARSITY_INTERFACE_FUN_BASE(DECL, FLAG, M)
     #if FLAG & IS_MEMBER
       DECL casadi_int casadi_length(const M &v) {
+        if (v.is_empty()) return 0;
         return std::max(v.size1(), v.size2());
       }
       DECL M casadi_sum(const M& x, casadi_int dim) {
@@ -5400,8 +5513,9 @@ namespace casadi{
       if self.is_scalar():
         return float(self)
       elif self.is_vector():
-        return np.array(self.T.elements())
-    return np.array(self.T.elements()).reshape(self.shape)
+        return np.array(self.elements())
+    # elements() is column-major; avoids materializing the transpose
+    return np.ascontiguousarray(np.array(self.elements()).reshape(self.shape, order='F'))
   def to_numpy(self):
     # Pandas-style densification hook.  matplotlib's
     # cbook._unpack_to_numpy looks for `to_numpy()` before falling back
@@ -6433,6 +6547,9 @@ class global_unpickle_context:
 %typemap(out, doc="DM", noblock=1) casadi::native_DM {
   $result = (void*) new casadi::Matrix<double>($1);
 }
+// Native Julia value, like Python's float/ndarray: a scalar becomes Float64,
+// a row or column a Vector{Float64}, anything else a dense Matrix{Float64}.
+%typemap(jlout) casadi::native_DM "(function (d::DM) n = nonzeros(densify(d)); r, c = size1(d), size2(d); r * c == 1 ? n[1] : (r == 1 || c == 1) ? n : Base.reshape(n, r, c) end)(DM(_check($call)))"
 #else
 %typemap(out, doc="double", pystub_out="float", noblock=1, fragment="casadi_all") casadi::native_DM {
   if(!($result = full_or_sparse($1, true))) SWIG_exception_fail(SWIG_TypeError,"Failed to convert output to type 'double'.");
@@ -6451,8 +6568,8 @@ class global_unpickle_context:
 }
 
 
+#if defined(SWIGPYTHON) || defined(SWIGJULIA)
 #ifdef SWIGPYTHON
-
 %define make_property(class, name, type)
   %rename(_ ## name) class ## :: ## name;
   %extend class {
@@ -6464,6 +6581,12 @@ class global_unpickle_context:
     %stub_attr(name, type)
   }
 %enddef
+#else
+// Julia: obj.name is the value itself (opti.f, opti.x, sol.debug), not a bound method
+%define make_property(class, name, type)
+  %feature("julia:property") class ## :: ## name;
+%enddef
+#endif
 
 
 make_property(casadi::Opti, debug, OptiAdvanced);
@@ -6490,7 +6613,13 @@ make_property_opti(x_linear_scale_offset, DM)
 make_property_opti(g_linear_scale, DM)
 make_property_opti(f_linear_scale, float)
 
+#ifdef SWIGPYTHON
+// (not for Julia: casadi_solver is renamed to solver there, the solver(...) method)
 make_property(casadi::Opti, casadi_solver, Function);
+#endif
+#endif // SWIGPYTHON || SWIGJULIA
+
+#ifdef SWIGPYTHON
 %define opti_metadata_modifiers(class)
   %rename(_variable) class ## :: variable;
   %rename(_parameter) class ## :: parameter;
@@ -6625,6 +6754,21 @@ opti_metadata_modifiers(casadi::Opti);
 
 opti_metadata_modifiers(casadi::Opti)
 #endif
+#ifdef SWIGJULIA
+// opti.callback(fh): fh(i) runs every iteration; opti.callback() clears it.
+// The director is never freed: the node holds a raw pointer that other proxies share.
+%{
+casadi::OptiCallback* julia_opti_callback(jl_value_t* fh);
+%}
+%wrapper %{
+casadi::OptiCallback* julia_opti_callback(jl_value_t* fh) { return new SwigDirector_OptiCallback(fh); }
+%}
+%extend casadi::Opti {
+  void callback(jl_value_t* fh) { $self->callback_class(julia_opti_callback(fh)); }
+  void callback() { $self->callback_class(); }
+}
+#endif
+
 %julia_convention_repair()
 %include <casadi/core/optistack.hpp>
 

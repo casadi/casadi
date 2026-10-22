@@ -40,7 +40,7 @@ function main()
     g = x + y - 10
 
     # NLP problem structure
-    nlp = Dict("x" => ca.vertcat(x, y), "f" => f, "g" => g)
+    nlp = Dict("x" => [x; y], "f" => f, "g" => g)
 
     # Common solver arguments
     arg = (lbx = -Inf, ubx = Inf, lbg = 0, ubg = 0, x0 = 0)

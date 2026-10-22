@@ -98,6 +98,15 @@ class _Validation:
             if name not in scope: self.fail('Missing scheme field or parameter: '+name)
             return scope[name]
         if op == 'length': return len(self.expression(operand[1], scope))
+        if op == 'version':
+            if ('version', operand[1]) not in scope: self.fail('Missing version of '+operand[1])
+            return scope['version', operand[1]]
+        if op == 'next':
+            # Is the upcoming field the named one? Validation reads debug data, which names it.
+            start = self.pos
+            try: return self.string() == self.expression(operand[1], scope)
+            except ValueError: return False
+            finally: self.pos = start
         a = self.expression(operand[1], scope)
         if op == 'not': return not a
         b = self.expression(operand[2], scope)
@@ -105,6 +114,10 @@ class _Validation:
         if op == 'and': return bool(a and b)
         if op == 'equal': return a == b
         if op == 'not_equal': return a != b
+        if op == 'less': return a < b
+        if op == 'less_equal': return a <= b
+        if op == 'greater': return a > b
+        if op == 'greater_equal': return a >= b
         if op == 'concat': return str(a)+str(b)
         self.fail('Unknown scheme operand: '+op)
 
@@ -130,8 +143,12 @@ class _Validation:
                     if name is None: name = self.expression(step['name_expression'], scope)
                     self.name(name+'::serialization::version')
                     version = self.number('int')
-                    if version != step['value']:
-                        self.fail(f"{name}: expected version {step['value']}, got {version}")
+                    if not step.get('minimum', step['value']) <= version <= step['value']:
+                        self.fail(f"{name}: unsupported version {version}")
+                    # Layouts of older versions branch on it.
+                    scope['version', name] = version
+                elif op == 'assign':
+                    scope[step['name']] = step['value']
                 elif op == 'call':
                     name = step['layout']
                     self.context.append(name)

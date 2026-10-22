@@ -4387,6 +4387,51 @@ class MXtests(casadiTestCase):
           self.checkarray(A,Ac,digits=8)
 
 
+  def test_convexify_large(self):
+    # issue #3169: blocks beyond 100 overflowed fixed-size work arrays
+    np.random.seed(1)
+    for n in [3, 120]:
+      B = np.random.randn(n,n)
+      A = ca.DM(B+B.T)
+      [D,V] = np.linalg.eigh(np.array(A))
+      As = ca.MX.sym("As",A.sparsity())
+      for strategy, Dm in [("eigen-reflect",ca.fmax(abs(D),1e-7)), ("eigen-clip",ca.fmax(D,1e-7))]:  # pyright: ignore[reportCallIssue,reportArgumentType]
+        f = ca.Function("f",[As],[ca.convexify(As,{"strategy":strategy,"max_iter_eig":2000})])
+        self.checkarray(f(A), V @ ca.diag(Dm) @ V.T, digits=8)  # pyright: ignore[reportCallIssue,reportArgumentType]
+        if n<10: self.check_codegen(f,inputs=[A])
+
+  def test_repmat_slice(self):
+    # issue #4190
+    x = ca.MX.sym("x",2)
+    y = ca.repmat(x,1,2)
+    self.assertTrue((y[:,0]-y[:,1]).is_zero())
+    self.assertTrue(ca.is_equal(y[:,1], x))
+    xs = ca.SX.sym("x",2)
+    X = ca.MX.sym("X",ca.Sparsity.lower(2))
+    Xs = ca.SX.sym("X",ca.Sparsity.lower(2))
+    for a, b in [(x, xs), (X, Xs)]:
+      f = ca.Function("f",[a],[ca.repmat(a,1,3)[:,[2,0,1]], ca.repmat(a,1,3)[[1,0],[1,2]], ca.repmat(a,1,3).nz[[5,0,2,1]]])
+      f_ref = ca.Function("f",[b],[ca.repmat(b,1,3)[:,[2,0,1]], ca.repmat(b,1,3)[[1,0],[1,2]], ca.repmat(b,1,3).nz[[5,0,2,1]]])
+      self.checkfunction(f,f_ref,inputs=[ca.DM(np.random.random(a.nnz()))] if a.is_dense() else [ca.DM(a.sparsity(),np.random.random(a.nnz()))])
+    # Non-vector, sparse (empty rows/columns) and all-zero inputs, horizontal and 2-D repeats
+    sps = [ca.Sparsity.dense(2,3), ca.Sparsity.triplet(3,3,[0,2,1],[0,0,2]),
+           ca.Sparsity.triplet(3,2,[0,2,2],[0,0,1]), ca.Sparsity(2,3)]
+    for sp in sps:
+      for m, n in [(1,3),(2,2)]:
+        def slices(a):
+          Y = ca.repmat(a,m,n)
+          R, C = Y.shape
+          return [Y[:,list(range(C))[::-1]], Y[list(range(R))[::-1],:], Y[[R-1,0],[C-1,0]],
+                  Y.nz[list(range(Y.nnz()))[::-1]], Y.T]
+        a = ca.MX.sym("a",sp)
+        b = ca.SX.sym("a",sp)
+        Y = ca.repmat(a,m,n)
+        w = Y.shape[1]//n
+        self.assertTrue((Y[:,w*(n-1):]-Y[:,:w]).is_zero())
+        f = ca.Function("f",[a],slices(a))
+        f_ref = ca.Function("f",[b],slices(b))
+        self.checkfunction(f,f_ref,inputs=[ca.DM(sp,np.random.random(sp.nnz()))])
+
   def test_logsumexp(self):
     x = ca.MX.sym("x",3)
 
@@ -5311,6 +5356,23 @@ class MXtests(casadiTestCase):
                     self.assertEqual(H.sparsity_jac(0,0).nnz(), 2)
                     # qn is non-diff output: no dependencies
                     self.assertEqual(H.sparsity_jac(0,1).nnz(), 0)
+
+  def test_is_nonnegative_binary(self):
+    x = ca.MX.sym("x")
+    y = ca.MX.sym("y")
+    # fabs(e) -> e for nonnegative e, binary operations included
+    for e in [x<y, x<=y, x==y, x!=y, ca.logic_and(x,y), ca.logic_or(x,y), ca.hypot(x,y), ca.sqrt(x)]:
+      self.assertTrue(ca.is_equal(ca.fabs(e), e))
+    for e in [x+y, x*y, x-y]:
+      self.assertFalse(ca.is_equal(ca.fabs(e), e))
+
+  def test_chained_inequality_kept(self):
+    y = ca.MX.sym("y")
+    # On-the-fly simplification keeps chained inequalities, explicit simplification folds them
+    for e in [0<=(y<=1), (1>=y)>=0]:
+      self.assertFalse(e.is_constant())
+      f = ca.Function("f",[y],[e]).transform([["simplify",0,"ref_count"]])
+      self.assertTrue(f.call([y],True,False)[0].is_one())
 
   def test_set_precision(self):
     # Issue #4326: numeric MX constants honor DM::set_precision

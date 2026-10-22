@@ -28,7 +28,7 @@ x = ca.MX.sym("x", 3)            # state
 s = x[1]; v = x[2]; m = x[3]   # position, speed, mass
 
 # ODE right-hand side
-xdot = ca.vertcat(v, (u - 0.05 * v * v) / m, -0.1 * u * u)
+xdot = [v; ((u - 0.05 * v * v) / m); (-0.1 * u * u)]
 f = ca.Function("f", [x, u], [xdot])
 
 function main()

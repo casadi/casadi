@@ -111,18 +111,6 @@ jobs:
           cmake -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} -H.
           cmake --build build -v
 
-  macos-14:
-    if: ${{ !contains(github.event.head_commit.message, '[skip-ci:compilers]') }}
-    runs-on: macos-14
-    env:
-      MACOSX_DEPLOYMENT_TARGET: "11.0"
-    steps:
-      - uses: actions/checkout@v6.0.2
-      - name: Build
-        run: |
-          cmake -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} -H.
-          cmake --build build -v
-          
   windows-2022:
     if: ${{ !contains(github.event.head_commit.message, '[skip-ci:compilers]') }}
     runs-on: windows-2022

@@ -61,10 +61,12 @@ if "SKIP_OSQP_TESTS" not in os.environ and ca.has_conic("osqp"):
   if os.name=='nt':
     options = []
   codegen = {"extralibs": ["osqp"], "extra_options": options, "std": "c99"}
+  if platform.system()=="Darwin":
+    codegen["digits"] = 13 # few-ulp codegen vs VM differences on macos-15
   conics.append(("osqp",{"osqp":{"alpha":1,"eps_abs":1e-8,"eps_rel":1e-8}},{"quadratic": True, "dual": True, "codegen": codegen,"soc":False,"binary":False, "discrete":False}))
 
 if "SKIP_SUPERSCS_TESTS" not in os.environ and ca.has_conic("superscs"):
-  conics.append(("superscs",{"superscs": {"eps":1e-9,"do_super_scs":1, "verbose":0}},{"quadratic": True, "dual": False, "codegen": False,"soc":True,"binary":False, "discrete":False}))
+  conics.append(("superscs",{"superscs": {"eps":1e-9,"do_super_scs":1, "verbose":0}},{"quadratic": True, "dual": True, "codegen": False,"soc":True,"binary":False, "discrete":False}))
 
 # No solution for licensing on travis
 
@@ -1461,6 +1463,66 @@ class ConicTests(casadiTestCase):
     solver_qp = solver.find_function("solver_qp")
     self.assertTrue(solver_qp.is_a("SXFunction"))
     
+  @requires_conic("ipqp")
+  def test_ipqp_status_init(self):
+    # More constraints than variables: uninitialized status and an undersized KKT iw
+    H = ca.DM([[1,-1],[-1,2]]); A = ca.DM([[1,1],[-1,2],[2,1]])
+    solver = ca.conic("solver","ipqp",{"h":H.sparsity(),"a":A.sparsity()},{"print_iter":False,"print_header":False,"print_info":False})
+    res = solver(h=H,g=ca.DM([-2,-6]),a=A,lbx=0,ubx=ca.inf,lba=-ca.inf,uba=ca.DM([2,2,3]))
+    self.assertTrue(solver.stats()["success"])
+    self.checkarray(res["x"],ca.DM([2./3,4./3]),digits=6)
+
+  @requires_conic("qrqp")
+  def test_qrqp_iter_count(self):
+    H = ca.DM([[1,-1],[-1,2]]); A = ca.DM([[1,1],[-1,2],[2,1]])
+    solver = ca.conic("solver","qrqp",{"h":H.sparsity(),"a":A.sparsity()},{"print_iter":False,"print_header":False,"print_info":False})
+    solver(h=H,g=ca.DM([-2,-6]),a=A,lbx=0,ubx=ca.inf,lba=-ca.inf,uba=ca.DM([2,2,3]))
+    self.assertTrue(solver.stats()["success"])
+    self.assertTrue(solver.stats()["iter_count"]>0)
+
+  @requires_conic("proxqp")
+  def test_proxqp_mixed_multipliers(self):
+    # Equality constraint between inequality constraints
+    H = ca.DM.eye(3); A = ca.DM([[1,1,0],[0,1,-1],[1,0,1]])
+    for backend in ["sparse","dense"]:
+      solver = ca.conic("solver","proxqp",{"h":H.sparsity(),"a":A.sparsity()},{"proxqp":{"eps_abs":1e-11,"backend":backend}})
+      res = solver(h=H,g=ca.DM([0,-2,1]),a=A,lba=ca.DM([-ca.inf,-0.5,1.8]),uba=ca.DM([1.5,-0.5,ca.inf]))
+      self.checkarray(res["x"],ca.DM([0.7,0.6,1.1]),digits=6)
+      self.checkarray(res["lam_a"],ca.DM([0,1.4,-0.7]),digits=6)
+
+  @requires_conic("qrqp")
+  def test_sensitivity(self):
+    x = ca.MX.sym("x",4)
+    p = ca.MX.sym("p",2)
+    H = ca.blockcat([[2+p[0],0.5,0,0],[0.5,3,p[1],0],[0,p[1],4,0],[0,0,0,1]])
+    f = 0.5*ca.bilin(H,x,x)+ca.dot(ca.vertcat(-5*p[0],2,p[1]-5,1),x)
+    g = ca.vertcat(x[0]+p[1]*x[1]+x[2], x[0]-x[2]+x[3], x[1]+p[0]*x[2])
+    qp = {"x":x,"p":p,"f":f,"g":g}
+    # Active: upper g[0], equality g[1], lower g[2], lower x[1]
+    bounds = dict(lbg=ca.vertcat(-inf,p[1]-0.2,0.3+p[0]),ubg=ca.vertcat(p[0]+1,p[1]-0.2,inf),
+                  lbx=ca.vertcat(-inf,1.5*p[1],-inf,-inf),ubx=inf)
+    pv = [0.7,0.3]
+
+    ref = ca.nlpsol("ref","sqpmethod",qp,{"qpsol":"qrqp","qpsol_options":{"print_iter":False,"print_header":False},
+                                          "print_iteration":False,"print_header":False,"print_status":False,
+                                          "tol_pr":1e-14,"tol_du":1e-14})
+    r = ref(p=p,**bounds)
+    R = ca.Function("R",[p],[r["x"],r["f"],r["lam_g"],r["lam_x"]])
+    lam_g = R(pv)[2]
+    self.assertTrue(lam_g[0]>1e-3 and lam_g[2]<-1e-3 and abs(lam_g[1])>1e-3)
+    self.assertTrue(R(pv)[3][1]<-1e-3)
+
+    for conic, qp_options, aux_options in conics:
+      if not aux_options["quadratic"] or not aux_options["dual"]: continue
+      if conic in ["nlpsol"]: continue
+      print("test_sensitivity",conic,qp_options)
+      less_digits = aux_options.get("less_digits",0)
+      digits = 7 if conic in ["qrqp","qpoases","daqp","ipqp"] else 4
+      solver = ca.qpsol("solver",conic,qp,dict(qp_options,sens_min_lam=1e-6))
+      r = solver(p=p,**bounds)
+      F = ca.Function("F",[p],[r["x"],r["f"],r["lam_g"],r["lam_x"]])
+      self.checkfunction(F,R,inputs=[pv],digits=digits-less_digits)
+
   @requires_conic("osqp")
   def test_postpone_expand(self):
 

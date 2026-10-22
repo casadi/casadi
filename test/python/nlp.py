@@ -354,6 +354,25 @@ class NLPtests(casadiTestCase):
         sol = opti.solve()
 
 
+  @requires_nlpsol("ipopt")
+  def test_eval_interrupt_stops_ipopt(self):
+    # A KeyboardInterrupt in a Callback must abort the solve, not count as a failed evaluation
+    class Counter(ca.Callback):
+      def __init__(self):
+        ca.Callback.__init__(self)
+        self.n = 0
+        self.construct("counter", {"enable_fd":True})
+      def eval(self, arg):
+        self.n += 1
+        if self.n>=3: raise KeyboardInterrupt()
+        return [(arg[0]-1)**2]
+    f = Counter()
+    x = ca.MX.sym("x")
+    solver = ca.nlpsol("solver","ipopt",{"x":x,"f":f(x)},{"print_time":False,"ipopt.print_level":0,"ipopt.sb":"yes","ipopt.hessian_approximation":"limited-memory"})
+    solver(x0=5)
+    self.assertEqual(solver.stats()["return_status"], "NonIpopt_Exception_Thrown")
+    self.assertEqual(f.n, 3)
+
   def test_discrete(self):
     self.message("rosenbrock, limited-memory hessian approx")
     x=ca.SX.sym("x")

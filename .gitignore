@@ -46,6 +46,7 @@ swig/*/target*
 *tmp*
 *temp*
 *.casadi
+!test/data/serialization/*.casadi
 *.mtx
 callgrind.out.*
 cachegrind.out.*

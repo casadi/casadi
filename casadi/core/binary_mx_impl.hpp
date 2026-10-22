@@ -55,6 +55,11 @@ namespace casadi {
   }
 
   template<bool ScX, bool ScY>
+  bool BinaryMX<ScX, ScY>::is_nonnegative() const {
+    return operation_checker<NonnegativeChecker>(op_);
+  }
+
+  template<bool ScX, bool ScY>
   void BinaryMX<ScX, ScY>::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res,
       const std::vector<bool>& unique) const {
     bool unique_x = !unique.empty() && unique[0];

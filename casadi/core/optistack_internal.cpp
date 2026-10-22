@@ -461,8 +461,6 @@ MX OptiNode::parameter(const Sparsity& sp, const std::string& attribute) {
 }
 
 MX OptiNode::parameter(casadi_int n, casadi_int m, const std::string& attribute) {
-  casadi_assert_dev(attribute=="full");
-
   // Prepare metadata
   MetaVar meta_data;
   meta_data.attribute = attribute;
@@ -472,12 +470,24 @@ MX OptiNode::parameter(casadi_int n, casadi_int m, const std::string& attribute)
   meta_data.count = count_++;
   meta_data.i = count_par_++;
 
-  MX symbol = MX::sym(name_prefix() + "p_" + str(count_par_), n, m);
+  MX symbol, ret;
+  if (attribute=="symmetric") {
+    casadi_assert(n==m, "You specified attribute 'symmetric', "
+      "while matrix is not even square, but " + str(n) + "-by-" + str(m) + ".");
+    symbol = MX::sym(name_prefix() + "p_" + str(count_par_), n*(n+1)/2);
+    ret = tril2symm(MX(Sparsity::lower(n), symbol));
+  } else if (attribute=="full") {
+    symbol = MX::sym(name_prefix() + "p_" + str(count_par_), n, m);
+    ret = symbol;
+  } else {
+    casadi_error("Unknown attribute '" + attribute + "'. Choose from 'full' or 'symmetric'.");
+  }
+
   symbols_.push_back(symbol);
   store_initial_[OPTI_PAR].push_back(DM::nan(symbol.sparsity()));
 
   set_meta(symbol, meta_data);
-  return symbol;
+  return ret;
 }
 
 Dict OptiNode::stats() const {
@@ -1079,6 +1089,7 @@ MetaCon OptiNode::canon_expr(const MX& expr, const DM& linear_scale) const {
       // Fall through to generic inequalities
     } else if (args.size()==3 && parametric[0] && parametric[2]) {
       // lb(p) <= g(x,p) <= ub(p)
+      casadi_assert(!parametric[1], "Constraint must contain decision variables.");
       con.type = OPTI_DOUBLE_INEQUALITY;
       con.lb = args[0]*DM::ones(args[1].sparsity());
       con.ub = args[2]*DM::ones(args[1].sparsity());
@@ -1196,7 +1207,6 @@ void OptiNode::minimize(const MX& f, double linear_scale) {
 void OptiNode::subject_to(const MX& g, const DM& linear_scale, const Dict& options) {
   assert_only_opti_nondual(g);
   mark_problem_dirty();
-  g_.push_back(g);
 
   casadi_assert(!g.is_empty(),    "You passed an empty expression to `subject_to`. "
                                   "Make sure the number of rows and columns is non-zero. "
@@ -1210,6 +1220,7 @@ void OptiNode::subject_to(const MX& g, const DM& linear_scale, const Dict& optio
   // Store the meta-data
   set_meta_con(g, canon_expr(g, linear_scale));
   register_dual(meta_con(g));
+  g_.push_back(g);
 
   for (auto && it : options) {
     if (it.first=="stacktrace") {

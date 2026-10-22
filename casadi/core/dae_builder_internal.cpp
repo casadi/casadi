@@ -768,6 +768,9 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
   casadi_assert(fmi_desc.has_child("ModelVariables"), "Missing 'ModelVariables'");
   import_model_variables(fmi_desc["ModelVariables"]);
 
+  // No explicit independent variable (FMI 2): expose the automatically added time variable
+  if (orig_time_index_ == -1 && !ignore_time_ && n_variables() > 0) categorize(0, Category::T);
+
   // Process model structure
   if (fmi_desc.has_child("ModelStructure")) {
     import_model_structure(fmi_desc["ModelStructure"]);

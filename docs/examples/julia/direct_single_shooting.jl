@@ -29,11 +29,11 @@ N = 20      # number of control intervals
 # Declare model variables
 x1 = ca.MX.sym("x1")
 x2 = ca.MX.sym("x2")
-x = ca.vertcat(x1, x2)
+x = [x1; x2]
 u = ca.MX.sym("u")
 
 # Model equations
-xdot = ca.vertcat((1 - x2^2) * x1 - x2 + u, x1)
+xdot = [((1 - x2^2) * x1 - x2 + u); x1]
 
 # Objective term
 L = x1^2 + x2^2 + u^2
@@ -89,7 +89,7 @@ function main()
     end
 
     # Create an NLP solver
-    prob = Dict("f" => J, "x" => ca.vertcat(w), "g" => ca.vertcat(g))
+    prob = Dict("f" => J, "x" => vcat(w...), "g" => vcat(g...))
     solver = ca.nlpsol("solver", "ipopt", prob)
 
     # Solve the NLP

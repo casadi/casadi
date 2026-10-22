@@ -209,6 +209,9 @@ namespace casadi {
     }
     // Simplifications
     if (GlobalOptions::simplification_on_the_fly) {
+      // Annihilation by a zero, unless constant folding applies (as in MX)
+      if ((operation_checker<F0XChecker>(op) && x.is_zero() && !y.is_constant()) ||
+          (operation_checker<FX0Checker>(op) && y.is_zero() && !x.is_constant())) return 0;
       bool hit;
       SXElem ret = common_simp_binary(op, x, y, SXNode::eq_depth_,
                 [](casadi_int op, const SXElem& a) { return unary(op, a);},
@@ -240,8 +243,8 @@ namespace casadi {
     if (GlobalOptions::simplification_on_the_fly) {
       switch (op) {
         case OP_NOT:
-          if (x.is_op(OP_NOT))
-            return x.dep(); // This looks problematic
+          if (x.is_op(OP_NOT) && x.dep().is_boolean())
+            return x.dep(); // !!x -> x only if x is 0 or 1
           break;
         case OP_TWICE:
           if (x.is_op(OP_MUL) && x.dep(0).is_constant())
@@ -364,13 +367,20 @@ namespace casadi {
     }
   }
 
+  bool SXElem::is_boolean() const {
+    if (is_constant()) {
+      double v = static_cast<double>(*this);
+      return v==0 || v==1;
+    } else {
+      return operation_checker<BooleanChecker>(node->op());
+    }
+  }
+
   bool SXElem::is_nonnegative() const {
     if (is_constant()) {
       return static_cast<double>(*this)>=0;
-    } else if (casadi_math<SXElem>::is_unary(node->op())) {
-      return operation_checker<NonnegativeChecker>(node->op());
     } else {
-      return false;
+      return operation_checker<NonnegativeChecker>(node->op());
     }
   }
 

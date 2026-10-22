@@ -94,9 +94,11 @@ class SerializeTests(casadiTestCase):
           outp_ref = f.generate_out(os.path.join(dir,out_name))
           outp = f.call(inp)
           self.assertEqual(len(outp),len(outp_ref))
-          for o,o_ref in zip(outp,outp_ref):
+          for name,o,o_ref in zip(f.name_out(),outp,outp_ref):
             digits = 15
             if "SuperscsInterface" in str(f):
+                # issue #3339: references predate superscs multipliers
+                if name.startswith("lam_"): continue
                 digits = 7
             if sys.platform=="darwin":
                 digits = 7 # Bug?
