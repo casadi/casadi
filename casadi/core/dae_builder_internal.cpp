@@ -2699,10 +2699,11 @@ const Function& DaeBuilderInternal::oracle(bool sx, bool elim_w, bool lifted_cal
     }
     // Eliminate v from inputs
     if (subst_v) {
-      // Dependent variable definitions
-      std::vector<MX> wdef = outputs(Category::WDEF);
+      // Sort local copies so that the public variable order is unchanged
+      std::vector<MX> w = var(Category::W), wdef = outputs(Category::WDEF);
+      sort_dependent(w, wdef);
       // Perform in-place substitution
-      substitute_inplace(var(Category::W), wdef, f_out, false);
+      substitute_inplace(w, wdef, f_out, false);
     } else if (lifted_calls && wdef_ind >= 0) {
       // Dependent variable definitions
       std::vector<MX> wdef = outputs(Category::WDEF);
@@ -2854,7 +2855,7 @@ void DaeBuilderInternal::sort_dependent(std::vector<MX>& v, std::vector<MX>& vde
   // Add diagonal (equation is v-vdef = 0)
   Jv = Jv + Sparsity::diag(Jv.size1());
   // If lower triangular, nothing to do
-  if (Jv.is_triu()) return;
+  if (Jv.is_tril()) return;
   // Perform a Dulmage-Mendelsohn decomposition
   std::vector<casadi_int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
   (void)Jv.btf(rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock);
@@ -2919,7 +2920,8 @@ Function DaeBuilderInternal::dependent_fun(const std::string& fname,
     std::vector<MX> wdef = outputs(Category::WDEF);
     dwdef.insert(dwdef.end(), wdef.begin(), wdef.end());
   }
-  // Perform elimination
+  // Sort local copies before elimination
+  sort_dependent(dw, dwdef);
   substitute_inplace(dw, dwdef, f_out);
   // Assemble return function
   return Function(fname, f_in, f_out, s_in, s_out);
@@ -2957,10 +2959,11 @@ Function DaeBuilderInternal::transition(const std::string& fname, casadi_int ind
 
   // Remove dependent variables, if any
   if (size(Category::W) > 0) {
-    // Dependent variable definitions
-    std::vector<MX> wdef = outputs(Category::WDEF);
+    // Sort local copies so that the public variable order is unchanged
+    std::vector<MX> w = var(Category::W), wdef = outputs(Category::WDEF);
+    sort_dependent(w, wdef);
     // Perform in-place substitution
-    substitute_inplace(var(Category::W), wdef, ret_out, false);
+    substitute_inplace(w, wdef, ret_out, false);
   }
 
   // Check if a dummy index input needes to be included
