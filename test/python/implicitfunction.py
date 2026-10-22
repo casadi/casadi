@@ -28,7 +28,7 @@ import casadi as c
 import numpy
 import unittest
 from types import *
-from helpers import casadiTestCase, jacobian_old, known_bug, memory_heavy
+from helpers import casadiTestCase, jacobian_old, known_bug, memory_heavy, requires_rootfinder
 
 solvers= []
 try:
@@ -225,6 +225,38 @@ class ImplicitFunctiontests(casadiTestCase):
     solver=ca.rootfinder("solver", "kinsol", f, {"constraints":[-1]})
     solver_out = solver(-6)
     self.assertAlmostEqual(solver_out[0],-2*pi,5)
+
+  @requires_rootfinder("kinsol")
+  def test_kinsol_user_defined_scalar(self):
+    x = ca.SX.sym("x")
+    f = ca.Function("f", [x], [x**2-2])
+    for strategy in ["none", "linesearch"]:
+      solver = ca.rootfinder("solver", "kinsol", f,
+        {"linear_solver_type":"user_defined", "strategy":strategy, "abstol":1e-10})
+      for x0 in [1, 2]:
+        self.checkarray(solver(x0), ca.sqrt(2), digits=8)
+        self.assertTrue(solver.stats()["success"])
+
+  @requires_rootfinder("kinsol")
+  def test_kinsol_user_defined_vector(self):
+    for symbolic in [ca.SX, ca.MX]:
+      x = symbolic.sym("x", 2)
+      p = symbolic.sym("p", 2)
+      g = ca.vertcat(x[0]**2+p[0]*x[1]-p[1], x[0]-x[1])
+      f = ca.Function("f", [x, p], [g])
+      for strategy in ["none", "linesearch"]:
+        opts = {"strategy":strategy, "abstol":1e-10,
+          "u_scale":[0.5, 2], "f_scale":[0.25, 4]}
+        dense = ca.rootfinder("dense", "kinsol", f,
+          dict(opts, linear_solver_type="dense"))
+        solver = ca.rootfinder("solver", "kinsol", f,
+          dict(opts, linear_solver_type="user_defined"))
+        for parameters, expected in [([1, 6], [2, 2]), ([2, 15], [3, 3])]:
+          result = solver([1, 1], parameters)
+          self.checkarray(result, ca.DM(expected), digits=8)
+          self.checkarray(result, dense([1, 1], parameters), digits=8)
+          self.checkarray(f(result, parameters), ca.DM.zeros(2), digits=8)
+          self.assertTrue(solver.stats()["success"])
 
   def test_constraints(self):
     for Solver, options, features in solvers:
