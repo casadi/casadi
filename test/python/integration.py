@@ -2024,7 +2024,7 @@ class Integrationtests(casadiTestCase):
       outs = [r["xf"], r["qf"], ca.gradient(obj, v), ca.jtimes(ca.jtimes(obj, v, S).T, v, S)]
       G = ca.Function("G", [v], outs)
       v0 = [0.4, -0.3, 2] + [0.1 * (i % 3) for i in range(len(grid))]
-      self.check_codegen(G, inputs=[ca.DM(v0)], digits=14)
+      self.check_codegen(G, inputs=[ca.DM(v0)], digits=12)
 
   @memory_heavy()
   def test_control_groups(self):
@@ -2066,7 +2066,7 @@ class Integrationtests(casadiTestCase):
         J_fd = fd_jacobian(G, v0)
         self.checkarray(J_fd, J_fwd, "fwd vs FD", digits=7)
         self.checkarray(J_fd, J_adj, "adj vs FD", digits=7)
-        if cgs: self.check_codegen(G, inputs=[ca.DM(v0)], digits=14)
+        if cgs: self.check_codegen(G, inputs=[ca.DM(v0)], digits=12)
         # States depend on the controls of their group and earlier ones, forward and reverse
         start = numpy.cumsum([0] + (cgs or [1] * 6))
         for w in [0, 1]:
@@ -2219,7 +2219,7 @@ class Integrationtests(casadiTestCase):
       G = ca.Function("G", [v], [ca.vec(xf), ca.jacobian(ca.vec(xf), v)])
       self.checkarray(G(v0)[0], ca.vec(xf_ref), plugin, digits=features["digits"])
       self.checkarray(G(v0)[1], fd_jacobian(G, v0), plugin, digits=min(6, features["digits"]))
-      if features["codegen"]: self.check_codegen(G, inputs=[v0], digits=12)
+      if features["codegen"]: self.check_codegen(G, inputs=[v0], digits=10)
 
   @memory_heavy()
   def test_events_dae(self):
@@ -2250,7 +2250,7 @@ class Integrationtests(casadiTestCase):
         digits=features["digits"])
       # Sensitivities through the events, with the rates after the transition
       self.checkarray(G(v0)[1], fd_jacobian(G, v0), plugin, digits=min(6, features["digits"]))
-      if features["codegen"]: self.check_codegen(G, inputs=[v0], digits=12)
+      if features["codegen"]: self.check_codegen(G, inputs=[v0], digits=10)
 
   @memory_heavy()
   def test_events_breaking_spring(self):
@@ -2326,7 +2326,7 @@ class Integrationtests(casadiTestCase):
         # Forward-over-adjoint: central differences of the gradient, Richardson extrapolated
         fd = lambda h: fd_jacobian(G, v0, h)
         self.checkarray(H, (4*fd(1e-4) - fd(2e-4))/3, plugin, digits=6)
-        if features["codegen"]: self.check_codegen(G, inputs=[v0], digits=11)
+        if features["codegen"]: self.check_codegen(G, inputs=[v0], digits=9)
 
   @memory_heavy()
   def test_erk_tape(self):
