@@ -158,11 +158,15 @@ namespace casadi {
     static MX sens_kkt(const MX& H, const MX& A, const MX& lam_x, const MX& lam_a,
                        double min_lam, MX& lbIx, MX& ubIx, MX& lbIa, MX& ubIa);
 
-    /** \brief Do the derivative functions need nondifferentiated outputs? */
+    /** \brief Do the derivative functions need nondifferentiated outputs?
+
+        \identifier{2kl} */
     bool uses_output() const override {return true;}
 
     ///@{
-    /** \brief Generate a function that calculates forward mode derivatives */
+    /** \brief Generate a function that calculates forward mode derivatives
+
+        \identifier{2km} */
     bool has_forward(casadi_int nfwd) const override { return true;}
     Function get_forward(casadi_int nfwd, const std::string& name,
                          const std::vector<std::string>& inames,
@@ -171,7 +175,9 @@ namespace casadi {
     ///@}
 
     ///@{
-    /** \brief Generate a function that calculates reverse mode derivatives */
+    /** \brief Generate a function that calculates reverse mode derivatives
+
+        \identifier{2kn} */
     bool has_reverse(casadi_int nadj) const override { return true;}
     Function get_reverse(casadi_int nadj, const std::string& name,
                          const std::vector<std::string>& inames,

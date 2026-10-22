@@ -65,7 +65,9 @@ namespace casadi {
         \identifier{1fs} */
     bool is_binary() const override { return true;}
 
-    /** \brief Check if not negative */
+    /** \brief Check if not negative
+
+        \identifier{2kk} */
     bool is_nonnegative() const override;
 
     /** \brief  Evaluate symbolically (MX)

@@ -205,7 +205,9 @@ namespace casadi {
         \identifier{10t} */
     bool is_nonnegative() const;
 
-    /** \brief Check if a value is always 0 or 1 (false negatives are allowed) */
+    /** \brief Check if a value is always 0 or 1 (false negatives are allowed)
+
+        \identifier{2kj} */
     bool is_boolean() const;
     SXElem dep(casadi_int ch=0) const;
 

@@ -53707,10 +53707,10 @@ Ternary if_else: x ? y : z.
 Extra doc: https://github.com/casadi/casadi/wiki/L_113
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L291
+https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L296
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L291-L293
+https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L296-L298
 
 ";
 
@@ -53721,10 +53721,10 @@ Ternary if_else: x ? y : z.
 Extra doc: https://github.com/casadi/casadi/wiki/L_113
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L291
+https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L296
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L291-L293
+https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L296-L298
 
 ";
 
@@ -53735,10 +53735,10 @@ Ternary if_else: x ? y : z.
 Extra doc: https://github.com/casadi/casadi/wiki/L_113
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L291
+https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L296
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L291-L293
+https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L296-L298
 
 ";
 
@@ -53852,7 +53852,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L174
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.cpp#L266-L269
+https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.cpp#L269-L272
 
 ";
 
@@ -53879,7 +53879,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L181
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.cpp#L271-L274
+https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.cpp#L274-L277
 
 ";
 
@@ -53960,7 +53960,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L201
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.cpp#L490-L496
+https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.cpp#L500-L506
 
 ";
 
@@ -53976,7 +53976,22 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L206
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.cpp#L367-L375
+https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.cpp#L379-L385
+
+";
+
+%feature("docstring")  casadi::SXElem::is_boolean() const "
+
+[INTERNAL] 
+Check if a value is always 0 or 1 (false negatives are allowed)
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_2kj
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L211
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.cpp#L370-L377
 
 ";
 
@@ -53992,7 +54007,7 @@ Check if the node is the sum of two equal expressions.
 Extra doc: https://github.com/casadi/casadi/wiki/L_10u
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L218
+https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L223
 
 Implementation: 
 https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.cpp#L169-L172
@@ -54007,10 +54022,10 @@ Get the number of dependencies of a binary  SXElem.
 Extra doc: https://github.com/casadi/casadi/wiki/L_10v
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L223
+https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L228
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.cpp#L390-L392
+https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.cpp#L400-L402
 
 ";
 
@@ -54022,10 +54037,10 @@ Get an output.
 Extra doc: https://github.com/casadi/casadi/wiki/L_29f
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L228
+https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L233
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.cpp#L394-L396
+https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.cpp#L404-L406
 
 ";
 
@@ -54036,10 +54051,10 @@ casadi_int > &oind) const "
 Get a batch of outputs.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L231
+https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L236
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.cpp#L398-L400
+https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.cpp#L408-L410
 
 ";
 
@@ -54053,10 +54068,10 @@ If the  SXElem does not point to any node, 0 is returned.
 Extra doc: https://github.com/casadi/casadi/wiki/L_10w
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L238
+https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L243
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.cpp#L402-L404
+https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.cpp#L412-L414
 
 ";
 
@@ -54068,7 +54083,7 @@ Element-wise inverse.
 Extra doc: https://github.com/casadi/casadi/wiki/L_10y
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L248
+https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L253
 
 Implementation: 
 https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.cpp#L174-L176
@@ -54082,7 +54097,7 @@ Element-wise inverse.
 Extra doc: https://github.com/casadi/casadi/wiki/L_10y
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L248
+https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L253
 
 Implementation: 
 https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.cpp#L174-L176
@@ -54096,7 +54111,7 @@ Element-wise inverse.
 Extra doc: https://github.com/casadi/casadi/wiki/L_10y
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L248
+https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L253
 
 Implementation: 
 https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.cpp#L174-L176
@@ -54111,10 +54126,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.cpp#L174-L176
 Extra doc: https://github.com/casadi/casadi/wiki/L_112
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L286
+https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L291
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L286-L286
+https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L291-L291
 
 ";
 
@@ -54127,10 +54142,10 @@ Serialize an object.
 Extra doc: https://github.com/casadi/casadi/wiki/L_114
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L298
+https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L303
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.cpp#L498-L500
+https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.cpp#L508-L510
 
 ";
 
@@ -55504,10 +55519,10 @@ Default input for an NLP solver.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1t4
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.hpp#L291
+https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.hpp#L292
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.cpp#L291-L302
+https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.cpp#L292-L303
 
 ";
 
@@ -55519,10 +55534,10 @@ Default input for an NLP solver.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1t4
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.hpp#L304
+https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.hpp#L305
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.cpp#L304-L308
+https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.cpp#L305-L309
 
 ";
 
@@ -57631,6 +57646,26 @@ General information
 |                  |                 | reverse mode     |                  |
 |                  |                 | constructor      |                  |
 +------------------+-----------------+------------------+------------------+
+| sens_linsol      | OT_STRING       | Linear solver    | casadi::Conic    |
+|                  |                 | used for         |                  |
+|                  |                 | parametric       |                  |
+|                  |                 | sensitivities    |                  |
+|                  |                 | (default 'qr').  |                  |
++------------------+-----------------+------------------+------------------+
+| sens_linsol_opti | OT_DICT         | Linear solver    | casadi::Conic    |
+| ons              |                 | options used for |                  |
+|                  |                 | parametric       |                  |
+|                  |                 | sensitivities.   |                  |
++------------------+-----------------+------------------+------------------+
+| sens_min_lam     | OT_DOUBLE       | Minimum          | casadi::Conic    |
+|                  |                 | multiplier value |                  |
+|                  |                 | for a constraint |                  |
+|                  |                 | to be considered |                  |
+|                  |                 | active in        |                  |
+|                  |                 | parametric       |                  |
+|                  |                 | sensitivities    |                  |
+|                  |                 | [0].             |                  |
++------------------+-----------------+------------------+------------------+
 | solver_version_c | OT_BOOL         | When the plugin  | casadi::Conic    |
 | heck             |                 | loads an         |                  |
 |                  |                 | externally       |                  |
@@ -58818,10 +58853,10 @@ Get all options for a plugin.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1ek
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/conic.hpp#L579
+https://github.com/casadi/casadi/blob/main/casadi/core/conic.hpp#L597
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/conic.cpp#L579-L581
+https://github.com/casadi/casadi/blob/main/casadi/core/conic.cpp#L597-L599
 
 ";
 
@@ -58834,10 +58869,10 @@ Get type info for a particular option.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1el
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/conic.hpp#L583
+https://github.com/casadi/casadi/blob/main/casadi/core/conic.hpp#L601
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/conic.cpp#L583-L585
+https://github.com/casadi/casadi/blob/main/casadi/core/conic.cpp#L601-L603
 
 ";
 
@@ -58850,10 +58885,10 @@ Get documentation for a particular option.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1em
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/conic.hpp#L587
+https://github.com/casadi/casadi/blob/main/casadi/core/conic.hpp#L605
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/conic.cpp#L587-L589
+https://github.com/casadi/casadi/blob/main/casadi/core/conic.cpp#L605-L607
 
 ";
 
@@ -63131,10 +63166,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/nlp_tools.hpp#L79-L120
 Check if a particular plugin is available.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.hpp#L35
+https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.hpp#L36
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.cpp#L35-L37
+https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.cpp#L36-L38
 ";
 
 %feature("docstring")  casadi::load_nlpsol(const std::string &name) "
@@ -63143,10 +63178,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.cpp#L35-L37
 Explicitly load a plugin dynamically.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.hpp#L39
+https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.hpp#L40
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.cpp#L39-L41
+https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.cpp#L40-L42
 ";
 
 %feature("docstring")  casadi::doc_nlpsol(const std::string &name) "
@@ -63155,10 +63190,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.cpp#L39-L41
 Get the documentation string for a plugin.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.hpp#L43
+https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.hpp#L44
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.cpp#L43-L45
+https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.cpp#L44-L46
 ";
 
 %feature("docstring")  casadi::nlpsol(const std::string &name, const 
@@ -65068,10 +65103,10 @@ Joel Andersson
 Extra doc: https://github.com/casadi/casadi/wiki/L_21q
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.hpp#L195
+https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.hpp#L196
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.cpp#L195-L198
+https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.cpp#L196-L199
 
 ";
 
@@ -65134,10 +65169,10 @@ Get input scheme of NLP solvers.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1sy
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.hpp#L279
+https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.hpp#L280
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.cpp#L279-L283
+https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.cpp#L280-L284
 
 ";
 
@@ -65175,10 +65210,10 @@ Get NLP solver input scheme name by index.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1t0
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.hpp#L310
+https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.hpp#L311
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.cpp#L310-L323
+https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.cpp#L311-L324
 
 ";
 
@@ -65214,10 +65249,10 @@ Get NLP solver output scheme of NLP solvers.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1sz
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.hpp#L285
+https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.hpp#L286
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.cpp#L285-L289
+https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.cpp#L286-L290
 
 ";
 
@@ -65253,10 +65288,10 @@ Get output scheme name by index.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1t1
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.hpp#L325
+https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.hpp#L326
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.cpp#L325-L336
+https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.cpp#L326-L337
 
 ";
 
@@ -65268,10 +65303,10 @@ Number of NLP solver inputs.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1t2
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.hpp#L338
+https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.hpp#L339
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.cpp#L338-L340
+https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.cpp#L339-L341
 
 ";
 
@@ -65283,10 +65318,10 @@ Number of NLP solver outputs.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1t3
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.hpp#L342
+https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.hpp#L343
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.cpp#L342-L344
+https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.cpp#L343-L345
 
 ";
 
@@ -65298,10 +65333,10 @@ Get all options for a plugin.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1t5
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.hpp#L919
+https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.hpp#L920
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.cpp#L919-L921
+https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.cpp#L920-L922
 
 ";
 
@@ -65314,10 +65349,10 @@ Get type info for a particular option.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1t6
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.hpp#L923
+https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.hpp#L924
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.cpp#L923-L925
+https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.cpp#L924-L926
 
 ";
 
@@ -65330,10 +65365,10 @@ Get documentation for a particular option.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1t7
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.hpp#L927
+https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.hpp#L928
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.cpp#L927-L929
+https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.cpp#L928-L930
 
 ";
 

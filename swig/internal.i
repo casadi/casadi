@@ -5188,6 +5188,9 @@
 %exception  casadi::SXElem::is_almost_zero(double tol) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::SXElem::is_boolean() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::SXElem::is_call() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
