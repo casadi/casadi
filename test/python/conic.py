@@ -26,7 +26,7 @@ import casadi as c
 import numpy
 import unittest
 from types import *
-from typing import Any
+from typing import Any, Dict
 from helpers import args, casadiTestCase, jacobian_old, memory_heavy, requires_conic, requires_nlpsol
 import os
 import platform
@@ -107,7 +107,7 @@ if "SKIP_CBC_TESTS" not in os.environ and ca.has_conic("cbc"):
   conics.append(("cbc",{"verbose":True},{"quadratic": False, "dual": True, "soc": False, "codegen": False, "binary":True, "discrete": True, "sos":True}))
 
 if "SKIP_QRQP_TESTS" not in os.environ and ca.has_conic("qrqp"):
-  codegen: dict[str, Any] = {"std":"c99"}
+  codegen: Dict[str, Any] = {"std":"c99"}
   if platform.system()=="Darwin":
     codegen["digits"] = 13 # few-ulp codegen vs VM differences on macos-15
   conics.append(("qrqp",{"max_iter":20,"print_header":False,"print_iter":False},{"quadratic": True, "dual": True, "soc": False, "codegen": codegen, "binary":False, "discrete": False, "sos":False}))
