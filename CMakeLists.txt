@@ -1069,8 +1069,8 @@ option(WITH_BUILD_HIGHS "Build HiGHS (BUILD_HIGHS_VERSION=${BUILD_HIGHS_VERSION}
 
 # DAQP: An Active-Set QP solver written in C
 option(WITH_DAQP "Compile the DAQP interface" OFF)
-set(BUILD_DAQP_GIT_REPO "https://github.com/jgillis/daqp.git" CACHE STRING "Git repo used together with BUILD_DAQP_VERSION")
-set(BUILD_DAQP_VERSION "master" CACHE STRING "Tag/branch/hash to be used for BUILD_DAQP_GIT_REPO")
+set(BUILD_DAQP_GIT_REPO "https://github.com/darnstrom/daqp.git" CACHE STRING "Git repo used together with BUILD_DAQP_VERSION")
+set(BUILD_DAQP_VERSION "v0.10.0" CACHE STRING "Tag/branch/hash to be used for BUILD_DAQP_GIT_REPO")
 set(BUILD_DAQP_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for DAQP")
 option(WITH_BUILD_DAQP "Build DAQP (BUILD_DAQP_VERSION=${BUILD_DAQP_VERSION}) from downloaded source (BUILD_DAQP_GIT_REPO=${BUILD_DAQP_GIT_REPO})." OFF)
 
@@ -2377,7 +2377,7 @@ if(WITH_DAQP)
     add_library(daqp ${TP_IMPORT_KIND} IMPORTED)
     add_dependencies(daqp daqp-external)
     set_target_properties(daqp PROPERTIES
-       INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include/daqp"
+       INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include"
        IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}daqp${CMAKE_SHARED_LIBRARY_SUFFIX}"
        IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}daqp${CMAKE_IMPORT_LIBRARY_SUFFIX}"
     )
