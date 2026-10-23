@@ -61,7 +61,254 @@ napoleon_use_param = True
 napoleon_use_rtype = True
 
 add_module_names = False
+toc_object_entries = False  # sidebar lists sections only
 autodoc_typehints = "none"
+autodoc_default_options = {'exclude-members': 'thisown'}
+
+# SWIG proxies: keep documented members of the casadi bases, drop object/junk
+def skip_member(app, what, name, obj, skip, options):
+    if name in ('thisown', 'this') or name.startswith('_'):
+        return True
+    return skip
+
+# Docstrings arrive from SWIG (signature block) + doxy2swigX (prose, provenance links).
+import re
+PROVENANCE = ('Doc source', 'Implementation', 'Extra doc')
+
+
+def _split_top(text):
+    """Split a See-also list on commas outside parentheses: 'a, Sparsity(n, m)'."""
+    parts, depth, cur = [], 0, ''
+    for ch in text:
+        depth += {'(': 1, ')': -1}.get(ch, 0)
+        if ch == ',' and depth == 0:
+            parts.append(cur); cur = ''
+        else:
+            cur += ch
+    return parts + [cur]
+
+def _xref(target, context):
+    """Link a See-also name to the class member or module function it denotes, if any."""
+    import casadi
+    target = re.sub(r'^casadi::', '', target).replace('::', '.')  # C++ scoped names, e.g. Function::transform
+    bare = re.sub(r'\(.*\)$', '', target).strip()
+    parts = context.split('.')
+    cls = parts[2] if len(parts) > 3 else None  # casadi.casadi.<Class>.<member>
+    if '.' not in bare and cls and hasattr(getattr(casadi, cls, None), bare):
+        return ':py:obj:`%s <casadi.casadi.%s.%s>`' % (target, cls, bare)
+    obj = casadi
+    for p in bare.split('.'):
+        obj = getattr(obj, p, None)
+    if obj is not None:
+        return ':py:obj:`%s <casadi.casadi.%s>`' % (target, bare)
+    return '``%s``' % target
+
+def _skip_first_literal(lines):
+    """Lines without the first '::' literal block (SWIG's signature list)."""
+    for i, l in enumerate(lines):
+        if l.strip() == '::':
+            ind = len(l) - len(l.lstrip()); j = i + 1
+            while j < len(lines) and (not lines[j].strip() or len(lines[j]) - len(lines[j].lstrip()) > ind):
+                j += 1
+            return lines[:i] + lines[j:]
+    return lines
+
+def _fix_literals(line):
+    """Repair inline literals produced from Doxygen \\p / backticks so RST accepts them."""
+    if line.lstrip().startswith(('>>>', '>> ', '...', '|', '+')):  # examples and grid tables
+        return line
+    line = line.replace('````', '')               # \\p a-by-\\p b: adjacent spans merge
+    parts = line.split('``')
+    if len(parts) % 2 == 0:                        # unbalanced: leave untouched
+        return line
+    for k in range(0, len(parts), 2):              # plain text: RST metacharacters are literal
+        t = re.sub(r'(?<!\\)\|', r'\\|', parts[k])                    # |x| is no substitution
+        t = re.sub(r'(?<![\\*])\*(?!\*)', r'\\*', t)                  # x*y is no emphasis; **bold** stays
+        parts[k] = re.sub(r'(?<=[A-Za-z0-9])_(?=[^\w`]|$)', r'\\_', t)  # name_ is no link
+    for k in range(1, len(parts), 2):              # odd parts are literal contents
+        lit = parts[k].strip()
+        m = re.match(r'^(.*?)([.,;:]+)$', lit)
+        if m and m.group(1):                       # trailing punctuation goes outside
+            lit = m.group(1)
+            parts[k + 1] = m.group(2) + parts[k + 1]
+        parts[k] = lit
+        if parts[k - 1] and re.search(r'\w$', parts[k - 1]):
+            parts[k - 1] += ' '
+        if parts[k + 1] and re.match(r'^[\w(]', parts[k + 1]):
+            parts[k + 1] = ' ' + parts[k + 1]
+    return '``'.join(parts)
+
+def _fix_prose(lines):
+    """Apply _fix_literals to prose only: skip literal blocks ('::') and directive bodies."""
+    out, skip_ind = [], None
+    for line in lines:
+        ind = len(line) - len(line.lstrip())
+        if skip_ind is not None:
+            if not line.strip() or ind > skip_ind:
+                out.append(line); continue
+            skip_ind = None
+        out.append(_fix_literals(line) if line.strip() else line)
+        if line.rstrip().endswith('::') or line.lstrip().startswith('.. '):
+            skip_ind = ind
+    return out
+
+def _merge_overload_groups(lines):
+    """SWIG autodoc appends, per overload group, '.......' + '::' signature block + doc +
+    '.............'. Drop empty groups; print a lone group's doc as is; label several."""
+    start = [i for i, l in enumerate(lines) if re.match(r'^\s*\.{7}\s*$', l)]
+    if not start:
+        return lines
+    head, groups, i = lines[:start[0]], [], start[0]
+    while i < len(lines):
+        if not re.match(r'^\s*\.{7}\s*$', lines[i]):
+            i += 1
+            continue
+        j = i + 1
+        while j < len(lines) and not re.match(r'^\s*\.{7,}\s*$', lines[j]):
+            j += 1
+        block, i = lines[i + 1:j], j + (1 if j < len(lines) and re.match(r'^\s*\.{13}\s*$', lines[j]) else 0)
+        sigs, k = [], 0
+        while k < len(block) and not block[k].strip(): k += 1
+        if k < len(block) and block[k].strip() == '::':
+            k += 1
+            while k < len(block) and not block[k].strip(): k += 1
+            while k < len(block) and block[k].strip():
+                sigs.append(block[k].strip()); k += 1
+        body = block[k:]
+        if not any(l.strip() for l in body):
+            continue
+        # Doxygen copies a shared doc onto every overload; fold identical copies (they differ
+        # only in their provenance lines) into one group listing all their signatures
+        key = '\n'.join(l.strip() for l in body if l.strip() and not re.match(
+            r'^(Doc source|Implementation|Extra doc):?\s*(https?://\S+)?$|^https?://\S+$', l.strip()))
+        for g in groups:
+            if g[2] == key:
+                g[0].extend(x for x in sigs if x not in g[0])
+                break
+        else:
+            groups.append((list(sigs), body, key))
+    # SWIG also prints the (first) doc in the head: a group repeating the head adds nothing
+    head_key = '\n'.join(l.strip() for l in _skip_first_literal(head) if l.strip() and not re.match(
+        r'^(Doc source|Implementation|Extra doc):?\s*(https?://\S+)?$|^https?://\S+$', l.strip()))
+    groups = [g for g in groups if g[2] != head_key]
+    out = list(head)
+    for sigs, body, _ in groups:
+        if len(groups) > 1 and sigs:
+            out += ['', '.. rst-class:: overload', '',
+                    '**Overload%s:** %s' % ('s' if len(sigs) > 1 else '',
+                                           ', '.join('``%s``' % s for s in sigs)), '']
+        out += body
+    return out
+
+
+import json, os
+_SIDECAR_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), '_doctest_sidecar.json')
+try:
+    _SIDECAR = json.load(open(_SIDECAR_PATH))
+except (OSError, ValueError):
+    _SIDECAR = {}
+_LEXER = {'matlab': 'matlabsession', 'julia': 'jlcon', 'javascript': 'javascript'}
+
+def _tag_examples(lines):
+    """Turn '::' blocks of >>> examples into tagged pycon blocks; add their translations."""
+    out, i = [], 0
+    while i < len(lines):
+        line = lines[i]
+        if line.strip() != '::':
+            out.append(line); i += 1; continue
+        ind = len(line) - len(line.lstrip())
+        j = i + 1
+        while j < len(lines) and (not lines[j].strip() or len(lines[j]) - len(lines[j].lstrip()) > ind):
+            j += 1
+        body = lines[i + 1:j]
+        content = [l for l in body if l.strip()]
+        if not content or not content[0].lstrip().startswith('>>>'):
+            out += lines[i:j]; i = j; continue
+        key = '\n'.join(l.strip() for l in content)
+        extra = _SIDECAR.get(key, [])
+        langs = {lang for lang, _ in extra}
+        pad = ' ' * ind
+        cls = 'doctest doctest-python' + ''.join(' has-' + l for l in sorted(langs))
+        out += [pad + '.. code-block:: pycon', pad + '   :class: ' + cls, '']
+        cind = min(len(l) - len(l.lstrip()) for l in content)
+        out += [pad + '   ' + l[cind:] if l.strip() else '' for l in body]
+        for lang, text in extra:
+            out += ['', pad + '.. code-block:: ' + _LEXER.get(lang, 'text'),
+                    pad + '   :class: doctest doctest-' + lang, '']
+            out += [pad + '   ' + l if l.strip() else '' for l in text.split('\n')]
+        out.append('')
+        i = j
+    return out
+
+def process_docstring(app, what, name, obj, options, lines):
+    lines[:] = _merge_overload_groups(lines)
+    out, links = [], []
+    first, sig_done = True, False
+    for i, line in enumerate(lines):
+        s = line.strip()
+        if not s:
+            out.append(line)
+            continue
+        if first:  # the brief is indented 2 deeper than the rest: would render as a block quote
+            first = False
+            if line.startswith(' '):
+                out.append(s)
+                continue
+        if s == '[INTERNAL]':
+            continue
+        m = re.match(r'^(Julia|JavaScript|MATLAB) example:$', s)
+        if m:  # doxy2swigX label for a non-Python \doctest block; render as a tagged code block
+            lang = {'Julia': 'julia', 'JavaScript': 'javascript', 'MATLAB': 'matlab'}[m.group(1)]
+            j = i + 1
+            while j < len(lines) and not lines[j].strip(): j += 1
+            if j < len(lines) and lines[j].strip() == '::':
+                indent = lines[j][:len(lines[j]) - len(lines[j].lstrip())]
+                lines[j] = indent + '.. code-block:: ' + lang
+                lines.insert(j + 1, indent + '   :class: doctest doctest-' + lang)
+            continue
+        if s == '::':
+            nxt = [l for l in lines[i+1:] if l.strip()]
+            if not nxt or not nxt[0].startswith(' ' * (len(line) - len(line.lstrip()) + 1)):
+                continue  # SWIG emits an empty literal block for classes without a signature
+            for k in range(i + 1, len(lines)):  # SWIG output-argument placeholders
+                if lines[k].strip() and not lines[k].startswith(line[:len(line) - len(line.lstrip())] + ' '):
+                    break
+                lines[k] = re.sub(r'\s*\bOUTPUT\d*\b', '', lines[k]).replace(' ,', ',')
+            if not sig_done:  # the first literal block is SWIG's overload list
+                sig_done = True
+                out.append('.. rst-class:: signatures')
+                out.append('')
+        m = re.match(r'^See also:\s*(.*)$', s)
+        if m:  # doxygen \sa list -> cross references, resolved on the live module
+            indent = line[:len(line) - len(line.lstrip())]
+            out.append(indent + '**See also:** ' + ', '.join(
+                _xref(x.strip(), name) for x in _split_top(m.group(1)) if x.strip()))
+            continue
+        m = re.match(r'^(Doc source|Implementation|Extra doc): *(https?://\S+)?$', s)
+        if m:
+            links.append([m.group(1), m.group(2)])
+            continue
+        if links and links[-1][1] is None and re.match(r'^https?://\S+$', s):
+            links[-1][1] = s
+            continue
+        out.append(line)
+    if links:  # merged overload docstrings repeat the links: keep the first of each URL
+        seen, uniq = set(), []
+        for k, u in links:
+            if u and k not in seen:
+                seen.add(k); uniq.append((k, u))
+        out += ['', '.. rst-class:: provenance', '',
+                ' | '.join('`%s <%s>`__' % (k, u) for k, u in uniq), '']
+    lines[:] = _fix_prose(_tag_examples(out))
+
+def process_signature(app, what, name, obj, options, signature, return_annotation):
+    if signature == '(*args)':  # SWIG wrapper; the real overloads are listed in the docstring
+        return ('(...)', None)
+
+def setup(app):
+    app.connect('autodoc-skip-member', skip_member)
+    app.connect('autodoc-process-docstring', process_docstring)
+    app.connect('autodoc-process-signature', process_signature)
 
 
 numfig = True
@@ -94,6 +341,7 @@ exclude_patterns = []
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
+smartquotes = False  # option names and strings keep their straight quotes
 
 
 # -- Options for HTML output -------------------------------------------------

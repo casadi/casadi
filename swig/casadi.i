@@ -6469,6 +6469,8 @@ namespace casadi {
   %}
 }
 %pythoncode %{
+veccat.__doc__, vertcat.__doc__, horzcat.__doc__, diagcat.__doc__ = \
+    _veccat.__doc__, _vertcat.__doc__, _horzcat.__doc__, _diagcat.__doc__
 
 try:
   import threading

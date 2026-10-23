@@ -188,7 +188,7 @@ end
 
 @testset "docstrings from the casadi documentation" begin
     @test occursin("nlpsol(String name, String solver, Dict{String,SX} nlp", string(@doc C.nlpsol))
-    @test occursin("Calculate all Jacobian blocks", string(@doc C.jacobian))
+    @test occursin("computing all Jacobian blocks", string(@doc C.jacobian))
     @test occursin("Opti(String problem_type)", string(@doc C.Opti))
     @test occursin("cb_get_jacobian", string(@doc CasadiCallback))
 end

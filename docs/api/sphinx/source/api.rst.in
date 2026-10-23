@@ -10,7 +10,7 @@ Expression tools
 =====================
 
 .. automodule:: casadi.casadi
-@@EXPRESSIONS@@,detect_simple_bounds,collocation_points,collocation_coeff,dae_reduce_index,dae_map_semi_expl,dae_init_gen
+@@EXPRESSIONS@@
 
 .. _api-classes:
 
@@ -25,6 +25,7 @@ DM
 
 .. autoclass:: DM
   :members:
+  :inherited-members:
 
 .. _api-classes-SX:
 
@@ -33,6 +34,7 @@ SX
 
 .. autoclass:: SX
   :members:
+  :inherited-members:
 
 .. _api-classes-MX:
 
@@ -41,6 +43,7 @@ MX
 
 .. autoclass:: MX
   :members:
+  :inherited-members:
 
 .. _api-classes-Sparsity:
 
@@ -49,6 +52,7 @@ Sparsity
 
 .. autoclass:: Sparsity
   :members:
+  :inherited-members:
 
 .. _api-classes-Function:
 
@@ -57,6 +61,7 @@ Function
 
 .. autoclass:: Function
   :members:
+  :inherited-members:
 
 
 .. _api-solvers:
@@ -106,6 +111,24 @@ Linear systems
 --------------
 .. autoclass:: Linsol
   :members:
+  :inherited-members:
+
+.. _api-opti:
+
+Opti stack
+============
+
+.. autoclass:: Opti
+  :members:
+  :inherited-members:
+
+.. autoclass:: OptiSol
+  :members:
+  :inherited-members:
+
+.. autoclass:: OptiAdvanced
+  :members:
+  :inherited-members: Opti
 
 Advanced
 ============
@@ -115,6 +138,7 @@ DaeBuilder
 
 .. autoclass:: DaeBuilder
   :members:
+  :inherited-members:
 
 .. _api-callback:
 
@@ -122,6 +146,7 @@ Callback
 -------------
 .. autoclass:: Callback
   :members:
+  :inherited-members: Function
 
 .. _api-globaloptions:
 
@@ -130,6 +155,7 @@ GlobalOptions
 
 .. autoclass:: GlobalOptions
   :members:
+  :inherited-members:
 
 .. _api-casadimeta:
 
@@ -138,3 +164,4 @@ CasadiMeta
 
 .. autoclass:: CasadiMeta
   :members:
+  :inherited-members:

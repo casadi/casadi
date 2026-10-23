@@ -30,6 +30,7 @@ from types import *
 from helpers import casadiTestCase, memory_heavy, requiresPlugin, requires_nlpsol, systemswig
 import pickle
 from operator import itemgetter
+import re
 import sys
 from casadi.tools import capture_stdout
 
@@ -392,7 +393,7 @@ class Misctests(casadiTestCase):
     doc = ca.nlpsol.__doc__ or ""
     self.assertTrue("jac_penalty" in doc) # FunctionInternal
     self.assertTrue("print_time" in doc)  # ProtoFunction
-    self.assertTrue( doc.count("print_time")==1)  # ProtoFunction
+    self.assertTrue( len(re.findall(r"^\s*\| print_time\s+\|", doc, re.M))==1)  # ProtoFunction
 
   @requires_nlpsol("ipopt")
   def test_output(self):

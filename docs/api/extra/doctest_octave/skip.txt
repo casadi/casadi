@@ -1,0 +1,15 @@
+# \doctest{matlab} blocks skipped under Octave (MATLAB-only behaviour or display).
+# <header>|<a statement of the block>  # reason. A block containing that exact statement is skipped.
+conic.hpp|delete(fn)  # delete() with an output request fails
+dae_builder.hpp|contains(msg, 'Could not open file')  # cell array display / error text differ
+dae_builder.hpp|cellstr(dae.categories('q'))  # cell array display / error text differ
+mx.hpp|s.slice  # struct display; copy-on-write of an MX alias differs
+mx.hpp|alias, copy, twice  # struct display; copy-on-write of an MX alias differs
+optistack.hpp|opti.callback(@(i) fprintf('%d %.3f\n', i, opti.debug.value(x)));  # OptiCallback subclassing, struct/cell display, round precision
+optistack.hpp|a = opti.debug.arg(); disp(round(full(a.x0), 4))  # OptiCallback subclassing, struct/cell display, round precision
+optistack.hpp|opti = Opti(); x = opti.variable(); disp(fieldnames(opti.user_dict(x)))  # OptiCallback subclassing, struct/cell display, round precision
+optistack.hpp|a = d.arg(); disp(fieldnames(a)'), disp(a.lbg), disp(a.ubg), disp(a.x0)  # OptiCallback subclassing, struct/cell display, round precision
+sparsity.hpp|s = Sparsity.diag(2, 3).info(); disp(s)  # struct display differs
+sparsity_interface.hpp|try, [DM.ones(2, 2), DM.ones(3, 1)]; catch e, disp(e.message); end  # concatenation errors are wrapped; [DM, double] literal unsupported
+sparsity_interface.hpp|try, [MX.sym('a', 2, 2); MX.sym('b', 2, 3)]; catch e, disp(e.message); end  # concatenation errors are wrapped; [DM, double] literal unsupported
+sparsity_interface.hpp|[DM(1), 2; 3, 4]  # concatenation errors are wrapped; [DM, double] literal unsupported

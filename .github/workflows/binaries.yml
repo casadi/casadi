@@ -1118,6 +1118,11 @@ jobs:
         with:
           source-folder: docs/examples/matlab
           select-by-tag: examples
+
+      - name: Run MATLAB doctests of the C++ headers
+        uses: matlab-actions/run-command@v3
+        with:
+          command: addpath('docs/api/extra'); doctest_matlab('casadi')
       - uses: casadi/commercial_solvers@master
         with:
           token: ${{ secrets.JGILLIS_RESTRICTED }}
@@ -1182,6 +1187,8 @@ jobs:
       - run: echo "MATLABPATH=${{ github.workspace }}/casadi" >> $GITHUB_ENV
         if: "!contains(env.os, 'windows')"
       - run: cd test && python internal/test_octave.py octave && python internal/test_octave.py matlab -skipfiles="solvers.m callback.m nlp_callback.m export_tests.m asorted_tests.m CasadiTests.m"
+      - name: Run Octave doctests of the C++ headers
+        run: octave --no-gui --no-window-system --eval "addpath('${{ github.workspace }}/casadi'); addpath('docs/api/extra'); doctest_matlab('casadi')"
       - uses: casadi/commercial_solvers@master
         with:
           token: ${{ secrets.JGILLIS_RESTRICTED }}
@@ -1411,6 +1418,12 @@ jobs:
           python alltests.py
         shell: pwsh
         if: contains(matrix.image, 'windows')
+      - name: Run Python doctests of the C++ headers
+        env:
+          PYTHONPATH: ${{ github.workspace }}/casadi
+        run: python docs/api/extra/doctest_headers.py --lang python
+        shell: bash -el {0}
+        if: matrix.image == 'ubuntu-24.04' && matrix.py2 == '314'
 
   matrix-test-python-long:
     runs-on: ubuntu-24.04

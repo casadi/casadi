@@ -5,13 +5,13 @@
 <tr><td>CONIC_H</td><td>h</td><td>The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical.</td></tr>
 <tr><td>CONIC_G</td><td>g</td><td>The vector g: dense, (n x 1)</td></tr>
 <tr><td>CONIC_A</td><td>a</td><td>The matrix A: sparse, (nc x n) - product with x must be dense.</td></tr>
-<tr><td>CONIC_LBA</td><td>lba</td><td>dense, (nc x 1)</td></tr>
-<tr><td>CONIC_UBA</td><td>uba</td><td>dense, (nc x 1)</td></tr>
-<tr><td>CONIC_LBX</td><td>lbx</td><td>dense, (n x 1)</td></tr>
-<tr><td>CONIC_UBX</td><td>ubx</td><td>dense, (n x 1)</td></tr>
-<tr><td>CONIC_X0</td><td>x0</td><td>dense, (n x 1)</td></tr>
-<tr><td>CONIC_LAM_X0</td><td>lam_x0</td><td>dense</td></tr>
-<tr><td>CONIC_LAM_A0</td><td>lam_a0</td><td>dense</td></tr>
+<tr><td>CONIC_LBA</td><td>lba</td><td>dense, (nc x 1), default -inf</td></tr>
+<tr><td>CONIC_UBA</td><td>uba</td><td>dense, (nc x 1), default +inf</td></tr>
+<tr><td>CONIC_LBX</td><td>lbx</td><td>dense, (n x 1), default -inf</td></tr>
+<tr><td>CONIC_UBX</td><td>ubx</td><td>dense, (n x 1), default +inf</td></tr>
+<tr><td>CONIC_X0</td><td>x0</td><td>dense, (n x 1), initial guess, default 0</td></tr>
+<tr><td>CONIC_LAM_X0</td><td>lam_x0</td><td>dense, (n x 1), initial guess for the multipliers of the simple bounds, default 0</td></tr>
+<tr><td>CONIC_LAM_A0</td><td>lam_a0</td><td>dense, (nc x 1), initial guess for the multipliers of the linear constraints, default 0</td></tr>
 <tr><td>CONIC_Q</td><td>q</td><td>The matrix Q: sparse symmetric, (np^2 x n)</td></tr>
 <tr><td>CONIC_P</td><td>p</td><td>The matrix P: sparse symmetric, (np x np)</td></tr>
 </table>
@@ -22,8 +22,8 @@
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
 <tr><td>CONIC_X</td><td>x</td><td>The primal solution.</td></tr>
 <tr><td>CONIC_COST</td><td>cost</td><td>The optimal cost.</td></tr>
-<tr><td>CONIC_LAM_A</td><td>lam_a</td><td>The dual solution corresponding to linear bounds.</td></tr>
-<tr><td>CONIC_LAM_X</td><td>lam_x</td><td>The dual solution corresponding to simple bounds.</td></tr>
+<tr><td>CONIC_LAM_A</td><td>lam_a</td><td>The dual solution corresponding to linear bounds; negative for an active lower bound, positive for an active upper bound</td></tr>
+<tr><td>CONIC_LAM_X</td><td>lam_x</td><td>The dual solution corresponding to simple bounds; same sign convention.</td></tr>
 </table>
 */
 /** \defgroup scheme_DpleInput
@@ -99,14 +99,14 @@
 <a name='schemes'></a><table>
 <caption>Input scheme: casadi::NlpsolInput  (NLPSOL_NUM_IN = 8)</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>NLPSOL_X0</td><td>x0</td><td>Decision variables, initial guess (nx x 1)</td></tr>
-<tr><td>NLPSOL_P</td><td>p</td><td>Value of fixed parameters (np x 1)</td></tr>
+<tr><td>NLPSOL_X0</td><td>x0</td><td>Decision variables, initial guess (nx x 1), default 0.</td></tr>
+<tr><td>NLPSOL_P</td><td>p</td><td>Value of fixed parameters (np x 1), default 0.</td></tr>
 <tr><td>NLPSOL_LBX</td><td>lbx</td><td>Decision variables lower bound (nx x 1), default -inf.</td></tr>
 <tr><td>NLPSOL_UBX</td><td>ubx</td><td>Decision variables upper bound (nx x 1), default +inf.</td></tr>
 <tr><td>NLPSOL_LBG</td><td>lbg</td><td>Constraints lower bound (ng x 1), default -inf.</td></tr>
 <tr><td>NLPSOL_UBG</td><td>ubg</td><td>Constraints upper bound (ng x 1), default +inf.</td></tr>
-<tr><td>NLPSOL_LAM_X0</td><td>lam_x0</td><td>Lagrange multipliers for bounds on X, initial guess (nx x 1)</td></tr>
-<tr><td>NLPSOL_LAM_G0</td><td>lam_g0</td><td>Lagrange multipliers for bounds on G, initial guess (ng x 1)</td></tr>
+<tr><td>NLPSOL_LAM_X0</td><td>lam_x0</td><td>Lagrange multipliers for bounds on X, initial guess (nx x 1), default 0.</td></tr>
+<tr><td>NLPSOL_LAM_G0</td><td>lam_g0</td><td>Lagrange multipliers for bounds on G, initial guess (ng x 1), default 0.</td></tr>
 </table>
 */
 /** \defgroup scheme_NlpsolOutput
@@ -116,9 +116,9 @@
 <tr><td>NLPSOL_X</td><td>x</td><td>Decision variables at the optimal solution (nx x 1)</td></tr>
 <tr><td>NLPSOL_F</td><td>f</td><td>Cost function value at the optimal solution (1 x 1)</td></tr>
 <tr><td>NLPSOL_G</td><td>g</td><td>Constraints function at the optimal solution (ng x 1)</td></tr>
-<tr><td>NLPSOL_LAM_X</td><td>lam_x</td><td>Lagrange multipliers for bounds on X at the solution (nx x 1)</td></tr>
-<tr><td>NLPSOL_LAM_G</td><td>lam_g</td><td>Lagrange multipliers for bounds on G at the solution (ng x 1)</td></tr>
-<tr><td>NLPSOL_LAM_P</td><td>lam_p</td><td>Lagrange multipliers for bounds on P at the solution (np x 1)</td></tr>
+<tr><td>NLPSOL_LAM_X</td><td>lam_x</td><td>Lagrange multipliers for bounds on X at the solution (nx x 1); negative for an active lower bound, positive for an active upper bound</td></tr>
+<tr><td>NLPSOL_LAM_G</td><td>lam_g</td><td>Lagrange multipliers for bounds on G at the solution (ng x 1); same sign convention.</td></tr>
+<tr><td>NLPSOL_LAM_P</td><td>lam_p</td><td>Lagrange multipliers for p == P at the solution (np x 1): minus the gradient of the optimal cost with respect to p</td></tr>
 </table>
 */
 /** \defgroup scheme_RootfinderInput

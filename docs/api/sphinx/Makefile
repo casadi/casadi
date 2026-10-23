@@ -8,7 +8,8 @@ SPHINXPROJ    = CasADi
 SOURCEDIR     = source
 BUILDDIR      = build
 
-EXPRESSIONS != grep DECL ../../../swig/casadi.i | grep -o -P "(?<=casadi_)\w*?(?=\()" | sort -u | paste -sd "," -
+# Module-level functions with a docstring, except the solver factories documented in their own sections
+EXPRESSIONS != python -c "import casadi, inspect; print(','.join(sorted(k for k, v in vars(casadi).items() if inspect.isfunction(v) and not k.startswith('_') and v.__doc__ and k not in ('nlpsol', 'qpsol', 'conic', 'integrator', 'rootfinder'))))"
 
 # Put it first so that "make" without argument is like "make help".
 help:
@@ -23,6 +24,7 @@ help:
 
 
 bare_body:
+	python ../extra/doctest_sidecar.py ../../../casadi source/_doctest_sidecar.json
 	sed 's/@@EXPRESSIONS@@/  :members: $(EXPRESSIONS)/g' source/api.rst.in > source/api.rst
 	rm -rf build
 	make singlehtml SPHINXOPTS="-D html_theme=bare_body "
@@ -33,6 +35,7 @@ bare_body:
 	cat build/singlehtml/index.html >> ../../../web/content/python-api/_index.html
 
 bare_toc:
+	python ../extra/doctest_sidecar.py ../../../casadi source/_doctest_sidecar.json
 	sed 's/@@EXPRESSIONS@@//g' source/api.rst.in > source/api.rst
 	make singlehtml SPHINXOPTS="-D html_theme=bare_body -D 'html_theme_options.mode=toc'"
 	sed -i 's/index\.html//g' build/singlehtml/index.html
