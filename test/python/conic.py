@@ -107,6 +107,8 @@ if "SKIP_CBC_TESTS" not in os.environ and ca.has_conic("cbc"):
 
 if "SKIP_QRQP_TESTS" not in os.environ and ca.has_conic("qrqp"):
   codegen = {"std":"c99"}
+  if platform.system()=="Darwin":
+    codegen["digits"] = 13 # few-ulp codegen vs VM differences on macos-15
   conics.append(("qrqp",{"max_iter":20,"print_header":False,"print_iter":False},{"quadratic": True, "dual": True, "soc": False, "codegen": codegen, "binary":False, "discrete": False, "sos":False}))
 
 if "SKIP_PROXQP_TESTS" not in os.environ and ca.has_conic("proxqp"):
