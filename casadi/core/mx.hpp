@@ -445,7 +445,9 @@ namespace casadi {
         ... except Exception as e:
         ...   print("Can only determine truth value of a numeric MX" in str(e))
         True
-        \enddoctest */
+        \enddoctest
+
+        \identifier{2pp} */
     bool __nonzero__() const;
 
     /** \brief Get an owning reference to the sparsity pattern
@@ -569,7 +571,9 @@ namespace casadi {
         >> -x, -(-x)
         (-x)
         x
-        \enddoctest */
+        \enddoctest
+
+        \identifier{2pq} */
     MX operator-() const;
 
     /// Unary plus: returns the expression itself
@@ -782,7 +786,9 @@ namespace casadi {
         error
         \enddoctest
 
-        \sa is_symbolic, symvar */
+        \sa is_symbolic, symvar
+
+        \identifier{2pr} */
     std::string name() const;
 
     /** \brief Get the value of a 1-by-1 constant node (float conversion)
@@ -806,7 +812,9 @@ namespace casadi {
         error
         \enddoctest
 
-        \sa to_DM, evalf */
+        \sa to_DM, evalf
+
+        \identifier{2ps} */
     explicit operator double() const;
 
     /** \brief Get the value of a constant node as a DM
@@ -836,7 +844,9 @@ namespace casadi {
         error
         \enddoctest
 
-        \sa evalf, is_constant */
+        \sa evalf, is_constant
+
+        \identifier{2pt} */
     explicit operator Matrix<double>() const;
 
     /** \brief Check if the node is a symbolic primitive (created by MX.sym)
@@ -863,7 +873,9 @@ namespace casadi {
         0
         \enddoctest
 
-        \sa is_constant, is_valid_input, name */
+        \sa is_constant, is_valid_input, name
+
+        \identifier{2pu} */
     bool is_symbolic() const;
 
     /** \brief Check if the node is a constant
@@ -889,7 +901,9 @@ namespace casadi {
         1
         \enddoctest
 
-        \sa is_symbolic, to_DM, evalf */
+        \sa is_symbolic, to_DM, evalf
+
+        \identifier{2pv} */
     bool is_constant() const;
 
     /** \brief Check if the node is a constant with integer-valued nonzeros
@@ -906,7 +920,9 @@ namespace casadi {
         1
         0
         0
-        \enddoctest */
+        \enddoctest
+
+        \identifier{2pw} */
     bool is_integer() const;
 
     /** \brief Check if the node is the sum of two equal expressions, or 2*x
@@ -965,7 +981,9 @@ namespace casadi {
         f
         \enddoctest
 
-        \sa which_function, is_output, which_output, n_out */
+        \sa which_function, is_output, which_output, n_out
+
+        \identifier{2px} */
     bool is_call() const;
 
     /** \brief Get the Function of a call node
@@ -999,7 +1017,9 @@ namespace casadi {
         error
         \enddoctest
 
-        \sa is_call */
+        \sa is_call
+
+        \identifier{2py} */
     Function which_function() const;
 
     /** \brief Check if the node selects one output of a multiple-output node
@@ -1034,7 +1054,9 @@ namespace casadi {
         0
         \enddoctest
 
-        \sa which_output, is_call, has_output */
+        \sa which_output, is_call, has_output
+
+        \identifier{2pz} */
     bool is_output() const;
 
     /** \brief  Check if this is a multiple-output node
@@ -1091,7 +1113,9 @@ namespace casadi {
         1
         \enddoctest
 
-        \sa is_output */
+        \sa is_output
+
+        \identifier{2q0} */
     casadi_int which_output() const;
 
     /** \brief Check if the node is a certain operation
@@ -1119,7 +1143,9 @@ namespace casadi {
         1
         \enddoctest
 
-        \sa op */
+        \sa op
+
+        \identifier{2q1} */
     bool is_op(casadi_int op) const;
 
     /** \brief Check if the node is a matrix product (mtimes)
@@ -1138,7 +1164,9 @@ namespace casadi {
         >> a.is_multiplication(), b.is_multiplication()
         1
         0
-        \enddoctest */
+        \enddoctest
+
+        \identifier{2q2} */
     bool is_multiplication() const;
 
     /** \brief Check if a binary operation is commutative
@@ -1160,7 +1188,9 @@ namespace casadi {
         0
         \enddoctest
 
-        \sa is_binary, is_unary */
+        \sa is_binary, is_unary
+
+        \identifier{2q3} */
     bool is_commutative() const;
 
     /** \brief Check if the node is a norm (norm_1, norm_2, norm_inf or norm_fro)
@@ -1178,7 +1208,9 @@ namespace casadi {
         1
         1
         0
-        \enddoctest */
+        \enddoctest
+
+        \identifier{2q4} */
     bool is_norm() const;
 
     /** \brief Check if the expression can be used as a Function input
@@ -1589,7 +1621,9 @@ namespace casadi {
         0
         >> try, MX.sym('x').is_regular(); catch e, disp('error'); end
         error
-        \enddoctest */
+        \enddoctest
+
+        \identifier{2q5} */
     bool is_regular() const;
 
     /** \brief Check if the node is an elementwise binary operation
@@ -1616,7 +1650,9 @@ namespace casadi {
         0
         \enddoctest
 
-        \sa is_unary, op */
+        \sa is_unary, op
+
+        \identifier{2q6} */
     bool is_binary() const;
 
     /** \brief Check if a value is always nonnegative (false negatives are allowed)
@@ -1670,7 +1706,9 @@ namespace casadi {
         0
         \enddoctest
 
-        \sa is_binary, op */
+        \sa is_binary, op
+
+        \identifier{2q7} */
     bool is_unary() const;
 
     /** \brief Get the operation type of the node
@@ -1697,7 +1735,9 @@ namespace casadi {
         (a+b)
         \enddoctest
 
-        \sa is_op, print_operator */
+        \sa is_op, print_operator
+
+        \identifier{2q8} */
     casadi_int op() const;
 
     /** \brief Obtain information about the node as a dictionary
@@ -1722,7 +1762,9 @@ namespace casadi {
         stop: 3
         >> isempty(fieldnames(X.info()))
         1
-        \enddoctest */
+        \enddoctest
+
+        \identifier{2q9} */
     Dict info() const;
 
     /** \brief Serialize the expression to a stream
@@ -1952,7 +1994,9 @@ namespace casadi {
         20
         \enddoctest
 
-        \sa set, get_nz, nz */
+        \sa set, get_nz, nz
+
+        \identifier{2qa} */
     void get(MX& SWIG_OUTPUT(m), bool ind1, const Slice& rr) const;
     void get(MX& SWIG_OUTPUT(m), bool ind1, const Matrix<casadi_int>& rr) const;
     void get(MX& SWIG_OUTPUT(m), bool ind1, const Sparsity& sp) const;
@@ -1999,7 +2043,9 @@ namespace casadi {
         X[((k-1);3)]
         \enddoctest
 
-        \sa set */
+        \sa set
+
+        \identifier{2qb} */
     void get(MX& SWIG_OUTPUT(m), bool ind1, const Slice& rr, const Slice& cc) const;
     void get(MX& SWIG_OUTPUT(m), bool ind1, const Slice& rr, const Matrix<casadi_int>& cc) const;
     void get(MX& SWIG_OUTPUT(m), bool ind1, const Slice& rr, casadi_int cc) const {
@@ -2075,7 +2121,9 @@ namespace casadi {
         (Y[0, 1, 2, 4, 5, 8] = ones(6x1))
         \enddoctest
 
-        \sa get, set_nz */
+        \sa get, set_nz
+
+        \identifier{2qc} */
     void set(const MX& m, bool ind1, const Slice& rr);
     void set(const MX& m, bool ind1, const Matrix<casadi_int>& rr);
     void set(const MX& m, bool ind1, const Sparsity& sp);
@@ -2114,7 +2162,9 @@ namespace casadi {
         dimension mismatch
         \enddoctest
 
-        \sa get */
+        \sa get
+
+        \identifier{2qd} */
     void set(const MX& m, bool ind1, const Slice& rr, const Slice& cc);
     void set(const MX& m, bool ind1, const Slice& rr, const Matrix<casadi_int>& cc);
     void set(const MX& m, bool ind1, const Matrix<casadi_int>& rr, const Slice& cc);
@@ -2155,7 +2205,9 @@ namespace casadi {
         0 0
         \enddoctest
 
-        \sa set_nz, get */
+        \sa set_nz, get
+
+        \identifier{2qe} */
     void get_nz(MX& SWIG_OUTPUT(m), bool ind1, const Slice& kk) const;
     void get_nz(MX& SWIG_OUTPUT(m), bool ind1, const Matrix<casadi_int>& kk) const;
     void get_nz(MX& SWIG_OUTPUT(m), bool ind1, const MX& kk) const;
@@ -2197,7 +2249,9 @@ namespace casadi {
         1
         \enddoctest
 
-        \sa get_nz, set */
+        \sa get_nz, set
+
+        \identifier{2qf} */
     void set_nz(const MX& m, bool ind1, const Slice& kk);
     void set_nz(const MX& m, bool ind1, const Matrix<casadi_int>& kk);
     void set_nz(const MX& m, bool ind1, const MX& kk);
@@ -2479,7 +2533,9 @@ namespace casadi {
         [1.17708, 2.5]
         \enddoctest
 
-        \sa bspline */
+        \sa bspline
+
+        \identifier{2qg} */
     static DM bspline_dual(const std::vector<double>& x,
             const std::vector< std::vector<double> >& knots,
             const std::vector<casadi_int>& degree,
@@ -2557,7 +2613,9 @@ namespace casadi {
         1
         \enddoctest
 
-        \sa monitor, attachAssert */
+        \sa monitor, attachAssert
+
+        \identifier{2qh} */
     MX printme(const MX& b) const;
 
 #if !defined(SWIG) || defined(DOXYGEN)
@@ -2872,7 +2930,9 @@ namespace casadi {
         must match
         \enddoctest
 
-        \sa bspline_dual, interpolant */
+        \sa bspline_dual, interpolant
+
+        \identifier{2qi} */
     inline friend MX bspline(const MX& x,
             const DM& coeffs,
             const std::vector< std::vector<double> >& knots,
@@ -2908,7 +2968,9 @@ namespace casadi {
         >> f = Function('f', {x, C}, {y});
         >> f(1.5, DM((0:5)'))
         2.5
-        \enddoctest */
+        \enddoctest
+
+        \identifier{2qj} */
     inline friend MX bspline(const MX& x, const MX& coeffs,
             const std::vector< std::vector<double> >& knots,
             const std::vector<casadi_int>& degree,
@@ -2939,7 +3001,9 @@ namespace casadi {
         >> f = Function('f', {x, C, K}, {y});
         >> f(1.5, DM((0:5)'), DM([0; 0; 0; 0; 1; 2; 3; 3; 3; 3]))
         2.5
-        \enddoctest */
+        \enddoctest
+
+        \identifier{2qk} */
     inline friend MX bspline(const MX& x, const MX& coeffs,
             const std::vector<MX>& knots,
             const std::vector<casadi_int>& degree,
@@ -3016,7 +3080,9 @@ namespace casadi {
         invalid strategy
         \enddoctest
 
-        \sa nlpsol */
+        \sa nlpsol
+
+        \identifier{2ql} */
     inline friend MX convexify(const MX& H,
             const Dict& opts = Dict()) {
       return MX::convexify(H, opts);
@@ -3256,7 +3322,9 @@ namespace casadi {
         (1+x)
         \enddoctest
 
-        \sa symvar */
+        \sa symvar
+
+        \identifier{2qm} */
     inline friend std::vector<MX> difference(const std::vector<MX>& a, const std::vector<MX>& b) {
       return MX::difference(a, b);
     }
@@ -3369,7 +3437,9 @@ namespace casadi {
         A
         \enddoctest
 
-        \sa is_transpose, transpose */
+        \sa is_transpose, transpose
+
+        \identifier{2qn} */
     MX T() const;
 
     /** \brief Get the nonzero mapping of a GetNonzeros or SetNonzeros node

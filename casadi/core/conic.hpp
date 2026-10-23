@@ -455,7 +455,8 @@ namespace casadi {
       1
       0
       \enddoctest
-  */
+
+      \identifier{2od} */
   CASADI_EXPORT bool has_conic(const std::string& name);
 
   /** \brief Explicitly load a QP solver plugin
@@ -476,7 +477,8 @@ namespace casadi {
       >> contains(msg, 'no_such_plugin')
       1
       \enddoctest
-  */
+
+      \identifier{2oe} */
   CASADI_EXPORT void load_conic(const std::string& name);
 
   /** \brief Get the documentation string of a QP solver plugin
@@ -492,7 +494,8 @@ namespace casadi {
       >> contains(doc_conic('qrqp'), 'active-set')
       1
       \enddoctest
-  */
+
+      \identifier{2of} */
   CASADI_EXPORT std::string doc_conic(const std::string& name);
 
   /** \brief Generate native code in the interfaced language for debugging
@@ -524,10 +527,13 @@ namespace casadi {
       1
       >> delete(fn)
       \enddoctest
-  */
+
+      \identifier{2og} */
   CASADI_EXPORT void conic_debug(const Function& f, const std::string &filename);
 
-  /** \brief Generate native code in the interfaced language for debugging, to a stream */
+  /** \brief Generate native code in the interfaced language for debugging, to a stream
+
+      \identifier{2oh} */
   CASADI_EXPORT void conic_debug(const Function& f, std::ostream &file);
 
   /** @} */

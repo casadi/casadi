@@ -378,7 +378,8 @@ namespace casadi {
       1
       0
       \enddoctest
-  */
+
+      \identifier{2ng} */
   CASADI_EXPORT bool has_rootfinder(const std::string& name);
 
   /** \brief Explicitly load a rootfinder plugin
@@ -399,7 +400,8 @@ namespace casadi {
       >> contains(msg, 'no_such_plugin')
       1
       \enddoctest
-  */
+
+      \identifier{2nh} */
   CASADI_EXPORT void load_rootfinder(const std::string& name);
 
   /** \brief Get the documentation string of a rootfinder plugin
@@ -415,7 +417,8 @@ namespace casadi {
       >> contains(doc_rootfinder('newton'), 'newton iterations')
       1
       \enddoctest
-  */
+
+      \identifier{2ni} */
   CASADI_EXPORT std::string doc_rootfinder(const std::string& name);
   /** @} */
 

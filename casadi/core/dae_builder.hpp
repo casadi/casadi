@@ -189,7 +189,9 @@ class CASADI_EXPORT DaeBuilder
       1
       \enddoctest
 
-      \sa load_fmi_description, symbolic */
+      \sa load_fmi_description, symbolic
+
+      \identifier{2ko} */
   explicit DaeBuilder(const std::string& name, const std::string& path = "",
     const Dict& opts = Dict());
 
@@ -916,7 +918,9 @@ class CASADI_EXPORT DaeBuilder
       1
       \enddoctest
 
-      \sa eq, der, var, category, set_category */
+      \sa eq, der, var, category, set_category
+
+      \identifier{2kp} */
   MX add(const std::string& name,
     const std::string& causality,
     const std::string& variability,
@@ -926,7 +930,9 @@ class CASADI_EXPORT DaeBuilder
 
       The variability follows the FMI 3.0 default: `"fixed"` for parameters and
       calculated parameters, `"continuous"` for floating-point variables and `"discrete"`
-      for any other type (see the `"type"` option). */
+      for any other type (see the `"type"` option).
+
+      \identifier{2kq} */
   MX add(const std::string& name,
     const std::string& causality,
     const Dict& opts=Dict());
@@ -934,7 +940,9 @@ class CASADI_EXPORT DaeBuilder
   /** \brief Add a new model variable, default variability and causality
 
       The causality defaults to `"local"`; the variability follows from the type as above,
-      so a plain `add(name)` gives a continuous local variable of category `z`. */
+      so a plain `add(name)` gives a continuous local variable of category `z`.
+
+      \identifier{2kr} */
   MX add(const std::string& name,
     const Dict& opts=Dict());
 
@@ -942,7 +950,9 @@ class CASADI_EXPORT DaeBuilder
 
       Registers an existing symbolic primitive instead of creating a new one. \p expr must
       be a pure symbol (`is_symbolic()`) whose name equals \p name; anything else is an
-      error. The dimension attribute is not taken from the expression. */
+      error. The dimension attribute is not taken from the expression.
+
+      \identifier{2ks} */
   void add(const std::string& name,
     const std::string& causality,
     const std::string& variability,
@@ -1050,7 +1060,9 @@ class CASADI_EXPORT DaeBuilder
       1
       \enddoctest
 
-      \sa der, when, set_init, add */
+      \sa der, when, set_init, add
+
+      \identifier{2kt} */
   void eq(const MX& lhs, const MX& rhs, const Dict& opts=Dict());
 
   /** \brief Add when equations
@@ -1104,7 +1116,9 @@ class CASADI_EXPORT DaeBuilder
       1
       \enddoctest
 
-      \sa reinit, assign, transition, nzero */
+      \sa reinit, assign, transition, nzero
+
+      \identifier{2ku} */
   void when(const MX& cond, const std::vector<std::string>& eqs, const Dict& opts=Dict());
 
   /** \brief Assignment inside a when-equation or if-else equation
@@ -1163,7 +1177,9 @@ class CASADI_EXPORT DaeBuilder
           b := 1
       \enddoctest
 
-      \sa when, reinit */
+      \sa when, reinit
+
+      \identifier{2kv} */
   std::string assign(const std::string& name, const MX& val);
 
   /** \brief Reinitialize a state inside when-equations
@@ -1201,7 +1217,9 @@ class CASADI_EXPORT DaeBuilder
       1
       \enddoctest
 
-      \sa when, assign, pre */
+      \sa when, assign, pre
+
+      \identifier{2kw} */
   std::string reinit(const std::string& name, const MX& val);
 
   /** \brief Specify the initial equation for a variable
@@ -1243,7 +1261,9 @@ class CASADI_EXPORT DaeBuilder
       0
       \enddoctest
 
-      \sa init_lhs, init_rhs */
+      \sa init_lhs, init_rhs
+
+      \identifier{2kx} */
   void set_init(const std::string& name, const MX& init_rhs);
 
   /** \brief Check if dimensions match
@@ -1259,7 +1279,9 @@ class CASADI_EXPORT DaeBuilder
       \doctest{matlab}
       >> dae = DaeBuilder('m');
       >> dae.sanity_check()
-      \enddoctest */
+      \enddoctest
+
+      \identifier{2ky} */
   void sanity_check() const;
   ///@}
 
@@ -1309,7 +1331,9 @@ class CASADI_EXPORT DaeBuilder
       1
       \enddoctest
 
-      \sa set_all, all */
+      \sa set_all, all
+
+      \identifier{2kz} */
   void reorder(const std::string& cat, const std::vector<std::string>& v);
 
   /** \brief Set all variables within a a category
@@ -1375,7 +1399,9 @@ class CASADI_EXPORT DaeBuilder
       1
       \enddoctest
 
-      \sa reorder, set_category, set_causality */
+      \sa reorder, set_category, set_causality
+
+      \identifier{2l0} */
   void set_all(const std::string& v, const std::vector<std::string>& name);
 
   /** @name Manipulation
@@ -1424,7 +1450,9 @@ class CASADI_EXPORT DaeBuilder
       1
       \enddoctest
 
-      \sa sort, dependent_fun, lift */
+      \sa sort, dependent_fun, lift
+
+      \identifier{2l1} */
   void eliminate(const std::string& cat);
 
   /** \brief Sort dependent parameters
@@ -1471,7 +1499,9 @@ class CASADI_EXPORT DaeBuilder
       (-w2)
       \enddoctest
 
-      \sa eliminate, reorder */
+      \sa eliminate, reorder
+
+      \identifier{2l2} */
   void sort(const std::string& cat);
 
   /** \brief Lift problem formulation by extracting shared subexpressions
@@ -1530,7 +1560,9 @@ class CASADI_EXPORT DaeBuilder
       f:(z[2],w[5])->(alg[2],wdef[5]) MXFunction
       \enddoctest
 
-      \sa eliminate, w, wdef */
+      \sa eliminate, w, wdef
+
+      \identifier{2l3} */
   void lift(bool lift_shared = true, bool lift_calls = true);
 
   /** \brief Prune unused controls
@@ -1541,7 +1573,9 @@ class CASADI_EXPORT DaeBuilder
       \param prune_p Consider the parameters `p`
       \param prune_u Consider the controls `u`
 
-      \sa p, u */
+      \sa p, u
+
+      \identifier{2l4} */
   void prune(bool prune_p = true, bool prune_u = true);
 
   /** \brief Identify iteration variables and residual equations using naming convention
@@ -1551,7 +1585,9 @@ class CASADI_EXPORT DaeBuilder
       are removed from `z` and `u` and appended to `z`, so that `z` and `alg` match up.
       Hold markers are not implemented and only produce a warning.
 
-      \sa z, sort */
+      \sa z, sort
+
+      \identifier{2l5} */
   void tear();
   ///@}
 
@@ -1604,7 +1640,9 @@ class CASADI_EXPORT DaeBuilder
       1
       \enddoctest
 
-      \sa fun, has_fun, gather_fun */
+      \sa fun, has_fun, gather_fun
+
+      \identifier{2l6} */
   Function add_fun(const std::string& name,
                    const std::vector<std::string>& arg,
                    const std::vector<std::string>& res, const Dict& opts=Dict());
@@ -1630,13 +1668,17 @@ class CASADI_EXPORT DaeBuilder
       F:(i0)->(o0) MXFunction
       >> cellfun(@(g) disp(g.name()), dae.fun())
       F
-      \enddoctest */
+      \enddoctest
+
+      \identifier{2l7} */
   Function add_fun(const Function& f);
 
   /** \brief Add an external function
 
       Loads the function \p name from the compiled sources or shared library behind
-      \p compiler (see `external`) and stores it. */
+      \p compiler (see `external`) and stores it.
+
+      \identifier{2l8} */
   Function add_fun(const std::string& name, const Importer& compiler,
                    const Dict& opts=Dict());
 
@@ -1644,7 +1686,9 @@ class CASADI_EXPORT DaeBuilder
 
       True when a function with this name has been stored with `add_fun` or `gather_fun`.
 
-      \sa fun, add_fun */
+      \sa fun, add_fun
+
+      \identifier{2l9} */
   bool has_fun(const std::string& name) const;
 
   /** \brief Get function by name
@@ -1673,7 +1717,9 @@ class CASADI_EXPORT DaeBuilder
       1
       \enddoctest
 
-      \sa has_fun, add_fun */
+      \sa has_fun, add_fun
+
+      \identifier{2la} */
   Function fun(const std::string& name) const;
 
   /// Get all functions
@@ -1711,7 +1757,9 @@ class CASADI_EXPORT DaeBuilder
       F
       \enddoctest
 
-      \sa fun, add_fun */
+      \sa fun, add_fun
+
+      \identifier{2lb} */
   void gather_fun(casadi_int max_depth = -1);
 ///@}
 
@@ -1726,7 +1774,9 @@ class CASADI_EXPORT DaeBuilder
       Reads the `providesDirectionalDerivatives` flag of an imported FMU. Calling it on a
       symbolic instance is an error.
 
-      \sa symbolic, load_fmi_description */
+      \sa symbolic, load_fmi_description
+
+      \identifier{2lc} */
   bool provides_directional_derivatives() const;
 
   /// Does the FMU provide support for analytic derivatives (FMI 2 naming)
@@ -1745,7 +1795,9 @@ class CASADI_EXPORT DaeBuilder
 
       \param filename Path to the XML file
 
-      \sa DaeBuilder, symbolic, provides_directional_derivatives */
+      \sa DaeBuilder, symbolic, provides_directional_derivatives
+
+      \identifier{2ld} */
   void load_fmi_description(const std::string& filename);
 
   /** \brief Export instance into an FMU
@@ -1762,7 +1814,9 @@ class CASADI_EXPORT DaeBuilder
         - `"with_serialization"` (bool, true): include the serialized oracle
       \return Map local file name to archive path
 
-      \sa compile_fmu, pack_fmu, oracle */
+      \sa compile_fmu, pack_fmu, oracle
+
+      \identifier{2le} */
   Dict export_fmu(const Dict& opts=Dict());
 
   /** \brief Compile the sources produced by export_fmu
@@ -1834,14 +1888,18 @@ class CASADI_EXPORT DaeBuilder
       -1
       \enddoctest
 
-      \sa create */
+      \sa create
+
+      \identifier{2lf} */
   void add_lc(const std::string& name, const std::vector<std::string>& f_out);
 
   /** \brief Construct a function object, legacy syntax
 
       Same as the overload with options, but with the flags `sx` (expand to an SX function)
       and `lifted_calls` (account for function calls lifted into `w`, see `lift`) instead;
-      neither is available for an imported FMU. */
+      neither is available for an imported FMU.
+
+      \identifier{2lg} */
   Function create(const std::string& fname,
     const std::vector<std::string>& name_in,
     const std::vector<std::string>& name_out, bool sx, bool lifted_calls = false) const;
@@ -2034,7 +2092,9 @@ class CASADI_EXPORT DaeBuilder
       1
       \enddoctest
 
-      \sa w, d, create, eliminate */
+      \sa w, d, create, eliminate
+
+      \identifier{2lh} */
   Function dependent_fun(const std::string& fname,
       const std::vector<std::string>& s_in,
       const std::vector<std::string>& s_out) const;
@@ -2082,7 +2142,9 @@ class CASADI_EXPORT DaeBuilder
       1
       \enddoctest
 
-      \sa when, create */
+      \sa when, create
+
+      \identifier{2li} */
   Function transition(const std::string& fname, casadi_int index) const;
 
   /** \brief Construct a function describing transition at any events
@@ -2116,12 +2178,16 @@ class CASADI_EXPORT DaeBuilder
       tr:(index[],t[0],x[2],z[0],p[0],u[0])->(post_x[2],post_z[0]) MXFunction
       \enddoctest
 
-      \sa when, create */
+      \sa when, create
+
+      \identifier{2lj} */
   Function transition(const std::string& fname) const;
 
   /** \brief Construct an event transition function, default naming
 
-      The function is named `<name>_transition`. */
+      The function is named `<name>_transition`.
+
+      \identifier{2lk} */
   Function transition() const {return transition(name() + "_transition");}
 
   ///@{
@@ -2157,7 +2223,9 @@ class CASADI_EXPORT DaeBuilder
       1
       \enddoctest
 
-      \sa has, all, inputs */
+      \sa has, all, inputs
+
+      \identifier{2ll} */
   MX var(const std::string& name) const;
   MX operator()(const std::string& name) const {return var(name);}
   ///@}
@@ -2224,7 +2292,9 @@ class CASADI_EXPORT DaeBuilder
       der(y)
       >> try, dae.der('p'); catch e, disp(contains(e.message, 'No derivative expression')); end
       1
-      \enddoctest */
+      \enddoctest
+
+      \identifier{2lm} */
   std::vector<std::string> der(const std::vector<std::string>& name) const;
 
   ///@{
@@ -2287,7 +2357,9 @@ class CASADI_EXPORT DaeBuilder
       1
       \enddoctest
 
-      \sa eq, der, var */
+      \sa eq, der, var
+
+      \identifier{2ln} */
   MX der(const MX& v) const;
   MX der(const MX& v);
   ///@}
@@ -2296,7 +2368,9 @@ class CASADI_EXPORT DaeBuilder
 
       Not implemented: returns the names unchanged, with a warning the first time.
 
-      \sa reinit */
+      \sa reinit
+
+      \identifier{2lo} */
   std::vector<std::string> pre(const std::vector<std::string>& name) const;
 
   /** \brief Get the pre-expression given variable expression
@@ -2305,7 +2379,9 @@ class CASADI_EXPORT DaeBuilder
       Meant for the value of a variable just before an event, as in
       `reinit("v", -0.8*pre(v))`.
 
-      \sa reinit, when */
+      \sa reinit, when
+
+      \identifier{2lp} */
   MX pre(const MX& v) const;
 
   /** \brief Does a variable have a binding equation?
@@ -2314,7 +2390,9 @@ class CASADI_EXPORT DaeBuilder
       (or an imported one); dependent variables, dependent parameters and defined
       derivatives have one.
 
-      \sa beq, eq */
+      \sa beq, eq
+
+      \identifier{2lq} */
   bool has_beq(const std::string& name) const;
 
   /** \brief Get the binding equation for a variable
@@ -2340,7 +2418,9 @@ class CASADI_EXPORT DaeBuilder
       (-w)
       \enddoctest
 
-      \sa has_beq, wdef */
+      \sa has_beq, wdef
+
+      \identifier{2lr} */
   MX beq(const std::string& name) const;
 
   ///@{
@@ -2368,7 +2448,9 @@ class CASADI_EXPORT DaeBuilder
       >> dae.set_value_reference('x', 100);
       >> dae.value_reference('x')
       100
-      \enddoctest */
+      \enddoctest
+
+      \identifier{2ls} */
   casadi_int value_reference(const std::string& name) const;
   void set_value_reference(const std::string& name, casadi_int val);
   ///@}
@@ -2396,7 +2478,9 @@ class CASADI_EXPORT DaeBuilder
       >> dae.set_description('x', 'height');
       >> dae.description('x')
       height
-      \enddoctest */
+      \enddoctest
+
+      \identifier{2lt} */
   std::string description(const std::string& name) const;
   void set_description(const std::string& name, const std::string& val);
   ///@}
@@ -2437,7 +2521,9 @@ class CASADI_EXPORT DaeBuilder
       Float32
       >> try, dae.set_type('x', 'bogus'); catch e, disp(contains(e.message, 'No such enum')); end
       1
-      \enddoctest */
+      \enddoctest
+
+      \identifier{2lu} */
   std::string type(const std::string& name, casadi_int fmi_version = 3) const;
   void set_type(const std::string& name, const std::string& val);
   ///@}
@@ -2465,7 +2551,9 @@ class CASADI_EXPORT DaeBuilder
       local
       \enddoctest
 
-      \sa set_causality, variability, category */
+      \sa set_causality, variability, category
+
+      \identifier{2lv} */
   std::string causality(const std::string& name) const;
 
   /** \brief Which categories are possible for a variable?
@@ -2498,7 +2586,9 @@ class CASADI_EXPORT DaeBuilder
       x,q,
       \enddoctest
 
-      \sa category, set_category */
+      \sa category, set_category
+
+      \identifier{2lw} */
   std::vector<std::string> categories(const std::string& name) const;
 
   /** \brief Set the causality, if permitted
@@ -2552,7 +2642,9 @@ class CASADI_EXPORT DaeBuilder
 
       One of `"constant"`, `"fixed"`, `"tunable"`, `"discrete"`, `"continuous"`.
 
-      \sa set_variability, causality */
+      \sa set_variability, causality
+
+      \identifier{2lx} */
   std::string variability(const std::string& name) const;
 
   /** \brief Set the variability, if permitted
@@ -2616,7 +2708,9 @@ class CASADI_EXPORT DaeBuilder
       One of `"t"`, `"c"`, `"p"`, `"d"`, `"w"`, `"u"`, `"x"`, `"z"`, `"q"`,
       `"calculated"` (internal helper variables), or an empty string for no category.
 
-      \sa categories, set_category, causality, variability */
+      \sa categories, set_category, causality, variability
+
+      \identifier{2ly} */
   std::string category(const std::string& name) const;
 
   /** \brief Set the variable category, if permitted
@@ -2711,7 +2805,9 @@ class CASADI_EXPORT DaeBuilder
       >> dae.set_initial('x', 'exact');
       >> dae.initial('x')
       exact
-      \enddoctest */
+      \enddoctest
+
+      \identifier{2lz} */
   std::string initial(const std::string& name) const;
   void set_initial(const std::string& name, const std::string& val);
   ///@}
@@ -2739,7 +2835,9 @@ class CASADI_EXPORT DaeBuilder
       >> dae.set_unit('v', 'km/h');
       >> dae.unit('v')
       km/h
-      \enddoctest */
+      \enddoctest
+
+      \identifier{2m0} */
   std::string unit(const std::string& name) const;
   void set_unit(const std::string& name, const std::string& val);
   ///@}
@@ -2748,7 +2846,9 @@ class CASADI_EXPORT DaeBuilder
   /** \brief Get/set the display unit
 
       Display unit string of a variable; empty by default. Also settable with the
-      `"display_unit"` option of `add`. */
+      `"display_unit"` option of `add`.
+
+      \identifier{2m1} */
   std::string display_unit(const std::string& name) const;
   void set_display_unit(const std::string& name, const std::string& val);
   ///@}
@@ -2776,7 +2876,9 @@ class CASADI_EXPORT DaeBuilder
       6 1
       \enddoctest
 
-      \sa dimension, var */
+      \sa dimension, var
+
+      \identifier{2m2} */
   casadi_int numel(const std::string& name) const;
 
   /** \brief Get the dimensions of a variable
@@ -2784,7 +2886,9 @@ class CASADI_EXPORT DaeBuilder
       The `"dimension"` list given to `add` (default `[1]`). The expression is always
       flattened to a column vector.
 
-      \sa numel */
+      \sa numel
+
+      \identifier{2m3} */
   std::vector<casadi_int> dimension(const std::string& name) const;
 
   /** \brief Get the start time
@@ -2814,7 +2918,9 @@ class CASADI_EXPORT DaeBuilder
       0 10 1e-06 0.01
       \enddoctest
 
-      \sa set_start_time, stop_time */
+      \sa set_start_time, stop_time
+
+      \identifier{2m4} */
   double start_time() const;
 
   /// Set the start time of the default experiment
@@ -2843,7 +2949,9 @@ class CASADI_EXPORT DaeBuilder
 #if !(defined(SWIG) && defined(SWIGMATLAB))
   /** \brief Get the time derivative of model variables, single variable
 
-      The name of the derivative variable of a single variable, e.g. `der(x)` for `x`. */
+      The name of the derivative variable of a single variable, e.g. `der(x)` for `x`.
+
+      \identifier{2m5} */
   std::string der(const std::string& name) const;
 
   /// Get the pre-variables of model variables, single variable (not implemented)
@@ -2891,7 +2999,9 @@ class CASADI_EXPORT DaeBuilder
       1
       \enddoctest
 
-      \sa min, max, nominal, start, get */
+      \sa min, max, nominal, start, get
+
+      \identifier{2m6} */
   double attribute(const std::string& a, const std::string& name) const;
 
   /// Set an attribute, single variable (vector-valued variables get all elements set)
@@ -2926,7 +3036,9 @@ class CASADI_EXPORT DaeBuilder
       2
       \enddoctest
 
-      \sa set_min, max, nominal */
+      \sa set_min, max, nominal
+
+      \identifier{2m7} */
   double min(const std::string& name) const;
 
   /// Set the lower bound, single variable
@@ -2986,7 +3098,9 @@ class CASADI_EXPORT DaeBuilder
       1
       \enddoctest
 
-      \sa set_start, get */
+      \sa set_start, get
+
+      \identifier{2m8} */
   std::vector<double> start(const std::string& name) const;
 
   /// Set the start attribute, single variable (all elements for a vector-valued variable)
@@ -3000,7 +3114,9 @@ class CASADI_EXPORT DaeBuilder
       Resets the current value of every variable to nan (empty for string variables); the
       start attributes are kept.
 
-      \sa set, get */
+      \sa set, get
+
+      \identifier{2m9} */
   void reset();
 
   /** \brief Set the current value, single value
@@ -3074,7 +3190,9 @@ class CASADI_EXPORT DaeBuilder
       -6
       \enddoctest
 
-      \sa get, reset, start, c */
+      \sa get, reset, start, c
+
+      \identifier{2ma} */
   void set(const std::string& name, double val);
 
   /// Set the current value, single value (string), for variables of type `"String"`
@@ -3086,7 +3204,9 @@ class CASADI_EXPORT DaeBuilder
       for a vector-valued variable, a string for a string variable; nan when unset. For an
       imported FMU the value is obtained by evaluating the FMU.
 
-      \sa set, start */
+      \sa set, start
+
+      \identifier{2mb} */
   GenericType get(const std::string& name) const;
 
   /** \brief Symbolic DAE instance?
@@ -3099,7 +3219,9 @@ class CASADI_EXPORT DaeBuilder
       True
       \enddoctest
 
-      \sa load_fmi_description, oracle */
+      \sa load_fmi_description, oracle
+
+      \identifier{2mc} */
   bool symbolic() const;
 
 #endif  // !SWIGMATLAB
@@ -3135,7 +3257,9 @@ class CASADI_EXPORT DaeBuilder
   /** \brief Set the start attribute for several variables
 
       \p val holds either one value per variable (broadcast over the elements) or one value
-      per element of all variables concatenated; any other length is an error. */
+      per element of all variables concatenated; any other length is an error.
+
+      \identifier{2md} */
   void set_start(const std::vector<std::string>& name, const std::vector<double>& val);
 
   /// Set the current value for several variables (one per variable or one per element)
@@ -3169,7 +3293,9 @@ class CASADI_EXPORT DaeBuilder
       1
       \enddoctest
 
-      \sa all, var */
+      \sa all, var
+
+      \identifier{2me} */
   bool has(const std::string& name) const;
 
   /** \brief Get a list of all variables
@@ -3200,13 +3326,17 @@ class CASADI_EXPORT DaeBuilder
       __assign__der(x)__
       \enddoctest
 
-      \sa has, x, w */
+      \sa has, x, w
+
+      \identifier{2mf} */
   std::vector<std::string> all() const;
 
   /** \brief Get a list of all variables of a particular category
 
       Names of the members of a category in category order; empty for an empty category,
-      an unknown category name is an error. `x()`, `z()`, `u()` etc. are shorthands. */
+      an unknown category name is an error. `x()`, `z()`, `u()` etc. are shorthands.
+
+      \identifier{2mg} */
   std::vector<std::string> all(const std::string& cat) const;
 
   /** \brief Get the (cached) oracle, SX or MX
@@ -3257,7 +3387,9 @@ class CASADI_EXPORT DaeBuilder
       t p d u x z q
       \enddoctest
 
-      \sa create, symbolic */
+      \sa create, symbolic
+
+      \identifier{2mh} */
   Function oracle(bool sx = false, bool elim_w = false, bool lifted_calls = false) const;
 
   /** \brief Get Jacobian sparsity

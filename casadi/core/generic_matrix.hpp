@@ -3111,7 +3111,8 @@ namespace casadi {
     * \enddoctest
     *
     * \sa extract_parametric, linear_coeff
-    */
+
+        \identifier{2mo} */
     inline friend void separate_linear(const MatType &expr,
       const MatType &sym_lin, const MatType &sym_const,
       MatType& expr_const, MatType& expr_lin, MatType& expr_nonlin) {
@@ -3149,7 +3150,8 @@ namespace casadi {
         \enddoctest
 
         \sa cse, Function::n_nodes
-     */
+
+        \identifier{2mp} */
     inline friend casadi_int n_nodes(const MatType& A) {
       return MatType::n_nodes(A);
     }
@@ -3173,7 +3175,8 @@ namespace casadi {
         \enddoctest
 
         \sa transform, cse
-     */
+
+        \identifier{2mq} */
     friend inline MatType simplify(const MatType &x) {
       return MatType::simplify(x);
     }
@@ -3198,7 +3201,8 @@ namespace casadi {
         \enddoctest
 
         \sa simplify, Function::transform
-     */
+
+        \identifier{2mr} */
     ///@{
     friend inline MatType transform(const MatType &x, const Dict& opts = Dict()) {
       return MatType::transform(x, opts);

@@ -30,7 +30,7 @@
       "\n"
 "\n"
 "\n"
-"This class solves the linear system  A.x=b by making an QR factorization of A:  A = Q.R, with Q orthogonal and R upper triangular\n"
+"This class solves the linear system ``A.x=b`` by making an QR factorization of A: ``A = Q.R``, with Q orthogonal and R upper triangular\n"
 "\n"
 "Extra doc: https://github.com/casadi/casadi/wiki/L_22g \n"
 "\n"

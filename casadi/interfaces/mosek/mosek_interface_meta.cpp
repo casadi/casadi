@@ -32,7 +32,7 @@
 "\n"
 "Interface to the MOSEK Optimizer for sparse Linear, Quadratic, Mixed-\n"
 "Integer and Second-Order Cone Programs. See https://www.mosek.com  for details and the MOSEK reference manual for the list of parameters\n"
-" that may be passed via the  mosek option dict (e.g.  MSK_IPAR_LOG,  MSK_DPAR_INTPNT_QO_TOL_REL_GAP).\n"
+" that may be passed via the ``mosek`` option dict (e.g. ``MSK_IPAR_LOG``, ``MSK_DPAR_INTPNT_QO_TOL_REL_GAP``).\n"
 "\n"
 "Extra doc: https://github.com/casadi/casadi/wiki/L_mosek \n"
 "\n"

@@ -979,6 +979,7 @@ namespace casadi {
     double default_in(casadi_int ind) const;
 
     /** \brief Get the largest admissible value of input \p ind (inf unless a solver
+
         restricts it)
 
         \doctest
@@ -999,6 +1000,7 @@ namespace casadi {
     double max_in(casadi_int ind) const;
 
     /** \brief Get the smallest admissible value of input \p ind (-inf unless a solver
+
         restricts it)
 
         \sa max_in, default_in
@@ -1205,7 +1207,9 @@ namespace casadi {
         1
         \enddoctest
 
-        \sa jacobian, forward, reverse, which_depends */
+        \sa jacobian, forward, reverse, which_depends
+
+        \identifier{2mi} */
     Function factory(const std::string& name,
                      const std::vector<std::string>& s_in,
                      const std::vector<std::string>& s_out,
@@ -1405,6 +1409,7 @@ namespace casadi {
     void print_options(std::ostream &stream=casadi::uout()) const;
 
     /** \brief Print the type and description of one option; unknown names print a
+
         notice
 
         \doctest
@@ -1475,6 +1480,7 @@ namespace casadi {
     void change_option(const std::string& option_name, const GenericType& option_value);
 
     /** \brief Reset to zero the counter that numbers the files written by dump_in,
+
         dump_out and dump_trace
 
         \identifier{2dy} */
@@ -1506,12 +1512,14 @@ namespace casadi {
 
 #ifdef WITH_DEPRECATED_FEATURES
     /** \brief [DEPRECATED] Jacobian of output \p oind w.r.t. input \p iind, followed by
+
         all outputs; use factory with "jac:out:in" instead
 
         \identifier{1w4} */
     Function jacobian_old(casadi_int iind, casadi_int oind) const;
 
     /** \brief [DEPRECATED] Hessian and gradient of scalar output \p oind w.r.t. input
+
         \p iind, followed by all outputs; use factory with "hess:out:in:in" instead
 
         \identifier{1w5} */
@@ -1875,6 +1883,7 @@ namespace casadi {
 
     ///@{
     /** \brief Create a function that applies this function N times, feeding outputs back
+
         as inputs
 
         The first \p n_accum inputs are accumulators: in every step they take the value
@@ -2161,6 +2170,7 @@ namespace casadi {
                                 const Function& f_def, const Dict& opts=Dict());
 
     /** \brief Create a function that calls \p f when its first input is nonzero and
+
         returns zeros otherwise
 
         Shorthand for if_else with a zero-returning function of the same signature as
@@ -2244,6 +2254,7 @@ namespace casadi {
       const std::vector<casadi_int>& degree, casadi_int m=1, const Dict& opts=Dict());
 
     /** \brief Create a function that evaluates \p f_true or \p f_false depending on
+
         a condition input
 
         The result takes the condition as first input followed by the inputs of the
@@ -2389,6 +2400,7 @@ namespace casadi {
     const std::vector<Sparsity>& jac_sparsity(bool compact = false) const;
 
     /** \brief Get the sparsity pattern of the Jacobian of output \p oind w.r.t. input
+
         \p iind
 
         \doctest
@@ -2770,7 +2782,9 @@ namespace casadi {
         n_call_total t_proc_total t_wall_total
         \enddoctest
 
-        \sa checkout */
+        \sa checkout
+
+        \identifier{2mj} */
     Dict stats(int mem=0) const;
 
     ///@{
@@ -2853,6 +2867,7 @@ namespace casadi {
     ///@}
 
     /** \brief Convert between a list of input/output matrices and one flat list of
+
         nonzeros
 
         nz_from_in flattens a list of n_in() DM arguments (shape rules as in call) into
@@ -3199,6 +3214,7 @@ namespace casadi {
 
     ///@{
     /** \brief Check whether the class supports forward (has_spfwd) or reverse (has_sprev)
+
         sparsity propagation
 
         Both are true for SXFunction and MXFunction; classes without it fall back to
@@ -3246,6 +3262,7 @@ namespace casadi {
     size_t sz_arg() const;
 
     /** \brief Get the length of the output pointer array needed to evaluate (at least
+
         n_out)
 
         \identifier{1xn} */
@@ -3475,7 +3492,9 @@ namespace casadi {
         1
         \enddoctest
 
-        \sa assert_size_out, size_in */
+        \sa assert_size_out, size_in
+
+        \identifier{2mk} */
     void assert_size_in(casadi_int i, casadi_int nrow, casadi_int ncol) const;
 
     /// Raise an error unless output \p i is \p nrow-by-\p ncol
@@ -3485,7 +3504,9 @@ namespace casadi {
         times horizontally
 
         With \p allow_all_zero_sparse, an output without nonzeros of the right shape
-        passes. Used to check derivative functions. */
+        passes. Used to check derivative functions.
+
+        \identifier{2ml} */
     void assert_sparsity_out(casadi_int i, const Sparsity& sp,
         casadi_int n = 1, bool allow_all_zero_sparse = true) const;
 
@@ -3511,7 +3532,9 @@ namespace casadi {
         >> f.release(m)
         \enddoctest
 
-        \sa release, stats, FunctionBuffer */
+        \sa release, stats, FunctionBuffer
+
+        \identifier{2mm} */
     casadi_int checkout() const;
 
     /// Give back a memory object obtained with checkout
@@ -3680,7 +3703,9 @@ namespace casadi {
         >>> x = SX.sym("x")
         >>> Function("f", [x], [x]).info()
         {}
-        \enddoctest */
+        \enddoctest
+
+        \identifier{2mn} */
     Dict info() const;
 
 #ifndef SWIG

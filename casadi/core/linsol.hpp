@@ -144,7 +144,8 @@ namespace casadi {
         >> contains(msg, 'Unknown option')
         1
         \enddoctest
-    */
+
+        \identifier{2pe} */
     explicit Linsol(const std::string& name, const std::string& solver,
                     const Sparsity& sp, const Dict& opts=Dict());
 
@@ -180,7 +181,8 @@ namespace casadi {
         1
         0
         \enddoctest
-    */
+
+        \identifier{2pf} */
     static bool has_plugin(const std::string& name);
 
     /** \brief Explicitly load a plugin dynamically
@@ -200,7 +202,8 @@ namespace casadi {
         >> contains(msg, 'no_such_plugin')
         1
         \enddoctest
-    */
+
+        \identifier{2pg} */
     static void load_plugin(const std::string& name);
 
     /** \brief Get solver specific documentation
@@ -216,7 +219,8 @@ namespace casadi {
         >> contains(Linsol.doc('ldl'), 'LDL')
         1
         \enddoctest
-    */
+
+        \identifier{2ph} */
     static std::string doc(const std::string& name);
 
     /// Query plugin name
@@ -229,7 +233,8 @@ namespace casadi {
 
         Only uses the sparsity pattern of \p A. Called automatically by nfact and solve when
         needed; raises an error when the plugin fails.
-    */
+
+        \identifier{2pi} */
     void sfact(const DM& A) const;
 
     /** \brief Numeric factorization of the linear system
@@ -256,7 +261,8 @@ namespace casadi {
         >> B = DM([-1 0; 0 1]); L.nfact(B); disp(L.neig(B))
         1
         \enddoctest
-    */
+
+        \identifier{2pj} */
     void nfact(const DM& A) const;
 
     ///@{
@@ -291,7 +297,8 @@ namespace casadi {
         >> contains(msg, 'matching row count')
         1
         \enddoctest
-    */
+
+        \identifier{2pk} */
     DM solve(const DM& A, const DM& B, bool tr=false) const;
     MX solve(const MX& A, const MX& B, bool tr=false) const;
     ///@}
@@ -402,7 +409,8 @@ namespace casadi {
         2
         1
         \enddoctest
-    */
+
+        \identifier{2pl} */
     Dict stats(int mem=1) const;
 
     #ifndef SWIG
@@ -449,7 +457,8 @@ namespace casadi {
       1
       0
       \enddoctest
-  */
+
+      \identifier{2pm} */
   CASADI_EXPORT bool has_linsol(const std::string& name);
 
   /** \brief Explicitly load a linear solver plugin
@@ -470,7 +479,8 @@ namespace casadi {
       >> contains(msg, 'no_such_plugin')
       1
       \enddoctest
-  */
+
+      \identifier{2pn} */
   CASADI_EXPORT void load_linsol(const std::string& name);
 
   /** \brief Get the documentation string of a linear solver plugin
@@ -486,7 +496,8 @@ namespace casadi {
       >> contains(doc_linsol('qr'), 'QR')
       1
       \enddoctest
-  */
+
+      \identifier{2po} */
   CASADI_EXPORT std::string doc_linsol(const std::string& name);
 
 } // namespace casadi

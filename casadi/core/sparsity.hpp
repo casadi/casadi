@@ -195,7 +195,8 @@ namespace casadi {
         >> try, sp.nnz(); catch e, disp('error'); end
         error
         \enddoctest
-    */
+
+        \identifier{2nj} */
     explicit Sparsity(casadi_int dummy=0);
 
     /** \brief Pattern of the given shape with all structural zeros
@@ -278,7 +279,8 @@ namespace casadi {
         \enddoctest
 
         \sa compressed, triplet, get_ccs
-    */
+
+        \identifier{2nk} */
     Sparsity(casadi_int nrow, casadi_int ncol,
              const std::vector<casadi_int>& colind, const std::vector<casadi_int>& row,
              bool order_rows=false);
@@ -788,7 +790,8 @@ namespace casadi {
         \enddoctest
 
         \sa compress, Sparsity(nrow, ncol, colind, row)
-    */
+
+        \identifier{2nl} */
     ///@{
     static Sparsity compressed(const std::vector<casadi_int>& v, bool order_rows=false);
 #ifndef SWIG
@@ -917,7 +920,8 @@ namespace casadi {
         \enddoctest
 
         \sa diag, nnz_diag
-    */
+
+        \identifier{2nm} */
     Sparsity get_diag(std::vector<casadi_int>& SWIG_OUTPUT(mapping)) const;
 
     /** \brief Compact single-vector representation of the pattern
@@ -950,7 +954,8 @@ namespace casadi {
         \enddoctest
 
         \sa compressed, get_ccs
-    */
+
+        \identifier{2nn} */
     std::vector<casadi_int> compress(bool canonical=true) const;
 
 #ifndef SWIG
@@ -995,7 +1000,8 @@ namespace casadi {
         \enddoctest
 
         \sa is_subset, is_transpose, is_reshape, hash
-    */
+
+        \identifier{2no} */
     /// @{
     bool is_equal(const Sparsity& y) const;
     bool is_equal(casadi_int nrow, casadi_int ncol, const std::vector<casadi_int>& colind,
@@ -1035,7 +1041,8 @@ namespace casadi {
         \enddoctest
 
         \sa is_equal, horzcat
-    */
+
+        \identifier{2np} */
     bool is_stacked(const Sparsity& y, casadi_int n) const;
 
 #ifndef SWIG
@@ -1076,7 +1083,8 @@ namespace casadi {
         \enddoctest
 
         \sa size2, size, numel
-    */
+
+        \identifier{2nq} */
     casadi_int size1() const;
 
     /// Number of rows, Octave-style alias of size1
@@ -1336,7 +1344,8 @@ namespace casadi {
         \enddoctest
 
         \sa get_ccs, compress
-    */
+
+        \identifier{2nr} */
     Dict info() const;
 
     /** \brief Write the pattern to a file
@@ -1386,7 +1395,8 @@ namespace casadi {
         \enddoctest
 
         \sa from_file, DM::to_file
-    */
+
+        \identifier{2ns} */
     void to_file(const std::string& filename, const std::string& format_hint="") const;
 
     /** \brief Read a pattern from a file written by to_file (Matrix Market pattern format)
@@ -1395,7 +1405,8 @@ namespace casadi {
         \param format_hint Format name, e.g. "mtx", when the extension does not tell
 
         \sa to_file
-    */
+
+        \identifier{2nt} */
     static Sparsity from_file(const std::string& filename, const std::string& format_hint="");
 
 #ifndef SWIG
@@ -1608,7 +1619,8 @@ namespace casadi {
         \enddoctest
 
         \sa enlarge, reshape
-    */
+
+        \identifier{2nu} */
     void resize(casadi_int nrow, casadi_int ncol);
 
     /** \brief Nonzero index of entry (rr, cc), inserting the entry into the pattern if needed
@@ -1695,7 +1707,8 @@ namespace casadi {
         \enddoctest
 
         \sa get_nz
-    */
+
+        \identifier{2nv} */
     bool has_nz(casadi_int rr, casadi_int cc) const;
 
     /** \brief Nonzero indices of the block of entries with rows \p rr and columns \p cc
@@ -1771,13 +1784,15 @@ namespace casadi {
         \enddoctest
 
         \sa get_upper, nnz_lower, tril
-    */
+
+        \identifier{2nw} */
     std::vector<casadi_int> get_lower() const;
 
     /** \brief Nonzero indices of the entries in the upper triangular part (row <= col)
 
         \sa get_lower, nnz_upper, triu
-    */
+
+        \identifier{2nx} */
     std::vector<casadi_int> get_upper() const;
 
     /** \brief The pattern in compressed column storage: the colind and row vectors
@@ -1797,7 +1812,8 @@ namespace casadi {
         \enddoctest
 
         \sa get_crs, get_triplet, get_colind, get_row
-    */
+
+        \identifier{2ny} */
     void get_ccs(std::vector<casadi_int>& SWIG_OUTPUT(colind),
                 std::vector<casadi_int>& SWIG_OUTPUT(row)) const;
 
@@ -1822,7 +1838,8 @@ namespace casadi {
         \enddoctest
 
         \sa get_ccs, T
-    */
+
+        \identifier{2nz} */
     void get_crs(std::vector<casadi_int>& SWIG_OUTPUT(rowind),
                 std::vector<casadi_int>& SWIG_OUTPUT(col)) const;
 
@@ -1845,7 +1862,8 @@ namespace casadi {
         \enddoctest
 
         \sa triplet, get_row, get_col
-    */
+
+        \identifier{2o0} */
     void get_triplet(std::vector<casadi_int>& SWIG_OUTPUT(row),
                     std::vector<casadi_int>& SWIG_OUTPUT(col)) const;
 
@@ -1987,7 +2005,8 @@ namespace casadi {
         \enddoctest
 
         \sa transpose, is_transpose, get_crs
-    */
+
+        \identifier{2o1} */
     Sparsity T() const;
 
     /** \brief Transposed pattern together with the reordering of the nonzeros
@@ -2039,7 +2058,8 @@ namespace casadi {
         \enddoctest
 
         \sa T, is_symmetric
-    */
+
+        \identifier{2o2} */
     bool is_transpose(const Sparsity& y) const;
 
     /** \brief Check whether \p y is a reshape of this pattern
@@ -2066,7 +2086,8 @@ namespace casadi {
         \enddoctest
 
         \sa reshape, find
-    */
+
+        \identifier{2o3} */
     bool is_reshape(const Sparsity& y) const;
 
     /** \brief Check if the nonzero pattern is the Cartesian product of a row and a column subset
@@ -2268,7 +2289,8 @@ namespace casadi {
         \enddoctest
 
         \sa unite, intersect, is_equal
-    */
+
+        \identifier{2o4} */
     bool is_subset(const Sparsity& rhs) const;
 
     /** \brief Propagate a subset of a pattern through a sparsity cast
@@ -2326,7 +2348,8 @@ namespace casadi {
         \enddoctest
 
         \sa unite, intersect
-    */
+
+        \identifier{2o5} */
     Sparsity pattern_inverse() const;
 
 #ifndef SWIG
@@ -2656,7 +2679,8 @@ namespace casadi {
         \enddoctest
 
         \sa appendColumns, vertcat
-    */
+
+        \identifier{2o6} */
     void append(const Sparsity& sp);
 
     /** \brief Append a pattern to the right of this one, in place (horizontal concatenation)
@@ -2682,7 +2706,8 @@ namespace casadi {
         \enddoctest
 
         \sa append, horzcat
-    */
+
+        \identifier{2o7} */
     void appendColumns(const Sparsity& sp);
 
     /** \brief Check whether the pattern is 1-by-1
@@ -2705,7 +2730,8 @@ namespace casadi {
         \enddoctest
 
         \sa scalar, is_dense
-    */
+
+        \identifier{2o8} */
     bool is_scalar(bool scalar_and_dense=false) const;
 
     /** \brief Check whether every entry is a structural nonzero, i.e. nnz() == numel()
@@ -2732,7 +2758,8 @@ namespace casadi {
         \enddoctest
 
         \sa dense, density, makeDense
-    */
+
+        \identifier{2o9} */
     bool is_dense() const;
 
     /** \brief Check whether the pattern is a row vector, i.e. size1() == 1
@@ -3923,7 +3950,8 @@ namespace casadi {
         \enddoctest
 
         \sa postfix_dim, repr_el
-    */
+
+        \identifier{2oa} */
     std::string dim(bool with_nz=false) const;
 
     /** \brief Dimension string to append to a name, as used when printing symbolic primitives
@@ -3988,7 +4016,8 @@ namespace casadi {
         \enddoctest
 
         \sa dim, get_nz
-    */
+
+        \identifier{2ob} */
     std::string repr_el(casadi_int k) const;
 
     /** \brief Print a textual picture of the pattern
@@ -4131,7 +4160,8 @@ namespace casadi {
         \enddoctest
 
         \sa is_equal
-    */
+
+        \identifier{2oc} */
     std::size_t hash() const;
 
     /// Check if a particular cast is allowed

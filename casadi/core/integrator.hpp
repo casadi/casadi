@@ -267,7 +267,8 @@ namespace casadi {
       1
       0
       \enddoctest
-  */
+
+      \identifier{2oi} */
   CASADI_EXPORT bool has_integrator(const std::string& name);
 
   /** \brief Explicitly load an integrator plugin
@@ -288,7 +289,8 @@ namespace casadi {
       >> contains(msg, 'no_such_plugin')
       1
       \enddoctest
-  */
+
+      \identifier{2oj} */
   CASADI_EXPORT void load_integrator(const std::string& name);
 
   /** \brief Get the documentation string of an integrator plugin
@@ -304,7 +306,8 @@ namespace casadi {
       >> contains(doc_integrator('rk'), 'Runge-Kutta')
       1
       \enddoctest
-  */
+
+      \identifier{2ok} */
   CASADI_EXPORT std::string doc_integrator(const std::string& name);
 
   /** \brief Get the input scheme of integrators

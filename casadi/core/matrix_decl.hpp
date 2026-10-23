@@ -286,7 +286,9 @@ namespace casadi {
         >>> try: DM([[1, 2], [3]])
         ... except Exception as e: print("error")
         error
-        \enddoctest */
+        \enddoctest
+
+        \identifier{2oo} */
     explicit Matrix(const std::vector< std::vector<double> >& m);
 
     /** \brief Dense column vector from a flat list of numbers
@@ -403,7 +405,9 @@ namespace casadi {
         1 0 1
         \enddoctest
 
-        \sa has_zeros, Sparsity::has_nz */
+        \sa has_zeros, Sparsity::has_nz
+
+        \identifier{2op} */
     bool has_nz(casadi_int rr, casadi_int cc) const;
 
     /** \brief Truth value of a 1-by-1 matrix (Python: bool(x))
@@ -421,7 +425,9 @@ namespace casadi {
         >>> try: bool(x > 0)
         ... except Exception as e: print("error")
         error
-        \enddoctest */
+        \enddoctest
+
+        \identifier{2oq} */
     bool __nonzero__() const;
 
     ///@{
@@ -487,7 +493,9 @@ namespace casadi {
         error
         \enddoctest
 
-        \sa set, get_nz, Sparsity::sub */
+        \sa set, get_nz, Sparsity::sub
+
+        \identifier{2or} */
     void get(Matrix<Scalar>& SWIG_OUTPUT(m), bool ind1, const Slice& rr) const;
     void get(Matrix<Scalar>& SWIG_OUTPUT(m), bool ind1, const Matrix<casadi_int>& rr) const;
     void get(Matrix<Scalar>& SWIG_OUTPUT(m), bool ind1, const Sparsity& sp) const;
@@ -550,7 +558,9 @@ namespace casadi {
         error
         \enddoctest
 
-        \sa set */
+        \sa set
+
+        \identifier{2os} */
     void get(Matrix<Scalar>& SWIG_OUTPUT(m), bool ind1,
                 const Slice& rr, const Slice& cc) const;
     void get(Matrix<Scalar>& SWIG_OUTPUT(m), bool ind1,
@@ -620,7 +630,9 @@ namespace casadi {
         error
         \enddoctest
 
-        \sa get, set_nz, erase */
+        \sa get, set_nz, erase
+
+        \identifier{2ot} */
     void set(const Matrix<Scalar>& m, bool ind1, const Slice& rr);
     void set(const Matrix<Scalar>& m, bool ind1, const Matrix<casadi_int>& rr);
     void set(const Matrix<Scalar>& m, bool ind1, const Sparsity& sp);
@@ -685,7 +697,9 @@ namespace casadi {
         error
         \enddoctest
 
-        \sa get */
+        \sa get
+
+        \identifier{2ou} */
     void set(const Matrix<Scalar>& m, bool ind1, const Slice& rr, const Slice& cc);
     void set(const Matrix<Scalar>& m, bool ind1, const Slice& rr, const Matrix<casadi_int>& cc);
     void set(const Matrix<Scalar>& m, bool ind1, const Matrix<casadi_int>& rr, const Slice& cc);
@@ -738,7 +752,9 @@ namespace casadi {
         error
         \enddoctest
 
-        \sa set_nz, get, nonzeros */
+        \sa set_nz, get, nonzeros
+
+        \identifier{2ov} */
     void get_nz(Matrix<Scalar>& SWIG_OUTPUT(m), bool ind1, const Slice& k) const;
     void get_nz(Matrix<Scalar>& SWIG_OUTPUT(m), bool ind1, const Matrix<casadi_int>& k) const;
     ///@}
@@ -783,7 +799,9 @@ namespace casadi {
         error
         \enddoctest
 
-        \sa get_nz, set */
+        \sa get_nz, set
+
+        \identifier{2ow} */
     void set_nz(const Matrix<Scalar>& m, bool ind1, const Slice& k);
     void set_nz(const Matrix<Scalar>& m, bool ind1, const Matrix<casadi_int>& k);
     ///@}
@@ -2145,7 +2163,8 @@ namespace casadi {
         >> fprintf('%s %s\n', DM.type_name(), SX.type_name())
         DM SX
         \enddoctest
-    */
+
+        \identifier{2ox} */
     static std::string type_name();
 
     /** \brief String representation of each nonzero and of the shared subexpressions
@@ -2175,7 +2194,8 @@ namespace casadi {
         (@1+@2) (@1-@2)
         (x*y) 1
         \enddoctest
-    */
+
+        \identifier{2oy} */
     void print_split(std::vector<std::string>& SWIG_OUTPUT(nz),
                     std::vector<std::string>& SWIG_OUTPUT(inter)) const;
 
@@ -2183,7 +2203,9 @@ namespace casadi {
 
         Picks the layout automatically: scalar, vector, dense matrix (small or at least
         half full) or sparse coordinate list. This is what str() and print() use.
-        \p more has no effect for matrices. */
+        \p more has no effect for matrices.
+
+        \identifier{2oz} */
     void disp(std::ostream& stream, bool more=false) const;
 
     /// Get the string representation that disp prints
@@ -2198,7 +2220,9 @@ namespace casadi {
         3
         >>> DM(1, 1).print_scalar()
         00
-        \enddoctest */
+        \enddoctest
+
+        \identifier{2p0} */
     void print_scalar(std::ostream &stream) const;
 
     /** \brief Print a column vector as [a, b, ...], structural zeros as 00
@@ -2210,7 +2234,9 @@ namespace casadi {
         \doctest
         >>> DM(Sparsity.unit(3, 1)).print_vector()
         [00, 1, 00]
-        \enddoctest */
+        \enddoctest
+
+        \identifier{2p1} */
     void print_vector(std::ostream &stream, bool truncate=true) const;
 
     /** \brief Print as a dense matrix, one row per line, structural zeros as 00
@@ -2226,7 +2252,9 @@ namespace casadi {
          [00, 1]]
         \enddoctest
 
-        \sa print_sparse */
+        \sa print_sparse
+
+        \identifier{2p2} */
     void print_dense(std::ostream &stream, bool truncate=true) const;
 
     /** \brief Print as a list of (row, col) -> value triplets, column-major order
@@ -2242,7 +2270,9 @@ namespace casadi {
         all zero sparse: 2-by-2
         \enddoctest
 
-        \sa print_dense */
+        \sa print_dense
+
+        \identifier{2p3} */
     void print_sparse(std::ostream &stream, bool truncate=true) const;
 
 #ifndef SWIG
@@ -2306,7 +2336,9 @@ namespace casadi {
         1
         \enddoctest
 
-        \sa enlarge, reshape */
+        \sa enlarge, reshape
+
+        \identifier{2p4} */
     void resize(casadi_int nrow, casadi_int ncol);
 
     /// Reserve storage for the given number of nonzeros (performance hint, no visible effect)
@@ -2682,7 +2714,9 @@ namespace casadi {
         error
         \enddoctest
 
-        \sa nan, inf */
+        \sa nan, inf
+
+        \identifier{2p5} */
     bool is_regular() const;
 
     /** \brief Check whether an SX expression contains only smooth operations
@@ -3115,7 +3149,9 @@ namespace casadi {
         0.333333
         \enddoctest
 
-        \sa get_precision */
+        \sa get_precision
+
+        \identifier{2p6} */
     static void set_precision(casadi_int precision);
     static void set_width(casadi_int width);
     static void set_scientific(bool scientific);
@@ -3147,7 +3183,9 @@ namespace casadi {
         0
         \enddoctest
 
-        \sa rand */
+        \sa rand
+
+        \identifier{2p7} */
     static void rng(casadi_int seed);
 
     ///@{
@@ -3213,7 +3251,8 @@ namespace casadi {
         >> strjoin(sort(fieldnames(s))', ' ')
         data sparsity
         \enddoctest
-    */
+
+        \identifier{2p8} */
     Dict info() const;
     #ifndef SWIG
         /** \brief Serialize an object
@@ -3309,7 +3348,9 @@ namespace casadi {
         >> delete(fn);
         \enddoctest
 
-        \sa from_file, Sparsity::to_file */
+        \sa from_file, Sparsity::to_file
+
+        \identifier{2p9} */
     void to_file(const std::string& filename, const std::string& format="") const;
 #ifndef SWIG
     static void to_file(const std::string& filename, const Sparsity& sp,
@@ -3352,7 +3393,9 @@ namespace casadi {
         >> delete(fn);
         \enddoctest
 
-        \sa to_file */
+        \sa to_file
+
+        \identifier{2pa} */
     static Matrix<double> from_file(const std::string& filename, const std::string& format_hint="");
     //@}
 

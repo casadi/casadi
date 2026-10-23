@@ -505,7 +505,8 @@ public:
       >> try, sol.value(opti.dual(con)); catch e, disp(contains(e.message, 'not given')); end
       1
       \enddoctest
-  */
+
+      \identifier{2ms} */
   void subject_to();
 
   /** \brief Select the numerical solver and its options
@@ -640,7 +641,8 @@ public:
       \enddoctest
 
       \sa set_value, initial, value_variables
-  */
+
+      \identifier{2mt} */
   void set_initial(const MX& x, const DM& v);
   void set_initial(const std::vector<MX>& assignments);
   /// @}
@@ -820,7 +822,8 @@ public:
       \enddoctest
 
       \sa solve_limited, OptiSol, stats, return_status
-  */
+
+      \identifier{2mu} */
   OptiSol solve();
 
   /** \brief Solve the problem, accepting a limit as outcome
@@ -914,7 +917,8 @@ public:
       \enddoctest
 
       \sa initial, value_variables, OptiSol::value
-  */
+
+      \identifier{2mv} */
   native_DM value(const MX& x, const std::vector<MX>& values=std::vector<MX>()) const;
   native_DM value(const DM& x, const std::vector<MX>& values=std::vector<MX>()) const;
   native_DM value(const SX& x, const std::vector<MX>& values=std::vector<MX>()) const;
@@ -1644,7 +1648,8 @@ public:
       >> try, opti.user_dict(x+1); catch e, disp(contains(e.message, 'Symbol expected')); end
       1
       \enddoctest
-  */
+
+      \identifier{2mw} */
   Dict user_dict(const MX& m) const;
 
   /// Readable name of the class
@@ -1681,7 +1686,8 @@ public:
         CasADi solver needs updating.
       }
       \enddoctest
-  */
+
+      \identifier{2mx} */
   void disp(std::ostream& stream, bool more=false) const;
 
   /// Get string representation
@@ -1788,7 +1794,8 @@ public:
 
     Subclass and override call(i), then register with Opti::callback_class. In Python and
     MATLAB, Opti::callback(fh) does this for a plain callable.
-*/
+
+    \identifier{2my} */
 class OptiCallback {
 public:
   OptiCallback() {
@@ -1809,7 +1816,8 @@ public:
     with the methods below added. No API stability is guaranteed for these methods. Most of
     them bake the problem (flatten variables and constraints) on the fly, so they also work
     on a copy that has not been solved.
-*/
+
+    \identifier{2mz} */
 class CASADI_EXPORT OptiAdvanced : public Opti {
   friend class InternalOptiCallback;
 public:
@@ -1851,7 +1859,8 @@ public:
       IpoptInterface
       x0 p lbx ubx lbg ubg lam_x0 lam_g0
       \enddoctest
-  */
+
+      \identifier{2n0} */
   Function casadi_solver() const;
 
   /** \brief Check whether an expression depends on parameters only
@@ -1872,7 +1881,8 @@ public:
       >> fprintf('%d %d\n', opti.debug.is_parametric(2*p), opti.debug.is_parametric(x*p))
       1 0
       \enddoctest
-  */
+
+      \identifier{2n1} */
   bool is_parametric(const MX& expr) const;
 
   /// @{
@@ -1939,7 +1949,8 @@ public:
       >> c = opti.debug.canon_expr(x + 1); disp(c.type == OPTI_UNKNOWN)
       1
       \enddoctest
-  */
+
+      \identifier{2n2} */
   MetaCon canon_expr(const MX& expr) const;
 
   /// Get meta-data of symbol (for internal use only)
@@ -1983,7 +1994,8 @@ public:
       opti..._x_1
       0
       \enddoctest
-  */
+
+      \identifier{2n3} */
   std::vector<MX> active_symvar(VariableType type) const;
   /// Initial guesses (or parameter values) of the symbols returned by active_symvar
   std::vector<DM> active_values(VariableType type) const;
@@ -2006,7 +2018,8 @@ public:
       opti..._x_1
       opti..._x_2
       \enddoctest
-  */
+
+      \identifier{2n4} */
   MX x_lookup(casadi_index i) const;
   /** \brief Get the constraint expression that owns row i of g
 
@@ -2025,7 +2038,8 @@ public:
       >> opti.debug.g_lookup(3)
       (1==(opti..._x_1[0]+opti..._x_1[1]))
       \enddoctest
-  */
+
+      \identifier{2n5} */
   MX g_lookup(casadi_index i) const;
 
   /// Row of the reduced g for row i of g when "detect_simple_bounds" is active (-1 if moved)
@@ -2058,7 +2072,8 @@ public:
       Opti decision variable 'opti..._x_1' of shape 3x1, called from ...
       At nonzero 3.
       \enddoctest
-  */
+
+      \identifier{2n6} */
   std::string x_describe(casadi_index i, const Dict& opts=Dict()) const;
   /** \brief Describe row i of the constraint vector g
 
@@ -2077,7 +2092,8 @@ public:
       Opti constraint of shape 3x1, called from ...
       At nonzero 2, part 0.
       \enddoctest
-  */
+
+      \identifier{2n7} */
   std::string g_describe(casadi_index i, const Dict& opts=Dict()) const;
   /** \brief Describe an expression in terms of this instance
 
@@ -2106,7 +2122,8 @@ public:
         Opti decision variable 'opti..._x_1' of shape 1x1, called from ...
         Opti parameter 'opti..._p_1' of shape 1x1, called from ...
       \enddoctest
-  */
+
+      \identifier{2n8} */
   std::string describe(const MX& x, casadi_index indent=0, const Dict& opts=Dict()) const;
 
   /** \brief Print the constraints violated at the latest iterate
@@ -2154,7 +2171,8 @@ public:
       -inf <= ... <= -1 (viol ...)
       Opti constraint of shape 1x1, called from ...
       \enddoctest
-  */
+
+      \identifier{2n9} */
   void show_infeasibilities(double tol=0, const Dict& opts=Dict()) const;
 
   /** \brief Prepare the solver arguments (first half of solve)
@@ -2197,7 +2215,8 @@ public:
       1
       {'f'} {'g'} {'lam_g'} {'lam_p'} {'lam_x'} {'x'}
       \enddoctest
-  */
+
+      \identifier{2na} */
   void solve_prepare();
   /// Run the solver on an argument dict (see solve_prepare)
   DMDict solve_actual(const DMDict& args);
@@ -2226,7 +2245,8 @@ public:
       (0<=opti..._x_1)
       ((1<=sq(opti..._x_1))<=4)
       \enddoctest
-  */
+
+      \identifier{2nb} */
   std::vector<MX> constraints() const;
   /// Objective expression; same as f()
   MX objective() const;
@@ -2243,7 +2263,8 @@ public:
       Flattens the active variables, parameters and constraints into the x, p, g, lbg and ubg
       vectors and builds the bounds function. Called automatically by solve() and the
       accessors; raises an error when neither an objective nor a constraint is set.
-  */
+
+      \identifier{2nc} */
   void bake();
 
   bool problem_dirty_;
@@ -2363,7 +2384,8 @@ class CASADI_EXPORT OptiSol : public SWIG_IF_ELSE(PrintableCommon, Printable<Opt
         >> size(sol.value(jacobian(opti.g, opti.x)))
         2 2
         \enddoctest
-    */
+
+        \identifier{2nd} */
     native_DM value(const MX& x, const std::vector<MX>& values=std::vector<MX>()) const;
     native_DM value(const DM& x, const std::vector<MX>& values=std::vector<MX>()) const;
     native_DM value(const SX& x, const std::vector<MX>& values=std::vector<MX>()) const;
@@ -2402,7 +2424,8 @@ class CASADI_EXPORT OptiSol : public SWIG_IF_ELSE(PrintableCommon, Printable<Opt
         >> s = sol2.stats(); disp(s.iter_count)
         0
         \enddoctest
-    */
+
+        \identifier{2ne} */
     std::vector<MX> value_variables() const;
     std::vector<MX> value_parameters() const;
 
@@ -2455,7 +2478,8 @@ class CASADI_EXPORT OptiSol : public SWIG_IF_ELSE(PrintableCommon, Printable<Opt
         Solve_Succeeded
         1
         \enddoctest
-    */
+
+        \identifier{2nf} */
     Opti opti() const { return optistack_; } // NOLINT(cppcoreguidelines-slicing)
 
   protected:

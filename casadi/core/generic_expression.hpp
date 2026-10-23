@@ -1741,7 +1741,8 @@ class GenericExpression : public GenericExpressionCommon {
          \enddoctest
 
          \sa sign, abs
-     */
+
+         \identifier{2ol} */
      static ExType copysign(const ExType& x, const ExType& y) {
        return ExType::binary(OP_COPYSIGN, x, y);
      }
@@ -1776,7 +1777,8 @@ class GenericExpression : public GenericExpressionCommon {
          \enddoctest
 
          \sa pow
-     */
+
+         \identifier{2om} */
      static ExType constpow(const ExType& x, const ExType& y) {
        return ExType::binary(OP_CONSTPOW, x, y);
      }
@@ -1809,7 +1811,8 @@ class GenericExpression : public GenericExpressionCommon {
          |> 7 : 3.0000000000000000e+00
          6
          \enddoctest
-     */
+
+         \identifier{2on} */
      static ExType printme(const ExType& x, const ExType& y) {
        return ExType::binary(OP_PRINTME, x, y);
      }

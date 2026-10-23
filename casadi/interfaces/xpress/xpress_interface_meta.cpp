@@ -32,7 +32,7 @@
 "\n"
 "Interface to FICO Xpress Optimizer for sparse Linear, Quadratic and \n"
 "Mixed-Integer Quadratic Programs. See https://www.fico.com/en/products/fico-xpress-optimization  for more information and the Xpress reference manual for the list of \n"
-"controls (options) accepted under the  xpress option dict.\n"
+"controls (options) accepted under the ``xpress`` option dict.\n"
 "\n"
 "Extra doc: https://github.com/casadi/casadi/wiki/L_xpress \n"
 "\n"

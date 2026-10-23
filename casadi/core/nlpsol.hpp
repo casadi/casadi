@@ -492,7 +492,8 @@ namespace casadi {
       1
       0
       \enddoctest
-  */
+
+      \identifier{2pb} */
   CASADI_EXPORT bool has_nlpsol(const std::string& name);
 
   /** \brief Explicitly load an NLP solver plugin
@@ -513,7 +514,8 @@ namespace casadi {
       >> contains(msg, 'no_such_plugin')
       1
       \enddoctest
-  */
+
+      \identifier{2pc} */
   CASADI_EXPORT void load_nlpsol(const std::string& name);
 
   /** \brief Get the documentation string of an NLP solver plugin
@@ -529,7 +531,8 @@ namespace casadi {
       >> contains(doc_nlpsol('sqpmethod'), 'max_iter')
       1
       \enddoctest
-  */
+
+      \identifier{2pd} */
   CASADI_EXPORT std::string doc_nlpsol(const std::string& name);
 
   /** @} */
