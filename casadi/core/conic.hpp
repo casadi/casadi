@@ -34,7 +34,8 @@ namespace casadi {
       \par
 
       Create a QP solver
-      Solves the following strictly convex problem:
+
+      Returns a Function that solves the convex quadratic program (QP)
 
       \verbatim
       min          1/2 x' H x + g' x
@@ -59,23 +60,179 @@ namespace casadi {
 
       \endverbatim
 
-      If H is not positive-definite, the solver should throw an error.
+      Whether an indefinite H is detected depends on the plugin: some raise an error, others
+      return a stationary point. Second-order cone constraints can be added as psd constraints
+      through the helper function soc: || x ||_2 <= y is equivalent to soc(x, y) being psd, with
+      soc(x, y) = [y*I x; x' y] (Schur complement). Only some plugins support psd constraints.
 
-      Second-order cone constraints can be added as psd constraints
-      through a helper function 'soc':
+      conic is the low-level form: the problem is given by the sparsity patterns of "h" and "a"
+      (and optionally "q", "p"), and the numerical values are passed at every call. At least one
+      of "h" and "a" is needed; a missing "h" means a linear objective (LP) and a missing "a" means
+      no linear constraints. "h" must have a square, symmetric sparsity pattern. Inputs are h, g,
+      a, lba, uba, lbx, ubx, x0, lam_x0, lam_a0, q, p (see conic_in); outputs are x, cost, lam_a,
+      lam_x (see conic_out). Omitted inputs default to -inf (lba, lbx), +inf (uba, ubx) or 0.
 
-      x in R^n
-      y in R
+      qpsol is the symbolic form: a dictionary with fields "x" (dense vector), "f" (scalar),
+      optionally "p" (parameters) and "g" (dense vector), as for nlpsol. The matrices H, g, A and
+      the constant terms are obtained by symbolic differentiation and evaluated at every call at
+      x0 and p; "f" must be quadratic and "g" linear in "x", this is NOT checked: other
+      expressions are silently replaced by their second order (f) or first order (g) expansion
+      around x0. The returned Function has the nlpsol input and output scheme (x0, p, lbx, ubx,
+      lbg, ubg, lam_x0, lam_g0 -> x, f, g, lam_x, lam_g, lam_p); lam_p is always NaN.
 
-      || x ||_2 <= y
+      Multiplier convention as for nlpsol: a multiplier is negative when the lower bound is
+      active and positive when the upper bound is active, such that H x + g + A' lam_a + lam_x = 0.
 
-        <=>
+      To silence a solver, set "print_time" False plus the plugin's own options, e.g.
+      {"print_iter": False, "print_header": False, "print_info": False} for qrqp or
+      {"printLevel": "none"} for qpoases (its copyright notice is printed regardless).
 
-      soc(x, y) psd
+      Options common to all plugins ("error_on_fail" defaults to true for QP solvers, so a failed
+      solve raises; with false the plugin result is returned and stats() reports "success"):
+      - "discrete": list of n booleans marking integer variables; needs a plugin with integer
+        support (e.g. cplex, gurobi, highs), otherwise an error at construction.
+      - "equality": list of nc booleans hinting which linear constraints have equal bounds.
+      - "print_problem": print the numerical problem data at every call (default false).
+      - "print_time": print a timing table after each call (default false).
+      - "expand" (qpsol only): convert an MX problem to SX (default false).
+      - "sens_min_lam", "sens_linsol", "sens_linsol_options": used when differentiating the
+        solver Function (a call embedded in an MX expression): a bound is treated as active when
+        its multiplier exceeds "sens_min_lam" in magnitude (default 0) and the KKT system is
+        solved with linear solver "sens_linsol" (default "qr").
+      The plugin options follow in the tables below.
 
-      This can be proven with soc(x, y)=[y*I   x; x'  y]
-      using the Shur complement.
+      \doctest
+      >>> x = SX.sym("x"); y = SX.sym("y")
+      >>> qp = {"x": vertcat(x, y), "f": x**2 + y**2 + x*y - 3*x, "g": x + y}
+      >>> opts = {"print_iter": False, "print_header": False, "print_info": False}
+      >>> S = qpsol("S", "qrqp", qp, opts)
+      >>> S.name_in()
+      ['x0', 'p', 'lbx', 'ubx', 'lbg', 'ubg', 'lam_x0', 'lam_g0']
+      >>> S.name_out()
+      ['x', 'f', 'g', 'lam_x', 'lam_g', 'lam_p']
+      >>> sol = S(lbg=1, ubg=1, lbx=0)
+      >>> np.round(sol["x"].full().ravel(), 4), round(float(sol["f"]), 4)
+      (array([1., 0.]), -2.0)
+      >>> round(float(sol["lam_g"]), 4), np.round(sol["lam_x"].full().ravel(), 4)
+      (1.0, array([ 0., -2.]))
+      >>> sol["g"], sol["lam_p"].shape
+      (DM(1), (0, 0))
+      >>> S.stats()["success"], S.stats()["return_status"]
+      (True, 'success')
+      \enddoctest
 
+      \doctest{matlab}
+      >> x = SX.sym('x'); y = SX.sym('y');
+      >> qp = struct('x', vertcat(x, y), 'f', x^2 + y^2 + x*y - 3*x, 'g', x + y);
+      >> opts = struct('print_iter', false, 'print_header', false, 'print_info', false);
+      >> S = qpsol('S', 'qrqp', qp, opts);
+      >> S.name_in()
+      x0
+      p
+      lbx
+      ubx
+      lbg
+      ubg
+      lam_x0
+      lam_g0
+      >> S.name_out()
+      x
+      f
+      g
+      lam_x
+      lam_g
+      lam_p
+      >> sol = S('lbg', 1, 'ubg', 1, 'lbx', 0);
+      >> fprintf('%.4f %.4f\n', full(sol.x)), disp(sol.f)
+      1.0000 0.0000
+      -2
+      >> sol.lam_g, sol.lam_x
+      1
+      [0, -2]
+      >> sol.g, size(sol.lam_p)
+      1
+      0 0
+      >> st = S.stats(); disp(st.success), disp(st.return_status)
+      1
+      success
+      \enddoctest
+
+      \doctest
+      >>> H = DM([[2, 1], [1, 2]]); g = DM([-3, 0]); A = DM([[1, 1]])
+      >>> opts = {"print_iter": False, "print_header": False, "print_info": False}
+      >>> C = conic("C", "qrqp", {"h": H.sparsity(), "a": A.sparsity()}, opts)
+      >>> print(C)
+      C:(h[2x2],g[2],a[1x2],lba,uba,lbx[2],ubx[2],x0[2],...)->(x[2],cost,lam_a,lam_x[2]) Qrqp
+      >>> sol = C(h=H, g=g, a=A, lba=1, uba=1, lbx=0)
+      >>> np.round(sol["x"].full().ravel(), 4), round(float(sol["cost"]), 4)
+      (array([1., 0.]), -2.0)
+      >>> round(float(sol["lam_a"]), 4), np.round(sol["lam_x"].full().ravel(), 4)
+      (1.0, array([ 0., -2.]))
+      >>> LP = conic("LP", "qrqp", {"a": A.sparsity()}, opts)
+      >>> LP(g=g, a=A, lba=1, uba=1, lbx=0, ubx=1)["x"]
+      DM([1, 0])
+      >>> try:
+      ...     conic("C", "qrqp", {"h": Sparsity.upper(2)}, opts)
+      ... except RuntimeError as e:
+      ...     print("square & symmetric" in str(e))
+      True
+      \enddoctest
+
+      \doctest{matlab}
+      >> H = DM([2 1; 1 2]); g = DM([-3; 0]); A = DM([1 1]);
+      >> opts = struct('print_iter', false, 'print_header', false, 'print_info', false);
+      >> C = conic('C', 'qrqp', struct('h', H.sparsity(), 'a', A.sparsity()), opts); disp(C)
+      C:(h[2x2],g[2],a[1x2],lba,uba,lbx[2],ubx[2],x0[2],...)->(x[2],cost,lam_a,lam_x[2]) Qrqp
+      >> sol = C('h', H, 'g', g, 'a', A, 'lba', 1, 'uba', 1, 'lbx', 0);
+      >> fprintf('%.4f %.4f\n', full(sol.x)), disp(sol.cost)
+      1.0000 0.0000
+      -2
+      >> sol.lam_a, sol.lam_x
+      1
+      [0, -2]
+      >> LP = conic('LP', 'qrqp', struct('a', A.sparsity()), opts);
+      >> sol = LP('g', g, 'a', A, 'lba', 1, 'uba', 1, 'lbx', 0, 'ubx', 1); disp(sol.x)
+      [1, 0]
+      >> qp = struct('h', Sparsity.upper(2));
+      >> try, conic('C', 'qrqp', qp, opts); catch e, msg = e.message; end
+      >> contains(msg, 'square & symmetric')
+      1
+      \enddoctest
+
+      \doctest
+      >>> x = SX.sym("x")
+      >>> opts = {"print_iter": False, "print_header": False, "print_info": False}
+      >>> S = qpsol("S", "qrqp", {"x": x, "f": x**2, "g": x}, dict(opts, error_on_fail=False))
+      >>> sol = S(lbx=0, ubx=1, lbg=2, ubg=3)
+      >>> S.stats()["success"]
+      False
+      >>> S = qpsol("S", "qrqp", {"x": x, "f": x**2 - 4*x, "g": 2*x}, opts)
+      >>> S(ubx=1)["lam_x"], S(lbx=3)["lam_x"], S(ubg=2)["lam_g"]
+      (DM(2), DM(-2), DM(1))
+      >>> try:
+      ...     qpsol("S", "qrqp", {"x": x, "f": x**2}, dict(opts, discrete=[True]))
+      ... except RuntimeError as e:
+      ...     print("integer support" in str(e))
+      True
+      \enddoctest
+
+      \doctest{matlab}
+      >> x = SX.sym('x'); qp = struct('x', x, 'f', x^2, 'g', x);
+      >> opts = struct('print_iter', false, 'print_header', false, 'print_info', false);
+      >> S = qpsol('S', 'qrqp', qp, setfield(opts, 'error_on_fail', false));
+      >> sol = S('lbx', 0, 'ubx', 1, 'lbg', 2, 'ubg', 3); st = S.stats(); disp(st.success)
+      0
+      >> S = qpsol('S', 'qrqp', struct('x', x, 'f', x^2 - 4*x, 'g', 2*x), opts);
+      >> r1 = S('ubx', 1); r2 = S('lbx', 3); r3 = S('ubg', 2);
+      >> r1.lam_x, r2.lam_x, r3.lam_g
+      2
+      -2
+      1
+      >> opts.discrete = true;
+      >> try, qpsol('S', 'qrqp', qp, opts); catch e, msg = e.message; end
+      >> contains(msg, 'integer support')
+      1
+      \enddoctest
 
       \generalsection{Conic}
       \pluginssection{Conic}
@@ -103,64 +260,274 @@ namespace casadi {
                                const MXDict& qp, const Dict& opts=Dict());
   ///@}
 
-  /** \brief Get input scheme of QP solvers
+  /** \brief Get the input scheme of QP solvers
+
+      Returns the names of the 12 inputs of a Function created by conic, in order:
+      h, g, a, lba, uba, lbx, ubx, x0, lam_x0, lam_a0, q, p. A Function created by qpsol
+      uses the nlpsol scheme instead.
+
+      \doctest
+      >>> conic_in()
+      ['h', 'g', 'a', 'lba', 'uba', 'lbx', 'ubx', 'x0', 'lam_x0', 'lam_a0', 'q', 'p']
+      \enddoctest
+
+      \doctest{matlab}
+      >> conic_in()
+      h
+      g
+      a
+      lba
+      uba
+      lbx
+      ubx
+      x0
+      lam_x0
+      lam_a0
+      q
+      p
+      \enddoctest
+
+      \sa conic_out, conic_n_in, nlpsol_in
 
       \identifier{1ee} */
   CASADI_EXPORT std::vector<std::string> conic_in();
 
-  /** \brief Get QP solver output scheme of QP solvers
+  /** \brief Get the output scheme of QP solvers
+
+      Returns the names of the 4 outputs of a Function created by conic, in order:
+      x, cost, lam_a, lam_x.
+
+      \doctest
+      >>> conic_out()
+      ['x', 'cost', 'lam_a', 'lam_x']
+      \enddoctest
+
+      \doctest{matlab}
+      >> conic_out()
+      x
+      cost
+      lam_a
+      lam_x
+      \enddoctest
+
+      \sa conic_in, conic_n_out
 
       \identifier{1ef} */
   CASADI_EXPORT std::vector<std::string> conic_out();
 
-  /** \brief Get QP solver input scheme name by index
+  /** \brief Get the name of a QP solver input by index
+
+      \param ind Index in 0..conic_n_in()-1; any other value gives an empty string
+
+      \doctest
+      >>> conic_in(0), conic_in(11), repr(conic_in(12))
+      ('h', 'p', "''")
+      \enddoctest
+
+      \doctest{matlab}
+      >> conic_in(0), conic_in(11), isempty(conic_in(12))
+      h
+      p
+      1
+      \enddoctest
 
       \identifier{1eg} */
   CASADI_EXPORT std::string conic_in(casadi_int ind);
 
-  /** \brief Get output scheme name by index
+  /** \brief Get the name of a QP solver output by index
+
+      \param ind Index in 0..conic_n_out()-1; any other value gives an empty string
+
+      \doctest
+      >>> conic_out(1), repr(conic_out(4))
+      ('cost', "''")
+      \enddoctest
+
+      \doctest{matlab}
+      >> conic_out(1), isempty(conic_out(4))
+      cost
+      1
+      \enddoctest
 
       \identifier{1eh} */
   CASADI_EXPORT std::string conic_out(casadi_int ind);
 
   /** \brief Get the number of QP solver inputs
 
+      \doctest
+      >>> conic_n_in()
+      12
+      \enddoctest
+
+      \doctest{matlab}
+      >> conic_n_in()
+      12
+      \enddoctest
+
       \identifier{1ei} */
   CASADI_EXPORT casadi_int conic_n_in();
 
   /** \brief Get the number of QP solver outputs
 
+      \doctest
+      >>> conic_n_out()
+      4
+      \enddoctest
+
+      \doctest{matlab}
+      >> conic_n_out()
+      4
+      \enddoctest
+
       \identifier{1ej} */
   CASADI_EXPORT casadi_int conic_n_out();
 
-  /** \brief Get all options for a plugin
+  /** \brief Get all options of a QP solver plugin
+
+      Returns the names of the plugin-specific options only; the options shared by all plugins
+      (e.g. "print_time", "discrete") are not included. Raises an error for an unknown plugin.
+
+      \doctest
+      >>> "max_iter" in conic_options("qrqp"), "discrete" in conic_options("qrqp")
+      (True, False)
+      \enddoctest
+
+      \doctest{matlab}
+      >> opts = cellstr(conic_options('qrqp'));
+      >> ismember({'max_iter', 'discrete'}, opts)
+      1 0
+      \enddoctest
+
+      \sa conic_option_type, conic_option_info
 
       \identifier{1ek} */
   CASADI_EXPORT std::vector<std::string> conic_options(const std::string& name);
 
-  /** \brief Get type info for a particular option
+  /** \brief Get the type of an option of a QP solver plugin
+
+      \param name Plugin name
+      \param op Option name; an unknown option raises an error
+      \return Type name such as "OT_INT", "OT_BOOL", "OT_STRING"
+
+      \doctest
+      >>> conic_option_type("qrqp", "max_iter"), conic_option_type("qrqp", "print_iter")
+      ('OT_INT', 'OT_BOOL')
+      \enddoctest
+
+      \doctest{matlab}
+      >> conic_option_type('qrqp', 'max_iter'), conic_option_type('qrqp', 'print_iter')
+      OT_INT
+      OT_BOOL
+      \enddoctest
 
       \identifier{1el} */
   CASADI_EXPORT std::string conic_option_type(const std::string& name, const std::string& op);
 
-  /** \brief Get documentation for a particular option
+  /** \brief Get the documentation string of an option of a QP solver plugin
+
+      \param name Plugin name
+      \param op Option name; an unknown option raises an error
+
+      \doctest
+      >>> conic_option_info("qrqp", "max_iter")
+      'Maximum number of iterations [1000].'
+      \enddoctest
+
+      \doctest{matlab}
+      >> conic_option_info('qrqp', 'max_iter')
+      Maximum number of iterations [1000].
+      \enddoctest
 
       \identifier{1em} */
   CASADI_EXPORT std::string conic_option_info(const std::string& name, const std::string& op);
 
-  /// Check if a particular plugin is available
+  /** \brief Check if a QP solver plugin is available
+
+      Tries to load the plugin \p name if it is not loaded yet; false when it is not found.
+
+      \doctest
+      >>> has_conic("qrqp"), has_conic("no_such_plugin")
+      (True, False)
+      \enddoctest
+
+      \doctest{matlab}
+      >> has_conic('qrqp'), has_conic('no_such_plugin')
+      1
+      0
+      \enddoctest
+  */
   CASADI_EXPORT bool has_conic(const std::string& name);
 
-  /// Explicitly load a plugin dynamically
+  /** \brief Explicitly load a QP solver plugin
+
+      Normally plugins are loaded on first use; this raises an error when the plugin cannot be
+      found.
+
+      \doctest
+      >>> try:
+      ...     load_conic("no_such_plugin")
+      ... except RuntimeError as e:
+      ...     print("no_such_plugin" in str(e))
+      True
+      \enddoctest
+
+      \doctest{matlab}
+      >> try, load_conic('no_such_plugin'); catch e, msg = e.message; end
+      >> contains(msg, 'no_such_plugin')
+      1
+      \enddoctest
+  */
   CASADI_EXPORT void load_conic(const std::string& name);
 
-  /// Get the documentation string for a plugin
+  /** \brief Get the documentation string of a QP solver plugin
+
+      The text includes the plugin-specific option table.
+
+      \doctest
+      >>> "active-set" in doc_conic("qrqp")
+      True
+      \enddoctest
+
+      \doctest{matlab}
+      >> contains(doc_conic('qrqp'), 'active-set')
+      1
+      \enddoctest
+  */
   CASADI_EXPORT std::string doc_conic(const std::string& name);
 
-  /** Generate native code in the interfaced language for debugging */
+  /** \brief Generate native code in the interfaced language for debugging
+
+      Writes a standalone problem description in the solver's own language (e.g. a script for
+      the solver's native API) for a Function created by conic. Only some plugins implement
+      this; the others raise an error.
+
+      \param f Function created by conic (not qpsol)
+      \param filename Output file name
+
+      \doctest
+      >>> import os, tempfile
+      >>> C = conic("C", "qrqp", {"h": Sparsity.dense(1)}, {"print_header": False})
+      >>> d = tempfile.mkdtemp(); fn = os.path.join(d, "C_debug.txt")
+      >>> try:
+      ...     conic_debug(C, fn)
+      ... except RuntimeError as e:
+      ...     print("generateNativeCode not defined" in str(e))
+      True
+      >>> os.remove(fn); os.rmdir(d)
+      \enddoctest
+
+      \doctest{matlab}
+      >> C = conic('C', 'qrqp', struct('h', Sparsity.dense(1)), struct('print_header', false));
+      >> fn = [tempname '.txt'];
+      >> try, conic_debug(C, fn); catch e, msg = e.message; end
+      >> contains(msg, 'generateNativeCode not defined')
+      1
+      >> delete(fn)
+      \enddoctest
+  */
   CASADI_EXPORT void conic_debug(const Function& f, const std::string &filename);
 
-  /** Generate native code in the interfaced language for debugging */
+  /** \brief Generate native code in the interfaced language for debugging, to a stream */
   CASADI_EXPORT void conic_debug(const Function& f, std::ostream &file);
 
   /** @} */
@@ -175,19 +542,19 @@ enum ConicInput {
   CONIC_G,
   /// The matrix A: sparse, (nc x n) - product with x must be dense.
   CONIC_A,
-  /// dense, (nc x 1)
+  /// dense, (nc x 1), default -inf
   CONIC_LBA,
-  /// dense, (nc x 1)
+  /// dense, (nc x 1), default +inf
   CONIC_UBA,
-  /// dense, (n x 1)
+  /// dense, (n x 1), default -inf
   CONIC_LBX,
-  /// dense, (n x 1)
+  /// dense, (n x 1), default +inf
   CONIC_UBX,
-  /// dense, (n x 1)
+  /// dense, (n x 1), initial guess, default 0
   CONIC_X0,
-  /// dense
+  /// dense, (n x 1), initial guess for the multipliers of the simple bounds, default 0
   CONIC_LAM_X0,
-  /// dense
+  /// dense, (nc x 1), initial guess for the multipliers of the linear constraints, default 0
   CONIC_LAM_A0,
   /// The matrix Q: sparse symmetric, (np^2 x n)
   CONIC_Q,
@@ -201,9 +568,10 @@ enum ConicOutput {
   CONIC_X,
   /// The optimal cost
   CONIC_COST,
-  /// The dual solution corresponding to linear bounds
+  /// The dual solution corresponding to linear bounds; negative for an active lower bound,
+  /// positive for an active upper bound
   CONIC_LAM_A,
-  /// The dual solution corresponding to simple bounds
+  /// The dual solution corresponding to simple bounds; same sign convention
   CONIC_LAM_X,
   CONIC_NUM_OUT};
 #endif // SWIG

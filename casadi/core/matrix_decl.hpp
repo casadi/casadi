@@ -87,6 +87,36 @@ namespace casadi {
       all non-identical-zero elements.\n
       The sparsity can be accessed with Sparsity& sparsity()\n
 
+      SX holds symbolic scalar entries (SXElem), DM holds doubles. A structural zero prints
+      as 00, a numerical zero as 0. The structural nonzeros are available as a flat
+      column-major vector with nonzeros().
+
+      \doctest
+      >>> A = DM([[1, 2], [3, 4]])
+      >>> A.sparsity().dim(), A.nonzeros()
+      ('2x2', [1.0, 3.0, 2.0, 4.0])
+      >>> S = DM(Sparsity.diag(2))
+      >>> S
+      DM(
+      [[1, 00],
+       [00, 1]])
+      >>> S.nnz(), S.numel()
+      (2, 4)
+      \enddoctest
+
+      \doctest{matlab}
+      >> A = DM([1 2; 3 4]);
+      >> A.sparsity().dim(), A.nonzeros()
+      2x2
+      1 3 2 4
+      >> S = DM(Sparsity.diag(2));
+      >> S
+      [[1, 00],
+       [00, 1]]
+      >> fprintf('%d %d\n', S.nnz(), S.numel())
+      2 4
+      \enddoctest
+
       \author Joel Andersson
       \date 2010-2014
 
@@ -99,13 +129,22 @@ namespace casadi {
     public SWIG_IF_ELSE(PrintableCommon, Printable<Matrix<Scalar> >) {
   public:
 
-    /** \brief  constructors
+    /** \brief Empty 0-by-0 matrix
+
+        \doctest
+        >>> DM().dim(), SX().is_empty()
+        ('0x0', True)
+        \enddoctest
+
+        \doctest{matlab}
+        >> fprintf('%s %d\n', DM().dim(), SX().is_empty())
+        0x0 1
+        \enddoctest
 
         \identifier{18f} */
-    /// empty 0-by-0 matrix constructor
     Matrix();
 
-    /// Copy constructor
+    /// Copy constructor: the copy has its own sparsity pattern and nonzeros
     Matrix(const Matrix<Scalar>& m);
 
 #ifndef SWIG
@@ -113,7 +152,36 @@ namespace casadi {
     Matrix<Scalar>& operator=(const Matrix<Scalar>& m);
 #endif // SWIG
 
-    /** \brief Create a sparse matrix with all structural zeros
+    /** \brief Create a matrix of the given shape with all structural zeros (no nonzeros)
+
+        The result has nnz()==0. Use zeros(nrow, ncol) for a dense matrix of numerical zeros.
+        Structural zeros print as 00.
+
+        \param nrow Number of rows, nonnegative
+        \param ncol Number of columns, nonnegative
+
+        \doctest
+        >>> DM(2, 3)
+        DM(
+        [[00, 00, 00],
+         [00, 00, 00]])
+        >>> DM(2, 3).nnz(), DM.zeros(2, 3).nnz()
+        (0, 6)
+        >>> SX(2, 0).dim()
+        '2x0'
+        \enddoctest
+
+        \doctest{matlab}
+        >> DM(2, 3)
+        [[00, 00, 00],
+         [00, 00, 00]]
+        >> fprintf('%d %d\n', DM(2, 3).nnz(), DM.zeros(2, 3).nnz())
+        0 6
+        >> SX(2, 0).dim()
+        2x0
+        \enddoctest
+
+        \sa zeros, ones
 
         \identifier{18g} */
     Matrix(casadi_int nrow, casadi_int ncol);
@@ -135,26 +203,100 @@ namespace casadi {
     const std::vector<Scalar>* operator->() const;
 #endif // SWIG
 
-    /** \brief Create a sparse matrix from a sparsity pattern.
+    /** \brief Create a matrix with the given sparsity pattern and all nonzeros equal to one
 
-        Same as Matrix::ones(sparsity)
+        Same as ones(sp).
+
+        \doctest
+        >>> DM(Sparsity.diag(2))
+        DM(
+        [[1, 00],
+         [00, 1]])
+        \enddoctest
+
+        \doctest{matlab}
+        >> DM(Sparsity.diag(2))
+        [[1, 00],
+         [00, 1]]
+        \enddoctest
 
         \identifier{18k} */
     explicit Matrix(const Sparsity& sp);
 
-    /** \brief Construct matrix with a given sparsity and nonzeros
+    /** \brief Create a matrix with a given sparsity pattern and given nonzeros
+
+        \param sp Sparsity pattern of the result
+        \param d Either a scalar, which is used for every structural nonzero, or a dense
+                 vector (row or column) with exactly sp.nnz() entries, in column-major order
+                 of the pattern. Anything else raises an error.
+
+        \doctest
+        >>> DM(Sparsity.diag(2), [5, 6])
+        DM(
+        [[5, 00],
+         [00, 6]])
+        >>> DM(Sparsity.diag(2), 5)
+        DM(
+        [[5, 00],
+         [00, 5]])
+        >>> SX(Sparsity.lower(2), SX.sym("v", 3))
+        SX(
+        [[v_0, 00],
+         [v_1, v_2]])
+        >>> try: DM(Sparsity.diag(3), [1, 2])
+        ... except Exception as e: print("error")
+        error
+        \enddoctest
+
+        \doctest{matlab}
+        >> DM(Sparsity.diag(2), [5; 6])
+        [[5, 00],
+         [00, 6]]
+        >> DM(Sparsity.diag(2), 5)
+        [[5, 00],
+         [00, 5]]
+        >> SX(Sparsity.lower(2), SX.sym('v', 3))
+        [[v_0, 00],
+         [v_1, v_2]]
+        >> try, DM(Sparsity.diag(3), [1; 2]); catch e, disp('error'); end
+        error
+        \enddoctest
 
         \identifier{18l} */
     Matrix(const Sparsity& sp, const Matrix<Scalar>& d);
 
-    /// This constructor enables implicit type conversion from a numeric type
+    /// Dense 1-by-1 matrix holding a number; enables implicit conversion from a numeric type
     Matrix(double val);
 
 #if !(defined(SWIG) && defined(SWIGMATLAB))
-    /// Dense matrix constructor with data given as vector of vectors
+    /** \brief Dense matrix from a list of rows
+
+        Every row must have the same length; a ragged input raises an error.
+        An empty outer list gives a 0-by-1 matrix.
+        At the Python level, 2-D NumPy arrays and SciPy sparse matrices are accepted as well;
+        a sparse input keeps its sparsity pattern.
+
+        \doctest
+        >>> DM([[1, 2], [3, 4]])
+        DM(
+        [[1, 2],
+         [3, 4]])
+        >>> DM(np.array([[1, 2], [3, 4]])).dim()
+        '2x2'
+        >>> try: DM([[1, 2], [3]])
+        ... except Exception as e: print("error")
+        error
+        \enddoctest */
     explicit Matrix(const std::vector< std::vector<double> >& m);
 
-    /** \brief  Create an expression from a vector
+    /** \brief Dense column vector from a flat list of numbers
+
+        A 1-D NumPy array also gives a column vector.
+
+        \doctest
+        >>> DM([1, 2, 3]).dim(), DM(np.array([1, 2, 3])).dim(), DM([]).dim()
+        ('3x1', '3x1', '0x1')
+        \enddoctest
 
         \identifier{18m} */
     template<typename A>
@@ -167,7 +309,29 @@ namespace casadi {
 
     /** \brief Create a matrix from another matrix with a different entry type
 
-     *  Assumes that the scalar conversion is valid.
+        The sparsity pattern is kept and every nonzero is converted.
+        SX(DM) always works. DM(SX) requires constant entries: a symbolic entry is
+        converted to nan without an error. Use evalf to get an error instead.
+
+        \doctest
+        >>> SX(DM(Sparsity.diag(2))).dim()
+        '2x2'
+        >>> DM(SX([1, 2]))
+        DM([1, 2])
+        >>> DM(SX.sym("x"))
+        DM(nan)
+        \enddoctest
+
+        \doctest{matlab}
+        >> SX(DM(Sparsity.diag(2))).dim()
+        2x2
+        >> DM(SX([1; 2]))
+        [1, 2]
+        >> DM(SX.sym('x'))
+        nan
+        \enddoctest
+
+        \sa evalf
 
         \identifier{18n} */
     template<typename A>
@@ -222,21 +386,171 @@ namespace casadi {
     using B::mtimes;
 #endif // SWIG
 
-    /// Returns true if the matrix has a non-zero at location rr, cc
+    /** \brief Check whether element (rr, cc) is a structural nonzero
+
+        Looks only at the sparsity pattern; a stored numerical zero still counts as a nonzero.
+        Negative indices count from the end. An index past the end raises an error.
+
+        \doctest
+        >>> S = DM(Sparsity.diag(2))
+        >>> S.has_nz(0, 0), S.has_nz(0, 1), DM([0, 1]).has_nz(0, 0)
+        (True, False, True)
+        \enddoctest
+
+        \doctest{matlab}
+        >> S = DM(Sparsity.diag(2));
+        >> fprintf('%d %d %d\n', S.has_nz(0, 0), S.has_nz(0, 1), DM([0; 1]).has_nz(0, 0))
+        1 0 1
+        \enddoctest
+
+        \sa has_zeros, Sparsity::has_nz */
     bool has_nz(casadi_int rr, casadi_int cc) const;
 
-    /// Returns the truth value of a Matrix
+    /** \brief Truth value of a 1-by-1 matrix (Python: bool(x))
+
+        Only defined for 1-by-1 matrices; other shapes raise an error.
+        A structurally empty 1-by-1 matrix is false. A symbolic SX entry raises an error
+        unless the on-the-fly simplifications already decided its value (x==x is true).
+
+        \doctest
+        >>> bool(DM(2)), bool(DM(0)), bool(DM(1, 1))
+        (True, False, False)
+        >>> x = SX.sym("x")
+        >>> bool(x == x)
+        True
+        >>> try: bool(x > 0)
+        ... except Exception as e: print("error")
+        error
+        \enddoctest */
     bool __nonzero__() const;
 
     ///@{
-    /// Get a submatrix, single argument
+    /** \brief Get elements by a single (linear) index
+
+        Backs the Python expressions x[k] and x[sp]. The index addresses elements, not
+        nonzeros, in column-major order: element (i, j) has linear index i + j*size1().
+        Negative indices count from the end; out-of-range indices raise an error.
+
+        - A scalar index returns a 1-by-1 matrix. If that element is a structural zero,
+          the result is structurally empty (prints 00).
+        - A Slice (Python slice) or a list of indices returns a column vector,
+          except that indexing a row vector gives a row vector.
+        - A matrix of indices (IM) returns a matrix of the same shape.
+        - A Sparsity pattern must have the same shape as the matrix; the result is the
+          projection of the matrix onto that pattern (entries outside it are dropped).
+
+        Note that the result of a comparison such as A > 2 is a DM of zeros and ones, not a
+        boolean mask: indexing with it uses those values as linear indices. Use a Sparsity
+        pattern or the nz accessor for masking.
+
+        \param ind1 True for one-based indices (MATLAB); Python always passes false
+        \param rr Linear index, Slice or list/matrix of indices
+        \param sp Sparsity pattern of the same shape as the matrix
+
+        \doctest
+        >>> A = DM([[1, 2, 3], [4, 5, 6]])
+        >>> A[1], A[2], A[-1]
+        (DM(4), DM(2), DM(6))
+        >>> A[[0, 5]]
+        DM([1, 6])
+        >>> A[Sparsity.diag(2, 3)]
+        DM(
+        [[1, 00, 00],
+         [00, 5, 00]])
+        >>> S = DM(Sparsity.diag(2))
+        >>> S[1]
+        DM(00)
+        >>> A.get(False, Slice(0, 2))
+        DM([1, 4])
+        >>> try: A[6]
+        ... except Exception as e: print("error")
+        error
+        \enddoctest
+
+        \doctest{matlab}
+        >> A = DM([1 2 3; 4 5 6]);
+        >> A(2), A(3), A(end)
+        4
+        2
+        6
+        >> A([1 6])
+        [[1, 6]]
+        >> A(Sparsity.diag(2, 3))
+        [[1, 00, 00],
+         [00, 5, 00]]
+        >> S = DM(Sparsity.diag(2));
+        >> S(2)
+        00
+        >> A.get(true, [1; 2])
+        [1, 4]
+        >> try, A(7); catch e, disp('error'); end
+        error
+        \enddoctest
+
+        \sa set, get_nz, Sparsity::sub */
     void get(Matrix<Scalar>& SWIG_OUTPUT(m), bool ind1, const Slice& rr) const;
     void get(Matrix<Scalar>& SWIG_OUTPUT(m), bool ind1, const Matrix<casadi_int>& rr) const;
     void get(Matrix<Scalar>& SWIG_OUTPUT(m), bool ind1, const Sparsity& sp) const;
     ///@}
 
-    /// Get a submatrix, two arguments
     ///@{
+    /** \brief Get a submatrix by row and column indices
+
+        Backs the Python expression x[i, j]. Each of \p rr and \p cc is a scalar, a Slice or
+        a list/vector of indices (any order, repetitions allowed, negative counts from the end).
+        The result has len(rr) rows and len(cc) columns and keeps the sparsity of the
+        selected entries. Two scalar indices give a 1-by-1 matrix (structurally empty when the
+        entry is a structural zero). Out-of-range indices raise an error.
+
+        \param ind1 True for one-based indices (MATLAB); Python always passes false
+        \param rr Row index, Slice or list/matrix of row indices
+        \param cc Column index, Slice or list/matrix of column indices
+
+        \doctest
+        >>> A = DM([[1, 2, 3], [4, 5, 6]])
+        >>> A[0, 1], A[1, -1]
+        (DM(2), DM(6))
+        >>> A[:, 1]
+        DM([2, 5])
+        >>> A[[1, 0], [0, 2]]
+        DM(
+        [[4, 6],
+         [1, 3]])
+        >>> A[1:1, :].dim()
+        '0x3'
+        >>> x = SX.sym("x", 2, 2)
+        >>> x[0, :]
+        SX([[x_0, x_2]])
+        >>> DM(Sparsity.diag(2))[1, 0]
+        DM(00)
+        >>> try: A[2, 0]
+        ... except Exception as e: print("error")
+        error
+        \enddoctest
+
+        \doctest{matlab}
+        >> A = DM([1 2 3; 4 5 6]);
+        >> A(1, 2), A(2, end)
+        2
+        6
+        >> A(:, 2)
+        [2, 5]
+        >> A([2 1], [1 3])
+        [[4, 6],
+         [1, 3]]
+        >> B = A(2:1, :); disp(B.dim())
+        0x3
+        >> x = SX.sym('x', 2, 2);
+        >> x(1, :)
+        [[x_0, x_2]]
+        >> S = DM(Sparsity.diag(2));
+        >> S(2, 1)
+        00
+        >> try, A(3, 1); catch e, disp('error'); end
+        error
+        \enddoctest
+
+        \sa set */
     void get(Matrix<Scalar>& SWIG_OUTPUT(m), bool ind1,
                 const Slice& rr, const Slice& cc) const;
     void get(Matrix<Scalar>& SWIG_OUTPUT(m), bool ind1,
@@ -248,14 +562,130 @@ namespace casadi {
     ///@}
 
     ///@{
-    /// Set a submatrix, single argument
+    /** \brief Assign elements by a single (linear) index
+
+        Backs the Python statements x[k] = v and x[sp] = v. Indices are linear, column-major
+        and zero-based (see get). The matrix is modified in place.
+
+        - \p m must be a scalar (assigned to every selected element) or have as many
+          entries as there are indices (a vector of the other orientation is transposed).
+          Any other shape raises an error.
+        - Assigning to a structural zero inserts a new nonzero; the sparsity pattern grows.
+          Assigning a structurally empty value (e.g. DM(1, 1)) removes the entry instead.
+        - With a Sparsity index of the same shape, the entries at the pattern's positions
+          receive \p m (a scalar) or the corresponding entries of \p m (a matrix).
+
+        \param m Value(s) to assign
+        \param ind1 True for one-based indices (MATLAB); Python always passes false
+        \param rr Linear index, Slice or list/matrix of indices
+        \param sp Sparsity pattern of the same shape as the matrix
+
+        \doctest
+        >>> A = DM([[1, 2], [3, 4]])
+        >>> A[1] = 10; A[[0, 3]] = [7, 8]
+        >>> A
+        DM(
+        [[7, 2],
+         [10, 8]])
+        >>> A[Sparsity.diag(2)] = 0
+        >>> A
+        DM(
+        [[0, 2],
+         [10, 0]])
+        >>> S = DM(Sparsity.diag(2))
+        >>> S[1] = 5
+        >>> S.nnz(), S[0, 1]
+        (3, DM(00))
+        >>> try: A[[0, 1]] = [1, 2, 3]
+        ... except Exception as e: print("error")
+        error
+        \enddoctest
+
+        \doctest{matlab}
+        >> A = DM([1 2; 3 4]);
+        >> A(2) = 10; A([1 4]) = [7 8];
+        >> A
+        [[7, 2],
+         [10, 8]]
+        >> A(Sparsity.diag(2)) = 0;
+        >> A
+        [[0, 2],
+         [10, 0]]
+        >> S = DM(Sparsity.diag(2));
+        >> S(2) = 5;
+        >> S.nnz(), S(1, 2)
+        3
+        00
+        >> try, A([1 2]) = [1 2 3]; catch e, disp('error'); end
+        error
+        \enddoctest
+
+        \sa get, set_nz, erase */
     void set(const Matrix<Scalar>& m, bool ind1, const Slice& rr);
     void set(const Matrix<Scalar>& m, bool ind1, const Matrix<casadi_int>& rr);
     void set(const Matrix<Scalar>& m, bool ind1, const Sparsity& sp);
     ///@}
 
     ///@{
-    /// Set a submatrix, two arguments
+    /** \brief Assign a submatrix by row and column indices
+
+        Backs the Python statement x[i, j] = v. The matrix is modified in place.
+        \p m must be len(rr)-by-len(cc), a scalar (broadcast to all selected entries) or a
+        vector of the transposed orientation (transposed automatically); other shapes raise
+        an error. Assigning into structural zeros inserts nonzeros; assigning a sparse \p m
+        first erases the selected block, so its structural zeros become structural zeros.
+
+        \param m Value(s) to assign
+        \param ind1 True for one-based indices (MATLAB); Python always passes false
+        \param rr Row index, Slice or list/matrix of row indices
+        \param cc Column index, Slice or list/matrix of column indices
+
+        \doctest
+        >>> A = DM([[1, 2, 3], [4, 5, 6]])
+        >>> A[0, 1] = 9; A[1, :] = 0
+        >>> A
+        DM(
+        [[1, 9, 3],
+         [0, 0, 0]])
+        >>> A[0, :] = DM([7, 8, 9])
+        >>> A[0, :]
+        DM([[7, 8, 9]])
+        >>> A[:, 0] = DM(2, 1)
+        >>> A.nnz()
+        4
+        >>> x = SX.sym("x", 2, 2)
+        >>> x[0, 0] = 0
+        >>> x
+        SX(
+        [[0, x_2],
+         [x_1, x_3]])
+        >>> try: A[0, :] = [1, 2]
+        ... except Exception as e: print("error")
+        error
+        \enddoctest
+
+        \doctest{matlab}
+        >> A = DM([1 2 3; 4 5 6]);
+        >> A(1, 2) = 9; A(2, :) = 0;
+        >> A
+        [[1, 9, 3],
+         [0, 0, 0]]
+        >> A(1, :) = DM([7; 8; 9]);
+        >> A(1, :)
+        [[7, 8, 9]]
+        >> A(:, 1) = DM(2, 1);
+        >> A.nnz()
+        4
+        >> x = SX.sym('x', 2, 2);
+        >> x(1, 1) = 0;
+        >> x
+        [[0, x_2],
+         [x_1, x_3]]
+        >> try, A(1, :) = [1 2]; catch e, disp('error'); end
+        error
+        \enddoctest
+
+        \sa get */
     void set(const Matrix<Scalar>& m, bool ind1, const Slice& rr, const Slice& cc);
     void set(const Matrix<Scalar>& m, bool ind1, const Slice& rr, const Matrix<casadi_int>& cc);
     void set(const Matrix<Scalar>& m, bool ind1, const Matrix<casadi_int>& rr, const Slice& cc);
@@ -264,13 +694,96 @@ namespace casadi {
     ///@}
 
     ///@{
-    /// Get a set of nonzeros
+    /** \brief Get structural nonzeros by their position in the nonzero storage
+
+        Backs the Python expression x.nz[k]. Index k runs over the nonzeros in column-major
+        order, 0 <= k < nnz(); negative values count from the end and out-of-range values
+        raise an error. Structural zeros are skipped, so for a dense matrix this coincides
+        with linear indexing. The result is a column vector shaped like the index
+        (a row vector when indexing a row vector; a matrix for a matrix index).
+        Iterating over x.nz in Python yields the nonzeros one by one.
+
+        \param ind1 True for one-based indices (MATLAB); Python always passes false
+        \param k Nonzero index, Slice or list/matrix of indices
+
+        \doctest
+        >>> S = DM(Sparsity.diag(3)); S[0, 2] = 7
+        >>> S.nz[:]
+        DM([1, 1, 7, 1])
+        >>> S.nz[2], S.nz[-1], len(S.nz)
+        (DM(7), DM(1), 4)
+        >>> x = SX.sym("x", Sparsity.lower(2))
+        >>> x.nz[[0, 2]]
+        SX([x_0, x_2])
+        >>> SX.sym("e", 2, 0).nz[:].dim()
+        '0x1'
+        >>> try: S.nz[4]
+        ... except Exception as e: print("error")
+        error
+        \enddoctest
+
+        \doctest{matlab}
+        >> S = DM(Sparsity.diag(3)); S(1, 3) = 7;
+        >> S.get_nz(true, Slice())
+        [1, 1, 7, 1]
+        >> S.get_nz(true, 3), S.get_nz(true, [1; 3])
+        7
+        [1, 7]
+        >> x = SX.sym('x', Sparsity.lower(2));
+        >> x.get_nz(true, [1; 3])
+        [x_0, x_2]
+        >> SX.sym('e', 2, 0).get_nz(true, Slice()).dim()
+        0x1
+        >> try, S.get_nz(true, 5); catch e, disp('error'); end
+        error
+        \enddoctest
+
+        \sa set_nz, get, nonzeros */
     void get_nz(Matrix<Scalar>& SWIG_OUTPUT(m), bool ind1, const Slice& k) const;
     void get_nz(Matrix<Scalar>& SWIG_OUTPUT(m), bool ind1, const Matrix<casadi_int>& k) const;
     ///@}
 
     ///@{
-    /// Set a set of nonzeros
+    /** \brief Assign structural nonzeros by their position in the nonzero storage
+
+        Backs the Python statement x.nz[k] = v. The sparsity pattern never changes: only
+        stored values are overwritten (writing 0 keeps the entry as a structural nonzero).
+        \p m must be a scalar (assigned to every selected nonzero) or have as many entries
+        as there are indices; a mismatch raises an error.
+
+        \param m Value(s) to assign
+        \param ind1 True for one-based indices (MATLAB); Python always passes false
+        \param k Nonzero index, Slice or list/matrix of indices
+
+        \doctest
+        >>> S = DM(Sparsity.diag(3))
+        >>> S.nz[:] = [4, 5, 6]; S.nz[0] = 0
+        >>> S
+        DM(
+        [[0, 00, 00],
+         [00, 5, 00],
+         [00, 00, 6]])
+        >>> S.nnz()
+        3
+        >>> try: S.nz[[0, 1]] = [1, 2, 3]
+        ... except Exception as e: print("error")
+        error
+        \enddoctest
+
+        \doctest{matlab}
+        >> S = DM(Sparsity.diag(3));
+        >> S.set_nz([4 5 6], true, 1:3); S.set_nz(0, true, 1);
+        >> S
+        [[0, 00, 00],
+         [00, 5, 00],
+         [00, 00, 6]]
+        >> S.nnz()
+        3
+        >> try, S.set_nz([1 2 3], true, [1 2]); catch e, disp('error'); end
+        error
+        \enddoctest
+
+        \sa get_nz, set */
     void set_nz(const Matrix<Scalar>& m, bool ind1, const Slice& k);
     void set_nz(const Matrix<Scalar>& m, bool ind1, const Matrix<casadi_int>& k);
     ///@}
@@ -550,42 +1063,188 @@ namespace casadi {
 \addtogroup expression_tools
 @{
 */
-    /** \brief Matrix adjoint
+    /** \brief Adjugate (classical adjoint) of a square matrix
+
+        Transpose of the cofactor matrix, computed by Laplace expansion. For an invertible
+        matrix inv(A) == adj(A)/det(A). Cost grows factorially with the size; intended for
+        small (symbolic) matrices. A structural zero cofactor stays structurally zero.
+        A non-square input raises an error.
+
+        \doctest
+        >>> adj(DM([[1, 2], [3, 4]]))
+        DM(
+        [[4, -2],
+         [-3, 1]])
+        >>> X = SX.sym("X", 2, 2)
+        >>> adj(X)
+        SX(
+        [[X_3, (-X_2)],
+         [(-X_1), X_0]])
+        >>> adj(DM(5)), adj(DM(Sparsity.diag(3))).nnz()
+        (DM(1), 3)
+        \enddoctest
+
+        \doctest{matlab}
+        >> adj(DM([1 2; 3 4]))
+        [[4, -2],
+         [-3, 1]]
+        >> X = SX.sym('X', 2, 2);
+        >> adj(X)
+        [[X_3, (-X_2)],
+         [(-X_1), X_0]]
+        >> adj(DM(5)), adj(DM(Sparsity.diag(3))).nnz()
+        1
+        3
+        \enddoctest
+
+        \sa inv_minor, cofactor, det
 
         \identifier{18p} */
     friend inline Matrix<Scalar> adj(const Matrix<Scalar>& A) {
       return Matrix<Scalar>::adj(A);
     }
 
-    /** \brief Get the (i,j) minor matrix
+    /** \brief Minor of a square matrix: determinant with one column and one row removed
+
+        Note the argument order: \p i is the column that is removed, \p j the row.
+        The input must be square; a 1-by-1 input gives 1.
+
+        \param x Square matrix
+        \param i Column index to remove (zero-based)
+        \param j Row index to remove (zero-based)
+
+        \doctest
+        >>> A = DM([[1, 2, 3], [0, 1, 4], [5, 6, 0]])
+        >>> minor(A, 0, 1)
+        DM(-18)
+        >>> X = SX.sym("X", 2, 2)
+        >>> minor(X, 0, 1)
+        SX(X_2)
+        \enddoctest
+
+        \doctest{matlab}
+        >> A = DM([1 2 3; 0 1 4; 5 6 0]);
+        >> minor(A, 0, 1)
+        -18
+        >> X = SX.sym('X', 2, 2);
+        >> minor(X, 0, 1)
+        X_2
+        \enddoctest
+
+        \sa cofactor, adj, det
 
         \identifier{18q} */
     friend inline Matrix<Scalar> minor(const Matrix<Scalar> &x, casadi_int i, casadi_int j) {
       return Matrix<Scalar>::minor(x, i, j);
     }
 
-    /** \brief Get the (i,j) cofactor matrix
+    /** \brief Cofactor of a square matrix: (-1)^(i+j) times minor(x, i, j)
+
+        Same argument convention as minor: \p i is a column index, \p j a row index.
+
+        \doctest
+        >>> A = DM([[1, 2, 3], [0, 1, 4], [5, 6, 0]])
+        >>> cofactor(A, 0, 1), cofactor(A, 0, 0)
+        (DM(18), DM(-24))
+        \enddoctest
+
+        \doctest{matlab}
+        >> A = DM([1 2 3; 0 1 4; 5 6 0]);
+        >> cofactor(A, 0, 1), cofactor(A, 0, 0)
+        18
+        -24
+        \enddoctest
+
+        \sa minor, adj
 
         \identifier{18r} */
     friend inline Matrix<Scalar> cofactor(const Matrix<Scalar> &x, casadi_int i, casadi_int j) {
       return Matrix<Scalar>::cofactor(x, i, j);
     }
 
-    /** \brief  QR factorization using the modified Gram-Schmidt algorithm
+    /** \brief Dense QR factorization using the modified Gram-Schmidt algorithm
 
-     * More stable than the classical Gram-Schmidt, but may break down if the rows of A
-     * are nearly linearly dependent
-     * See J. Demmel: Applied Numerical Linear Algebra (algorithm 3.1.).
-     * Note that in SWIG, Q and R are returned by value.
+        Factorizes A = Q*R with Q of the same shape as A (orthonormal columns) and R square
+        upper triangular. More stable than classical Gram-Schmidt, but breaks down (nan
+        entries, no error) when the columns of A are (nearly) linearly dependent.
+        A must have at least as many rows as columns. Works symbolically on SX.
+        See J. Demmel: Applied Numerical Linear Algebra (algorithm 3.1).
+        In Python and MATLAB, Q and R are returned as a tuple.
+
+        \doctest
+        >>> Q, R = qr(DM([[3, 1], [4, 2]]))
+        >>> Q
+        DM(
+        [[0.6, -0.8],
+         [0.8, 0.6]])
+        >>> R
+        DM(
+        [[5, 2.2],
+         [00, 0.4]])
+        >>> mtimes(Q, R)
+        DM(
+        [[3, 1],
+         [4, 2]])
+        >>> try: qr(DM([[1, 2, 3]]))
+        ... except Exception as e: print("error")
+        error
+        \enddoctest
+
+        \doctest{matlab}
+        >> [Q, R] = qr(DM([3 1; 4 2]));
+        >> Q
+        [[0.6, -0.8],
+         [0.8, 0.6]]
+        >> R
+        [[5, 2.2],
+         [00, 0.4]]
+        >> Q*R
+        [[3, 1],
+         [4, 2]]
+        >> try, [Q, R] = qr(DM([1 2 3])); catch e, disp('error'); end
+        error
+        \enddoctest
+
+        \sa qr_sparse, chol, ldl
 
         \identifier{18s} */
     friend inline void qr(const Matrix<Scalar>& A, Matrix<Scalar>& Q, Matrix<Scalar>& R) {
       return Matrix<Scalar>::qr(A, Q, R);
     }
 
-    /** \brief Sparse direct QR factorization
+    /** \brief Sparse direct QR factorization with Householder reflections
 
-     * See T. Davis: Direct Methods for Sparse Linear Systems
+        Computes a compact representation of Q (Householder vectors \p V and scaling factors
+        \p beta), the upper triangular factor \p R and the row and column permutations
+        \p prinv and \p pc that were applied, so that the factors can be reused by qr_solve.
+        See T. Davis: Direct Methods for Sparse Linear Systems. Works symbolically on SX.
+
+        \param A Matrix to factorize
+        \param amd Use an approximate minimum degree column ordering to reduce fill-in
+        \return V, R, beta, prinv, pc (a tuple in Python)
+
+        \doctest
+        >>> A = DM([[3, 1], [4, 2]])
+        >>> V, R, beta, prinv, pc = qr_sparse(A)
+        >>> R
+        DM(
+        [[5, 2.2],
+         [00, 0.4]])
+        >>> qr_solve(DM([1, 2]), V, R, beta, prinv, pc)
+        DM([0, 1])
+        \enddoctest
+
+        \doctest{matlab}
+        >> A = DM([3 1; 4 2]);
+        >> [V, R, beta, prinv, pc] = qr_sparse(A);
+        >> R
+        [[5, 2.2],
+         [00, 0.4]]
+        >> qr_solve(DM([1; 2]), V, R, beta, prinv, pc)
+        [0, 1]
+        \enddoctest
+
+        \sa qr_solve, Sparsity::qr_sparse, qr
 
         \identifier{18t} */
     friend inline void qr_sparse(const Matrix<Scalar>& A, Matrix<Scalar>& V, Matrix<Scalar>& R,
@@ -594,7 +1253,32 @@ namespace casadi {
       return Matrix<Scalar>::qr_sparse(A, V, R, beta, prinv, pc, amd);
     }
 
-    /** \brief Solve using a sparse QR factorization
+    /** \brief Solve A*x = b (or A^T*x = b) with the factors returned by qr_sparse
+
+        \param b Right-hand side, one column per system; a sparse \p b is densified
+        \param v, r, beta, prinv, pc Output of qr_sparse(A)
+        \param tr Solve with the transpose of A instead
+        \return Dense solution with the shape of \p b
+
+        \doctest
+        >>> A = DM([[3, 1], [4, 2]])
+        >>> V, R, beta, prinv, pc = qr_sparse(A)
+        >>> qr_solve(DM([1, 2]), V, R, beta, prinv, pc, True)
+        DM([-3, 2.5])
+        >>> solve(A.T, DM([1, 2]))
+        DM([-3, 2.5])
+        \enddoctest
+
+        \doctest{matlab}
+        >> A = DM([3 1; 4 2]);
+        >> [V, R, beta, prinv, pc] = qr_sparse(A);
+        >> qr_solve(DM([1; 2]), V, R, beta, prinv, pc, true)
+        [-3, 2.5]
+        >> solve(A', DM([1; 2]))
+        [-3, 2.5]
+        \enddoctest
+
+        \sa qr_sparse, solve
 
         \identifier{18u} */
     friend inline Matrix<Scalar>
@@ -605,21 +1289,88 @@ namespace casadi {
         return Matrix<Scalar>::qr_solve(b, v, r, beta, prinv, pc, tr);
     }
 
-    /** \brief Obtain a Cholesky factorisation of a matrix
+    /** \brief Cholesky factorization of a symmetric positive definite matrix
 
-     * Performs and LDL transformation [L,D] = ldl(A) and
-     * returns diag(sqrt(D))*L'
+        Returns the upper triangular factor R with R^T*R == A, obtained from the sparse
+        LDL^T factorization (without fill-reducing permutation) as diag(sqrt(D))*L^T.
+        The sparsity pattern of A must be symmetric; otherwise an error is raised. An
+        indefinite A gives nan entries without an error. Works symbolically on SX.
+
+        \doctest
+        >>> R = chol(DM([[4, 2], [2, 3]]))
+        >>> R
+        DM(
+        [[2, 1],
+         [00, 1.41421]])
+        >>> mtimes(R.T, R)
+        DM(
+        [[4, 2],
+         [2, 3]])
+        >>> chol(DM(Sparsity.diag(3)) * 4).nnz()
+        3
+        \enddoctest
+
+        \doctest{matlab}
+        >> R = chol(DM([4 2; 2 3]));
+        >> R
+        [[2, 1],
+         [00, 1.41421]]
+        >> R'*R
+        [[4, 2],
+         [2, 3]]
+        >> chol(DM(Sparsity.diag(3)) * 4).nnz()
+        3
+        \enddoctest
+
+        \sa ldl, qr
 
         \identifier{18v} */
     friend inline Matrix<Scalar> chol(const Matrix<Scalar>& A) {
       return Matrix<Scalar>::chol(A);
     }
 
-    /** \brief Sparse LDL^T factorization
+    /** \brief Sparse LDL^T factorization of a symmetric matrix
 
-     * Returns D and the strictly upper triangular entries of L^T
-     * I.e. ones on the diagonal are ignored.
-     * Only guarenteed to work for positive definite matrices.
+        Computes A(p, p) = L*diag(D)*L^T with L unit lower triangular. Returns \p D as a
+        vector, \p LT holding the strictly upper triangular entries of L^T (the unit diagonal
+        is omitted), and the permutation \p p. Only the upper triangle of A is referenced.
+        The sparsity pattern of A must be symmetric. Only guaranteed to work for positive
+        definite matrices (no pivoting). Works symbolically on SX.
+
+        \param A Square matrix with symmetric sparsity pattern
+        \param amd Use an approximate minimum degree ordering to reduce fill-in
+        \return D, LT, p (a tuple in Python)
+
+        \doctest
+        >>> D, LT, p = ldl(DM([[4, 2], [2, 3]]))
+        >>> D, p
+        (DM([4, 2]), [0, 1])
+        >>> LT
+        DM(
+        [[00, 0.5],
+         [00, 00]])
+        >>> L = DM.eye(2) + LT.T
+        >>> mtimes(mtimes(L, diag(D)), L.T)
+        DM(
+        [[4, 2],
+         [2, 3]])
+        \enddoctest
+
+        \doctest{matlab}
+        >> [D, LT, p] = ldl(DM([4 2; 2 3]));
+        >> D, p
+        [4, 2]
+        0 1
+        >> LT
+        [[00, 0.5],
+         [00, 00]]
+        >> L = DM.eye(2) + LT';
+        >> L*diag(D)*L'
+        [[4, 2],
+         [2, 3]]
+        \enddoctest
+
+        \sa ldl_solve, chol, Sparsity::ldl
 
         \identifier{18w} */
     friend inline void ldl(const Matrix<Scalar>& A, Matrix<Scalar>& D, Matrix<Scalar>& LT,
@@ -627,7 +1378,31 @@ namespace casadi {
       return Matrix<Scalar>::ldl(A, D, LT, p, amd);
     }
 
-    /** \brief Solve using a sparse LDL^T factorization
+    /** \brief Solve A*x = b with the factors returned by ldl
+
+        \param b Right-hand side, one column per system; a sparse \p b is densified
+        \param D, LT, p Output of ldl(A)
+        \return Dense solution with the shape of \p b
+
+        \doctest
+        >>> A = DM([[4, 2], [2, 3]])
+        >>> D, LT, p = ldl(A)
+        >>> ldl_solve(DM([1, 2]), D, LT, p)
+        DM([-0.125, 0.75])
+        >>> solve(A, DM([1, 2]))
+        DM([-0.125, 0.75])
+        \enddoctest
+
+        \doctest{matlab}
+        >> A = DM([4 2; 2 3]);
+        >> [D, LT, p] = ldl(A);
+        >> ldl_solve(DM([1; 2]), D, LT, p)
+        [-0.125, 0.75]
+        >> solve(A, DM([1; 2]))
+        [-0.125, 0.75]
+        \enddoctest
+
+        \sa ldl, solve
 
         \identifier{18x} */
     friend inline Matrix<Scalar>
@@ -636,21 +1411,65 @@ namespace casadi {
       return Matrix<Scalar>::ldl_solve(b, D, LT, p);
     }
 
-    /** \brief Returns true only if any element in the matrix is true
+    /** \brief True if any entry equals one
+
+        Returns a 1-by-1 matrix. A matrix with structural zeros gives false.
+        Not available in Python (shadowed by the builtin); use logic_any or sum1/sum2.
+
+        \doctest{matlab}
+        >> any(DM([0; 1])), any(DM([0; 0]))
+        1
+        0
+        >> any(DM(Sparsity.diag(2)))
+        0
+        \enddoctest
+
+        \sa all, logic_any
 
         \identifier{18y} */
     friend inline Matrix<Scalar> any(const Matrix<Scalar> &x) {
       return Matrix<Scalar>::any(x);
     }
 
-    /** \brief Returns true only if every element in the matrix is true
+    /** \brief True if every entry equals one
+
+        Returns a 1-by-1 matrix. A matrix with structural zeros gives false.
+        Not available in Python (shadowed by the builtin); use logic_all.
+
+        \doctest{matlab}
+        >> all(DM([1; 1])), all(DM([0; 1]))
+        1
+        0
+        >> all(DM(Sparsity.diag(2)))
+        0
+        \enddoctest
+
+        \sa any, logic_all
 
         \identifier{18z} */
     friend inline Matrix<Scalar> all(const Matrix<Scalar> &x) {
       return Matrix<Scalar>::all(x);
     }
 
-    /** \brief Inf-norm of a Matrix-Matrix product
+    /** \brief Infinity norm of a matrix product, without forming the product
+
+        Equals norm_inf(mtimes(x, y)): the largest absolute entry of x*y. Exploits sparsity;
+        a shape mismatch raises an error. Works symbolically on SX.
+
+        \doctest
+        >>> A = DM([[1, 2], [3, 4]])
+        >>> norm_inf_mul(A, A), norm_inf(mtimes(A, A))
+        (DM(22), DM(22))
+        \enddoctest
+
+        \doctest{matlab}
+        >> A = DM([1 2; 3 4]);
+        >> norm_inf_mul(A, A), norm_inf(A*A)
+        22
+        22
+        \enddoctest
+
+        \sa norm_inf, mtimes
 
         \identifier{190} */
     friend inline Matrix<Scalar>
@@ -658,7 +1477,42 @@ namespace casadi {
       return Matrix<Scalar>::norm_inf_mul(x, y);
     }
 
-    /** \brief  Make a matrix sparse by removing numerical zeros
+    /** \brief Make a matrix sparse by turning numerical zeros into structural zeros
+
+        Every stored entry with absolute value at most \p tol is dropped from the sparsity
+        pattern. With the default tol=0 only exact zeros are removed; SX entries that the
+        symbolic simplifications already reduced to the constant 0 count as zeros.
+        Returns a new matrix; the input is unchanged.
+
+        \param A Matrix to compact
+        \param tol Absolute threshold below which an entry counts as zero
+
+        \doctest
+        >>> sparsify(DM([[1, 0], [0, 2]]))
+        DM(
+        [[1, 00],
+         [00, 2]])
+        >>> A = DM([[1, 0], [1e-9, 2]])
+        >>> sparsify(A).nnz(), sparsify(A, 1e-6).nnz()
+        (3, 2)
+        >>> x = SX.sym("x")
+        >>> sparsify(vertcat(x, 0, x * 0))
+        SX([x, 00, 00])
+        \enddoctest
+
+        \doctest{matlab}
+        >> sparsify(DM([1 0; 0 2]))
+        [[1, 00],
+         [00, 2]]
+        >> A = DM([1 0; 1e-9 2]);
+        >> fprintf('%d %d\n', sparsify(A).nnz(), sparsify(A, 1e-6).nnz())
+        3 2
+        >> x = SX.sym('x');
+        >> sparsify([x; 0; x * 0])
+        [x, 00, 00]
+        \enddoctest
+
+        \sa densify, has_zeros
 
         \identifier{191} */
     friend inline Matrix<Scalar>
@@ -666,7 +1520,37 @@ namespace casadi {
       return Matrix<Scalar>::sparsify(A, tol);
     }
 
-    /** \brief  Expand the expression as a weighted sum (with constant weights)
+    /** \brief Expand a scalar SX expression as a weighted sum of terms with constant weights
+
+        Collects additions, subtractions and multiplications by constants so that
+        ex == dot(weights, terms), merging repeated terms. Any other operation (a product of
+        two non-constant factors, a function call, ...) is kept as a single term with
+        weight 1. The input must be a scalar SX; DM is not supported.
+
+        \return weights and terms, both column vectors (a tuple in Python)
+
+        \doctest
+        >>> x = SX.sym("x"); y = SX.sym("y")
+        >>> w, t = expand(3*x - x + 5*y)
+        >>> w, t
+        (SX([2, 5]), SX([x, y]))
+        >>> w, t = expand(3*(x + y) + 1)
+        >>> t
+        SX([x, y, 1])
+        \enddoctest
+
+        \doctest{matlab}
+        >> x = SX.sym('x'); y = SX.sym('y');
+        >> [w, t] = expand(3*x - x + 5*y);
+        >> w, t
+        [2, 5]
+        [x, y]
+        >> [w, t] = expand(3*(x + y) + 1);
+        >> t
+        [x, y, 1]
+        \enddoctest
+
+        \sa linear_coeff
 
         \identifier{192} */
     friend inline void expand(const Matrix<Scalar>& ex, Matrix<Scalar> &weights,
@@ -674,14 +1558,40 @@ namespace casadi {
       Matrix<Scalar>::expand(ex, weights, terms);
     }
 
-    /** \brief Create a piecewise constant function
+    /** \brief Piecewise constant function of a scalar symbolic variable
 
-        Create a piecewise constant function with n=val.size() intervals
+        Builds an SX expression that equals val[0] for t < tval[0], val[k] for
+        tval[k-1] <= t < tval[k] and val[n-1] for t >= tval[n-2], with n = val.numel().
+        \p tval must be increasing. The result is a sum of step functions, so it is not
+        smooth; its derivative with respect to \p t is zero almost everywhere.
+        Only defined for SX.
 
-        Inputs:
-        \param t a scalar variable (e.g. time)
-        \param tval vector with the discrete values of t at the interval transitions (length n-1)
-        \param val vector with the value of the function for each interval (length n)
+        \param t Scalar SX variable (e.g. time)
+        \param tval Breakpoints, length n-1; a length mismatch raises an error
+        \param val Function value on each interval, length n
+
+        \doctest
+        >>> t = SX.sym("t")
+        >>> e = pw_const(t, [0, 2], [7, 1, 3])
+        >>> f = Function("f", [t], [e])
+        >>> [float(f(v)) for v in [-1, 0, 1, 2, 5]]
+        [7.0, 1.0, 1.0, 3.0, 3.0]
+        >>> try: pw_const(t, [0], [7, 1, 3])
+        ... except Exception as e: print("error")
+        error
+        \enddoctest
+
+        \doctest{matlab}
+        >> t = SX.sym('t');
+        >> e = pw_const(t, [0 2], [7 1 3]);
+        >> f = Function('f', {t}, {e});
+        >> f([-1; 0; 1; 2; 5])
+        [7, 1, 1, 3, 3]
+        >> try, pw_const(t, 0, [7 1 3]); catch e, disp('error'); end
+        error
+        \enddoctest
+
+        \sa pw_lin, if_else, interpolant
 
         \identifier{193} */
     friend inline Matrix<Scalar> pw_const(const Matrix<Scalar> &t,
@@ -690,80 +1600,133 @@ namespace casadi {
       return Matrix<Scalar>::pw_const(t, tval, val);
     }
 
-    /** Create a piecewise linear function
+    /** \brief Piecewise linear function of a scalar symbolic variable
 
-        Create a piecewise linear function:
+        Builds an SX expression that interpolates linearly between the points
+        (tval[k], val[k]). Outside [tval[0], tval[N-1]] the first and last segments are
+        extrapolated. Only defined for SX.
 
-        Inputs:
-        \brief t a scalar variable (e.g. time)
-        \brief tval vector with the the discrete values of t (monotonically increasing)
-        \brief val vector with the corresponding function values (same length as tval)
+        \param t Scalar SX variable (e.g. time)
+        \param tval Breakpoints, increasing, at least two
+        \param val Function values at the breakpoints, same length as \p tval
 
-                                                                                                                \identifier{194} */
+        \doctest
+        >>> t = SX.sym("t")
+        >>> f = Function("f", [t], [pw_lin(t, [0, 1, 3], [0, 2, 1])])
+        >>> [float(f(v)) for v in [-1, 0, 0.5, 1, 2, 3, 4]]
+        [-2.0, 0.0, 1.0, 2.0, 1.5, 1.0, 0.5]
+        >>> try: pw_lin(t, [0], [7])
+        ... except Exception as e: print("error")
+        error
+        \enddoctest
+
+        \doctest{matlab}
+        >> t = SX.sym('t');
+        >> f = Function('f', {t}, {pw_lin(t, [0 1 3], [0 2 1])});
+        >> f([-1; 0; 0.5; 1; 2; 3; 4])
+        [-2, 0, 1, 2, 1.5, 1, 0.5]
+        >> try, pw_lin(t, 0, 7); catch e, disp('error'); end
+        error
+        \enddoctest
+
+        \sa pw_const, interpolant
+
+        \identifier{194} */
     friend inline Matrix<Scalar>
       pw_lin(const Matrix<Scalar> &t, const Matrix<Scalar> &tval,
              const Matrix<Scalar> &val) {
       return Matrix<Scalar>::pw_lin(t, tval, val);
     }
 
-    /**  \brief Heaviside function
-     *
-     * \f[
-     * \begin {cases}
-     * H(x) = 0 & x<0 \\
-     * H(x) = 1/2 & x=0 \\
-     * H(x) = 1 & x>0 \\
-     * \end {cases}
-     * \f]
+    /** \brief Heaviside step function, elementwise
 
-         \identifier{195} */
+        H(x) = 0 for x < 0, 1/2 for x == 0 and 1 for x > 0, computed as (1 + sign(x))/2.
+        Structural zeros of a sparse input become 1/2. Not defined for MX.
+
+        \doctest
+        >>> heaviside(DM([-1, 0, 1]))
+        DM([0, 0.5, 1])
+        >>> heaviside(SX.sym("x"))
+        SX(((1+sign(x))/2))
+        \enddoctest
+
+        \doctest{matlab}
+        >> heaviside(DM([-1; 0; 1]))
+        [0, 0.5, 1]
+        >> heaviside(SX.sym('x'))
+        ((1+sign(x))/2)
+        \enddoctest
+
+        \sa ramp, rectangle, sign
+
+        \identifier{195} */
     friend inline Matrix<Scalar> heaviside(const Matrix<Scalar> &x) {
       return Matrix<Scalar>::heaviside(x);
     }
 
-    /** \brief rectangle function
-     *
-     * \f[
-     * \begin {cases}
-     * \Pi(x) = 1     & |x| < 1/2 \\
-     * \Pi(x) = 1/2   & |x| = 1/2  \\
-     * \Pi(x) = 0     & |x| > 1/2  \\
-     * \end {cases}
-     * \f]
-     *
-     * Also called: gate function, block function, band function, pulse function, window function
+    /** \brief Rectangle (gate, pulse, window) function, elementwise
+
+        1 for |x| < 1/2, 1/2 for |x| == 1/2 and 0 for |x| > 1/2, built from sign.
+        Not defined for MX.
+
+        \doctest
+        >>> rectangle(DM([-1, -0.5, 0, 0.5, 1]))
+        DM([0, 0.5, 1, 0.5, 0])
+        \enddoctest
+
+        \doctest{matlab}
+        >> rectangle(DM([-1; -0.5; 0; 0.5; 1]))
+        [0, 0.5, 1, 0.5, 0]
+        \enddoctest
+
+        \sa triangle, heaviside
 
         \identifier{23n} */
     friend inline Matrix<Scalar> rectangle(const Matrix<Scalar> &x) {
       return Matrix<Scalar>::rectangle(x);
     }
 
-    /** \brief triangle function
-     *
-     * \f[
-     * \begin {cases}
-     * \Lambda(x) = 0 &    |x| >= 1  \\
-     * \Lambda(x) = 1-|x| &  |x| < 1
-     * \end {cases}
-     * \f]
-     *
+    /** \brief Triangle (hat) function, elementwise
+
+        1 - |x| for |x| < 1 and 0 otherwise, built from rectangle and fabs. Not defined for MX.
+
+        \doctest
+        >>> triangle(DM([-1, -0.5, 0, 0.5, 1]))
+        DM([0, 0.5, 1, 0.5, 0])
+        \enddoctest
+
+        \doctest{matlab}
+        >> triangle(DM([-1; -0.5; 0; 0.5; 1]))
+        [0, 0.5, 1, 0.5, 0]
+        \enddoctest
+
+        \sa rectangle, ramp
 
         \identifier{23o} */
     friend inline Matrix<Scalar> triangle(const Matrix<Scalar> &x) {
       return Matrix<Scalar>::triangle(x);
     }
 
-    /** \brief ramp function
-     *
-     *
-     * \f[
-     * \begin {cases}
-     *  R(x) = 0   & x <= 1 \\
-     *  R(x) = x   & x > 1 \\
-     * \end {cases}
-     * \f]
-     *
-     * Also called: slope function
+    /** \brief Ramp function, elementwise
+
+        x for x > 0 and 0 for x <= 0, computed as x*heaviside(x). Also called the slope
+        function or relu. Not defined for MX; use fmax(x, 0) for an MX-compatible alternative.
+
+        \doctest
+        >>> ramp(DM([0, 0.5, 3]))
+        DM([0, 0.5, 3])
+        >>> ramp(SX.sym("x"))
+        SX((x*((1+sign(x))/2)))
+        \enddoctest
+
+        \doctest{matlab}
+        >> ramp(DM([0; 0.5; 3]))
+        [0, 0.5, 3]
+        >> ramp(SX.sym('x'))
+        (x*((1+sign(x))/2))
+        \enddoctest
+
+        \sa heaviside, fmax
 
         \identifier{23p} */
     friend inline Matrix<Scalar> ramp(const Matrix<Scalar> &x) {
@@ -771,7 +1734,32 @@ namespace casadi {
     }
 
     ///@{
-    /** \brief  Integrate f from a to b using Gaussian quadrature with n points
+    /** \brief Integrate a scalar SX expression over [a, b] with 5-point Gauss-Legendre quadrature
+
+        Evaluates \p f at the five Gauss points of [a, b] and returns the weighted sum,
+        which is exact for polynomials in \p x up to degree 9. Only defined for SX.
+
+        \param f Scalar expression to integrate; it may depend only on \p x
+        \param x Scalar symbolic integration variable
+        \param a Lower bound, a numeric constant
+        \param b Upper bound, a numeric constant
+        \param order Must be 5; any other value raises an error
+        \param w Reserved; must be empty
+
+        \doctest
+        >>> x = SX.sym("x")
+        >>> try: gauss_quadrature(x**2, x, 0, 1, 3)
+        ... except Exception as e: print("error")
+        error
+        \enddoctest
+
+        \doctest{matlab}
+        >> x = SX.sym('x');
+        >> try, gauss_quadrature(x^2, x, 0, 1, 3); catch e, disp('error'); end
+        error
+        \enddoctest
+
+        \sa integrator
 
         \identifier{196} */
     friend inline Matrix<Scalar>
@@ -789,24 +1777,45 @@ namespace casadi {
     ///@}
 
     ///@{
-    /** \brief univariate Taylor series expansion
-     *
-     * Calculate the Taylor expansion of expression 'ex' up to order 'order' with
-     * respect to variable 'x' around the point 'a'
-     *
-     * \f$(x)=f(a)+f'(a)(x-a)+f''(a)\frac {(x-a)^2}{2!}+f'''(a)\frac{(x-a)^3}{3!}+\ldots\f$
-     *
-     * Example usage:
-     * \code
-     * taylor(sin(x), x)
-     * \endcode
-     * \verbatim >>   x \endverbatim
-     *
-     * \code
-     * taylor(sin(x),x,x0) -> sin(x0)+cos(x0)*(x-x0)
-     * \endcode
-     *
-     * \sa linearize, mtaylor, linear_coeff
+    /** \brief Univariate Taylor series expansion
+
+        Expands \p ex around \p a with respect to the scalar symbol \p x up to the given
+        order:
+        ex(a) + ex'(a)*(x-a) + ex''(a)*(x-a)^2/2! + ... + ex^(order)(a)*(x-a)^order/order!
+        The expansion is done entrywise for a dense matrix \p ex; sparse \p ex raises an
+        error. \p a may itself be symbolic. The two-argument form expands around 0 to first
+        order. Only defined for SX.
+
+        \param ex Dense SX expression to expand
+        \param x Scalar SX symbol
+        \param a Scalar expansion point, default 0
+        \param order Highest power of (x-a) kept, default 1; 0 gives ex(a)
+
+        \doctest
+        >>> x = SX.sym("x"); a = SX.sym("a")
+        >>> taylor(sin(x), x)
+        SX(x)
+        >>> taylor(sin(x), x, a, 1)
+        SX((sin(a)+(cos(a)*(x-a))))
+        >>> taylor(exp(x), x, 0, 3)
+        SX(@1=sq(x), (((1+x)+(0.5*@1))+(0.166667*(@1*x))))
+        >>> taylor(vertcat(sin(x), cos(x)), x, 0, 2)
+        SX([x, (1+(-0.5*sq(x)))])
+        \enddoctest
+
+        \doctest{matlab}
+        >> x = SX.sym('x'); a = SX.sym('a');
+        >> taylor(sin(x), x)
+        x
+        >> taylor(sin(x), x, a, 1)
+        (sin(a)+(cos(a)*(x-a)))
+        >> taylor(exp(x), x, 0, 3)
+        @1=sq(x), (((1+x)+(0.5*@1))+(0.166667*(@1*x)))
+        >> taylor([sin(x); cos(x)], x, 0, 2)
+        [x, (1+(-0.5*sq(x)))]
+        \enddoctest
+
+        \sa mtaylor, linearize, linear_coeff
 
         \identifier{23q} */
     friend inline Matrix<Scalar> taylor(const Matrix<Scalar>& ex, const Matrix<Scalar>& x,
@@ -818,12 +1827,35 @@ namespace casadi {
     }
     ///@}
 
-    /** \brief multivariate Taylor series expansion
-     *
-     * Do Taylor expansions until the aggregated order of a term is equal to 'order'.
-     * The aggregated order of \f$x^n y^m\f$ equals \f$n+m\f$.
-     *
-     * \sa taylor
+    /** \brief Multivariate Taylor series expansion
+
+        Expands \p ex around the point \p a with respect to the symbols in \p x, keeping all
+        terms whose total degree is at most \p order. The total degree of x^n*y^m is n+m.
+        \p ex and \p x must be dense; \p a must have the same number of entries as \p x.
+        Only defined for SX.
+
+        \param ex Dense SX expression to expand
+        \param x Vector of SX symbols
+        \param a Expansion point, a vector of the same length as \p x
+        \param order Maximum total degree, default 1 (linearization)
+
+        \doctest
+        >>> x = SX.sym("x"); y = SX.sym("y"); a = SX.sym("a"); b = SX.sym("b")
+        >>> mtaylor(sin(x + y), vertcat(x, y), vertcat(a, b), 1)
+        SX(((sin((a+b))+(cos((a+b))*(x-a)))+(cos((a+b))*(y-b))))
+        >>> mtaylor(exp(x * y), vertcat(x, y), DM([0, 0]), 2)
+        SX(@1=2, ((1+((x*y)/@1))+((y*x)/@1)))
+        \enddoctest
+
+        \doctest{matlab}
+        >> x = SX.sym('x'); y = SX.sym('y'); a = SX.sym('a'); b = SX.sym('b');
+        >> mtaylor(sin(x + y), [x; y], [a; b], 1)
+        ((sin((a+b))+(cos((a+b))*(x-a)))+(cos((a+b))*(y-b)))
+        >> mtaylor(exp(x * y), [x; y], DM([0; 0]), 2)
+        @1=2, ((1+((x*y)/@1))+((y*x)/@1))
+        \enddoctest
+
+        \sa taylor
 
         \identifier{23r} */
     friend inline Matrix<Scalar> mtaylor(const Matrix<Scalar>& ex, const Matrix<Scalar>& x,
@@ -831,31 +1863,25 @@ namespace casadi {
       return Matrix<Scalar>::mtaylor(ex, x, a, order);
     }
 
-    /** \brief multivariate Taylor series expansion
-     *
-     * Do Taylor expansions until the aggregated order of a term is equal to 'order'.
-     * The aggregated order of \f$x^n y^m\f$ equals \f$n+m\f$.
-     *
-     * The argument order_contributions can denote how match each variable contributes
-     * to the aggregated order. If x=[x, y] and order_contributions=[1, 2], then the
-     * aggregated order of \f$x^n y^m\f$ equals \f$1n+2m\f$.
-     *
-     * Example usage
-     *
-     * \code
-     * taylor(sin(x+y),[x, y],[a, b], 1)
-     * \endcode
-     * \f$ \sin(b+a)+\cos(b+a)(x-a)+\cos(b+a)(y-b) \f$
-     * \code
-     * taylor(sin(x+y),[x, y],[0, 0], 4)
-     * \endcode
-     * \f$  y+x-(x^3+3y x^2+3 y^2 x+y^3)/6  \f$
-     * \code
-     * taylor(sin(x+y),[x, y],[0, 0], 4,[1, 2])
-     * \endcode
-     * \f$  (-3 x^2 y-x^3)/6+y+x \f$
-     *
-     * \sa taylor
+    /** \brief Multivariate Taylor series expansion with weighted degrees
+
+        Same as mtaylor, but each variable contributes a given weight to the total degree:
+        with x = [x, y] and order_contributions = [1, 2] the degree of x^n*y^m is n + 2*m.
+        The length of \p order_contributions must equal the number of entries of \p x.
+
+        \doctest
+        >>> x = SX.sym("x"); y = SX.sym("y")
+        >>> mtaylor(sin(x + y), vertcat(x, y), vertcat(0, 0), 3, [1, 2])
+        SX(((x-((sq(x)*x)/6))+y))
+        \enddoctest
+
+        \doctest{matlab}
+        >> x = SX.sym('x'); y = SX.sym('y');
+        >> mtaylor(sin(x + y), [x; y], [0; 0], 3, [1 2])
+        ((x-((sq(x)*x)/6))+y)
+        \enddoctest
+
+        \sa taylor
 
         \identifier{23s} */
     friend inline Matrix<Scalar> mtaylor(const Matrix<Scalar>& ex, const Matrix<Scalar>& x,
@@ -864,10 +1890,38 @@ namespace casadi {
       return Matrix<Scalar>::mtaylor(ex, x, a, order, order_contributions);
     }
 
-    /** \brief extracts polynomial coefficients from an expression
-     *
-     * \param ex Scalar expression that represents a polynomial
-     * \param x  Scalar symbol that the polynomial is build up with
+    /** \brief Extract the polynomial coefficients of a scalar expression in one symbol
+
+        Returns the coefficients in decreasing power order (highest degree first), as a
+        column vector; the constant term is last. Coefficients may be symbolic in other
+        variables. Found by repeated differentiation, so an expression that is not polynomial
+        in \p x raises an error. Only defined for SX.
+
+        \param ex Scalar SX expression that is a polynomial in \p x
+        \param x Scalar SX symbol
+
+        \doctest
+        >>> x = SX.sym("x"); a = SX.sym("a")
+        >>> poly_coeff(3*x**2 + 2*x + 1, x)
+        SX([3, 2, 1])
+        >>> poly_coeff((x - a)*(x + a), x)
+        SX([1, 0, (-sq(a))])
+        >>> try: poly_coeff(sin(x), x)
+        ... except Exception as e: print("error")
+        error
+        \enddoctest
+
+        \doctest{matlab}
+        >> x = SX.sym('x'); a = SX.sym('a');
+        >> poly_coeff(3*x^2 + 2*x + 1, x)
+        [3, 2, 1]
+        >> poly_coeff((x - a)*(x + a), x)
+        [1, 0, (-sq(a))]
+        >> try, poly_coeff(sin(x), x); catch e, disp('error'); end
+        error
+        \enddoctest
+
+        \sa poly_roots, polyval
 
         \identifier{197} */
     friend inline Matrix<Scalar> poly_coeff(const Matrix<Scalar>& f,
@@ -875,19 +1929,76 @@ namespace casadi {
       return Matrix<Scalar>::poly_coeff(f, x);
     }
 
-    /** \brief Attempts to find the roots of a polynomial
-     *
-     *  This will only work for polynomials up to order 3
-     *  It is assumed that the roots are real.
-     *
+    /** \brief Roots of a polynomial given by its coefficients, in closed form
+
+        \p p is a dense column vector of coefficients in decreasing power order, as returned
+        by poly_coeff. Closed-form formulas are used for degrees 1 to 4; a zero constant term
+        is split off as a root 0 first. Higher degrees raise an error. All roots are assumed
+        real: complex roots give nan. The result stays symbolic for symbolic coefficients.
+        Only defined for SX; pass SX(p) for numeric coefficients.
+
+        \doctest
+        >>> poly_roots(SX([1, -3, 2]))
+        SX([1, 2])
+        >>> evalf(poly_roots(SX([1, -6, 11, -6])))
+        DM([3, 1, 2])
+        >>> a = SX.sym("a")
+        >>> poly_roots(vertcat(a, 2))
+        SX((-2/a))
+        >>> try: poly_roots(SX([1, 1, 1, 1, 1, 1]))
+        ... except Exception as e: print("error")
+        error
+        \enddoctest
+
+        \doctest{matlab}
+        >> poly_roots(SX([1; -3; 2]))
+        [1, 2]
+        >> evalf(poly_roots(SX([1; -6; 11; -6])))
+        [3, 1, 2]
+        >> a = SX.sym('a');
+        >> poly_roots([a; 2])
+        (-2/a)
+        >> try, poly_roots(SX([1; 1; 1; 1; 1; 1])); catch e, disp('error'); end
+        error
+        \enddoctest
+
+        \sa poly_coeff, eig_symbolic
+
         \identifier{198} */
     friend inline Matrix<Scalar> poly_roots(const Matrix<Scalar>& p) {
       return Matrix<Scalar>::poly_roots(p);
     }
 
-    /** \brief Attempts to find the eigenvalues of a symbolic matrix
+    /** \brief Eigenvalues of a square SX matrix in closed form
 
-     *  This will only work for up to 3x3 matrices
+        Splits the matrix into its strongly connected (block diagonal) components and solves
+        the characteristic polynomial of each block with poly_roots, so every block may be at
+        most 4-by-4. Larger blocks raise an error. Eigenvalues are assumed real.
+        Returns a column vector; the order follows the block structure, not the magnitude.
+        Only defined for SX; pass SX(m) for a numeric matrix.
+
+        \doctest
+        >>> evalf(eig_symbolic(SX([[2, 1], [1, 2]])))
+        DM([1, 3])
+        >>> M = SX.sym("M", 2, 2)
+        >>> eig_symbolic(M)
+        SX(@1=(M_3+M_0), @2=sqrt((sq(@1)-(4*((M_0*M_3)-(M_2*M_1))))), @3=2, [((@1-@2)/@3),
+        ((@1+@2)/@3)])
+        >>> evalf(eig_symbolic(SX.eye(5) * 3)).T
+        DM([[3, 3, 3, 3, 3]])
+        \enddoctest
+
+        \doctest{matlab}
+        >> evalf(eig_symbolic(SX([2 1; 1 2])))
+        [1, 3]
+        >> a = SX.sym('a'); b = SX.sym('b'); c = SX.sym('c'); d = SX.sym('d');
+        >> eig_symbolic([a b; c d])
+        @1=(d+a), @2=sqrt((sq(@1)-(4*((a*d)-(b*c))))), @3=2, [((@1-@2)/@3), ((@1+@2)/@3)]
+        >> evalf(eig_symbolic(SX.eye(5) * 3))'
+        [[3, 3, 3, 3, 3]]
+        \enddoctest
+
+        \sa poly_roots, Sparsity::scc
 
         \identifier{199} */
     friend inline Matrix<Scalar> eig_symbolic(const Matrix<Scalar>& m) {
@@ -895,9 +2006,35 @@ namespace casadi {
     }
 
 
-    /** \brief Evaluates the expression numerically
-    *
-    * An error is raised when the expression contains symbols
+    /** \brief Evaluate a constant expression numerically, returning a DM
+
+        Works on SX and MX expressions without free symbols (including constant results of
+        function calls). The sparsity pattern is preserved. An expression that still
+        depends on a symbol raises an error, unlike the DM(SX) constructor which yields nan.
+
+        \doctest
+        >>> evalf(SX([[1, 2], [3, 4]]) * 2)
+        DM(
+        [[2, 4],
+         [6, 8]])
+        >>> evalf(MX(DM([1, 2])) + 1)
+        DM([2, 3])
+        >>> try: evalf(SX.sym("x"))
+        ... except Exception as e: print("error")
+        error
+        \enddoctest
+
+        \doctest{matlab}
+        >> evalf(SX([1 2; 3 4]) * 2)
+        [[2, 4],
+         [6, 8]]
+        >> evalf(MX(DM([1; 2])) + 1)
+        [2, 3]
+        >> try, evalf(SX.sym('x')); catch e, disp('error'); end
+        error
+        \enddoctest
+
+        \sa substitute, Function
 
         \identifier{19a} */
     inline friend Matrix<double> evalf(const Matrix<Scalar>& expr) {
@@ -906,49 +2043,206 @@ namespace casadi {
 /** @} */
 #endif
 
-    /** \brief Set or reset the depth to which equalities are being checked for simplifications
+    /** \brief Set the depth to which SX subexpressions are compared during simplification
+
+        The on-the-fly simplifications (x - x -> 0, x/x -> 1, x == x -> 1, ...) recognise two
+        operands as equal when they are the same node, or, up to this depth, when they are
+        the same operation applied to equal operands. Depth 1 (the default) recognises
+        (x+y) - (x+y); depth 2 also sin(x+y) - sin(x+y). Depth 0 compares nodes only.
+        Global setting, SX only; calling without an argument restores the default.
+
+        \param eq_depth Comparison depth, default 1
+
+        \doctest
+        >>> x = SX.sym("x"); y = SX.sym("y")
+        >>> sin(x + y) - sin(x + y)
+        SX((sin((x+y))-sin((x+y))))
+        >>> SX.set_max_depth(2)
+        >>> sin(x + y) - sin(x + y)
+        SX(0)
+        >>> SX.set_max_depth()
+        >>> SX.get_max_depth()
+        1
+        \enddoctest
+
+        \doctest{matlab}
+        >> x = SX.sym('x'); y = SX.sym('y');
+        >> sin(x + y) - sin(x + y)
+        (sin((x+y))-sin((x+y)))
+        >> SX.set_max_depth(2);
+        >> sin(x + y) - sin(x + y)
+        0
+        >> SX.set_max_depth();
+        >> SX.get_max_depth()
+        1
+        \enddoctest
+
+        \sa get_max_depth, is_equal
 
         \identifier{19b} */
     static void set_max_depth(casadi_int eq_depth=1);
 
-    /** \brief Get the depth to which equalities are being checked for simplifications
+    /** \brief Get the depth to which SX subexpressions are compared during simplification
+
+        \sa set_max_depth
 
         \identifier{19c} */
     static casadi_int get_max_depth();
 
-    /** \brief Get function input
+    /** \brief Get the symbolic input expressions of an SX Function
+
+        Same as Function::sx_in. Only defined for SX.
+
+        \doctest
+        >>> x = SX.sym("x")
+        >>> SX.get_input(Function("f", [x], [x + 1]))
+        [SX(x)]
+        \enddoctest
+
+        \doctest{matlab}
+        >> x = SX.sym('x');
+        >> v = SX.get_input(Function('f', {x}, {x + 1}));
+        >> numel(v), v{1}
+        1
+        x
+        \enddoctest
+
+        \sa Function::sx_in, get_free
 
         \identifier{19d} */
     static std::vector<Matrix<Scalar> > get_input(const Function& f);
 
-    /** \brief Get free
+    /** \brief Get the free symbols of an SX Function
+
+        Same as Function::free_sx. Only defined for SX.
+
+        \doctest
+        >>> x = SX.sym("x"); y = SX.sym("y")
+        >>> SX.get_free(Function("f", [x], [x + y], {"allow_free": True}))
+        [SX(y)]
+        \enddoctest
+
+        \doctest{matlab}
+        >> x = SX.sym('x'); y = SX.sym('y');
+        >> v = SX.get_free(Function('f', {x}, {x + y}, struct('allow_free', true)));
+        >> v{1}
+        y
+        \enddoctest
+
+        \sa Function::free_sx, get_input
 
         \identifier{19e} */
     static std::vector<Matrix<Scalar> > get_free(const Function& f);
 
-    /// Get name of the class
+    /** \brief Name of the class: "DM" or "SX"
+
+        \doctest
+        >>> DM.type_name(), SX.type_name()
+        ('DM', 'SX')
+        \enddoctest
+
+        \doctest{matlab}
+        >> fprintf('%s %s\n', DM.type_name(), SX.type_name())
+        DM SX
+        \enddoctest
+    */
     static std::string type_name();
 
-    /// Get strings corresponding to the nonzeros and the interdependencies
+    /** \brief String representation of each nonzero and of the shared subexpressions
+
+        Returns two lists: one string per nonzero (in storage order) and the definitions of
+        the intermediate expressions "@1", "@2", ... that the nonzero strings refer to
+        (always empty for DM).
+
+        \doctest
+        >>> DM([[1, 2], [3, 4]]).print_split()
+        (['1', '3', '2', '4'], [])
+        >>> x = SX.sym("x"); y = SX.sym("y")
+        >>> e = x * y
+        >>> vertcat(e + 1, e - 1).print_split()
+        (['(@1+@2)', '(@1-@2)'], ['(x*y)', '1'])
+        \enddoctest
+
+        \doctest{matlab}
+        >> [nz, inter] = DM([1 2; 3 4]).print_split();
+        >> disp(strjoin(cellstr(nz)', ' ')), disp(isempty(inter))
+        1 3 2 4
+        1
+        >> x = SX.sym('x'); y = SX.sym('y');
+        >> e = x * y;
+        >> [nz, inter] = vertcat(e + 1, e - 1).print_split();
+        >> disp(strjoin(cellstr(nz)', ' ')), disp(strjoin(cellstr(inter)', ' '))
+        (@1+@2) (@1-@2)
+        (x*y) 1
+        \enddoctest
+    */
     void print_split(std::vector<std::string>& SWIG_OUTPUT(nz),
                     std::vector<std::string>& SWIG_OUTPUT(inter)) const;
 
-    /// Print a representation of the object
+    /** \brief Print a representation of the object to a stream
+
+        Picks the layout automatically: scalar, vector, dense matrix (small or at least
+        half full) or sparse coordinate list. This is what str() and print() use.
+        \p more has no effect for matrices. */
     void disp(std::ostream& stream, bool more=false) const;
 
-    /// Get string representation
+    /// Get the string representation that disp prints
     std::string get_str(bool more=false) const;
 
-    /// Print scalar
+    /** \brief Print a 1-by-1 matrix as a bare number or expression
+
+        A structurally empty 1-by-1 matrix prints as 00; other shapes raise an error.
+
+        \doctest
+        >>> DM(3).print_scalar()
+        3
+        >>> DM(1, 1).print_scalar()
+        00
+        \enddoctest */
     void print_scalar(std::ostream &stream) const;
 
-    /// Print vector-style
+    /** \brief Print a column vector as [a, b, ...], structural zeros as 00
+
+        Only column vectors are accepted; a row vector raises an error.
+
+        \param truncate Print only the first and last 3 entries of vectors longer than 1000
+
+        \doctest
+        >>> DM(Sparsity.unit(3, 1)).print_vector()
+        [00, 1, 00]
+        \enddoctest */
     void print_vector(std::ostream &stream, bool truncate=true) const;
 
-    /// Print dense matrix-stype
+    /** \brief Print as a dense matrix, one row per line, structural zeros as 00
+
+        Shared SX subexpressions are printed first as @1=..., @2=....
+
+        \param truncate Print only 3 leading and trailing rows and columns when the matrix
+                        has more than 1000 elements and at least 7 rows or columns
+
+        \doctest
+        >>> DM(Sparsity.diag(2)).print_dense()
+        [[1, 00],
+         [00, 1]]
+        \enddoctest
+
+        \sa print_sparse */
     void print_dense(std::ostream &stream, bool truncate=true) const;
 
-    /// Print sparse matrix style
+    /** \brief Print as a list of (row, col) -> value triplets, column-major order
+
+        \param truncate Print only the first and last 3 nonzeros when there are more than 1000
+
+        \doctest
+        >>> DM(Sparsity.diag(2)).print_sparse()
+        sparse: 2-by-2, 2 nnz
+         (0, 0) -> 1
+         (1, 1) -> 1
+        >>> DM(2, 2).print_sparse()
+        all zero sparse: 2-by-2
+        \enddoctest
+
+        \sa print_dense */
     void print_sparse(std::ostream &stream, bool truncate=true) const;
 
 #ifndef SWIG
@@ -980,37 +2274,166 @@ namespace casadi {
       bool truncate=true);
 #endif
 
+    /// Reset to an empty 0-by-0 matrix, in place
     void clear();
+
+    /** \brief Change the shape in place, keeping nonzeros that remain inside the new bounds
+
+        Growing appends structural zeros; shrinking drops the entries outside the new shape.
+
+        \doctest
+        >>> A = DM([[1, 2], [3, 4]])
+        >>> A.resize(3, 3)
+        >>> A
+        DM(
+        [[1, 2, 00],
+         [3, 4, 00],
+         [00, 00, 00]])
+        >>> A.resize(1, 1)
+        >>> A
+        DM(1)
+        \enddoctest
+
+        \doctest{matlab}
+        >> A = DM([1 2; 3 4]);
+        >> A.resize(3, 3);
+        >> A
+        [[1, 2, 00],
+         [3, 4, 00],
+         [00, 00, 00]]
+        >> A.resize(1, 1);
+        >> A
+        1
+        \enddoctest
+
+        \sa enlarge, reshape */
     void resize(casadi_int nrow, casadi_int ncol);
+
+    /// Reserve storage for the given number of nonzeros (performance hint, no visible effect)
     void reserve(casadi_int nnz);
     void reserve(casadi_int nnz, casadi_int ncol);
 
-    /** \brief Erase a submatrix (leaving structural zeros in its place)
+    /** \brief Erase the block at the given rows and columns, leaving structural zeros
 
-        Erase rows and/or columns of a matrix
+        The shape is unchanged; the entries of the submatrix rr x cc are removed from the
+        sparsity pattern. Negative indices count from the end; out-of-range indices raise
+        an error.
+
+        \param rr Row indices
+        \param cc Column indices
+        \param ind1 True for one-based indices
+
+        \doctest
+        >>> A = DM([[1, 2, 3], [4, 5, 6]])
+        >>> A.erase([0], [1])
+        >>> A
+        DM(
+        [[1, 00, 3],
+         [4, 5, 6]])
+        >>> A.dim(), A.nnz()
+        ('2x3', 5)
+        \enddoctest
+
+        \doctest{matlab}
+        >> A = DM([1 2 3; 4 5 6]);
+        >> A.erase(1, 2, true);
+        >> A
+        [[1, 00, 3],
+         [4, 5, 6]]
+        >> fprintf('%s %d\n', A.dim(), A.nnz())
+        2x3 5
+        \enddoctest
+
+        \sa remove, sparsify
 
         \identifier{19f} */
     void erase(const std::vector<casadi_int>& rr, const std::vector<casadi_int>& cc,
                bool ind1=false);
 
-    /** \brief Erase a submatrix (leaving structural zeros in its place)
+    /** \brief Erase the elements at the given linear indices, leaving structural zeros
 
-        Erase elements of a matrix
+        Column-major linear indices, as in get. The shape is unchanged.
+
+        \doctest
+        >>> A = DM([[1, 2, 3], [4, 5, 6]])
+        >>> A.erase([0, -1])
+        >>> A
+        DM(
+        [[00, 2, 3],
+         [4, 5, 00]])
+        \enddoctest
+
+        \doctest{matlab}
+        >> A = DM([1 2 3; 4 5 6]);
+        >> A.erase([1 6], true);
+        >> A
+        [[00, 2, 3],
+         [4, 5, 00]]
+        \enddoctest
 
         \identifier{19g} */
     void erase(const std::vector<casadi_int>& rr, bool ind1=false);
 
-    /** \brief Remove columns and rows
+    /** \brief Delete rows and columns, shrinking the matrix in place
 
-        Remove/delete rows and/or columns of a matrix
+        Both lists may be empty; duplicates are ignored, out-of-range indices raise an error.
+
+        \doctest
+        >>> A = DM([[1, 2, 3], [4, 5, 6]])
+        >>> A.remove([0], [1])
+        >>> A
+        DM([[4, 6]])
+        \enddoctest
+
+        \doctest{matlab}
+        >> A = DM([1 2 3; 4 5 6]);
+        >> A.remove(0, 1);
+        >> A
+        [[4, 6]]
+        \enddoctest
+
+        \sa erase
 
         \identifier{19h} */
     void remove(const std::vector<casadi_int>& rr, const std::vector<casadi_int>& cc);
 
-    /** \brief Enlarge matrix
+    /** \brief Enlarge the matrix in place, moving the existing rows and columns to new positions
 
-        Make the matrix larger by inserting empty rows and columns,
-        keeping the existing non-zeros
+        The new shape is nrow-by-ncol. \p rr lists, for every existing row, its index in the
+        enlarged matrix; \p cc does the same for the columns. Both must have exactly size1()
+        and size2() entries. All other rows and columns are structurally zero.
+
+        \param nrow New number of rows
+        \param ncol New number of columns
+        \param rr New position of each existing row, length size1()
+        \param cc New position of each existing column, length size2()
+        \param ind1 True for one-based indices
+
+        \doctest
+        >>> A = DM([[1, 2], [3, 4]])
+        >>> A.enlarge(3, 4, [0, 2], [0, 1])
+        >>> A
+        DM(
+        [[1, 2, 00, 00],
+         [00, 00, 00, 00],
+         [3, 4, 00, 00]])
+        >>> try: A.enlarge(4, 4, [0, 1], [0, 1])
+        ... except Exception as e: print("error")
+        error
+        \enddoctest
+
+        \doctest{matlab}
+        >> A = DM([1 2; 3 4]);
+        >> A.enlarge(3, 4, [1 3], [1 2], true);
+        >> A
+        [[1, 2, 00, 00],
+         [00, 00, 00, 00],
+         [3, 4, 00, 00]]
+        >> try, A.enlarge(4, 4, [1 2], [1 2], true); catch e, disp('error'); end
+        error
+        \enddoctest
+
+        \sa resize, Sparsity::enlarge
 
         \identifier{19i} */
     void enlarge(casadi_int nrow, casadi_int ncol,
@@ -1037,7 +2460,21 @@ namespace casadi {
 
 #endif // SWIG
 
-    /** \brief Get an owning reference to the sparsity pattern
+    /** \brief Get the sparsity pattern (Python: sparsity())
+
+        Returns a copy of the Sparsity object; patterns are reference counted, so this is cheap.
+
+        \doctest
+        >>> DM(Sparsity.diag(2)).sparsity()
+        Sparsity(2x2,2nz)
+        \enddoctest
+
+        \doctest{matlab}
+        >> DM(Sparsity.diag(2)).sparsity()
+        2x2,2nz
+        \enddoctest
+
+        \sa nonzeros
 
         \identifier{19j} */
     Sparsity get_sparsity() const;
@@ -1047,9 +2484,55 @@ namespace casadi {
         \identifier{28i} */
     Matrix<Scalar> get_output(casadi_int oind) const;
 
-    /** \brief Construct a sparse matrix from triplet form
+    /** \brief Construct a sparse matrix from triplet form (row indices, column indices, values)
 
-     * Default matrix size is max(col) x max(row)
+        Entry k of the result is at (row[k], col[k]) with value d[k]. The three lists must have
+        the same length; indices are zero-based and must be within the matrix bounds.
+        The nonzeros are reordered into column-major order. When the same (row, col) pair
+        appears more than once, only the first value is kept; duplicates are not summed.
+
+        \param row Row index of each entry
+        \param col Column index of each entry
+        \param d Dense vector of values, one per entry
+        \param nrow Number of rows of the result
+        \param ncol Number of columns of the result
+
+        \doctest
+        >>> DM.triplet([0, 1], [1, 0], [5, 6], 3, 3)
+        DM(
+        [[00, 5, 00],
+         [6, 00, 00],
+         [00, 00, 00]])
+        >>> DM.triplet([0, 1], [1, 0], [5, 6], (3, 3)).nonzeros()
+        [6.0, 5.0]
+        >>> SX.triplet([0, 1], [0, 1], SX.sym("v", 2), 2, 2)
+        SX(
+        [[v_0, 00],
+         [00, v_1]])
+        >>> DM.triplet([], [], [], 2, 2).nnz()
+        0
+        >>> try: DM.triplet([0, 1], [1, 0], [5], 3, 3)
+        ... except Exception as e: print("error")
+        error
+        \enddoctest
+
+        \doctest{matlab}
+        >> DM.triplet([0 1], [1 0], [5 6], 3, 3)
+        [[00, 5, 00],
+         [6, 00, 00],
+         [00, 00, 00]]
+        >> DM.triplet([0 1], [1 0], [5 6], [3 3]).nonzeros()
+        6 5
+        >> SX.triplet([0 1], [0 1], SX.sym('v', 2), 2, 2)
+        [[v_0, 00],
+         [00, v_1]]
+        >> DM.triplet([], [], [], 2, 2).nnz()
+        0
+        >> try, DM.triplet([0 1], [1 0], 5, 3, 3); catch e, disp('error'); end
+        error
+        \enddoctest
+
+        \sa Sparsity::triplet
 
         \identifier{23t} */
     ///@{
@@ -1066,7 +2549,29 @@ namespace casadi {
     ///@}
 
     ///@{
-    /** \brief  create a matrix with all inf
+    /** \brief Create a matrix with every nonzero equal to +inf
+
+        Takes a shape (dense result, default 1-by-1) or a sparsity pattern.
+
+        \doctest
+        >>> DM.inf(), DM.inf(2, 1).is_inf()
+        (DM(inf), True)
+        >>> DM.inf(Sparsity.diag(2))
+        DM(
+        [[inf, 00],
+         [00, inf]])
+        \enddoctest
+
+        \doctest{matlab}
+        >> DM.inf(), DM.inf(2, 1).is_inf()
+        inf
+        1
+        >> DM.inf(Sparsity.diag(2))
+        [[inf, 00],
+         [00, inf]]
+        \enddoctest
+
+        \sa nan, is_inf
 
         \identifier{19k} */
     static Matrix<Scalar> inf(const Sparsity& sp);
@@ -1075,7 +2580,27 @@ namespace casadi {
     ///@}
 
     ///@{
-    /** \brief  create a matrix with all nan
+    /** \brief Create a matrix with every nonzero equal to nan
+
+        Takes a shape (dense result, default 1-by-1) or a sparsity pattern.
+        Useful as a placeholder that is easy to detect with is_regular.
+
+        \doctest
+        >>> DM.nan(), DM.nan((2, 1)).dim()
+        (DM(nan), '2x1')
+        >>> DM.nan(2, 2).is_regular()
+        False
+        \enddoctest
+
+        \doctest{matlab}
+        >> DM.nan(), DM.nan([2 1]).dim()
+        nan
+        2x1
+        >> DM.nan(2, 2).is_regular()
+        0
+        \enddoctest
+
+        \sa inf, is_regular
 
         \identifier{19l} */
     static Matrix<Scalar> nan(const Sparsity& sp);
@@ -1083,22 +2608,104 @@ namespace casadi {
     static Matrix<Scalar> nan(const std::pair<casadi_int, casadi_int>& rc);
     ///@}
 
-    /** \brief  create an n-by-n identity matrix
+    /** \brief Create an n-by-n identity matrix
+
+        The result is sparse: only the n diagonal entries are structural nonzeros.
+
+        \doctest
+        >>> DM.eye(2)
+        DM(
+        [[1, 00],
+         [00, 1]])
+        >>> DM.eye(3).nnz(), DM.eye(0).dim()
+        (3, '0x0')
+        \enddoctest
+
+        \doctest{matlab}
+        >> DM.eye(2)
+        [[1, 00],
+         [00, 1]]
+        >> fprintf('%d %s\n', DM.eye(3).nnz(), DM.eye(0).dim())
+        3 0x0
+        \enddoctest
+
+        \sa is_eye, Sparsity::diag
 
         \identifier{19m} */
     static Matrix<Scalar> eye(casadi_int n);
 
-    /** \brief Returns a number that is unique for a given symbolic scalar
-     *
-     * Only defined if symbolic scalar.
+    /** \brief Hash of the node of a 1-by-1 SX expression
+
+        Equal expressions (same node) have the same hash. Only defined for a scalar SX;
+        a vector or a DM raises an error.
+
+        \doctest
+        >>> x = SX.sym("x"); y = SX.sym("y")
+        >>> x.element_hash() == x.element_hash(), x.element_hash() == y.element_hash()
+        (True, False)
+        \enddoctest
+
+        \doctest{matlab}
+        >> x = SX.sym('x'); y = SX.sym('y');
+        >> h = x.element_hash();
+        >> fprintf('%d %d\n', h == x.element_hash(), h == y.element_hash())
+        1 0
+        \enddoctest
 
         \identifier{19n} */
     casadi_int element_hash() const;
 
-    /// Checks if expression does not contain NaN or Inf
+    /** \brief Check that no entry is nan, inf or -inf
+
+        Structural zeros are ignored. For SX, every entry must be a constant: the check
+        raises an error when it reaches a symbolic entry (an infinite constant found before
+        it still gives false).
+
+        \doctest
+        >>> DM([1, 2]).is_regular(), DM([1, inf]).is_regular(), DM.nan(2, 2).is_regular()
+        (True, False, False)
+        >>> DM(2, 2).is_regular(), SX([1, 2]).is_regular()
+        (True, True)
+        >>> try: SX.sym("x").is_regular()
+        ... except Exception as e: print("error")
+        error
+        \enddoctest
+
+        \doctest{matlab}
+        >> fprintf('%d %d\n', DM([1; 2]).is_regular(), DM([1; inf]).is_regular())
+        1 0
+        >> fprintf('%d %d\n', DM.nan(2, 2).is_regular(), DM(2, 2).is_regular())
+        0 1
+        >> SX([1; 2]).is_regular()
+        1
+        >> try, SX.sym('x').is_regular(); catch e, disp('error'); end
+        error
+        \enddoctest
+
+        \sa nan, inf */
     bool is_regular() const;
 
-    /** \brief Check if smooth
+    /** \brief Check whether an SX expression contains only smooth operations
+
+        False when any node is a non-smooth operation such as floor, ceil, sign, a comparison
+        or if_else. Operations such as fabs, fmin and fmax count as smooth. Always true for DM.
+
+        \doctest
+        >>> x = SX.sym("x")
+        >>> sin(x).is_smooth(), fabs(x).is_smooth(), floor(x).is_smooth()
+        (True, True, False)
+        >>> if_else(x > 0, x, 0).is_smooth(), (x > 0).is_smooth(), DM(1).is_smooth()
+        (False, False, True)
+        \enddoctest
+
+        \doctest{matlab}
+        >> x = SX.sym('x');
+        >> fprintf('%d %d %d\n', sin(x).is_smooth(), abs(x).is_smooth(), floor(x).is_smooth())
+        1 1 0
+        >> c = x > 0; b = if_else(c, x, 0);
+        >> fprintf('%d %d %d\n', b.is_smooth(), c.is_smooth(), DM(1).is_smooth())
+        0 0 1
+        \enddoctest
 
         \identifier{19o} */
     bool is_smooth() const;
@@ -1147,23 +2754,68 @@ namespace casadi {
     bool is_valid_input() const;
 
     /// \cond INTERNAL
-    /** \brief Detect duplicate symbolic expressions
+    /** \brief Detect symbolic primitives that appear more than once in an SX matrix
 
-        If there are symbolic primitives appearing more than once, the function will return
-        true and the names of the duplicate expressions will be passed to casadi_warning.
-        Note: Will mark the node using SXElem::set_temp.
-        Make sure to call reset_input() after usage.
+        Returns true and emits a warning naming each duplicate. Used when checking Function
+        inputs ("input expressions are not independent"). Marks the visited nodes; a second
+        call on the same symbols reports them as duplicates until reset_input is called.
+        Only defined for SX.
+
+        \doctest
+        >>> x = SX.sym("x"); y = SX.sym("y")
+        >>> v = vertcat(x, y)
+        >>> v.has_duplicates()
+        False
+        >>> v.reset_input()
+        >>> vertcat(x, x).has_duplicates()
+        True
+        \enddoctest
+
+        \doctest{matlab}
+        >> x = SX.sym('x'); y = SX.sym('y');
+        >> v = vertcat(x, y);
+        >> v.has_duplicates()
+        0
+        >> v.reset_input();
+        >> vertcat(x, x).has_duplicates()
+        ...
+        1
+        \enddoctest
+
+        \sa reset_input, is_valid_input
 
         \identifier{19t} */
     bool has_duplicates() const;
 
-    /** \brief Reset the marker for an input expression
+    /** \brief Clear the markers set by has_duplicates
 
         \identifier{19u} */
     void reset_input() const;
   /// \endcond
 
-    /** \brief Check if the matrix is constant (note that false negative answers are possible)
+    /** \brief Check if every entry is a numerical constant (no symbols)
+
+        Always true for DM. For SX, true when no entry depends on a symbol; the
+        simplifications make x*0 and x-x constant. A false negative is possible for
+        expressions that are constant only in value, e.g. x - x after other operations.
+
+        \doctest
+        >>> x = SX.sym("x")
+        >>> SX([1, 2]).is_constant(), x.is_constant(), (x * 0).is_constant()
+        (True, False, True)
+        >>> vertcat(x, 1).is_constant(), SX.sym("e", 2, 0).is_constant()
+        (False, True)
+        \enddoctest
+
+        \doctest{matlab}
+        >> x = SX.sym('x'); z = x * 0;
+        >> fprintf('%d %d %d\n', SX([1; 2]).is_constant(), x.is_constant(), z.is_constant())
+        1 0 1
+        >> fprintf('%d %d\n', vertcat(x, 1).is_constant(), SX.sym('e', 2, 0).is_constant())
+        0 1
+        \enddoctest
+
+        \sa is_symbolic, evalf
 
         \identifier{19v} */
     bool is_constant() const;
@@ -1255,17 +2907,78 @@ namespace casadi {
     /// Is it a certain operation
     bool is_op(casadi_int op) const;
 
-    /** \brief  Check if the matrix has any zero entries which are not structural zeros
+    /** \brief Check if any structural nonzero is known to be numerically zero
+
+        For SX only entries that are the constant 0 count. Use sparsify to remove them.
+
+        \doctest
+        >>> DM([1, 0]).has_zeros(), DM([1, 2]).has_zeros(), DM(2, 2).has_zeros()
+        (True, False, False)
+        >>> x = SX.sym("x")
+        >>> vertcat(x, 0).has_zeros(), vertcat(x, x * 0).has_zeros()
+        (True, True)
+        \enddoctest
+
+        \doctest{matlab}
+        >> fprintf('%d %d\n', DM([1; 0]).has_zeros(), DM([1; 2]).has_zeros())
+        1 0
+        >> DM(2, 2).has_zeros()
+        0
+        >> x = SX.sym('x');
+        >> fprintf('%d %d\n', vertcat(x, 0).has_zeros(), vertcat(x, x * 0).has_zeros())
+        1 1
+        \enddoctest
+
+        \sa sparsify, has_nz
 
         \identifier{1a1} */
     bool has_zeros() const;
 
-    /** \brief Get all nonzeros
+    /** \brief Get all structural nonzeros as a flat list in column-major order (Python: nonzeros())
+
+        Returns floats for DM and 1-by-1 SX objects for SX. Structural zeros are skipped.
+
+        \doctest
+        >>> DM([[1, 2], [3, 4]]).nonzeros()
+        [1.0, 3.0, 2.0, 4.0]
+        >>> DM(Sparsity.diag(2)).nonzeros(), DM(2, 0).nonzeros()
+        ([1.0, 1.0], [])
+        >>> SX.sym("x", 2).nonzeros()
+        [SX(x_0), SX(x_1)]
+        \enddoctest
+
+        \doctest{matlab}
+        >> DM([1 2; 3 4]).nonzeros()
+        1 3 2 4
+        >> DM(Sparsity.diag(2)).nonzeros(), size(DM(2, 0).nonzeros())
+        1 1
+        1 0
+        >> v = SX.sym('x', 2).nonzeros();
+        >> class(v), v{2}
+        cell
+        x_1
+        \enddoctest
+
+        \sa elements, get_nz
 
         \identifier{1a2} */
     std::vector<Scalar> get_nonzeros() const;
 
-    /** \brief Get all elements
+    /** \brief Get all elements as a flat list in column-major order (Python: elements())
+
+        Like nonzeros, but structural zeros are included as 0, so the list has numel() entries.
+
+        \doctest
+        >>> DM(Sparsity.diag(2)).elements()
+        [1.0, 0.0, 0.0, 1.0]
+        \enddoctest
+
+        \doctest{matlab}
+        >> DM(Sparsity.diag(2)).elements()
+        1 0 0 1
+        \enddoctest
+
+        \sa nonzeros, densify
 
         \identifier{1a3} */
     std::vector<Scalar> get_elements() const;
@@ -1278,12 +2991,39 @@ namespace casadi {
     std::vector<A> get_nonzeros() const;
 #endif // SWIG
 
-    /** \brief Type conversion to double
+    /** \brief Conversion of a 1-by-1 matrix to a double (Python: float(x))
+
+        Other shapes raise an error. A symbolic SX entry converts to nan without an error.
+
+        \doctest
+        >>> float(DM(2.5)), float(SX(3))
+        (2.5, 3.0)
+        >>> try: float(DM([1, 2]))
+        ... except Exception as e: print("error")
+        error
+        \enddoctest
+
+        \doctest{matlab}
+        >> fprintf('%g %g\n', full(DM(2.5)), SX(3).to_double())
+        2.5 3
+        >> try, DM([1; 2]).to_double(); catch e, disp('error'); end
+        error
+        \enddoctest
 
         \identifier{1a5} */
     explicit operator double() const;
 
-    /** \brief Type conversion to casadi_int
+    /** \brief Conversion of a 1-by-1 matrix to an integer (Python: int(x)), truncating
+
+        \doctest
+        >>> int(DM(3.7))
+        3
+        \enddoctest
+
+        \doctest{matlab}
+        >> DM(3.7).to_int()
+        3
+        \enddoctest
 
         \identifier{1a6} */
     explicit operator casadi_int() const;
@@ -1296,45 +3036,144 @@ namespace casadi {
     explicit operator std::vector<A>() const;
 #endif // SWIG
 
-    /** \brief Get name (only if symbolic scalar)
+    /** \brief Name of a 1-by-1 symbolic SX primitive
+
+        Raises an error for a non-scalar, for an expression that is not a pure symbol, and for DM.
+
+        \doctest
+        >>> SX.sym("x").name(), SX.sym("v", 2)[1].name()
+        ('x', 'v_1')
+        \enddoctest
+
+        \doctest{matlab}
+        >> v = SX.sym('v', 2); v2 = v(2);
+        >> fprintf('%s %s\n', SX.sym('x').name(), v2.name())
+        x v_1
+        \enddoctest
+
+        \sa is_symbolic
 
         \identifier{1a8} */
     std::string name() const;
 
-    /** \brief Get expressions of the children of the expression
+    /** \brief Get operand ch of a 1-by-1 SX expression
 
-        Only defined if symbolic scalar.
-        Wraps SXElem SXElem::dep(casadi_int ch=0) const.
+        Only defined for a scalar SX that is the result of an operation; a symbol, a
+        constant or a DM raises an error.
+
+        \param ch Operand index, 0 or 1
+
+        \doctest
+        >>> x = SX.sym("x"); y = SX.sym("y")
+        >>> e = x * y
+        >>> e.dep(0), e.dep(1), e.n_dep()
+        (SX(x), SX(y), 2)
+        \enddoctest
+
+        \doctest{matlab}
+        >> x = SX.sym('x'); y = SX.sym('y');
+        >> e = x * y;
+        >> e.dep(0), e.dep(1), e.n_dep()
+        x
+        y
+        2
+        \enddoctest
+
+        \sa n_dep, op
 
         \identifier{1a9} */
     Matrix<Scalar> dep(casadi_int ch=0) const;
 
-    /** \brief Get the number of dependencies of a binary SXElem
+    /** \brief Number of operands of a 1-by-1 SX expression (0 for symbols and constants)
 
-        Only defined if symbolic scalar.
+        \sa dep
 
         \identifier{1aa} */
     casadi_int n_dep() const;
 
     // @{
-    /// Set the 'precision, width & scientific' used in printing and serializing to streams
+    /** \brief Set the precision, field width and scientific flag used when printing nonzeros
+
+        Global settings per class (DM and SX each keep their own), applied by str(), print()
+        and the print_* methods. Defaults: precision 6, width 0, scientific false.
+
+        \doctest
+        >>> DM.set_precision(3)
+        >>> DM(1/3)
+        DM(0.333)
+        >>> DM.set_precision(6)
+        >>> DM(1/3)
+        DM(0.333333)
+        \enddoctest
+
+        \doctest{matlab}
+        >> DM.set_precision(3);
+        >> DM(1/3)
+        0.333
+        >> DM.set_precision(6);
+        >> DM(1/3)
+        0.333333
+        \enddoctest
+
+        \sa get_precision */
     static void set_precision(casadi_int precision);
     static void set_width(casadi_int width);
     static void set_scientific(bool scientific);
     // @}
 
     // @{
-    /// Get the 'precision, width & scientific' used in printing and serializing to streams
+    /// Get the precision, field width and scientific flag used when printing nonzeros
     static casadi_int get_precision();
     static casadi_int get_width();
     static bool get_scientific();
     // @}
 
-    /// Seed the random number generator
+    /** \brief Seed the random number generator used by rand
+
+        The generator is global to the class and is seeded from the clock at startup;
+        seeding it makes subsequent rand calls reproducible.
+
+        \doctest
+        >>> DM.rng(1); a = DM.rand(2, 2)
+        >>> DM.rng(1); b = DM.rand(2, 2)
+        >>> float(norm_inf(a - b))
+        0.0
+        \enddoctest
+
+        \doctest{matlab}
+        >> DM.rng(1); a = DM.rand(2, 2);
+        >> DM.rng(1); b = DM.rand(2, 2);
+        >> norm_inf(a - b)
+        0
+        \enddoctest
+
+        \sa rand */
     static void rng(casadi_int seed);
 
     ///@{
-    /** \brief Create a matrix with uniformly distributed random numbers
+    /** \brief Create a matrix with uniformly distributed random numbers in [0, 1)
+
+        Takes a shape (dense result, default 1-by-1) or a sparsity pattern, in which case
+        only the structural nonzeros get a random value. Only available for DM.
+
+        \doctest
+        >>> DM.rand(2, 3).dim(), DM.rand().dim(), DM.rand(Sparsity.diag(3)).nnz()
+        ('2x3', '1x1', 3)
+        >>> try: SX.rand(2)
+        ... except Exception as e: print("error")
+        error
+        \enddoctest
+
+        \doctest{matlab}
+        >> fprintf('%s %s\n', DM.rand(2, 3).dim(), DM.rand().dim())
+        2x3 1x1
+        >> DM.rand(Sparsity.diag(3)).nnz()
+        3
+        >> try, SX.rand(2); catch e, disp('error'); end
+        error
+        \enddoctest
+
+        \sa rng
 
         \identifier{1ab} */
     static Matrix<Scalar> rand(  // NOLINT(runtime/threadsafe_fn)
@@ -1362,7 +3201,19 @@ namespace casadi {
     void export_code(const std::string& lang,
         std::ostream &stream=casadi::uout(), const Dict& options=Dict()) const;
 
-    /** Obtain information about sparsity */
+    /** \brief Dictionary with the sparsity pattern and the nonzeros (DM only)
+
+        \doctest
+        >>> sorted(DM([1, 2]).info().keys())
+        ['data', 'sparsity']
+        \enddoctest
+
+        \doctest{matlab}
+        >> s = DM([1; 2]).info();
+        >> strjoin(sort(fieldnames(s))', ' ')
+        data sparsity
+        \enddoctest
+    */
     Dict info() const;
     #ifndef SWIG
         /** \brief Serialize an object
@@ -1371,17 +3222,47 @@ namespace casadi {
         void serialize(std::ostream &stream) const;
     #endif
 
-    /** \brief Serialize
+    /** \brief Serialize to a string
+
+        The string can be restored with deserialize of the same class (DM or SX).
+        For SX the whole expression graph is stored, symbols included.
+
+        \doctest
+        >>> s = DM([[1, 2], [3, 4]]).serialize()
+        >>> DM.deserialize(s)
+        DM(
+        [[1, 2],
+         [3, 4]])
+        >>> x = SX.sym("x")
+        >>> SX.deserialize((sin(x) + x).serialize())
+        SX((sin(x)+x))
+        \enddoctest
+
+        \doctest{matlab}
+        >> s = DM([1 2; 3 4]).serialize();
+        >> DM.deserialize(s)
+        [[1, 2],
+         [3, 4]]
+        >> x = SX.sym('x'); e = sin(x) + x;
+        >> SX.deserialize(e.serialize())
+        (sin(x)+x)
+        \enddoctest
+
+        \sa deserialize, StringSerializer
 
         \identifier{1ae} */
     std::string serialize() const;
 
-    /** \brief Build Sparsity from serialization
+    /** \brief Build a matrix from a serialization stream
 
         \identifier{1af} */
     static Matrix<Scalar> deserialize(std::istream& stream);
 
-    /** \brief Build Sparsity from serialization
+    /** \brief Build a matrix from a string produced by serialize
+
+        A string that is not a CasADi serialization raises an error.
+
+        \sa serialize
 
         \identifier{1ag} */
     static Matrix<Scalar> deserialize(const std::string& s);
@@ -1394,27 +3275,84 @@ namespace casadi {
     static Matrix<Scalar> deserialize(DeserializingStream& s);
 
     // @{
-    /** Export numerical matrix to file
-    *
-    * Supported formats:
-    *
-    * \verbatim
-    *   - .mtx   Matrix Market (sparse)
-    *   - .txt   Ascii full precision representation (sparse)
-    *            Whitespace separated, aligned.
-    *            Comments with # % or /
-    *            Uses C locale
-    *            Structural zeros represented by 00
-    *            Does not scale well for large sparse matrices
-    * \endverbatim
-    *
-    */
+    /** \brief Write a numerical matrix to a text file (DM only)
+
+        Supported formats, selected by the file extension unless \p format is given:
+        - mtx: Matrix Market coordinate format (sparse, one-based row/col/value triplets)
+        - txt: one line per row, whitespace separated, aligned columns, full precision,
+               structural zeros written as 00. Does not scale to large sparse matrices.
+        Values are written with the C locale; nan and inf round-trip. An unknown extension
+        or format raises an error. SX is not supported.
+
+        \param filename Output path
+        \param format "mtx" or "txt"; empty means deduce from the extension
+
+        \doctest
+        >>> import os, tempfile
+        >>> fn = os.path.join(tempfile.mkdtemp(), "a.txt")
+        >>> A = DM(Sparsity.diag(2)) * 2.5
+        >>> A.to_file(fn)
+        >>> DM.from_file(fn)
+        DM(
+        [[2.5, 00],
+         [00, 2.5]])
+        >>> os.remove(fn); os.rmdir(os.path.dirname(fn))
+        \enddoctest
+
+        \doctest{matlab}
+        >> fn = [tempname '.txt'];
+        >> A = DM(Sparsity.diag(2)) * 2.5;
+        >> A.to_file(fn);
+        >> DM.from_file(fn)
+        [[2.5, 00],
+         [00, 2.5]]
+        >> delete(fn);
+        \enddoctest
+
+        \sa from_file, Sparsity::to_file */
     void to_file(const std::string& filename, const std::string& format="") const;
 #ifndef SWIG
     static void to_file(const std::string& filename, const Sparsity& sp,
       const Scalar* nonzeros, const std::string& format="");
 #endif
 
+    /** \brief Read a numerical matrix from a text file written by to_file (DM only)
+
+        Same formats as to_file. In txt format, lines starting with #, % or / and empty lines
+        are skipped, 00 marks a structural zero and a plain 0 a stored zero; every row must
+        have the same number of columns, otherwise an error is raised. An empty file gives a
+        0-by-0 matrix. A missing file raises an error.
+
+        \param filename Input path
+        \param format_hint "mtx" or "txt"; empty means deduce from the extension
+
+        \doctest
+        >>> import os, tempfile
+        >>> fn = os.path.join(tempfile.mkdtemp(), "a.txt")
+        >>> with open(fn, "w") as f: n = f.write("# comment\n1 00\n0 2\n")
+        >>> A = DM.from_file(fn)
+        >>> A
+        DM(
+        [[1, 00],
+         [0, 2]])
+        >>> A.nnz()
+        3
+        >>> os.remove(fn); os.rmdir(os.path.dirname(fn))
+        \enddoctest
+
+        \doctest{matlab}
+        >> fn = [tempname '.txt'];
+        >> fid = fopen(fn, 'w'); fprintf(fid, '# comment\n1 00\n0 2\n'); fclose(fid);
+        >> A = DM.from_file(fn);
+        >> A
+        [[1, 00],
+         [0, 2]]
+        >> A.nnz()
+        3
+        >> delete(fn);
+        \enddoctest
+
+        \sa to_file */
     static Matrix<double> from_file(const std::string& filename, const std::string& format_hint="");
     //@}
 

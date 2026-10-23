@@ -63,6 +63,67 @@ class GenericExpression : public GenericExpressionCommon {
   ///@{
   /** \brief Addition: (x,y) -> x + y
 
+      Elementwise sum. The shape rules below hold for every binary operation in this group
+      (minus, times, rdivide, the comparisons, logic_and, ...):
+      - both operands have the same shape, or
+      - one operand is a scalar (1-by-1), which is combined with every element, or
+      - the operands have the same number of rows and the column count of one is a multiple
+        of the other's; the narrower one is repeated horizontally (so a column vector can be
+        added to every column of a matrix, but a row vector cannot be added to every row).
+      Any other combination raises an error; there is no further broadcasting. Empty
+      matrices follow the same rules and give an empty result.
+
+      The result is sparse where both operands are structurally zero; an entry that is a
+      structural zero in only one operand becomes an explicit value. Operations that map
+      (0, y) or (x, 0) to a nonzero, such as x + 1 or cos, densify the result. Numeric (DM)
+      operands are evaluated, symbolic ones (SX, MX) build an expression; DM and SX or MX can
+      be mixed, SX and MX cannot.
+
+      \doctest
+      >>> plus(DM([1, 2]), DM([10, 20]))
+      DM([11, 22])
+      >>> DM([1, 2]) + 1
+      DM([2, 3])
+      >>> DM.eye(2) + DM.eye(2)
+      DM(
+      [[2, 00],
+       [00, 2]])
+      >>> DM.eye(2) + 1
+      DM(
+      [[2, 1],
+       [1, 2]])
+      >>> SX.sym("x", 2, 2) + SX.sym("y", 2)
+      SX(
+      [[(x_0+y_0), (x_2+y_0)],
+       [(x_1+y_1), (x_3+y_1)]])
+      >>> (MX.sym("x", 2, 0) + 1).shape
+      (2, 0)
+      >>> DM.ones(2, 2) + DM.ones(1, 2)
+      Traceback (most recent call last):
+        ...
+      RuntimeError: ...Dimension mismatch...
+      \enddoctest
+
+      \doctest{matlab}
+      >> plus(DM([1; 2]), DM([10; 20]))
+      [11, 22]
+      >> DM([1; 2]) + 1
+      [2, 3]
+      >> DM.eye(2) + DM.eye(2)
+      [[2, 00],
+       [00, 2]]
+      >> DM.eye(2) + 1
+      [[2, 1],
+       [1, 2]]
+      >> SX.sym('x', 2, 2) + SX.sym('y', 2)
+      [[(x_0+y_0), (x_2+y_0)],
+       [(x_1+y_1), (x_3+y_1)]]
+      >> size(MX.sym('x', 2, 0) + 1)
+      2 0
+      >> try, DM.ones(2, 2) + DM.ones(1, 2); catch e, disp(e.message); end
+      ...Dimension mismatch...
+      \enddoctest
+
       \identifier{on} */
   static ExType plus(const ExType &x, const ExType &y) {
     return ExType::binary(OP_ADD, x, y);
@@ -78,6 +139,32 @@ class GenericExpression : public GenericExpressionCommon {
 
   ///@{
   /** \brief Subtraction: (x,y) -> x - y
+
+      Elementwise difference; shape and sparsity rules as for plus. For symbolic arguments,
+      x - x with the same node simplifies to 0.
+
+      \doctest
+      >>> minus(DM([5, 6]), DM([1, 2]))
+      DM([4, 4])
+      >>> DM.eye(2) - 1
+      DM(
+      [[0, -1],
+       [-1, 0]])
+      >>> x = SX.sym("x")
+      >>> x - x
+      SX(0)
+      \enddoctest
+
+      \doctest{matlab}
+      >> minus(DM([5; 6]), DM([1; 2]))
+      [4, 4]
+      >> DM.eye(2) - 1
+      [[0, -1],
+       [-1, 0]]
+      >> x = SX.sym('x');
+      >> x - x
+      0
+      \enddoctest
 
       \identifier{oo} */
   static ExType minus(const ExType &x, const ExType &y) {
@@ -95,6 +182,39 @@ class GenericExpression : public GenericExpressionCommon {
   ///@{
   /** \brief Elementwise multiplication: (x,y) -> x .* y
 
+      Elementwise (Hadamard) product, not the matrix product; use mtimes for that. Shape rules
+      as for plus. The result is structurally zero wherever either operand is, so the sparsity
+      pattern is the intersection of the patterns.
+
+      \doctest
+      >>> times(DM([1, 2]), DM([3, 4]))
+      DM([3, 8])
+      >>> DM([[1, 2], [3, 4]]) * DM([[1, 2], [3, 4]])
+      DM(
+      [[1, 4],
+       [9, 16]])
+      >>> DM.eye(2) * DM.ones(2, 2)
+      DM(
+      [[1, 00],
+       [00, 1]])
+      \enddoctest
+
+      \doctest{matlab}
+      >> times(DM([1; 2]), DM([3; 4]))
+      [3, 8]
+      >> DM([1 2; 3 4]) .* DM([1 2; 3 4])
+      [[1, 4],
+       [9, 16]]
+      >> DM([1 2; 3 4]) * DM([1 2; 3 4])
+      [[7, 10],
+       [15, 22]]
+      >> DM.eye(2) .* DM.ones(2, 2)
+      [[1, 00],
+       [00, 1]]
+      \enddoctest
+
+      \sa mtimes
+
       \identifier{op} */
   static ExType times(const ExType &x, const ExType &y) {
     return ExType::binary(OP_MUL, x, y);
@@ -110,6 +230,40 @@ class GenericExpression : public GenericExpressionCommon {
 
   ///@{
   /** \brief Elementwise division: (x,y) -> x ./ y
+
+      Elementwise quotient, not a linear solve; use solve or mldivide for that. Shape rules as
+      for plus. Division by zero follows IEEE arithmetic (inf or nan), no error is raised.
+      Structural zeros of \p x stay structural zeros; dividing by a sparse \p y densifies.
+
+      \doctest
+      >>> rdivide(DM([1, 2]), 4)
+      DM([0.25, 0.5])
+      >>> DM([1, 2]) / DM([4, 8])
+      DM([0.25, 0.25])
+      >>> 1 / DM.eye(2)
+      DM(
+      [[1, inf],
+       [inf, 1]])
+      >>> DM.eye(2) / 2
+      DM(
+      [[0.5, 00],
+       [00, 0.5]])
+      \enddoctest
+
+      \doctest{matlab}
+      >> rdivide(DM([1; 2]), 4)
+      [0.25, 0.5]
+      >> DM([1; 2]) ./ DM([4; 8])
+      [0.25, 0.25]
+      >> 1 ./ DM.eye(2)
+      [[1, inf],
+       [inf, 1]]
+      >> DM.eye(2) ./ 2
+      [[0.5, 00],
+       [00, 0.5]]
+      \enddoctest
+
+      \sa mldivide, mrdivide, solve
 
       \identifier{oq} */
   static ExType rdivide(const ExType &x, const ExType &y) {
@@ -127,6 +281,39 @@ class GenericExpression : public GenericExpressionCommon {
   ///@{
   /** \brief Logical less than: (x,y) -> x < y
 
+      Elementwise comparison; shape rules as for plus. Every comparison in this group returns
+      a matrix of the same type as the operands with entries 1 (true) and 0 (false): for DM a
+      numeric 0/1 matrix, not a boolean, and for SX and MX a symbolic expression that is only
+      decided at evaluation time. Comparisons with NaN are false. The result is sparse where
+      both operands are structurally zero (0 < 0 is false).
+
+      \doctest
+      >>> lt(DM([1, 2, 3]), 2)
+      DM([1, 0, 0])
+      >>> DM([1, 2, 3]) < DM([3, 2, 1])
+      DM([1, 0, 0])
+      >>> SX.sym("x", 2) < SX.sym("y", 2)
+      SX([(x_0<y_0), (x_1<y_1)])
+      >>> DM.eye(2) < 1
+      DM(
+      [[0, 1],
+       [1, 0]])
+      \enddoctest
+
+      \doctest{matlab}
+      >> lt(DM([1; 2; 3]), 2)
+      [1, 0, 0]
+      >> DM([1; 2; 3]) < DM([3; 2; 1])
+      [1, 0, 0]
+      >> SX.sym('x', 2) < SX.sym('y', 2)
+      [(x_0<y_0), (x_1<y_1)]
+      >> DM.eye(2) < 1
+      [[0, 1],
+       [1, 0]]
+      \enddoctest
+
+      \sa le, gt, ge, eq, ne, if_else
+
       \identifier{or} */
   static ExType lt(const ExType &x, const ExType &y) {
     return ExType::binary(OP_LT, x, y);
@@ -141,6 +328,27 @@ class GenericExpression : public GenericExpressionCommon {
 
   ///@{
   /** \brief Logical less or equal to: (x,y) -> x <= y
+
+      Elementwise comparison with 0/1 result, see lt. Chained inequalities such as
+      lb <= (x <= ub) are recognised by Opti as bound constraints.
+
+      \doctest
+      >>> le(DM([1, 2, 3]), 2)
+      DM([1, 1, 0])
+      >>> x = SX.sym("x")
+      >>> x <= x
+      SX(1)
+      \enddoctest
+
+      \doctest{matlab}
+      >> le(DM([1; 2; 3]), 2)
+      [1, 1, 0]
+      >> x = SX.sym('x');
+      >> x <= x
+      1
+      \enddoctest
+
+      \sa lt
 
       \identifier{os} */
   static ExType le(const ExType &x, const ExType &y) {
@@ -157,6 +365,25 @@ class GenericExpression : public GenericExpressionCommon {
   ///@{
   /** \brief Logical greater than: (x,y) -> x > y
 
+      Elementwise comparison with 0/1 result, see lt. Implemented as y < x, which is how a
+      symbolic expression prints.
+
+      \doctest
+      >>> gt(DM([1, 2, 3]), 2)
+      DM([0, 0, 1])
+      >>> gt(SX.sym("x"), SX.sym("y"))
+      SX((y<x))
+      \enddoctest
+
+      \doctest{matlab}
+      >> gt(DM([1; 2; 3]), 2)
+      [0, 0, 1]
+      >> SX.sym('x') > SX.sym('y')
+      (y<x)
+      \enddoctest
+
+      \sa lt
+
       \identifier{ot} */
   static ExType gt(const ExType &x, const ExType &y) {
     return ExType::lt(y, x);
@@ -171,6 +398,24 @@ class GenericExpression : public GenericExpressionCommon {
 
   ///@{
   /** \brief Logical greater or equal to: (x,y) -> x >= y
+
+      Elementwise comparison with 0/1 result, see lt. Implemented as y <= x.
+
+      \doctest
+      >>> ge(DM([1, 2, 3]), 2)
+      DM([0, 1, 1])
+      >>> ge(MX.sym("x"), MX.sym("y"))
+      MX((y<=x))
+      \enddoctest
+
+      \doctest{matlab}
+      >> ge(DM([1; 2; 3]), 2)
+      [0, 1, 1]
+      >> MX.sym('x') >= MX.sym('y')
+      (y<=x)
+      \enddoctest
+
+      \sa lt
 
       \identifier{ou} */
   static ExType ge(const ExType &x, const ExType &y) {
@@ -187,6 +432,41 @@ class GenericExpression : public GenericExpressionCommon {
   ///@{
   /** \brief Logical equal to: (x,y) -> x == y
 
+      Elementwise comparison with 0/1 result, see lt: this is value equality of the entries,
+      not identity of expressions; use is_equal to test whether two symbolic expressions are
+      the same. For symbolic operands x == x with the same node simplifies to 1. NaN is not
+      equal to anything, including itself.
+
+      \doctest
+      >>> eq(DM([1, 2, 3]), 2)
+      DM([0, 1, 0])
+      >>> DM.eye(2) == DM([[1, 0], [0, 1]])
+      DM(
+      [[1, 1],
+       [1, 1]])
+      >>> x = SX.sym("x")
+      >>> x == x, x == SX.sym("x")
+      (SX(1), SX((x==x)))
+      >>> DM(float("nan")) == DM(float("nan"))
+      DM(0)
+      \enddoctest
+
+      \doctest{matlab}
+      >> eq(DM([1; 2; 3]), 2)
+      [0, 1, 0]
+      >> DM.eye(2) == DM([1 0; 0 1])
+      [[1, 1],
+       [1, 1]]
+      >> x = SX.sym('x');
+      >> x == x, x == SX.sym('x')
+      1
+      (x==x)
+      >> DM(nan) == DM(nan)
+      0
+      \enddoctest
+
+      \sa ne, is_equal
+
       \identifier{ov} */
   static ExType eq(const ExType &x, const ExType &y) {
     return ExType::binary(OP_EQ, x, y);
@@ -201,6 +481,27 @@ class GenericExpression : public GenericExpressionCommon {
 
   ///@{
   /** \brief Logical not equal to: (x,y) -> x != y
+
+      Elementwise comparison with 0/1 result, see lt and eq. For symbolic operands x != x with
+      the same node simplifies to 0, so it cannot be used to detect NaN symbolically.
+
+      \doctest
+      >>> ne(DM([1, 2, 3]), 2)
+      DM([1, 0, 1])
+      >>> x = MX.sym("x")
+      >>> x != x
+      MX(0)
+      \enddoctest
+
+      \doctest{matlab}
+      >> ne(DM([1; 2; 3]), 2)
+      [1, 0, 1]
+      >> x = MX.sym('x');
+      >> x ~= x
+      0
+      \enddoctest
+
+      \sa eq
 
       \identifier{ow} */
   static ExType ne(const ExType &x, const ExType &y) {
@@ -217,8 +518,35 @@ class GenericExpression : public GenericExpressionCommon {
   ///@{
   /** \brief Logical `and`
 
-   * Returns (an expression evaluating to) 1 if both
-   * expressions are nonzero and 0 otherwise
+   * Returns (an expression evaluating to) 1 where both
+   * entries are nonzero and 0 otherwise, elementwise
+
+      Any nonzero value, including NaN, counts as true. Shape rules as for plus; the result is
+      structurally zero wherever either operand is. The Python keyword `and` does not work on
+      matrices (it needs a single truth value); use this function.
+
+      \doctest
+      >>> logic_and(DM([1, 2, 0]), DM([3, 0, 0]))
+      DM([1, 0, 0])
+      >>> logic_and(SX.sym("x"), SX.sym("y"))
+      SX((x&&y))
+      >>> logic_and(DM.eye(2), DM.ones(2, 2))
+      DM(
+      [[1, 00],
+       [00, 1]])
+      \enddoctest
+
+      \doctest{matlab}
+      >> DM([1; 2; 0]) & DM([3; 0; 0])
+      [1, 0, 0]
+      >> SX.sym('x') & SX.sym('y')
+      (x&&y)
+      >> and(DM.eye(2), DM.ones(2, 2))
+      [[1, 00],
+       [00, 1]]
+      \enddoctest
+
+      \sa logic_or, logic_not
 
       \identifier{ox} */
    static ExType logic_and(const ExType &x, const ExType &y) {
@@ -235,8 +563,26 @@ class GenericExpression : public GenericExpressionCommon {
   ///@{
   /** \brief  Logical `or`
 
-   * returns (an expression evaluating to) 1 if at
-   * least one expression is nonzero and 0 otherwise
+   * returns (an expression evaluating to) 1 where at
+   * least one entry is nonzero and 0 otherwise, elementwise
+
+      Shape rules as for plus; the result is structurally zero where both operands are.
+
+      \doctest
+      >>> logic_or(DM([1, 0, 0]), DM([0, 0, 2]))
+      DM([1, 0, 1])
+      >>> logic_or(MX.sym("x"), MX.sym("y"))
+      MX((x||y))
+      \enddoctest
+
+      \doctest{matlab}
+      >> DM([1; 0; 0]) | DM([0; 0; 2])
+      [1, 0, 1]
+      >> or(MX.sym('x'), MX.sym('y'))
+      (x||y)
+      \enddoctest
+
+      \sa logic_and, logic_not
 
       \identifier{oy} */
    static ExType logic_or(const ExType &x, const ExType &y) {
@@ -253,8 +599,34 @@ class GenericExpression : public GenericExpressionCommon {
    ///@{
    /** \brief  Logical `not` x -> !x
 
-    * Returns (an expression evaluating to) 1 if
-    * expression is zero and 0 otherwise
+    * Returns (an expression evaluating to) 1 where the
+    * entry is zero and 0 otherwise, elementwise
+
+      Structural zeros map to 1, so a sparse input gives a dense result. The Python keyword
+      `not` does not work on matrices; use this function.
+
+      \doctest
+      >>> logic_not(DM([1, 0, -1]))
+      DM([0, 1, 0])
+      >>> logic_not(DM.eye(2))
+      DM(
+      [[0, 1],
+       [1, 0]])
+      >>> logic_not(SX.sym("x"))
+      SX((!x))
+      \enddoctest
+
+      \doctest{matlab}
+      >> ~DM([1; 0; -1])
+      [0, 1, 0]
+      >> not(DM.eye(2))
+      [[0, 1],
+       [1, 0]]
+      >> ~SX.sym('x')
+      (!x)
+      \enddoctest
+
+      \sa logic_and, logic_or
 
        \identifier{oz} */
     static ExType logic_not(const ExType& x) {
@@ -271,6 +643,36 @@ class GenericExpression : public GenericExpressionCommon {
     ///@{
     /** \brief Absolute value: x -> abs(x)
 
+        Elementwise; structural zeros are preserved. The unary functions of this group operate
+        on every entry, keep the shape and build a symbolic expression for SX and MX. Those
+        that map 0 to 0 (abs, sqrt, sin, tan, atan, asin, sinh, tanh, asinh, atanh, floor,
+        ceil, sign, erf, erfinv, log1p, expm1) keep the sparsity pattern; the others (cos,
+        cosh, exp, log, log10, acos, acosh, logic_not) return a dense result. Named fabs in
+        Python, where the built-in abs also applies.
+
+        \doctest
+        >>> fabs(DM([-1, 0, 2]))
+        DM([1, 0, 2])
+        >>> fabs(DM.eye(2) * -1)
+        DM(
+        [[1, 00],
+         [00, 1]])
+        >>> abs(SX.sym("x"))
+        SX(fabs(x))
+        \enddoctest
+
+        \doctest{matlab}
+        >> abs(DM([-1; 0; 2]))
+        [1, 0, 2]
+        >> abs(-DM.eye(2))
+        [[1, 00],
+         [00, 1]]
+        >> abs(SX.sym('x'))
+        fabs(x)
+        \enddoctest
+
+        \sa sign, copysign
+
         \identifier{p0} */
     static ExType abs(const ExType& x) {
       return ExType::unary(OP_FABS, x);
@@ -286,6 +688,25 @@ class GenericExpression : public GenericExpressionCommon {
     ///@{
     /** \brief Square root: x -> sqrt(x)
 
+        Elementwise; sparsity preserved. A negative argument gives NaN, no error is raised.
+        A symbolic power x**0.5 simplifies to sqrt(x).
+
+        \doctest
+        >>> sqrt(DM([4, 9]))
+        DM([2, 3])
+        >>> SX.sym("x")**0.5
+        SX(sqrt(x))
+        \enddoctest
+
+        \doctest{matlab}
+        >> sqrt(DM([4; 9]))
+        [2, 3]
+        >> SX.sym('x').^0.5
+        sqrt(x)
+        \enddoctest
+
+        \sa sq, pow
+
         \identifier{p1} */
     static ExType sqrt(const ExType& x) {
       return ExType::unary(OP_SQRT, x);
@@ -297,6 +718,21 @@ class GenericExpression : public GenericExpressionCommon {
 
     ///@{
     /** \brief Square: x -> x^2
+
+        Elementwise; sparsity preserved. Not exposed as a function in Python; a symbolic
+        power with exponent 2 is turned into this operation.
+
+        \doctest
+        >>> SX.sym("x")**2
+        SX(sq(x))
+        \enddoctest
+
+        \doctest{matlab}
+        >> SX.sym('x').^2
+        sq(x)
+        \enddoctest
+
+        \sa sqrt, pow
 
         \identifier{p2} */
     static ExType sq(const ExType& x) {
@@ -310,6 +746,27 @@ class GenericExpression : public GenericExpressionCommon {
     ///@{
     /** \brief Sine: x -> sin(x)
 
+        Elementwise; sparsity preserved (sin(0) == 0).
+
+        \doctest
+        >>> sin(DM.eye(2))
+        DM(
+        [[0.841471, 00],
+         [00, 0.841471]])
+        >>> sin(MX.sym("x", 2))
+        MX(sin(x))
+        \enddoctest
+
+        \doctest{matlab}
+        >> sin(DM.eye(2))
+        [[0.841471, 00],
+         [00, 0.841471]]
+        >> sin(MX.sym('x', 2))
+        sin(x)
+        \enddoctest
+
+        \sa cos, tan, asin
+
         \identifier{p3} */
     static ExType sin(const ExType& x) {
       return ExType::unary(OP_SIN, x);
@@ -321,6 +778,31 @@ class GenericExpression : public GenericExpressionCommon {
 
     ///@{
     /** \brief Cosine: x -> cos(x)
+
+        Elementwise; structural zeros become 1, so the result is dense.
+
+        \doctest
+        >>> cos(DM.eye(2))
+        DM(
+        [[0.540302, 1],
+         [1, 0.540302]])
+        >>> cos(SX.sym("s", Sparsity.diag(2)))
+        SX(@1=1,
+        [[cos(s_0), @1],
+         [@1, cos(s_1)]])
+        \enddoctest
+
+        \doctest{matlab}
+        >> cos(DM.eye(2))
+        [[0.540302, 1],
+         [1, 0.540302]]
+        >> cos(SX.sym('s', Sparsity.diag(2)))
+        @1=1,
+        [[cos(s_0), @1],
+         [@1, cos(s_1)]]
+        \enddoctest
+
+        \sa sin, tan, acos
 
         \identifier{p4} */
     static ExType cos(const ExType& x) {
@@ -334,6 +816,20 @@ class GenericExpression : public GenericExpressionCommon {
     ///@{
     /** \brief Tangent: x -> tan(x)
 
+        Elementwise; sparsity preserved.
+
+        \doctest
+        >>> tan(DM([0, 1]))
+        DM([0, 1.55741])
+        \enddoctest
+
+        \doctest{matlab}
+        >> tan(DM([0; 1]))
+        [0, 1.55741]
+        \enddoctest
+
+        \sa atan, sin, cos
+
         \identifier{p5} */
     static ExType tan(const ExType& x) {
       return ExType::unary(OP_TAN, x);
@@ -345,6 +841,21 @@ class GenericExpression : public GenericExpressionCommon {
 
     ///@{
     /** \brief Arc tangent: x -> atan(x)
+
+        Elementwise; sparsity preserved. Result in (-pi/2, pi/2); use atan2 for a
+        quadrant-aware angle.
+
+        \doctest
+        >>> atan(DM([0, 1]))
+        DM([0, 0.785398])
+        \enddoctest
+
+        \doctest{matlab}
+        >> atan(DM([0; 1]))
+        [0, 0.785398]
+        \enddoctest
+
+        \sa atan2, tan
 
         \identifier{p6} */
     static ExType atan(const ExType& x) {
@@ -358,6 +869,20 @@ class GenericExpression : public GenericExpressionCommon {
     ///@{
     /** \brief Arc sine: x -> asin(x)
 
+        Elementwise; sparsity preserved. Arguments outside [-1, 1] give NaN.
+
+        \doctest
+        >>> asin(DM([0, 1]))
+        DM([0, 1.5708])
+        \enddoctest
+
+        \doctest{matlab}
+        >> asin(DM([0; 1]))
+        [0, 1.5708]
+        \enddoctest
+
+        \sa sin, acos
+
         \identifier{p7} */
     static ExType asin(const ExType& x) {
       return ExType::unary(OP_ASIN, x);
@@ -369,6 +894,20 @@ class GenericExpression : public GenericExpressionCommon {
 
     ///@{
     /** \brief Arc cosine: x -> acos(x)
+
+        Elementwise; the result is dense (acos(0) == pi/2). Arguments outside [-1, 1] give NaN.
+
+        \doctest
+        >>> acos(DM([0, 1]))
+        DM([1.5708, 0])
+        \enddoctest
+
+        \doctest{matlab}
+        >> acos(DM([0; 1]))
+        [1.5708, 0]
+        \enddoctest
+
+        \sa cos, asin
 
         \identifier{p8} */
     static ExType acos(const ExType& x) {
@@ -382,6 +921,20 @@ class GenericExpression : public GenericExpressionCommon {
     ///@{
     /** \brief Hyperbolic tangent: x -> tanh(x)
 
+        Elementwise; sparsity preserved.
+
+        \doctest
+        >>> tanh(DM([0, 1]))
+        DM([0, 0.761594])
+        \enddoctest
+
+        \doctest{matlab}
+        >> tanh(DM([0; 1]))
+        [0, 0.761594]
+        \enddoctest
+
+        \sa atanh, sinh, cosh
+
         \identifier{p9} */
     static ExType tanh(const ExType& x) {
       return ExType::unary(OP_TANH, x);
@@ -393,6 +946,20 @@ class GenericExpression : public GenericExpressionCommon {
 
     ///@{
     /** \brief Hyperbolic sin: x -> sinh(x)
+
+        Elementwise; sparsity preserved.
+
+        \doctest
+        >>> sinh(DM([0, 1]))
+        DM([0, 1.1752])
+        \enddoctest
+
+        \doctest{matlab}
+        >> sinh(DM([0; 1]))
+        [0, 1.1752]
+        \enddoctest
+
+        \sa asinh, cosh, tanh
 
         \identifier{pa} */
     static ExType sinh(const ExType& x) {
@@ -406,6 +973,20 @@ class GenericExpression : public GenericExpressionCommon {
     ///@{
     /** \brief Hyperbolic cosine: x -> cosh(x)
 
+        Elementwise; the result is dense (cosh(0) == 1).
+
+        \doctest
+        >>> cosh(DM([0, 1]))
+        DM([1, 1.54308])
+        \enddoctest
+
+        \doctest{matlab}
+        >> cosh(DM([0; 1]))
+        [1, 1.54308]
+        \enddoctest
+
+        \sa acosh, sinh, tanh
+
         \identifier{pb} */
     static ExType cosh(const ExType& x) {
       return ExType::unary(OP_COSH, x);
@@ -417,6 +998,20 @@ class GenericExpression : public GenericExpressionCommon {
 
     ///@{
     /** \brief Inverse hyperbolic tangent: x -> atanh(x)
+
+        Elementwise; sparsity preserved. Defined for |x| < 1, infinite at +-1.
+
+        \doctest
+        >>> atanh(DM([0, 0.5]))
+        DM([0, 0.549306])
+        \enddoctest
+
+        \doctest{matlab}
+        >> atanh(DM([0; 0.5]))
+        [0, 0.549306]
+        \enddoctest
+
+        \sa tanh
 
         \identifier{pc} */
     static ExType atanh(const ExType& x) {
@@ -430,6 +1025,20 @@ class GenericExpression : public GenericExpressionCommon {
     ///@{
     /** \brief Inverse hyperbolic sin: x -> asinh(x)
 
+        Elementwise; sparsity preserved.
+
+        \doctest
+        >>> asinh(DM([-1, 1]))
+        DM([-0.881374, 0.881374])
+        \enddoctest
+
+        \doctest{matlab}
+        >> asinh(DM([-1; 1]))
+        [-0.881374, 0.881374]
+        \enddoctest
+
+        \sa sinh
+
         \identifier{pd} */
     static ExType asinh(const ExType& x) {
       return ExType::unary(OP_ASINH, x);
@@ -441,6 +1050,20 @@ class GenericExpression : public GenericExpressionCommon {
 
     ///@{
     /** \brief Inverse hyperbolic cosine: x -> acosh(x)
+
+        Elementwise; the result is dense. Defined for x >= 1, NaN below.
+
+        \doctest
+        >>> acosh(DM([1, 2]))
+        DM([0, 1.31696])
+        \enddoctest
+
+        \doctest{matlab}
+        >> acosh(DM([1; 2]))
+        [0, 1.31696]
+        \enddoctest
+
+        \sa cosh
 
         \identifier{pe} */
     static ExType acosh(const ExType& x) {
@@ -454,6 +1077,27 @@ class GenericExpression : public GenericExpressionCommon {
     ///@{
     /** \brief Elementwise exponential: x -> exp(x)
 
+        Elementwise; the result is dense (exp(0) == 1).
+
+        \doctest
+        >>> exp(DM.eye(2))
+        DM(
+        [[2.71828, 1],
+         [1, 2.71828]])
+        >>> exp(MX.sym("m", Sparsity.diag(2)))
+        MX(exp(dense(m)))
+        \enddoctest
+
+        \doctest{matlab}
+        >> exp(DM.eye(2))
+        [[2.71828, 1],
+         [1, 2.71828]]
+        >> exp(MX.sym('m', Sparsity.diag(2)))
+        exp(dense(m))
+        \enddoctest
+
+        \sa log, expm1
+
         \identifier{pf} */
     static ExType exp(const ExType& x) {
       return ExType::unary(OP_EXP, x);
@@ -465,6 +1109,25 @@ class GenericExpression : public GenericExpressionCommon {
 
     ///@{
     /** \brief Natural logarithm: x -> log(x)
+
+        Elementwise; the result is dense with -inf at structural zeros. Negative arguments
+        give NaN; no error is raised.
+
+        \doctest
+        >>> log(DM([1, 0]))
+        DM([0, -inf])
+        >>> log(SX.sym("x"))
+        SX(log(x))
+        \enddoctest
+
+        \doctest{matlab}
+        >> log(DM([1; 0]))
+        [0, -inf]
+        >> log(SX.sym('x'))
+        log(x)
+        \enddoctest
+
+        \sa exp, log10, log1p
 
         \identifier{pg} */
     static ExType log(const ExType& x) {
@@ -478,6 +1141,25 @@ class GenericExpression : public GenericExpressionCommon {
     ///@{
     /** \brief Base-10 logarithm: x -> log10(x)
 
+        Computed as log(x) * (1 / log(10)); there is no dedicated operation, which is visible
+        in symbolic expressions. Dense result like log.
+
+        \doctest
+        >>> log10(DM([1, 10, 1000]))
+        DM([0, 1, 3])
+        >>> log10(SX.sym("x"))
+        SX((0.434294*log(x)))
+        \enddoctest
+
+        \doctest{matlab}
+        >> log10(DM([1; 10; 1000]))
+        [0, 1, 3]
+        >> log10(SX.sym('x'))
+        (0.434294*log(x))
+        \enddoctest
+
+        \sa log
+
         \identifier{ph} */
     static ExType log10(const ExType& x) {
       return log(x)*(1/std::log(10.));
@@ -489,6 +1171,25 @@ class GenericExpression : public GenericExpressionCommon {
 
     ///@{
     /** \brief Precision variant for natural logarithm: x -> log(x+1)
+
+        Elementwise; accurate for small x where log(1 + x) would lose digits. Sparsity
+        preserved (log1p(0) == 0).
+
+        \doctest
+        >>> log1p(DM([0, 1e-10]))
+        DM([0, 1e-10])
+        >>> log1p(SX.sym("x"))
+        SX(log1p(x))
+        \enddoctest
+
+        \doctest{matlab}
+        >> log1p(DM([0; 1e-10]))
+        [0, 1e-10]
+        >> log1p(SX.sym('x'))
+        log1p(x)
+        \enddoctest
+
+        \sa log, expm1
 
         \identifier{pi} */
     static ExType log1p(const ExType& x) {
@@ -502,6 +1203,21 @@ class GenericExpression : public GenericExpressionCommon {
     ///@{
     /** \brief Precision variant for elementwise exponential: x -> exp(x)-1
 
+        Elementwise; accurate for small x where exp(x) - 1 would lose digits. Sparsity
+        preserved (expm1(0) == 0).
+
+        \doctest
+        >>> expm1(DM([0, 1e-10]))
+        DM([0, 1e-10])
+        \enddoctest
+
+        \doctest{matlab}
+        >> expm1(DM([0; 1e-10]))
+        [0, 1e-10]
+        \enddoctest
+
+        \sa exp, log1p
+
         \identifier{pj} */
     static ExType expm1(const ExType& x) {
       return ExType::unary(OP_EXPM1, x);
@@ -513,6 +1229,29 @@ class GenericExpression : public GenericExpressionCommon {
 
     ///@{
     /** \brief Round down to nearest integer: x -> floor(x)
+
+        Elementwise, towards minus infinity; sparsity preserved. The derivative is zero
+        everywhere. Floor division x // y in Python is floor(x / y).
+
+        \doctest
+        >>> floor(DM([-1.5, 1.5]))
+        DM([-2, 1])
+        >>> DM([7, -7]) // 2
+        DM([3, -4])
+        >>> SX.sym("x") // 2
+        SX(floor((x/2)))
+        \enddoctest
+
+        \doctest{matlab}
+        >> floor(DM([-1.5; 1.5]))
+        [-2, 1]
+        >> floor(DM([7; -7]) ./ 2)
+        [3, -4]
+        >> floor(SX.sym('x') / 2)
+        floor((x/2))
+        \enddoctest
+
+        \sa ceil, sign
 
         \identifier{pk} */
     static ExType floor(const ExType& x) {
@@ -526,6 +1265,21 @@ class GenericExpression : public GenericExpressionCommon {
     ///@{
     /** \brief Round up to nearest integer: x -> ceil(x)
 
+        Elementwise, towards plus infinity; sparsity preserved. The derivative is zero
+        everywhere.
+
+        \doctest
+        >>> ceil(DM([-1.5, 1.5]))
+        DM([-1, 2])
+        \enddoctest
+
+        \doctest{matlab}
+        >> ceil(DM([-1.5; 1.5]))
+        [-1, 2]
+        \enddoctest
+
+        \sa floor
+
         \identifier{pl} */
     static ExType ceil(const ExType& x) {
       return ExType::unary(OP_CEIL, x);
@@ -538,6 +1292,20 @@ class GenericExpression : public GenericExpressionCommon {
     ///@{
     /** \brief Error function: x -> erf(x)
 
+        Elementwise; sparsity preserved (erf(0) == 0). Range (-1, 1).
+
+        \doctest
+        >>> erf(DM([0, 1]))
+        DM([0, 0.842701])
+        \enddoctest
+
+        \doctest{matlab}
+        >> erf(DM([0; 1]))
+        [0, 0.842701]
+        \enddoctest
+
+        \sa erfinv
+
         \identifier{pm} */
     static ExType erf(const ExType& x) {
       return ExType::unary(OP_ERF, x);
@@ -549,6 +1317,21 @@ class GenericExpression : public GenericExpressionCommon {
 
     ///@{
     /** \brief Inverse error function: x -> erfinv(x)
+
+        Elementwise; sparsity preserved. Defined on [-1, 1] with erfinv(+-1) infinite;
+        arguments outside give NaN.
+
+        \doctest
+        >>> erfinv(DM([0, 0.5, 1]))
+        DM([0, 0.476936, inf])
+        \enddoctest
+
+        \doctest{matlab}
+        >> erfinv(DM([0; 0.5; 1]))
+        [0, 0.476936, inf]
+        \enddoctest
+
+        \sa erf
 
         \identifier{pn} */
     static ExType erfinv(const ExType& x) {
@@ -567,6 +1350,24 @@ class GenericExpression : public GenericExpressionCommon {
         sign(0)   :=  0
         sign(NaN) :=  NaN
 
+        Elementwise; sparsity preserved. The derivative is zero everywhere.
+
+        \doctest
+        >>> sign(DM([-2, 0, 3]))
+        DM([-1, 0, 1])
+        >>> sign(SX.sym("x"))
+        SX(sign(x))
+        \enddoctest
+
+        \doctest{matlab}
+        >> sign(DM([-2; 0; 3]))
+        [-1, 0, 1]
+        >> sign(SX.sym('x'))
+        sign(x)
+        \enddoctest
+
+        \sa abs, copysign
+
         \identifier{po} */
     static ExType sign(const ExType& x) {
       return ExType::unary(OP_SIGN, x);
@@ -578,6 +1379,42 @@ class GenericExpression : public GenericExpressionCommon {
 
     ///@{
     /** \brief Elementwise power: (x,y) -> x.^y
+
+        Elementwise; shape rules as for plus. Named power in Python, where the ** operator
+        maps to it as well. A constant exponent is simplified symbolically: integer powers
+        become repeated squaring and multiplication, 0.5 becomes sqrt, -1 a reciprocal, other
+        constants a constpow operation. Structural zeros of \p x stay zero for a nonzero
+        exponent; x**0 is dense (0**0 == 1).
+
+        \doctest
+        >>> power(DM([1, 2, 3]), 2)
+        DM([1, 4, 9])
+        >>> DM([1, 2, 3])**DM([3, 2, 1]), 2**DM([1, 2, 3])
+        (DM([1, 4, 3]), DM([2, 4, 8]))
+        >>> x = SX.sym("x")
+        >>> x**2, x**3, x**-1, x**x
+        (SX(sq(x)), SX((x*sq(x))), SX((1./x)), SX(pow(x,x)))
+        >>> x**2.5
+        SX(pow(x,2.5))
+        \enddoctest
+
+        \doctest{matlab}
+        >> power(DM([1; 2; 3]), 2)
+        [1, 4, 9]
+        >> DM([1; 2; 3]).^DM([3; 2; 1]), 2.^DM([1; 2; 3])
+        [1, 4, 3]
+        [2, 4, 8]
+        >> x = SX.sym('x');
+        >> x.^2, x.^3, x.^-1, x.^x
+        sq(x)
+        (x*sq(x))
+        (1./x)
+        pow(x,x)
+        >> x.^2.5
+        pow(x,2.5)
+        \enddoctest
+
+        \sa sq, sqrt, constpow, mpower
 
         \identifier{pp} */
     static ExType pow(const ExType& x, const ExType& y) {
@@ -591,17 +1428,36 @@ class GenericExpression : public GenericExpressionCommon {
     ///@{
     /** \brief Remainder after division: (x,y) -> fmod(x,y)
 
-    This Function follows the convention of https://en.cppreference.com/w/c/numeric/math/fmod
+    This Function follows the convention of https://en.cppreference.com/w/c/numeric/math/fmod:
+    the result has the sign of \p x and magnitude below |y|.
 
-    Notably:
-      - fmod(5,3)   -> 2
-      - fmod(5,-3)  -> 2
-      - fmod(-5,3)  -> -2
-      - fmod(-5,-3) -> -2
+    This is equivalent to Python's numpy.fmod and Matlab's rem. It differs from the Python
+    operator x % y on these objects, which follows the Python convention x - y*floor(x/y)
+    (result with the sign of \p y). Elementwise, shape rules as for plus; structural zeros of
+    \p x stay zero. A zero divisor gives NaN.
 
-    This is equivalent to Python's numpy.fmod and Matlab's rem.
+    \doctest
+    >>> fmod(DM([5, 5, -5, -5]), DM([3, -3, 3, -3]))
+    DM([2, 2, -2, -2])
+    >>> DM([5, 5, -5, -5]) % DM([3, -3, 3, -3])
+    DM([2, -1, 1, -2])
+    >>> fmod(SX.sym("x"), 2), SX.sym("x") % 2
+    (SX(fmod(x,2)), SX((x-(2.*floor((x/2))))))
+    \enddoctest
 
-    \seealso remainder
+    \doctest{matlab}
+    >> x = DM([5; 5; -5; -5]); y = DM([3; -3; 3; -3]);
+    >> fmod(x, y)
+    [2, 2, -2, -2]
+    >> rem(x, y)
+    [2, 2, -2, -2]
+    >> x - y .* floor(x ./ y)
+    [2, -1, 1, -2]
+    >> rem(SX.sym('x'), 2)
+    fmod(x,2)
+    \enddoctest
+
+    \sa remainder, floor
 
         \identifier{pq} */
     static ExType mod(const ExType& x, const ExType& y) {
@@ -618,7 +1474,9 @@ class GenericExpression : public GenericExpressionCommon {
     ///@{
     /** \brief Remainder after division: (x,y) -> remainder(x,y)
 
-    This Function follows the convention of https://en.cppreference.com/w/c/numeric/math/remainder
+    This Function follows the convention of
+    https://en.cppreference.com/w/c/numeric/math/remainder: x - n*y with n the integer nearest
+    to x/y (ties to even), so the result lies in [-|y|/2, |y|/2].
 
     Notably:
       - remainder(5,3)   -> -1
@@ -627,8 +1485,27 @@ class GenericExpression : public GenericExpressionCommon {
       - remainder(-5,-3) -> 1
 
     This is equivalent to Python's math.remainder. There is no equivalence in Matlab.
+    Elementwise, shape rules as for plus; structural zeros of \p x stay zero.
 
-    \seealso fmod
+    \doctest
+    >>> remainder(DM([5, 5, -5, -5]), DM([3, -3, 3, -3]))
+    DM([-1, -1, 1, 1])
+    >>> remainder(DM([2.5, 3.5]), 2)
+    DM([0.5, -0.5])
+    >>> remainder(MX.sym("x"), 2)
+    MX(remainder(x,2))
+    \enddoctest
+
+    \doctest{matlab}
+    >> remainder(DM([5; 5; -5; -5]), DM([3; -3; 3; -3]))
+    [-1, -1, 1, 1]
+    >> remainder(DM([2.5; 3.5]), 2)
+    [0.5, -0.5]
+    >> remainder(MX.sym('x'), 2)
+    remainder(x,2)
+    \enddoctest
+
+    \sa fmod
 
         \identifier{24x} */
     static ExType remainder(const ExType& x, const ExType& y) {
@@ -644,6 +1521,26 @@ class GenericExpression : public GenericExpressionCommon {
      *
      * theta = atan2(y,x) corresponds to x = r cos(theta), y = r sin(theta)
 
+        Angle in (-pi, pi] of the point (x, y), taking the quadrant into account; the first
+        argument is the y coordinate, as in C and numpy. Elementwise, shape rules as for plus.
+        atan2(0, 0) is 0.
+
+        \doctest
+        >>> atan2(DM([1, -1, 0]), DM([-1, -1, 1]))
+        DM([2.35619, -2.35619, 0])
+        >>> atan2(SX.sym("y"), SX.sym("x"))
+        SX(atan2(y,x))
+        \enddoctest
+
+        \doctest{matlab}
+        >> atan2(DM([1; -1; 0]), DM([-1; -1; 1]))
+        [2.35619, -2.35619, 0]
+        >> atan2(SX.sym('y'), SX.sym('x'))
+        atan2(y,x)
+        \enddoctest
+
+        \sa atan
+
         \identifier{pr} */
     static ExType atan2(const ExType& y, const ExType& x) {
       return ExType::binary(OP_ATAN2, y, x);
@@ -655,6 +1552,14 @@ class GenericExpression : public GenericExpressionCommon {
 
     ///@{
     /** \brief Conditional assignment: (x,y) -> x ? y : 0
+
+        Elementwise: \p y where \p x is nonzero, 0 elsewhere; the result is structurally zero
+        wherever either operand is. The value of \p y in the inactive branch does not
+        propagate, so a NaN or inf there yields 0 rather than NaN, and the derivatives are
+        treated accordingly. This is the building block of if_else; it is not exposed as a
+        function in Python, use if_else(x, y, 0) there.
+
+        \sa if_else
 
         \identifier{ps} */
     static ExType if_else_zero(const ExType& x, const ExType& y) {
@@ -668,6 +1573,41 @@ class GenericExpression : public GenericExpressionCommon {
     ///@{
     /** \brief Smallest of two values: (x,y) -> min(x,y)
 
+        Elementwise minimum; shape rules as for plus. Follows C fmin: when one operand is NaN
+        the other is returned, NaN results only when both are NaN. The derivative is 1 with
+        respect to the smaller operand (split evenly on ties). The sparsity pattern is kept
+        where both operands are structurally zero; fmin with a negative scalar densifies.
+        For the minimum over the entries of one matrix use mmin.
+
+        \doctest
+        >>> fmin(DM([1, 5]), DM([3, 2]))
+        DM([1, 2])
+        >>> fmin(DM([1, float("nan")]), DM([float("nan"), 2]))
+        DM([1, 2])
+        >>> fmin(DM.eye(2), 1)
+        DM(
+        [[1, 00],
+         [00, 1]])
+        >>> fmin(SX.sym("x"), SX.sym("y"))
+        SX(fmin(x,y))
+        \enddoctest
+
+        \doctest{matlab}
+        >> fmin(DM([1; 5]), DM([3; 2]))
+        [1, 2]
+        >> min(DM([1; 5]), DM([3; 2]))
+        [1, 2]
+        >> fmin(DM([1; nan]), DM([nan; 2]))
+        [1, 2]
+        >> fmin(DM.eye(2), 1)
+        [[1, 00],
+         [00, 1]]
+        >> min(SX.sym('x'), SX.sym('y'))
+        fmin(x,y)
+        \enddoctest
+
+        \sa fmax, mmin
+
         \identifier{pt} */
     static ExType fmin(const ExType& x, const ExType& y) {
       return ExType::binary(OP_FMIN, x, y);
@@ -679,6 +1619,34 @@ class GenericExpression : public GenericExpressionCommon {
 
     ///@{
     /** \brief Largest of two values: (x,y) -> max(x,y)
+
+        Elementwise maximum; shape rules as for plus. Follows C fmax: when one operand is NaN
+        the other is returned. The derivative is 1 with respect to the larger operand (split
+        evenly on ties). For the maximum over the entries of one matrix use mmax.
+
+        \doctest
+        >>> fmax(DM([1, 5]), DM([3, 2]))
+        DM([3, 5])
+        >>> fmax(DM([1, 5]), 3)
+        DM([3, 5])
+        >>> fmax(DM([1, float("nan")]), DM([float("nan"), 2]))
+        DM([1, 2])
+        >>> fmax(MX.sym("x"), MX.sym("y"))
+        MX(fmax(x,y))
+        \enddoctest
+
+        \doctest{matlab}
+        >> fmax(DM([1; 5]), DM([3; 2]))
+        [3, 5]
+        >> max(DM([1; 5]), 3)
+        [3, 5]
+        >> fmax(DM([1; nan]), DM([nan; 2]))
+        [1, 2]
+        >> max(MX.sym('x'), MX.sym('y'))
+        fmax(x,y)
+        \enddoctest
+
+        \sa fmin, mmax
 
         \identifier{pu} */
     static ExType fmax(const ExType& x, const ExType& y) {
@@ -697,7 +1665,49 @@ class GenericExpression : public GenericExpressionCommon {
      * a = x*x
      * b = x*x
      *
-     *  is_equal(a,b,0)  will return false, but a.is_equal(a,b,1) will return true
+     *  is_equal(a,b,0)  will return false, but is_equal(a,b,1) will return true
+
+        Returns a plain boolean, unlike the elementwise comparison eq. With \p depth > 0 two
+        different nodes are equivalent when they have the same operation and their
+        dependencies are equivalent up to depth-1. For SX and DM matrices the test is applied
+        entry by entry; matrices of different shape raise an error, and for DM it is value
+        equality. Both arguments must be of the same type.
+
+        \param x First expression
+        \param y Second expression
+        \param depth Number of levels of the expression graph to compare, 0 for identity
+
+        \doctest
+        >>> x = SX.sym("x")
+        >>> is_equal(x, x), is_equal(x, SX.sym("x"))
+        (True, False)
+        >>> is_equal(x*x, x*x), is_equal(x*x, x*x, 1)
+        (False, True)
+        >>> is_equal(DM([1, 2]), DM([1, 2])), is_equal(DM([1, 2]), DM([1, 3]))
+        (True, False)
+        >>> y = MX.sym("y")
+        >>> is_equal(y * y, y * y), is_equal(y * y, y * y, 1)
+        (False, True)
+        \enddoctest
+
+        \doctest{matlab}
+        >> x = SX.sym('x');
+        >> is_equal(x, x), is_equal(x, SX.sym('x'))
+        1
+        0
+        >> is_equal(x*x, x*x), is_equal(x*x, x*x, 1)
+        0
+        1
+        >> is_equal(DM([1; 2]), DM([1; 2])), is_equal(DM([1; 2]), DM([1; 3]))
+        1
+        0
+        >> y = MX.sym('y');
+        >> is_equal(y * y, y * y), is_equal(y * y, y * y, 1)
+        0
+        1
+        \enddoctest
+
+        \sa eq
 
         \identifier{pv} */
      friend inline bool is_equal(const ExType& x, const ExType& y, casadi_int depth=0) {
@@ -706,7 +1716,32 @@ class GenericExpression : public GenericExpressionCommon {
      ///@}
 
      ///@{
-     /// Copy sign
+     /** \brief Copy sign: (x,y) -> copysign(x,y)
+
+         Elementwise value with the magnitude of \p x and the sign of \p y, as C copysign;
+         a negative zero \p y counts as negative. Shape rules as for plus. The derivative with
+         respect to \p y is zero.
+
+         \doctest
+         >>> copysign(DM([1, -2]), DM([-1, 1]))
+         DM([-1, 2])
+         >>> copysign(DM(3), DM(-0.0))
+         DM(-3)
+         >>> copysign(SX.sym("x"), SX.sym("y"))
+         SX(copysign(x,y))
+         \enddoctest
+
+         \doctest{matlab}
+         >> copysign(DM([1; -2]), DM([-1; 1]))
+         [-1, 2]
+         >> copysign(DM(3), DM(-0.0))
+         -3
+         >> copysign(SX.sym('x'), SX.sym('y'))
+         copysign(x,y)
+         \enddoctest
+
+         \sa sign, abs
+     */
      static ExType copysign(const ExType& x, const ExType& y) {
        return ExType::binary(OP_COPYSIGN, x, y);
      }
@@ -716,7 +1751,32 @@ class GenericExpression : public GenericExpressionCommon {
      ///@}
 
      ///@{
-     /// Elementwise power with const power
+     /** \brief Elementwise power with const power: (x,y) -> x^y with y constant
+
+         Same value as pow, but the exponent is assumed constant: the derivative with respect
+         to \p y is taken as zero. pow itself produces this operation for a non-integer
+         constant exponent, so it is rarely needed directly. Passing a symbolic exponent
+         gives a wrong derivative for MX; SX falls back to pow.
+
+         \doctest
+         >>> constpow(DM(2), 3)
+         DM(8)
+         >>> x = MX.sym("x")
+         >>> constpow(x, 2.5), jacobian(constpow(x, 2.5), x)
+         (MX(pow(x,2.5)), MX((2.5*pow(x,1.5))))
+         \enddoctest
+
+         \doctest{matlab}
+         >> constpow(DM(2), 3)
+         8
+         >> x = MX.sym('x');
+         >> constpow(x, 2.5), jacobian(constpow(x, 2.5), x)
+         pow(x,2.5)
+         (2.5*pow(x,1.5))
+         \enddoctest
+
+         \sa pow
+     */
      static ExType constpow(const ExType& x, const ExType& y) {
        return ExType::binary(OP_CONSTPOW, x, y);
      }
@@ -726,7 +1786,30 @@ class GenericExpression : public GenericExpressionCommon {
      ///@}
 
      ///@{
-     /// Debug printing
+     /** \brief Debug printing: (x,y) -> x, printing x when evaluated
+
+         Identity operation with a side effect: whenever the expression is evaluated inside a
+         Function (and hence inside a solver), every nonzero of \p x is printed on its own
+         line as "|> y : value" in storage (column-major) order, with \p y an identifier of
+         choice to tell several printme nodes apart. Available as a method x.printme(y) in
+         Python; the derivative is that of \p x. Use monitor to print a whole matrix at once.
+
+         \doctest
+         >>> x = MX.sym("x")
+         >>> f = Function("f", [x], [x.printme(7) * 2])
+         >>> f(3)
+         |> 7 : 3.0000000000000000e+00
+         DM(6)
+         \enddoctest
+
+         \doctest{matlab}
+         >> x = MX.sym('x');
+         >> f = Function('f', {x}, {x.printme(7) * 2});
+         >> f(3)
+         |> 7 : 3.0000000000000000e+00
+         6
+         \enddoctest
+     */
      static ExType printme(const ExType& x, const ExType& y) {
        return ExType::binary(OP_PRINTME, x, y);
      }
@@ -737,6 +1820,29 @@ class GenericExpression : public GenericExpressionCommon {
 
     ///@{
     /** \brief Precision variant for 2 norm: (x,y) -> sqrt(x^2+y^2)
+
+        Elementwise; avoids the overflow and underflow of forming the squares, as C hypot.
+        Shape rules as for plus; the result is structurally zero where both operands are.
+
+        \doctest
+        >>> hypot(DM(3), DM(4))
+        DM(5)
+        >>> hypot(DM(1e200), DM(1e200))
+        DM(1.41421e+200)
+        >>> hypot(SX.sym("x"), SX.sym("y"))
+        SX(hypot(x,y))
+        \enddoctest
+
+        \doctest{matlab}
+        >> hypot(DM(3), DM(4))
+        5
+        >> hypot(DM(1e200), DM(1e200))
+        1.41421e+200
+        >> hypot(SX.sym('x'), SX.sym('y'))
+        hypot(x,y)
+        \enddoctest
+
+        \sa norm_2
 
         \identifier{pw} */
     static ExType hypot(const ExType& x, const ExType& y) {

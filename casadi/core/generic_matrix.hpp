@@ -78,91 +78,281 @@ namespace casadi {
     using SparsityInterface<MatType>::self;
   public:
 
-    /** \brief Get the number of (structural) non-zero elements
+    /** \brief Get the number of structural nonzeros
+
+        Counts the entries present in the sparsity pattern. Entries that are stored but
+        numerically zero still count; structural zeros (not stored) do not.
+        For a dense matrix this equals numel().
+
+        \doctest
+        >>> DM.eye(3).nnz(), DM.ones(3, 3).nnz(), DM(3, 3).nnz()
+        (3, 9, 0)
+        >>> DM([[1, 0], [0, 2]]).nnz()
+        4
+        >>> MX.sym("x", 2, 0).nnz()
+        0
+        \enddoctest
+
+        \doctest{matlab}
+        >> fprintf('%d %d %d\n', DM.eye(3).nnz(), DM.ones(3, 3).nnz(), DM(3, 3).nnz())
+        3 9 0
+        >> DM([1 0; 0 2]).nnz()
+        4
+        >> MX.sym('x', 2, 0).nnz()
+        0
+        \enddoctest
+
+        \sa numel, nnz_lower, nnz_upper, nnz_diag, sparsity
 
         \identifier{1an} */
     casadi_int nnz() const;
 
-    /** \brief Get the number of non-zeros in the lower triangular half
+    /** \brief Get the number of structural nonzeros on or below the diagonal
+
+        \doctest
+        >>> DM.ones(3, 3).nnz_lower(), DM.eye(3).nnz_lower(), DM.ones(2, 3).nnz_lower()
+        (6, 3, 3)
+        \enddoctest
+
+        \doctest{matlab}
+        >> A = DM.ones(3, 3); I = DM.eye(3); B = DM.ones(2, 3);
+        >> fprintf('%d %d %d\n', A.nnz_lower(), I.nnz_lower(), B.nnz_lower())
+        6 3 3
+        \enddoctest
+
+        \sa nnz, nnz_upper, nnz_diag
 
         \identifier{1ao} */
     casadi_int nnz_lower() const;
 
-    /** \brief Get the number of non-zeros in the upper triangular half
+    /** \brief Get the number of structural nonzeros on or above the diagonal
+
+        \doctest
+        >>> DM.ones(3, 3).nnz_upper(), DM.eye(3).nnz_upper(), DM.ones(2, 3).nnz_upper()
+        (6, 3, 5)
+        \enddoctest
+
+        \doctest{matlab}
+        >> A = DM.ones(3, 3); I = DM.eye(3); B = DM.ones(2, 3);
+        >> fprintf('%d %d %d\n', A.nnz_upper(), I.nnz_upper(), B.nnz_upper())
+        6 3 5
+        \enddoctest
+
+        \sa nnz, nnz_lower, nnz_diag
 
         \identifier{1ap} */
     casadi_int nnz_upper() const;
 
-    /** \brief Get get the number of non-zeros on the diagonal
+    /** \brief Get the number of structural nonzeros on the diagonal
+
+        Also defined for non-square matrices.
+
+        \doctest
+        >>> DM.ones(3, 3).nnz_diag(), DM.eye(3).nnz_diag(), DM.ones(2, 3).nnz_diag()
+        (3, 3, 2)
+        \enddoctest
+
+        \doctest{matlab}
+        >> A = DM.ones(3, 3); I = DM.eye(3); B = DM.ones(2, 3);
+        >> fprintf('%d %d %d\n', A.nnz_diag(), I.nnz_diag(), B.nnz_diag())
+        3 3 2
+        \enddoctest
+
+        \sa nnz, nnz_lower, nnz_upper
 
         \identifier{1aq} */
     casadi_int nnz_diag() const;
 
-    /** \brief Get the number of elements
+    /** \brief Get the number of elements, size1()*size2()
+
+        Counts all entries, structural zeros included.
+
+        \doctest
+        >>> DM.eye(3).numel(), MX.sym("x", 2, 0).numel(), SX.sym("x").numel()
+        (9, 0, 1)
+        \enddoctest
+
+        \doctest{matlab}
+        >> fprintf('%d %d %d\n', DM.eye(3).numel(), MX.sym('x', 2, 0).numel(), SX.sym('x').numel())
+        9 0 1
+        \enddoctest
+
+        \sa nnz, size
 
         \identifier{1ar} */
     casadi_int numel() const;
 
     /** \brief Get the first dimension (i.e. number of rows)
 
+        \doctest
+        >>> x = MX.sym("x", 2, 3)
+        >>> x.size1(), x.size2()
+        (2, 3)
+        \enddoctest
+
+        \doctest{matlab}
+        >> x = MX.sym('x', 2, 3);
+        >> fprintf('%d %d\n', x.size1(), x.size2())
+        2 3
+        \enddoctest
+
+        \sa size2, size, rows
+
         \identifier{1as} */
     casadi_int size1() const;
 
-    /** \brief Get the number of rows, Octave-style syntax
+    /** \brief Get the number of rows, Octave-style syntax (same as size1())
 
         \identifier{1at} */
     casadi_int rows() const {return size1();}
 
     /** \brief Get the second dimension (i.e. number of columns)
 
+        \sa size1, size, columns
+
         \identifier{1au} */
     casadi_int size2() const;
 
-    /** \brief Get the number of columns, Octave-style syntax
+    /** \brief Get the number of columns, Octave-style syntax (same as size2())
 
         \identifier{1av} */
     casadi_int columns() const {return size2();}
 
     /** \brief Get string representation of dimensions.
 
-        The representation is e.g. "4x5" or  "4x5,10nz"
+        The representation is e.g. "4x5" or, with \p with_nz true, "4x5,10nz".
+
+        \doctest
+        >>> DM.eye(3).dim(), DM.eye(3).dim(True), DM.ones(3, 3).dim(True)
+        ('3x3', '3x3,3nz', '3x3,9nz')
+        \enddoctest
+
+        \doctest{matlab}
+        >> fprintf('%s %s %s\n', DM.eye(3).dim(), DM.eye(3).dim(true), DM.ones(3, 3).dim(true))
+        3x3 3x3,3nz 3x3,9nz
+        \enddoctest
+
+        \sa size, nnz
 
         \identifier{1aw} */
     std::string dim(bool with_nz=false) const;
 
-    /** \brief  Get the shape
+    /** \brief  Get the shape as a pair (number of rows, number of columns)
+
+        \doctest
+        >>> x = MX.sym("x", 2, 3)
+        >>> x.size(), x.size(1), x.size(2)
+        ((2, 3), 2, 3)
+        \enddoctest
+
+        \doctest{matlab}
+        >> x = MX.sym('x', 2, 3);
+        >> size(x)
+        2 3
+        >> fprintf('%d %d\n', size(x, 1), size(x, 2))
+        2 3
+        \enddoctest
+
+        \sa size1, size2, numel, dim
 
         \identifier{1ax} */
     std::pair<casadi_int, casadi_int> size() const;
 
-    /** \brief  Get the size along a particular dimensions
+    /** \brief  Get the size along a particular dimension
+
+        \param axis 1 for the number of rows, 2 for the number of columns; any other value
+        raises an error
 
         \identifier{1ay} */
     casadi_int size(casadi_int axis) const;
 
-    /** \brief Check if the sparsity is empty, i.e. if one of the dimensions is zero
+    /** \brief Check if the matrix is empty, i.e. if one of the dimensions is zero
 
-     * (or optionally both dimensions)
+        With \p both true, only a 0-by-0 matrix counts as empty.
+
+        \doctest
+        >>> DM(0, 3).is_empty(), DM(0, 3).is_empty(True), DM(0, 0).is_empty(True)
+        (True, False, True)
+        >>> DM(1, 1).is_empty()
+        False
+        \enddoctest
+
+        \doctest{matlab}
+        >> E = DM(0, 3);
+        >> fprintf('%d %d %d\n', E.is_empty(), E.is_empty(true), DM(0, 0).is_empty(true))
+        1 0 1
+        >> DM(1, 1).is_empty()
+        0
+        \enddoctest
 
         \identifier{1az} */
     bool is_empty(bool both=false) const { return sparsity().is_empty(both);}
 
-    /** \brief  Check if the matrix expression is dense
+    /** \brief  Check if the matrix is dense, i.e. nnz() equals numel()
+
+        Based on the sparsity pattern only: stored numerical zeros still count as nonzeros.
+        Empty matrices are dense.
+
+        \doctest
+        >>> DM.zeros(2, 2).is_dense(), DM(2, 2).is_dense(), DM(0, 3).is_dense()
+        (True, False, True)
+        \enddoctest
+
+        \doctest{matlab}
+        >> Z = DM.zeros(2, 2);
+        >> fprintf('%d %d %d\n', Z.is_dense(), DM(2, 2).is_dense(), DM(0, 3).is_dense())
+        1 0 1
+        \enddoctest
+
+        \sa nnz, numel, densify
 
         \identifier{1b0} */
     bool is_dense() const { return sparsity().is_dense();}
 
-    /** \brief  Check if the matrix expression is scalar
+    /** \brief  Check if the matrix is scalar, i.e. 1-by-1
+
+        \param scalar_and_dense When true, a 1-by-1 matrix with a structural zero does not count
+
+        \doctest
+        >>> x = SX.sym("x", Sparsity(1, 1))
+        >>> x.is_scalar(), x.is_scalar(True), SX.sym("y").is_scalar(True)
+        (True, False, True)
+        \enddoctest
+
+        \doctest{matlab}
+        >> x = SX.sym('x', Sparsity(1, 1));
+        >> fprintf('%d %d %d\n', x.is_scalar(), x.is_scalar(true), SX.sym('y').is_scalar(true))
+        1 0 1
+        \enddoctest
 
         \identifier{1b1} */
     bool is_scalar(bool scalar_and_dense=false) const;
 
-    /** \brief  Check if the matrix expression is square
+    /** \brief  Check if the matrix is square, i.e. size1() equals size2()
 
         \identifier{1b2} */
     bool is_square() const { return sparsity().is_square();}
 
     /** \brief  Check if the matrix is a row or column vector
+
+        True when size1() or size2() is one, so scalars and n-by-1 or 1-by-n empties count.
+        A 0-by-0 matrix does not.
+
+        \doctest
+        >>> DM(3, 1).is_vector(), DM(1, 3).is_vector(), DM(1, 1).is_vector()
+        (True, True, True)
+        >>> DM(3, 3).is_vector(), DM(0, 1).is_vector(), DM(0, 0).is_vector()
+        (False, True, False)
+        \enddoctest
+
+        \doctest{matlab}
+        >> fprintf('%d %d %d\n', DM(3, 1).is_vector(), DM(1, 3).is_vector(), DM(1, 1).is_vector())
+        1 1 1
+        >> fprintf('%d %d %d\n', DM(3, 3).is_vector(), DM(0, 1).is_vector(), DM(0, 0).is_vector())
+        0 1 0
+        \enddoctest
+
+        \sa is_row, is_column
 
         \identifier{1b3} */
     bool is_vector() const { return sparsity().is_vector();}
@@ -179,16 +369,59 @@ namespace casadi {
 
     /** \brief Check if the matrix is upper triangular
 
+        Decided on the sparsity pattern alone: all structural nonzeros must lie on or above
+        the diagonal. A dense matrix with numerical zeros below the diagonal is not upper
+        triangular. Also defined for non-square matrices.
+
+        \doctest
+        >>> DM(Sparsity.upper(3), 1).is_triu(), DM.zeros(2, 2).is_triu(), DM(2, 2).is_triu()
+        (True, False, True)
+        \enddoctest
+
+        \doctest{matlab}
+        >> U = DM(Sparsity.upper(3), 1);
+        >> fprintf('%d %d %d\n', U.is_triu(), DM.zeros(2, 2).is_triu(), DM(2, 2).is_triu())
+        1 0 1
+        \enddoctest
+
+        \sa is_tril, triu, triu2symm
+
         \identifier{1b6} */
     bool is_triu() const { return sparsity().is_triu();}
 
     /** \brief Check if the matrix is lower triangular
+
+        Decided on the sparsity pattern alone, see is_triu.
+
+        \sa is_triu, tril, tril2symm
 
         \identifier{1b7} */
     bool is_tril() const { return sparsity().is_tril();}
 
     ///@{
     /** \brief Get the sparsity pattern. See the Sparsity class for details.
+
+        The pattern is stored in compressed column format: colind has size2()+1 entries,
+        the nonzeros of column j are the entries colind(j) up to colind(j+1) (exclusive),
+        and row(el) is the row index of nonzero \p el. Without argument, the full vectors
+        are returned. Out-of-range indices raise an error.
+
+        \doctest
+        >>> x = DM(Sparsity.diag(2), [5, 6])
+        >>> x.row(), x.colind()
+        ([0, 1], [0, 1, 2])
+        >>> x.row(1), x.colind(2)
+        (1, 2)
+        \enddoctest
+
+        \doctest{matlab}
+        >> x = DM(Sparsity.diag(2), [5; 6]);
+        >> x.row(), x.colind()
+        0 1
+        0 1 2
+        >> fprintf('%d %d\n', x.row(1), x.colind(2))
+        1 2
+        \enddoctest
 
         \identifier{1b8} */
     std::vector<casadi_int> get_row() const { return sparsity().get_row(); }
@@ -202,6 +435,20 @@ namespace casadi {
     ///@}
 
     /** \brief Get the sparsity pattern
+
+        \doctest
+        >>> DM.eye(2).sparsity()
+        Sparsity(2x2,2nz)
+        >>> DM.eye(2).sparsity() == Sparsity.diag(2)
+        True
+        \enddoctest
+
+        \doctest{matlab}
+        >> DM.eye(2).sparsity()
+        2x2,2nz
+        >> DM.eye(2).sparsity() == Sparsity.diag(2)
+        1
+        \enddoctest
 
         \identifier{1b9} */
     SWIG_CONSTREF(Sparsity) sparsity() const;
@@ -303,9 +550,54 @@ namespace casadi {
 */
 
      /** \brief Performs 1d linear interpolation
-     *
-     * The data-points to be interpolated are given as (x[i], v[i]).
-     * xq[j] is used as interpolating value
+
+         The data points are (x[i], v[i, :]): row i of \p v holds the values at abscissa x[i],
+         so \p v has as many rows as \p x has entries and every column is interpolated
+         independently. The result has one row per query point xq[j].
+
+         Queries outside the range of \p x are clamped to the first or last data point
+         (no extrapolation). The result is a constant sparse matrix times \p v, so for
+         symbolic \p v the expression is linear in \p v.
+
+         \param x Abscissae, strictly increasing, at least two entries
+         \param v Data values, x.size()-by-m
+         \param xq Query abscissae, any order
+         \param mode "linear" (interpolate), "floor" (value at the data point at or below the
+         query) or "ceil" (at or above); any other string raises an error
+         \param equidistant When true, \p x is assumed uniformly spaced and the interval is
+         located arithmetically from x[0] and x[1] instead of by search
+         \return Matrix of size xq.size()-by-m
+
+         \doctest
+         >>> interp1d([0, 1, 2], DM([0, 10, 20]), [0.5, 1.5])
+         DM([5, 15])
+         >>> interp1d([0, 1, 2], DM([0, 10, 20]), [0.5, 1.5], "floor")
+         DM([0, 10])
+         >>> interp1d([0, 1, 2], DM([[0, 1], [10, 11], [20, 21]]), [0.5, 2])
+         DM(
+         [[5, 6],
+          [20, 21]])
+         >>> interp1d([0, 1, 2], DM([0, 10, 20]), [-1, 3])
+         DM([0, 20])
+         >>> interp1d([0, 1, 2], SX.sym("v", 3), [0.5])
+         SX(@1=0.5, ((@1*v_0)+(@1*v_1)))
+         \enddoctest
+
+         \doctest{matlab}
+         >> interp1d([0, 1, 2], DM([0; 10; 20]), [0.5, 1.5])
+         [5, 15]
+         >> interp1d([0, 1, 2], DM([0; 10; 20]), [0.5, 1.5], 'floor')
+         [0, 10]
+         >> interp1d([0, 1, 2], DM([0 1; 10 11; 20 21]), [0.5, 2])
+         [[5, 6],
+          [20, 21]]
+         >> interp1d([0, 1, 2], DM([0; 10; 20]), [-1, 3])
+         [0, 20]
+         >> interp1d([0, 1, 2], SX.sym('v', 3), 0.5)
+         @1=0.5, ((@1*v_0)+(@1*v_1))
+         \enddoctest
+
+         \sa interpolant
 
          \identifier{1bh} */
      inline friend MatType interp1d(const std::vector<double>& x, const MatType&v,
@@ -315,21 +607,82 @@ namespace casadi {
 
     /** \brief Matrix power x^n
 
+        For a square matrix \p x and a constant integer scalar \p n, computes the repeated
+        matrix product by squaring. n == 0 gives the (sparse) identity, negative \p n gives
+        the inverse of the positive power (via inv). If both arguments are scalar, this is
+        the elementwise pow. A non-integer or symbolic \p n for a matrix raises an error.
+
+        \doctest
+        >>> A = DM([[1, 2], [3, 4]])
+        >>> mpower(A, 2)
+        DM(
+        [[7, 10],
+         [15, 22]])
+        >>> mpower(A, 0)
+        DM(
+        [[1, 00],
+         [00, 1]])
+        >>> mpower(A, -1)
+        DM(
+        [[-2, 1],
+         [1.5, -0.5]])
+        >>> mpower(DM(2), 0.5)
+        DM(1.41421)
+        >>> try: mpower(A, 0.5)
+        ... except Exception as e: print("error")
+        error
+        \enddoctest
+
+        \doctest{matlab}
+        >> A = DM([1 2; 3 4]);
+        >> A^2
+        [[7, 10],
+         [15, 22]]
+        >> A^0
+        [[1, 00],
+         [00, 1]]
+        >> mpower(A, -1)
+        [[-2, 1],
+         [1.5, -0.5]]
+        >> DM(2)^0.5
+        1.41421
+        >> try, A^0.5; catch e, disp('error'); end
+        error
+        \enddoctest
+
+        \sa mtimes, inv, expm
+
         \identifier{1bi} */
     inline friend MatType mpower(const MatType& x, const MatType& n) {
       return MatType::mpower(x, n);
     }
 
-    /** \brief Construct second-order-convex
-     *
-     * \param[in] x vector expression of size n
-     * \param[in] y scalar expression
-     *
-     * soc(x,y) computes [y*eye(n) x; x' y]
-     *
-     *  soc(x,y) positive semi definite
-     *        <=> || x ||_2 <= y
-     *
+    /** \brief Construct second-order-cone matrix
+
+        soc(x, y) computes the (n+1)-by-(n+1) matrix [y*eye(n) x; x' y].
+        This matrix is positive semidefinite if and only if norm_2(x) <= y, which makes it
+        a way to express a second-order cone constraint as a semidefinite constraint.
+
+        \param x Vector expression of size n (row or column; sparse entries are densified)
+        \param y Scalar expression
+
+        \doctest
+        >>> soc(DM([1, 2]), 3)
+        DM(
+        [[3, 00, 1],
+         [00, 3, 2],
+         [1, 2, 3]])
+        \enddoctest
+
+        \doctest{matlab}
+        >> soc(DM([1; 2]), 3)
+        [[3, 00, 1],
+         [00, 3, 2],
+         [1, 2, 3]]
+        \enddoctest
+
+        \sa norm_2
+
         \identifier{1bj} */
     inline friend MatType soc(const MatType& x, const MatType& y) {
       return MatType::soc(x, y);
@@ -337,17 +690,44 @@ namespace casadi {
 
     /** \brief Compute any contraction of two dense tensors, using index/einstein notation
 
-        einstein(A, B, a, b, c) -> C
-
         Given two tensors, A and B, computes a third tensor C such that:
 
         C_c = A_a * B_b
 
         With a, b, c representing einstein indices.
         Instead of the classical index labels i,j,k,... we employ -1,-2,-3,...
+        An index that appears in a or b but not in c is summed over.
 
-        A, B, C are represented as CasADi vectors, with dim_a, dim_b, dim_c
-        indictating theire tensorial dimensions.
+        A, B, C are represented as CasADi column vectors (column-major flattening), with
+        dim_a, dim_b, dim_c indicating their tensorial dimensions. The product of dim_a must
+        equal the number of elements of A, and likewise for B and C.
+
+        In the overload with an explicit \p C argument, the contraction is added to \p C.
+
+        \doctest
+        >>> A = DM([1, 2, 3, 4])
+        >>> einstein(A, A, [2, 2], [2, 2], [2, 2], [-1, -2], [-2, -3], [-1, -3])
+        DM([7, 10, 15, 22])
+        >>> mtimes(DM([[1, 3], [2, 4]]), DM([[1, 3], [2, 4]]))
+        DM(
+        [[7, 15],
+         [10, 22]])
+        >>> einstein(DM([1, 2, 3]), DM([4, 5, 6]), [3], [3], [], [-1], [-1], [])
+        DM(32)
+        \enddoctest
+
+        \doctest{matlab}
+        >> A = DM([1; 2; 3; 4]);
+        >> einstein(A, A, [2, 2], [2, 2], [2, 2], [-1, -2], [-2, -3], [-1, -3])
+        [7, 10, 15, 22]
+        >> DM([1 3; 2 4])*DM([1 3; 2 4])
+        [[7, 15],
+         [10, 22]]
+        >> einstein(DM([1; 2; 3]), DM([4; 5; 6]), 3, 3, [], -1, -1, [])
+        32
+        \enddoctest
+
+        \sa mtimes, dot
 
         \identifier{1bk} */
     ///@{
@@ -370,24 +750,92 @@ namespace casadi {
     }
     ///@}
 
-    /** \brief Matrix divide (cf. slash '/' in MATLAB)
+    /** \brief Matrix right divide, x/A (cf. slash '/' in MATLAB)
+
+        Computes x*inv(A) as solve(A', x')'. If either argument is scalar, the
+        elementwise division x/A is returned instead.
+
+        \doctest
+        >>> A = DM([[1, 2], [3, 4]])
+        >>> mrdivide(DM([[1, 2]]), A)
+        DM([[1, 0]])
+        \enddoctest
+
+        \doctest{matlab}
+        >> A = DM([1 2; 3 4]);
+        >> DM([1 2])/A
+        [[1, 0]]
+        \enddoctest
+
+        \sa mldivide, solve, inv
 
         \identifier{1bl} */
     inline friend MatType mrdivide(const MatType& x, const MatType& n) {
       return MatType::mrdivide(x, n);
     }
 
-    /** \brief Matrix divide (cf. backslash '\' in MATLAB)
+    /** \brief Matrix left divide, A\\b (cf. backslash '\' in MATLAB)
+
+        Computes inv(A)*b as solve(A, b). If either argument is scalar, the
+        elementwise division b/A is returned instead.
+
+        \doctest
+        >>> A = DM([[1, 2], [3, 4]])
+        >>> mldivide(A, DM([1, 2]))
+        DM([0, 0.5])
+        \enddoctest
+
+        \doctest{matlab}
+        >> A = DM([1 2; 3 4]);
+        >> A\DM([1; 2])
+        [0, 0.5]
+        \enddoctest
+
+        \sa mrdivide, solve, inv
 
         \identifier{1bm} */
     inline friend MatType mldivide(const MatType& x, const MatType& n) {
       return MatType::mldivide(x, n);
     }
 
-    /** \brief Get all symbols contained in the supplied expression
+    /** \brief Get all symbolic primitives present in an expression
 
-     * Get all symbols on which the supplied expression depends
-     * \see SXFunction::getFree(), MXFunction::getFree()
+        Returns the symbols the expression was built from, in order of first appearance,
+        each once. For SX every scalar symbol is a separate entry; for MX the entries are
+        the symbolic matrices as created by MX.sym, even if only part of such a matrix
+        is used. Presence in the graph is a structural notion; an expression like 0*x
+        still lists x. Use depends_on for mathematical dependency. Not defined for DM.
+
+        \doctest
+        >>> x = SX.sym("x"); y = SX.sym("y"); z = SX.sym("z")
+        >>> symvar(vertcat(z*x, y))
+        [SX(z), SX(x), SX(y)]
+        >>> symvar(SX.sym("v", 2)*3)
+        [SX(v_0), SX(v_1)]
+        >>> v = MX.sym("v", 2)
+        >>> symvar(v[0]*3)
+        [MX(v)]
+        >>> symvar(SX(3))
+        []
+        \enddoctest
+
+        \doctest{matlab}
+        >> x = SX.sym('x'); y = SX.sym('y'); z = SX.sym('z');
+        >> v = symvar(vertcat(z*x, y));
+        >> numel(v), vertcat(v{:})
+        3
+        [z, x, y]
+        >> v = symvar(SX.sym('v', 2)*3); disp(vertcat(v{:}))
+        [v_0, v_1]
+        >> v = MX.sym('v', 2);
+        >> s = symvar(v(1)*3); disp(numel(s)), disp(s{1})
+        1
+        v
+        >> numel(symvar(SX(3)))
+        0
+        \enddoctest
+
+        \sa depends_on, contains
 
         \identifier{1bn} */
     inline friend std::vector<MatType> symvar(const MatType& x) {
@@ -396,8 +844,32 @@ namespace casadi {
 
     ///@{
     /** \brief Calculate bilinear/quadratic form x^T A y
-     *
-     * \param[in] y can be omitted, in which case x^T A x is calculated
+
+        \p x and \p y must be vectors (row vectors are transposed, sparse vectors densified)
+        with x.numel() == A.size1() and y.numel() == A.size2(); otherwise an error is raised.
+        The result is scalar. When \p y is omitted, the quadratic form x^T A x is calculated.
+
+        \doctest
+        >>> A = DM([[1, 2], [3, 4]])
+        >>> bilin(A, DM([1, 1]), DM([1, 2]))
+        DM(16)
+        >>> bilin(A, DM([1, 1]))
+        DM(10)
+        >>> bilin(MX.sym("A", 2, 2), MX.sym("x", 2), MX.sym("y", 2))
+        MX(bilin(A, x, y))
+        \enddoctest
+
+        \doctest{matlab}
+        >> A = DM([1 2; 3 4]);
+        >> bilin(A, DM([1; 1]), DM([1; 2]))
+        16
+        >> bilin(A, DM([1; 1]))
+        10
+        >> bilin(MX.sym('A', 2, 2), MX.sym('x', 2), MX.sym('y', 2))
+        bilin(A, x, y)
+        \enddoctest
+
+        \sa rank1, dot, mtimes
 
         \identifier{1bo} */
     inline friend MatType bilin(const MatType &A, const MatType &x, const MatType &y) {
@@ -412,7 +884,32 @@ namespace casadi {
     ///@{
     /** \brief Make a rank-1 update to a matrix A
 
-     * Calculates A + 1/2 * alpha * x*y'
+        Calculates A + alpha * x*y'
+
+        \param alpha Scalar; if it is a structural zero, \p A is returned unchanged
+        \param x Vector with x.numel() == A.size1() (row vectors are transposed)
+        \param y Vector with y.numel() == A.size2()
+
+        \doctest
+        >>> A = DM([[1, 2], [3, 4]])
+        >>> rank1(A, 2, DM([1, 0]), DM([0, 1]))
+        DM(
+        [[1, 4],
+         [3, 4]])
+        >>> rank1(MX.sym("A", 2, 2), MX.sym("a"), MX.sym("x", 2), MX.sym("y", 2))
+        MX(rank1(A, a, x, y))
+        \enddoctest
+
+        \doctest{matlab}
+        >> A = DM([1 2; 3 4]);
+        >> rank1(A, 2, DM([1; 0]), DM([0; 1]))
+        [[1, 4],
+         [3, 4]]
+        >> rank1(MX.sym('A', 2, 2), MX.sym('a'), MX.sym('x', 2), MX.sym('y', 2))
+        rank1(A, a, x, y)
+        \enddoctest
+
+        \sa bilin, mtimes
 
         \identifier{1bp} */
     inline friend MatType rank1(const MatType &A, const MatType &alpha,
@@ -425,28 +922,89 @@ namespace casadi {
 
     /** \brief Calculate sum of squares: sum_ij X_ij^2
 
+        Defined as dot(x, x) for a matrix of any shape; structural zeros contribute nothing.
+        Prefer this over norm_2(x)**2 in objectives: it is smooth everywhere.
+
+        \doctest
+        >>> sumsqr(DM([[1, 2], [3, 4]]))
+        DM(30)
+        >>> sumsqr(SX.sym("x", 2))
+        SX((sq(x_0)+sq(x_1)))
+        >>> sumsqr(MX.sym("x", 2))
+        MX(dot(x, x))
+        \enddoctest
+
+        \doctest{matlab}
+        >> sumsqr(DM([1 2; 3 4]))
+        30
+        >> sumsqr(SX.sym('x', 2))
+        (sq(x_0)+sq(x_1))
+        >> sumsqr(MX.sym('x', 2))
+        dot(x, x)
+        \enddoctest
+
+        \sa dot, norm_2, norm_fro
+
         \identifier{1bq} */
     inline friend MatType sumsqr(const MatType &x) {
       return MatType::sumsqr(x);
     }
 
     /** \brief x -> log(sum_i exp(x_i))
-     * 
-     * Can be used to achieve a smooth max.
-     * 
-     * Implementations for DM/SX/MX are hardened against overflow
-     * Implementations for DM/MX are more accurate with log1p (*)
-     * 
-     * (*) https://nhigham.com/2021/01/05/what-is-the-log-sum-exp-function/
-     *
+
+        Can be used to achieve a smooth max.
+
+        The argument must be a dense column vector; a scalar is returned unchanged.
+        Implementations for DM/SX/MX are hardened against overflow by shifting with the
+        largest entry. Implementations for DM/MX are more accurate with log1p (*).
+
+        (*) https://nhigham.com/2021/01/05/what-is-the-log-sum-exp-function/
+
+        \doctest
+        >>> logsumexp(DM([1, 2, 3]))
+        DM(3.40761)
+        >>> logsumexp(DM([1000, 1000]))
+        DM(1000.69)
+        >>> logsumexp(MX.sym("x", 3))
+        MX(logsumexp(x))
+        >>> try: logsumexp(DM([1, 2, 3]).T)
+        ... except Exception as e: print("error")
+        error
+        \enddoctest
+
+        \doctest{matlab}
+        >> logsumexp(DM([1; 2; 3]))
+        3.40761
+        >> logsumexp(DM([1000; 1000]))
+        1000.69
+        >> logsumexp(MX.sym('x', 3))
+        logsumexp(x)
+        >> try, logsumexp(DM([1; 2; 3])'); catch e, disp('error'); end
+        error
+        \enddoctest
+
+        \sa mmax
+
         \identifier{1br} */
     inline friend MatType logsumexp(const MatType& x) {
       return MatType::logsumexp(x);
     }
     /** \brief Scaled version of logsumexp
-     * 
-     * Scaled such that max(x) <= logsumexp(x, margin) <= max(x)+margin
-     *
+
+        Scaled such that max(x) <= logsumexp(x, margin) <= max(x)+margin,
+        computed as logsumexp(alpha*x)/alpha with alpha = log(n)/margin for n = x.size1().
+        \p margin must be of the same type as \p x (MX for MX).
+
+        \doctest
+        >>> logsumexp(DM([1, 2, 3]), 0.1)
+        DM(3)
+        \enddoctest
+
+        \doctest{matlab}
+        >> logsumexp(DM([1; 2; 3]), 0.1)
+        3
+        \enddoctest
+
         \identifier{1bs} */
     inline friend MatType logsumexp(const MatType& x, const MatType& margin) {
       MatType alpha = log(x.size1()) / margin;
@@ -456,12 +1014,65 @@ namespace casadi {
 
     /** \brief Matlab's \c linspace command
 
+        Returns the column vector [a, a + (b-a)/(nsteps-1), ..., b] with \p nsteps entries,
+        the endpoints included. For nsteps == 1 the result is \p b. When \p a and \p b are
+        matrices, the \p nsteps intermediate matrices are stacked vertically (vertcat).
+        \p nsteps must be at least 1.
+
+        \doctest
+        >>> linspace(0, 1, 5)
+        DM([0, 0.25, 0.5, 0.75, 1])
+        >>> linspace(SX.sym("a"), SX.sym("b"), 3)
+        SX([a, (a+((b-a)/2)), b])
+        >>> linspace(DM([0, 0]), DM([1, 2]), 3)
+        DM([0, 0, 0.5, 1, 1, 2])
+        \enddoctest
+
+        \doctest{matlab}
+        >> linspace(DM(0), DM(1), 5)
+        [0, 0.25, 0.5, 0.75, 1]
+        >> linspace(SX.sym('a'), SX.sym('b'), 3)
+        [a, (a+((b-a)/2)), b]
+        >> linspace(DM([0; 0]), DM([1; 2]), 3)
+        [0, 0, 0.5, 1, 1, 2]
+        \enddoctest
+
         \identifier{1bt} */
     inline friend MatType linspace(const MatType &a, const MatType &b, casadi_int nsteps) {
       return MatType::linspace(a, b, nsteps);
     }
 
     /** \brief Matlab's \c cross command
+
+        Cross product of 3-vectors. \p a and \p b must have the same shape and one of the
+        dimensions must be 3; for 3-by-n or n-by-3 matrices the products are taken per column
+        or per row respectively.
+
+        \param dim 1 to take the products along the rows (3-by-n input), 2 along the columns,
+        -1 (default) to pick the dimension of length 3 (rows first)
+
+        \doctest
+        >>> cross(DM([1, 0, 0]), DM([0, 1, 0]))
+        DM([0, 0, 1])
+        >>> cross(DM([[1, 0, 0], [0, 1, 0]]), DM([[0, 1, 0], [0, 0, 1]]))
+        DM(
+        [[0, 0, 1],
+         [1, 0, 0]])
+        >>> cross(SX.sym("a", 3), SX.sym("b", 3))
+        SX([((a_1*b_2)-(a_2*b_1)), ((a_2*b_0)-(a_0*b_2)), ((a_0*b_1)-(a_1*b_0))])
+        \enddoctest
+
+        \doctest{matlab}
+        >> cross(DM([1; 0; 0]), DM([0; 1; 0]))
+        [0, 0, 1]
+        >> cross(DM([1 0 0; 0 1 0]), DM([0 1 0; 0 0 1]))
+        [[0, 0, 1],
+         [1, 0, 0]]
+        >> cross(SX.sym('a', 3), SX.sym('b', 3))
+        [((a_1*b_2)-(a_2*b_1)), ((a_2*b_0)-(a_0*b_2)), ((a_0*b_1)-(a_1*b_0))]
+        \enddoctest
+
+        \sa skew, dot
 
         \identifier{1bu} */
     inline friend MatType cross(const MatType &a, const MatType &b, casadi_int dim = -1) {
@@ -470,12 +1081,41 @@ namespace casadi {
 
     /** \brief Generate a skew symmetric matrix from a 3-vector
 
+        skew(a) is the 3-by-3 matrix S with S*b == cross(a, b).
+
+        \doctest
+        >>> skew(DM([1, 2, 3]))
+        DM(
+        [[0, -3, 2],
+         [3, 0, -1],
+         [-2, 1, 0]])
+        >>> inv_skew(skew(DM([1, 2, 3])))
+        DM([1, 2, 3])
+        \enddoctest
+
+        \doctest{matlab}
+        >> skew(DM([1; 2; 3]))
+        [[0, -3, 2],
+         [3, 0, -1],
+         [-2, 1, 0]]
+        >> inv_skew(skew(DM([1; 2; 3])))
+        [1, 2, 3]
+        \enddoctest
+
+        \sa inv_skew, cross
+
         \identifier{1bv} */
     inline friend MatType skew(const MatType &a) {
       return MatType::skew(a);
     }
 
     /** \brief Generate the 3-vector progenitor of a skew symmetric matrix
+
+        Inverse of skew: for a 3-by-3 matrix S, returns 0.5*[S(2,1)-S(1,2); S(0,2)-S(2,0);
+        S(1,0)-S(0,1)], which recovers \p a from skew(a). A non-3-by-3 argument raises an
+        error.
+
+        \sa skew
 
         \identifier{1bw} */
     inline friend MatType inv_skew(const MatType &a) {
@@ -484,10 +1124,51 @@ namespace casadi {
 
     /** \brief Matrix determinant (experimental)
 
+        For DM and SX the determinant is formed by minor expansion along the sparsest
+        row or column (a 2-by-2 directly, a scalar is returned as is); the cost grows
+        quickly with the matrix size. For MX a determinant node is created that is
+        evaluated through the 'qr' linear solver. A non-square argument raises an error.
+
+        \doctest
+        >>> det(DM([[1, 2], [3, 4]]))
+        DM(-2)
+        >>> det(SX.sym("A", 2, 2))
+        SX(((A_0*A_3)-(A_2*A_1)))
+        >>> det(MX.sym("A", 2, 2))
+        MX(det(A))
+        \enddoctest
+
+        \doctest{matlab}
+        >> det(DM([1 2; 3 4]))
+        -2
+        >> det(SX.sym('A', 2, 2))
+        ((A_0*A_3)-(A_2*A_1))
+        >> det(MX.sym('A', 2, 2))
+        det(A)
+        \enddoctest
+
+        \sa inv, inv_minor
+
         \identifier{1bx} */
     inline friend MatType det(const MatType& A) { return MatType::det(A);}
 
-    /** \brief Matrix determinant (experimental)
+    /** \brief Matrix determinant through a linear solver factorization (experimental)
+
+        \param lsolver Name of a Linsol plugin, e.g. "qr" or "symbolicqr" (for SX only plugins
+        with a symbolic determinant, such as "symbolicqr", are accepted)
+        \param dict Options passed to the linear solver
+
+        \doctest
+        >>> det(DM([[1, 2], [3, 4]]), "qr")
+        DM(-2)
+        \enddoctest
+
+        \doctest{matlab}
+        >> det(DM([1 2; 3 4]), 'qr')
+        -2
+        \enddoctest
+
+        \sa Linsol
 
         \identifier{2hx} */
     inline friend MatType det(const MatType& A, const std::string& lsolver,
@@ -495,19 +1176,91 @@ namespace casadi {
       return MatType::det(A, lsolver, dict);
     }
 
-    /** \brief Matrix inverse (experimental)
+    /** \brief Matrix inverse by the adjugate (experimental)
+
+        Computes adj(A)/det(A) by minor expansion. Available for DM and SX; MX raises
+        "Not implemented". Use inv for the general case.
+
+        \doctest
+        >>> inv_minor(DM([[1, 2], [3, 4]]))
+        DM(
+        [[-2, 1],
+         [1.5, -0.5]])
+        \enddoctest
+
+        \doctest{matlab}
+        >> inv_minor(DM([1 2; 3 4]))
+        [[-2, 1],
+         [1.5, -0.5]]
+        \enddoctest
+
+        \sa inv, det
 
         \identifier{1by} */
     inline friend MatType inv_minor(const MatType& A) { return MatType::inv_minor(A);}
 
     /** \brief Matrix inverse
 
+        Computed as solve(A, eye(n)), see solve for the algorithm. A non-square argument
+        raises an error. A numerically singular DM does not raise; the result contains
+        inf or nan. For MX the result is a solve node.
+
+        \doctest
+        >>> inv(DM([[1, 2], [3, 4]]))
+        DM(
+        [[-2, 1],
+         [1.5, -0.5]])
+        >>> inv(SX.sym("A", 2, 2))
+        SX(@1=((A_0*A_3)-(A_2*A_1)),
+        [[(A_3/@1), (-(A_2/@1))],
+         [(-(A_1/@1)), (A_0/@1)]])
+        >>> inv(DM(Sparsity.diag(2), [2, 4]))
+        DM(
+        [[0.5, 00],
+         [00, 0.25]])
+        \enddoctest
+
+        \doctest{matlab}
+        >> inv(DM([1 2; 3 4]))
+        [[-2, 1],
+         [1.5, -0.5]]
+        >> inv(SX.sym('A', 2, 2))
+        @1=((A_0*A_3)-(A_2*A_1)),
+        [[(A_3/@1), (-(A_2/@1))],
+         [(-(A_1/@1)), (A_0/@1)]]
+        >> inv(DM(Sparsity.diag(2), [2; 4]))
+        [[0.5, 00],
+         [00, 0.25]]
+        \enddoctest
+
+        \sa solve, pinv, det, mldivide
+
         \identifier{1bz} */
     inline friend MatType inv(const MatType& A) {
         return MatType::inv(A);
     }
 
-    /** \brief Matrix inverse
+    /** \brief Matrix inverse using a linear solver plugin
+
+        Computes solve(A, eye(n), lsolver, options). Available for DM and MX; SX raises.
+
+        \param lsolver Name of a Linsol plugin, e.g. "qr", "csparse", "lapacklu"
+        \param options Options passed to the linear solver
+
+        \doctest
+        >>> inv(DM([[1, 2], [3, 4]]), "qr")
+        DM(
+        [[-2, 1],
+         [1.5, -0.5]])
+        \enddoctest
+
+        \doctest{matlab}
+        >> inv(DM([1 2; 3 4]), 'qr')
+        [[-2, 1],
+         [1.5, -0.5]]
+        \enddoctest
+
+        \sa solve, Linsol
 
         \identifier{1c0} */
     inline friend MatType inv(const MatType& A,
@@ -518,40 +1271,229 @@ namespace casadi {
 
     /** \brief Matrix trace
 
+        Sum of the diagonal entries of a square matrix (structural zeros contribute nothing).
+        A non-square argument raises an error.
+
+        \doctest
+        >>> trace(DM([[1, 2], [3, 4]]))
+        DM(5)
+        >>> trace(SX.sym("A", 2, 2))
+        SX((A_0+A_3))
+        \enddoctest
+
+        \doctest{matlab}
+        >> trace(DM([1 2; 3 4]))
+        5
+        >> trace(SX.sym('A', 2, 2))
+        (A_0+A_3)
+        \enddoctest
+
+        \sa diag
+
         \identifier{1c1} */
     inline friend MatType trace(const MatType& x) { return MatType::trace(x);}
 
     /** \brief Convert a lower triangular matrix to a symmetric one
+
+        Returns a + a' - diag(diag(a)), i.e. mirrors the strictly lower part to the upper
+        part. The argument must be square and have no structural nonzeros above the diagonal
+        (a dense matrix is rejected even if numerically lower triangular).
+
+        \doctest
+        >>> L = DM(Sparsity.lower(3), [1, 2, 3, 4, 5, 6])
+        >>> tril2symm(L)
+        DM(
+        [[1, 2, 3],
+         [2, 4, 5],
+         [3, 5, 6]])
+        >>> tril2symm(SX.sym("L", Sparsity.lower(2)))
+        SX(
+        [[L_0, L_1],
+         [L_1, L_2]])
+        \enddoctest
+
+        \doctest{matlab}
+        >> L = DM(Sparsity.lower(3), [1; 2; 3; 4; 5; 6]);
+        >> tril2symm(L)
+        [[1, 2, 3],
+         [2, 4, 5],
+         [3, 5, 6]]
+        >> tril2symm(SX.sym('L', Sparsity.lower(2)))
+        [[L_0, L_1],
+         [L_1, L_2]]
+        \enddoctest
+
+        \sa triu2symm, tril, is_tril
 
         \identifier{1c2} */
     inline friend MatType tril2symm(const MatType &a) { return MatType::tril2symm(a);}
 
     /** \brief Convert a upper triangular matrix to a symmetric one
 
+        Mirror image of tril2symm: the argument must be square without structural nonzeros
+        below the diagonal.
+
+        \doctest
+        >>> U = DM(Sparsity.upper(2), [1, 2, 3])
+        >>> triu2symm(U)
+        DM(
+        [[1, 2],
+         [2, 3]])
+        \enddoctest
+
+        \doctest{matlab}
+        >> U = DM(Sparsity.upper(2), [1; 2; 3]);
+        >> triu2symm(U)
+        [[1, 2],
+         [2, 3]]
+        \enddoctest
+
+        \sa tril2symm, triu, is_triu
+
         \identifier{1c3} */
     inline friend MatType triu2symm(const MatType &a) { return MatType::triu2symm(a);}
 
     /** \brief  Frobenius norm
+
+        sqrt(sum_ij x_ij^2) over all entries, for a matrix of any shape.
+        Not differentiable at x == 0 (the derivative evaluates to nan there); use sumsqr
+        in objectives where possible.
+
+        \doctest
+        >>> norm_fro(DM([[1, -2], [3, 4]]))
+        DM(5.47723)
+        >>> norm_fro(SX.sym("x", 2))
+        SX(sqrt((sq(x_0)+sq(x_1))))
+        \enddoctest
+
+        \doctest{matlab}
+        >> norm_fro(DM([1 -2; 3 4]))
+        5.47723
+        >> norm_fro(SX.sym('x', 2))
+        sqrt((sq(x_0)+sq(x_1)))
+        \enddoctest
+
+        \sa norm_2, norm_1, norm_inf, sumsqr
 
         \identifier{1c4} */
     inline friend MatType norm_fro(const MatType &x) { return MatType::norm_fro(x);}
 
     /** \brief  2-norm
 
+        For a vector (row or column) this is the Euclidean norm, identical to norm_fro.
+        For a matrix argument DM and SX raise an error (use norm_fro if that is what you
+        meant); MX creates a spectral-norm node that cannot be evaluated.
+        Not differentiable at x == 0; use sumsqr in objectives where possible.
+
+        \doctest
+        >>> norm_2(DM([3, 4]))
+        DM(5)
+        >>> norm_2(MX.sym("x", 2))
+        MX(||x||_F)
+        >>> try: norm_2(DM([[1, 2], [3, 4]]))
+        ... except Exception as e: print("error")
+        error
+        \enddoctest
+
+        \doctest{matlab}
+        >> norm_2(DM([3; 4]))
+        5
+        >> norm_2(MX.sym('x', 2))
+        ||x||_F
+        >> try, norm_2(DM([1 2; 3 4])); catch e, disp('error'); end
+        error
+        \enddoctest
+
+        \sa norm_fro, norm_1, norm_inf, sumsqr
+
         \identifier{1c5} */
     inline friend MatType norm_2(const MatType &x) { return MatType::norm_2(x);}
 
     /** \brief 1-norm
+
+        Sum of the absolute values of all entries. For a matrix this is the entrywise norm,
+        not the induced (maximum column sum) matrix norm. Nonsmooth at zero entries.
+
+        \doctest
+        >>> norm_1(DM([[1, -2], [3, 4]]))
+        DM(10)
+        >>> norm_1(SX.sym("x", 2))
+        SX((fabs(x_0)+fabs(x_1)))
+        \enddoctest
+
+        \doctest{matlab}
+        >> norm_1(DM([1 -2; 3 4]))
+        10
+        >> norm_1(SX.sym('x', 2))
+        (fabs(x_0)+fabs(x_1))
+        \enddoctest
+
+        \sa norm_inf, norm_2, norm_fro
 
         \identifier{1c6} */
     inline friend MatType norm_1(const MatType &x) { return MatType::norm_1(x);}
 
     /** \brief Infinity-norm
 
+        Largest absolute value among all entries. For a matrix this is the entrywise norm,
+        not the induced (maximum row sum) matrix norm. Nonsmooth.
+
+        \doctest
+        >>> norm_inf(DM([[1, -2], [3, 4]]))
+        DM(4)
+        >>> norm_inf(SX.sym("x", 2))
+        SX(fmax(fmax(0,fabs(x_0)),fabs(x_1)))
+        \enddoctest
+
+        \doctest{matlab}
+        >> norm_inf(DM([1 -2; 3 4]))
+        4
+        >> norm_inf(SX.sym('x', 2))
+        fmax(fmax(0,fabs(x_0)),fabs(x_1))
+        \enddoctest
+
+        \sa norm_1, norm_2, norm_fro, mmax
+
         \identifier{1c7} */
     inline friend MatType norm_inf(const MatType &x) { return MatType::norm_inf(x);}
 
     /** \brief Returns difference (n-th order) along given axis (MATLAB convention)
+
+        Each pass subtracts neighbouring rows (axis 0) or columns (axis 1), shrinking that
+        dimension by one; \p n passes are applied. With axis -1 the first non-singleton
+        dimension is used (columns for a row vector, rows otherwise) and, as in MATLAB,
+        a scalar gives an empty 0-by-0 result.
+
+        \param n Order, at least 1
+        \param axis 0 (rows), 1 (columns) or -1 (automatic)
+
+        \doctest
+        >>> diff(DM([1, 4, 9, 16]))
+        DM([3, 5, 7])
+        >>> diff(DM([1, 4, 9, 16]), 2)
+        DM([2, 2])
+        >>> diff(DM([[1, 2], [4, 8], [9, 10]]), 1, 1)
+        DM([1, 4, 1])
+        >>> diff(SX.sym("x", 3))
+        SX([(x_1-x_0), (x_2-x_1)])
+        >>> diff(DM(3)).dim()
+        '0x0'
+        \enddoctest
+
+        \doctest{matlab}
+        >> diff(DM([1; 4; 9; 16]))
+        [3, 5, 7]
+        >> diff(DM([1; 4; 9; 16]), 2)
+        [2, 2]
+        >> diff(DM([1 2; 4 8; 9 10]), 1, 2)
+        [1, 4, 1]
+        >> diff(SX.sym('x', 3))
+        [(x_1-x_0), (x_2-x_1)]
+        >> d = diff(DM(3)); disp(d.dim())
+        0x0
+        \enddoctest
+
+        \sa cumsum
 
         \identifier{1c8} */
     inline friend MatType diff(const MatType &x, casadi_int n=1, casadi_int axis=-1) {
@@ -560,6 +1502,40 @@ namespace casadi {
 
     /** \brief Returns cumulative sum along given axis (MATLAB convention)
 
+        Running sum down the rows (axis 0) or along the columns (axis 1); the shape is
+        preserved. With axis -1, the columns are summed for a row vector and the rows
+        otherwise.
+
+        \doctest
+        >>> cumsum(DM([1, 2, 3]))
+        DM([1, 3, 6])
+        >>> cumsum(DM([[1, 2], [3, 4]]))
+        DM(
+        [[1, 2],
+         [4, 6]])
+        >>> cumsum(DM([[1, 2], [3, 4]]), 1)
+        DM(
+        [[1, 3],
+         [3, 7]])
+        >>> cumsum(SX.sym("x", 3))
+        SX(@1=(x_1+x_0), [x_0, @1, (x_2+@1)])
+        \enddoctest
+
+        \doctest{matlab}
+        >> cumsum(DM([1; 2; 3]))
+        [1, 3, 6]
+        >> cumsum(DM([1 2; 3 4]))
+        [[1, 2],
+         [4, 6]]
+        >> cumsum(DM([1 2; 3 4]), 2)
+        [[1, 3],
+         [3, 7]]
+        >> cumsum(SX.sym('x', 3))
+        @1=(x_1+x_0), [x_0, @1, (x_2+@1)]
+        \enddoctest
+
+        \sa diff, sum1, sum2
+
         \identifier{1c9} */
     inline friend MatType cumsum(const MatType &x, casadi_int axis=-1) {
       return MatType::cumsum(x, axis);
@@ -567,7 +1543,33 @@ namespace casadi {
 
     /** \brief Inner product of two matrices
 
-        with x and y matrices of the same dimension
+        Sum of the elementwise products over all entries, with \p x and \p y of the same
+        shape (a matrix is treated as the vector of its entries). Only entries that are
+        structurally nonzero in both arguments contribute. A shape mismatch raises an error.
+
+        \doctest
+        >>> dot(DM([1, 2]), DM([3, 4]))
+        DM(11)
+        >>> dot(DM([[1, 2], [3, 4]]), DM([[1, 1], [1, 1]]))
+        DM(10)
+        >>> dot(DM(Sparsity.diag(2), [1, 2]), DM([[1, 1], [1, 1]]))
+        DM(3)
+        >>> dot(SX.sym("x", 2), SX.sym("y", 2))
+        SX(((x_0*y_0)+(x_1*y_1)))
+        \enddoctest
+
+        \doctest{matlab}
+        >> dot(DM([1; 2]), DM([3; 4]))
+        11
+        >> dot(DM([1 2; 3 4]), DM([1 1; 1 1]))
+        10
+        >> dot(DM(Sparsity.diag(2), [1; 2]), DM([1 1; 1 1]))
+        3
+        >> dot(SX.sym('x', 2), SX.sym('y', 2))
+        ((x_0*y_0)+(x_1*y_1))
+        \enddoctest
+
+        \sa mtimes, sumsqr, bilin
 
         \identifier{1ca} */
     inline friend MatType dot(const MatType &x, const MatType &y) {
@@ -575,13 +1577,30 @@ namespace casadi {
     }
 
     /** \brief Computes the nullspace of a matrix A
-     *
-     * Finds Z m-by-(m-n) such that AZ = 0
-     * with A n-by-m with m > n
-     *
-     * Assumes A is full rank
-     *
-     * Inspired by Numerical Methods in Scientific Computing by Ake Bjorck
+
+        Finds Z m-by-(m-n) such that AZ = 0
+        with A n-by-m with m >= n (a matrix with more rows than columns raises an error).
+
+        Assumes A is full rank. Computed with Householder reflections, dense; for MX the
+        SX algorithm is embedded as a function call node.
+
+        Inspired by Numerical Methods in Scientific Computing by Ake Bjorck
+
+        \doctest
+        >>> A = DM([[1, 2, 3], [4, 5, 6]])
+        >>> Z = nullspace(A)
+        >>> Z.dim(), float(norm_1(mtimes(A, Z))) < 1e-12
+        ('3x1', True)
+        \enddoctest
+
+        \doctest{matlab}
+        >> A = DM([1 2 3; 4 5 6]);
+        >> Z = nullspace(A);
+        >> fprintf('%s %d\n', Z.dim(), full(norm_1(A*Z)) < 1e-12)
+        3x1 1
+        \enddoctest
+
+        \sa qr, pinv
 
         \identifier{1cb} */
     inline friend MatType nullspace(const MatType& A) {
@@ -590,6 +1609,32 @@ namespace casadi {
 
     /** \brief  Evaluate a polynomial with coefficients p in x
 
+        Horner evaluation of p[0]*x^(n-1) + ... + p[n-2]*x + p[n-1]: the first coefficient
+        belongs to the highest power, as in MATLAB's polyval. The polynomial is applied to
+        every structurally nonzero entry of \p x; the result keeps the shape and sparsity of
+        \p x (structural zeros stay zero even when p[n-1] != 0).
+
+        \param p Dense column vector of coefficients, at least one entry
+        \param x Point(s) of evaluation, any shape
+
+        \doctest
+        >>> polyval(DM([1, 2, 3]), 2)
+        DM(11)
+        >>> polyval(DM([1, 0, -1]), DM([0, 1, 2]))
+        DM([-1, 0, 3])
+        >>> polyval(SX.sym("p", 3), SX.sym("x"))
+        SX(((((p_0*x)+p_1)*x)+p_2))
+        \enddoctest
+
+        \doctest{matlab}
+        >> polyval(DM([1; 2; 3]), 2)
+        11
+        >> polyval(DM([1; 0; -1]), DM([0; 1; 2]))
+        [-1, 0, 3]
+        >> polyval(SX.sym('p', 3), SX.sym('x'))
+        ((((p_0*x)+p_1)*x)+p_2)
+        \enddoctest
+
         \identifier{1cc} */
     inline friend MatType polyval(const MatType& p, const MatType& x) {
       return MatType::polyval(p, x);
@@ -597,15 +1642,72 @@ namespace casadi {
 
     /** \brief   Get the diagonal of a matrix or construct a diagonal
 
-        When the input is square, the diagonal elements are returned.
-        If the input is vector-like, a diagonal matrix is constructed with it.
+        If the input is a vector (row or column), a square matrix with the vector on its
+        diagonal and structural zeros elsewhere is constructed. Otherwise the diagonal
+        entries are returned as a column vector of length min(size1(), size2()); only
+        structurally nonzero entries are kept.
+
+        \doctest
+        >>> diag(DM([1, 2]))
+        DM(
+        [[1, 00],
+         [00, 2]])
+        >>> diag(DM([[1, 2], [3, 4]]))
+        DM([1, 4])
+        >>> diag(DM(Sparsity.upper(2), [1, 2, 3]))
+        DM([1, 3])
+        >>> diag(DM.ones(2, 3))
+        DM([1, 1])
+        \enddoctest
+
+        \doctest{matlab}
+        >> diag(DM([1; 2]))
+        [[1, 00],
+         [00, 2]]
+        >> diag(DM([1 2; 3 4]))
+        [1, 4]
+        >> diag(DM(Sparsity.upper(2), [1; 2; 3]))
+        [1, 3]
+        >> diag(DM.ones(2, 3))
+        [1, 1]
+        \enddoctest
+
+        \sa trace, diagcat, Sparsity::diag
 
         \identifier{1cd} */
     inline friend MatType diag(const MatType &A) {
       return MatType::diag(A);
     }
 
-    /** \brief  Unite two matrices no overlapping sparsity
+    /** \brief  Unite two matrices with non-overlapping sparsity patterns
+
+        The result has the union of both patterns with the nonzeros of \p A and \p B at their
+        positions. Both must have the same shape; a shared structural nonzero raises
+        "Pattern intersection not empty".
+
+        \doctest
+        >>> A = DM(Sparsity.upper(2), [1, 2, 3])
+        >>> B = DM(Sparsity.triplet(2, 2, [1], [0]), [4])
+        >>> unite(A, B)
+        DM(
+        [[1, 2],
+         [4, 3]])
+        >>> try: unite(DM.eye(2), DM.eye(2))
+        ... except Exception as e: print("error")
+        error
+        \enddoctest
+
+        \doctest{matlab}
+        >> A = DM(Sparsity.upper(2), [1; 2; 3]);
+        >> B = DM(Sparsity.triplet(2, 2, 1, 0), 4);
+        >> unite(A, B)
+        [[1, 2],
+         [4, 3]]
+        >> try, unite(DM.eye(2), DM.eye(2)); catch e, disp('error'); end
+        error
+        \enddoctest
+
+        \sa project, Sparsity::unite
 
         \identifier{1ce} */
     inline friend MatType unite(const MatType& A, const MatType& B) {
@@ -614,12 +1716,44 @@ namespace casadi {
 
     /** \brief  Make the matrix dense if not already
 
+        Structural zeros become stored numerical zeros; the shape and the values of the
+        existing nonzeros are unchanged. A dense input is returned as is.
+
+        \doctest
+        >>> densify(DM.eye(2))
+        DM(
+        [[1, 0],
+         [0, 1]])
+        >>> densify(SX.sym("x", Sparsity.diag(2)))
+        SX(@1=0,
+        [[x_0, @1],
+         [@1, x_1]])
+        >>> densify(MX.sym("x", Sparsity.diag(2)))
+        MX(dense(x))
+        \enddoctest
+
+        \doctest{matlab}
+        >> densify(DM.eye(2))
+        [[1, 0],
+         [0, 1]]
+        >> densify(SX.sym('x', Sparsity.diag(2)))
+        @1=0,
+        [[x_0, @1],
+         [@1, x_1]]
+        >> densify(MX.sym('x', Sparsity.diag(2)))
+        dense(x)
+        \enddoctest
+
+        \sa project, sparsify, is_dense
+
         \identifier{1cf} */
     inline friend MatType densify(const MatType& x) {
       return MatType::densify(x);
     }
 
     /** \brief  Make the matrix dense and assign nonzeros to a value
+
+        Like densify(x) but the structural zeros get the scalar \p val instead of zero.
 
         \identifier{1cg} */
     inline friend MatType densify(const MatType& x, const MatType& val) {
@@ -629,6 +1763,40 @@ namespace casadi {
     /** \brief Create a new matrix with a given sparsity pattern but with the
 
       * nonzeros taken from an existing matrix
+
+        Entries of \p A outside \p sp are dropped; entries of \p sp not present in \p A
+        become numerical zeros. The shape of \p sp must equal that of \p A. With \p intersect
+        true, the target pattern is the intersection of \p sp and the pattern of \p A, so the
+        result only ever loses entries.
+
+        \doctest
+        >>> project(DM([[1, 2], [3, 4]]), Sparsity.diag(2))
+        DM(
+        [[1, 00],
+         [00, 4]])
+        >>> project(DM.eye(2), Sparsity.dense(2, 2))
+        DM(
+        [[1, 0],
+         [0, 1]])
+        >>> project(DM(Sparsity.diag(2), [1, 2]), Sparsity.upper(2), True)
+        DM(
+        [[1, 00],
+         [00, 2]])
+        \enddoctest
+
+        \doctest{matlab}
+        >> project(DM([1 2; 3 4]), Sparsity.diag(2))
+        [[1, 00],
+         [00, 4]]
+        >> project(DM.eye(2), Sparsity.dense(2, 2))
+        [[1, 0],
+         [0, 1]]
+        >> project(DM(Sparsity.diag(2), [1; 2]), Sparsity.upper(2), true)
+        [[1, 00],
+         [00, 2]]
+        \enddoctest
+
+        \sa densify, sparsify, unite
 
         \identifier{1ch} */
     inline friend MatType project(const MatType& A, const Sparsity& sp,
@@ -640,6 +1808,49 @@ namespace casadi {
 
         Ternary operator, "cond ? if_true : if_false"
 
+        Selects \p if_true where \p cond is nonzero and \p if_false elsewhere. \p cond may be
+        a scalar or have the shape of the branches (elementwise selection); a scalar branch is
+        broadcast. By default the result is if_else_zero(cond, if_true) +
+        if_else_zero(!cond, if_false): both branches are part of the expression and are
+        evaluated, but the value of the unselected branch is discarded, so a nan or inf there
+        does not propagate. With \p short_circuit true (MX only; ignored for SX and DM) the
+        branches are wrapped in functions and only the selected one is evaluated.
+
+        \doctest
+        >>> if_else(DM(1), DM(10), DM(20)), if_else(DM(0), DM(10), DM(20))
+        (DM(10), DM(20))
+        >>> if_else(DM([1, 0]), DM([1, 2]), DM([3, 4]))
+        DM([1, 4])
+        >>> x = SX.sym("x")
+        >>> if_else(x > 0, x, -x)
+        SX(@1=(0<x), ((@1?x:0)+((!@1)?(-x):0)))
+        >>> f = Function("f", [x], [if_else(x >= 0, sqrt(x), 0)])
+        >>> f(-1)
+        DM(0)
+        >>> X = MX.sym("X")
+        >>> if_else(X > 0, X, -X, True)
+        MX(switch((0<X), X){0})
+        \enddoctest
+
+        \doctest{matlab}
+        >> if_else(DM(1), DM(10), DM(20)), if_else(DM(0), DM(10), DM(20))
+        10
+        20
+        >> if_else(DM([1; 0]), DM([1; 2]), DM([3; 4]))
+        [1, 4]
+        >> x = SX.sym('x');
+        >> if_else(x > 0, x, -x)
+        @1=(0<x), ((@1?x:0)+((!@1)?(-x):0))
+        >> f = Function('f', {x}, {if_else(x >= 0, sqrt(x), 0)});
+        >> f(-1)
+        0
+        >> X = MX.sym('X');
+        >> if_else(X > 0, X, -X, true)
+        switch((0<X), X){0}
+        \enddoctest
+
+        \sa conditional, if_else_zero, Function::if_else
+
         \identifier{1ci} */
     inline friend MatType if_else(const MatType &cond, const MatType &if_true,
                                   const MatType &if_false, bool short_circuit=false) {
@@ -647,9 +1858,40 @@ namespace casadi {
     }
 
     /** \brief Create a switch
-     *
-     * If the condition \param ind evaluates to the integer k, where 0<=k<f.size(),
-     * then x[k] will be returned, otherwise \param x_default will be returned.
+
+        If the scalar condition \p ind evaluates to the integer k, where 0<=k<x.size(),
+        then x[k] is returned, otherwise \p x_default is returned (also for negative or
+        non-integer values). By default this is a chain of if_else expressions, so all cases
+        are evaluated. With \p short_circuit true (MX only; SX raises an error) a Switch
+        function evaluates only the selected case.
+
+        \doctest
+        >>> conditional(DM(1), [DM(10), DM(20)], DM(-1))
+        DM(20)
+        >>> conditional(DM(5), [DM(10), DM(20)], DM(-1))
+        DM(-1)
+        >>> x = SX.sym("x"); y = SX.sym("y"); z = SX.sym("z")
+        >>> conditional(x, [y, z], 0)
+        SX(@1=(x==1), ((@1?z:0)+((!@1)?((x==0)?y:0):0)))
+        >>> X = MX.sym("X"); Y = MX.sym("Y")
+        >>> conditional(X, [Y, 2*Y], 0, True)
+        MX(switch(X, Y){0})
+        \enddoctest
+
+        \doctest{matlab}
+        >> conditional(DM(1), {DM(10), DM(20)}, DM(-1))
+        20
+        >> conditional(DM(5), {DM(10), DM(20)}, DM(-1))
+        -1
+        >> x = SX.sym('x'); y = SX.sym('y'); z = SX.sym('z');
+        >> conditional(x, {y, z}, 0)
+        @1=(x==1), ((@1?z:0)+((!@1)?((x==0)?y:0):0))
+        >> X = MX.sym('X'); Y = MX.sym('Y');
+        >> conditional(X, {Y, 2*Y}, 0, true)
+        switch(X, Y){0}
+        \enddoctest
+
+        \sa if_else, Function::conditional
 
         \identifier{1cj} */
     inline friend MatType conditional(const MatType& ind, const std::vector<MatType> &x,
@@ -659,15 +1901,46 @@ namespace casadi {
 
     /** \brief Check if expression depends on the argument
 
-        The argument must be symbolic
+        The argument must be symbolic (for MX: symbolic primitives as created by MX.sym,
+        not elements of them).
 
         The dependency is in a mathematical way:
         Does the value of the argument affect the value of the expression?
         Equivalently, will the corresponding entry of the Jacobian by a non-zero?
+        This is decided by sparsity propagation through the graph, so 0*x and x-x do
+        not depend on x.
 
         The symbol could still be present in the expression graph.
 
         To check that kind of dependency, use contains(symvar(f),arg)
+
+        \doctest
+        >>> x = SX.sym("x"); y = SX.sym("y")
+        >>> depends_on(x*y, x), depends_on(x*y, SX.sym("z"))
+        (True, False)
+        >>> depends_on(0*x, x), depends_on(x - x, x), depends_on(SX(3), x)
+        (False, False, False)
+        >>> depends_on(vertcat(x, 3), vertcat(x, y))
+        True
+        >>> v = MX.sym("v", 2)
+        >>> depends_on(v[0], v)
+        True
+        \enddoctest
+
+        \doctest{matlab}
+        >> x = SX.sym('x'); y = SX.sym('y');
+        >> fprintf('%d %d\n', depends_on(x*y, x), depends_on(x*y, SX.sym('z')))
+        1 0
+        >> fprintf('%d %d %d\n', depends_on(0*x, x), depends_on(x - x, x), depends_on(SX(3), x))
+        0 0 0
+        >> depends_on(vertcat(x, 3), vertcat(x, y))
+        1
+        >> v = MX.sym('v', 2);
+        >> depends_on(v(1), v)
+        1
+        \enddoctest
+
+        \sa which_depends, symvar, contains, jacobian_sparsity
 
         \identifier{1ck} */
     inline friend bool depends_on(const MatType& f, const MatType &arg) {
@@ -679,14 +1952,39 @@ namespace casadi {
     * This function checks for correspondence between nodes.
     * The detection does not descend into the expression graph.
     *
-    * contains({a,b},b) -> true
-    * contains({a+b},b) -> false
-    * 
-    * e = a+b
-    * contains({e},e) -> true
+    * contains_all checks that every entry of n is listed in v, contains_any that at
+    * least one is. For SX the entries must be scalar. Not defined for DM.
     *
     * For mathematical dependency, see depends_on
     * \sa depends_on
+    *
+    * \doctest
+    * >>> x = SX.sym("x"); y = SX.sym("y"); z = SX.sym("z")
+    * >>> e = x + y
+    * >>> contains([x, y], y), contains([e], y), contains([e], e)
+    * (True, False, True)
+    * >>> contains([SX.sym("x")], x)
+    * False
+    * >>> contains_all([x, y, z], [x, y]), contains_all([x, y], [x, z])
+    * (True, False)
+    * >>> contains_any([x, y], [x, z]), contains_any([x, y], [z])
+    * (True, False)
+    * >>> X = MX.sym("X"); Y = MX.sym("Y")
+    * >>> contains([X, Y], Y), contains([X + Y], Y)
+    * (True, False)
+    * \enddoctest
+    *
+    * \doctest{matlab}
+    * >> x = SX.sym('x'); y = SX.sym('y');
+    * >> e = x + y;
+    * >> fprintf('%d %d %d\n', contains({x, y}, y), contains({e}, y), contains({e}, e))
+    * 1 0 1
+    * >> contains({SX.sym('x')}, x)
+    * 0
+    * >> X = MX.sym('X'); Y = MX.sym('Y');
+    * >> fprintf('%d %d\n', contains({X, Y}, Y), contains({X + Y}, Y))
+    * 1 0
+    * \enddoctest
 
         \identifier{2c8} */
     /// @{
@@ -705,13 +2003,70 @@ namespace casadi {
 
     /** \brief  Substitute variable v with expression vdef in an expression ex
 
+        \p v must be symbolic and have the same shape as \p vdef (for SX also the same
+        sparsity). For MX, \p v must be a symbolic primitive as created by MX.sym; an element
+        of such a primitive is rejected. Substituting a symbol that does not occur in \p ex
+        is a no-op. Not defined for DM.
+
+        \doctest
+        >>> x = SX.sym("x"); y = SX.sym("y"); z = SX.sym("z")
+        >>> substitute(x*y + x, x, 2)
+        SX(((2.*y)+2))
+        >>> substitute(x*y + x, x, z**2)
+        SX(@1=sq(z), ((@1*y)+@1))
+        >>> p = SX.sym("p", 2)
+        >>> substitute(sumsqr(p), p, DM([1, 2]))
+        SX(5)
+        >>> X = MX.sym("X"); Y = MX.sym("Y")
+        >>> substitute(X*Y + X, X, Y)
+        MX((sq(Y)+Y))
+        \enddoctest
+
+        \doctest{matlab}
+        >> x = SX.sym('x'); y = SX.sym('y'); z = SX.sym('z');
+        >> substitute(x*y + x, x, 2)
+        ((2.*y)+2)
+        >> substitute(x*y + x, x, z^2)
+        @1=sq(z), ((@1*y)+@1)
+        >> p = SX.sym('p', 2);
+        >> substitute(sumsqr(p), p, DM([1; 2]))
+        5
+        >> X = MX.sym('X'); Y = MX.sym('Y');
+        >> substitute(X*Y + X, X, Y)
+        (sq(Y)+Y)
+        \enddoctest
+
+        \sa substitute_inplace, graph_substitute, Function
+
         \identifier{1cl} */
     friend inline MatType substitute(const MatType& ex, const MatType& v,
                                      const MatType& vdef) {
       return MatType::substitute(ex, v, vdef);
     }
 
-    /** \brief  Substitute variable var with expression expr in multiple expressions
+    /** \brief  Substitute variables v with expressions vdef in multiple expressions ex
+
+        All substitutions happen simultaneously: vdef[k] is not itself subject to the
+        other substitutions, so swapping two variables works as expected.
+
+        \doctest
+        >>> x = SX.sym("x"); y = SX.sym("y")
+        >>> substitute([x*y, x + y], [x, y], [1, 2])
+        [SX(2), SX(3)]
+        >>> substitute([x + y], [x, y], [y, x])
+        [SX((x+y))]
+        \enddoctest
+
+        \doctest{matlab}
+        >> x = SX.sym('x'); y = SX.sym('y');
+        >> r = substitute({x*y, x + y}, {x, y}, {1, 2});
+        >> r{1}, r{2}
+        2
+        3
+        >> r = substitute({x + y}, {x, y}, {y, x});
+        >> r{1}
+        (x+y)
+        \enddoctest
 
         \identifier{1cm} */
     friend inline std::vector<MatType>
@@ -722,8 +2077,40 @@ namespace casadi {
 
     /** \brief Inplace substitution with piggyback expressions
 
-     * Substitute variables v out of the expressions vdef sequentially,
-     * as well as out of a number of other expressions piggyback
+        Substitute variables \p v out of the expressions \p vdef sequentially,
+        as well as out of a number of other expressions piggyback
+
+        Interprets vdef[k] as the definition of the symbol v[k] and resolves the definitions
+        into each other, so that afterwards neither \p vdef nor \p ex contain any of the
+        symbols \p v. Both \p vdef and \p ex are modified in place (and returned, in Python).
+        \p v must consist of symbolic primitives with the shapes of \p vdef.
+        \p reverse is only accepted for SX; MX raises "Not implemented".
+
+        \doctest
+        >>> x = SX.sym("x"); y = SX.sym("y")
+        >>> substitute_inplace([x, y], [y + 1, 3], [x*y])
+        ([SX(4), SX(3)], [SX(12)])
+        >>> X = MX.sym("X"); Y = MX.sym("Y")
+        >>> substitute_inplace([X, Y], [Y + 1, 3], [X*Y])
+        ([MX(1), MX(3)], [MX(00)])
+        \enddoctest
+
+        \doctest{matlab}
+        >> x = SX.sym('x'); y = SX.sym('y');
+        >> [vdef, ex] = substitute_inplace({x, y}, {y + 1, 3}, {x*y});
+        >> vdef{1}, vdef{2}, ex{1}
+        4
+        3
+        12
+        >> X = MX.sym('X'); Y = MX.sym('Y');
+        >> [vdef, ex] = substitute_inplace({X, Y}, {Y + 1, 3}, {X*Y});
+        >> vdef{1}, vdef{2}, ex{1}
+        1
+        3
+        00
+        \enddoctest
+
+        \sa substitute
 
         \identifier{1cn} */
     inline friend void
@@ -735,13 +2122,56 @@ namespace casadi {
 
     /** \brief Common subexpression elimination
 
+        Returns an equivalent expression in which identical subexpressions that were built
+        separately share a single node, reducing the number of nodes and the evaluation
+        cost. The shape is preserved. DM is returned unchanged.
+
+        \doctest
+        >>> x = SX.sym("x"); y = SX.sym("y")
+        >>> e = sin(x + y)*cos(x + y)
+        >>> cse(e)
+        SX(@1=(x+y), (sin(@1)*cos(@1)))
+        >>> n_nodes(e), n_nodes(cse(e))
+        (7, 6)
+        \enddoctest
+
+        \doctest{matlab}
+        >> x = SX.sym('x'); y = SX.sym('y');
+        >> e = sin(x + y)*cos(x + y);
+        >> cse(e)
+        @1=(x+y), (sin(@1)*cos(@1))
+        >> fprintf('%d %d\n', n_nodes(e), n_nodes(cse(e)))
+        7 6
+        \enddoctest
+
+        \sa n_nodes, shared, extract
+
         \identifier{1co} */
     inline friend MatType cse(const MatType& e) {
       return MatType::cse({e}).at(0);
     }
 
 
-    /** \brief Common subexpression elimination
+    /** \brief Common subexpression elimination over a list of expressions
+
+        Subexpressions are shared across all entries of the list.
+
+        \doctest
+        >>> X = MX.sym("X"); Y = MX.sym("Y")
+        >>> vertcat(sin(X + Y), cos(X + Y))
+        MX(vertcat(sin((X+Y)), cos((X+Y))))
+        >>> vertcat(*cse([sin(X + Y), cos(X + Y)]))
+        MX(@1=(X+Y), vertcat(sin(@1), cos(@1)))
+        \enddoctest
+
+        \doctest{matlab}
+        >> X = MX.sym('X'); Y = MX.sym('Y');
+        >> [sin(X + Y); cos(X + Y)]
+        vertcat(sin((X+Y)), cos((X+Y)))
+        >> r = cse({sin(X + Y), cos(X + Y)});
+        >> vertcat(r{:})
+        @1=(X+Y), vertcat(sin(@1), cos(@1))
+        \enddoctest
 
         \identifier{1cp} */
     inline friend std::vector<MatType> cse(const std::vector<MatType>& e) {
@@ -765,6 +2195,46 @@ namespace casadi {
         formed. Only the permutation part of this is however used. An improvement would be to solve
         block-by-block if there are multiple BLT blocks.
 
+        The description above applies to DM and SX. For MX, triangular systems give dedicated
+        solve nodes, an orthonormal pattern is inverted by transposition, and everything else
+        falls back to solve(A, b, "qr"). A scalar \p A gives the elementwise division b/A.
+        \p b may have several columns (one right-hand side each). A non-square \p A or a row
+        count mismatch raises an error; a numerically singular DM returns nan or inf.
+
+        \doctest
+        >>> A = DM([[1, 2], [3, 4]])
+        >>> solve(A, DM([1, 2]))
+        DM([0, 0.5])
+        >>> solve(A, DM.eye(2))
+        DM(
+        [[-2, 1],
+         [1.5, -0.5]])
+        >>> solve(SX.sym("A", 2, 2), SX.sym("b", 2))
+        SX(@1=((A_0*A_3)-(A_2*A_1)), [(((A_3/@1)*b_0)-((A_2/@1)*b_1)),
+        (((A_0/@1)*b_1)-((A_1/@1)*b_0))])
+        >>> solve(MX.sym("A", 2, 2), MX.sym("b", 2))
+        MX((A\b))
+        >>> solve(DM(2), DM([1, 2]))
+        DM([0.5, 1])
+        \enddoctest
+
+        \doctest{matlab}
+        >> A = DM([1 2; 3 4]);
+        >> solve(A, DM([1; 2]))
+        [0, 0.5]
+        >> solve(A, DM.eye(2))
+        [[-2, 1],
+         [1.5, -0.5]]
+        >> solve(SX.sym('A', 2, 2), SX.sym('b', 2))
+        @1=((A_0*A_3)-(A_2*A_1)), [(((A_3/@1)*b_0)-((A_2/@1)*b_1)), (((A_0/@1)*b_1)-((A_1/@1)*b_0))]
+        >> solve(MX.sym('A', 2, 2), MX.sym('b', 2))
+        (A\b)
+        >> solve(DM(2), DM([1; 2]))
+        [0.5, 1]
+        \enddoctest
+
+        \sa inv, mldivide, Linsol, qr
+
         \identifier{1cq} */
     friend inline MatType solve(const MatType& A, const MatType& b) {
       // If A is scalar, just divide
@@ -772,7 +2242,32 @@ namespace casadi {
       return MatType::solve(A, b);
     }
 
-    /** \brief Solve a system of equations: A*x = b
+    /** \brief Solve a system of equations: A*x = b, using a linear solver plugin
+
+        Available for DM and MX (for MX the solve becomes a call to the solver, evaluated
+        numerically); SX raises an error. A scalar \p A gives the elementwise division b/A.
+
+        \param lsolver Name of a Linsol plugin, e.g. "qr", "csparse", "lapacklu", "lapackqr",
+        "symbolicqr", "ldl", "ma27"; which ones are available depends on the build
+        \param dict Options passed to the linear solver
+
+        \doctest
+        >>> A = DM([[1, 2], [3, 4]])
+        >>> solve(A, DM([1, 2]), "qr")
+        DM([0, 0.5])
+        >>> solve(MX.sym("A", 2, 2), MX.sym("b", 2), "qr")
+        MX((A\b))
+        \enddoctest
+
+        \doctest{matlab}
+        >> A = DM([1 2; 3 4]);
+        >> solve(A, DM([1; 2]), 'qr')
+        [0, 0.5]
+        >> solve(MX.sym('A', 2, 2), MX.sym('b', 2), 'qr')
+        (A\b)
+        \enddoctest
+
+        \sa Linsol, has_linsol
 
         \identifier{1cr} */
     friend inline MatType solve(const MatType& A, const MatType& b,
@@ -789,13 +2284,24 @@ namespace casadi {
     * [DEPRECATED] confusing behaviour
     *
     * This function linearizes an expression around a point x0,
-    * using x as delta around that point.
+    * using x as delta around that point:
     *
-    * \code
     *  linearize(sin(x),x,x0) -> sin(x0)+cos(x0)*x
-    * \endcode
     *
+    * \p x0 must have the shape of \p x or be a scalar (broadcast).
     * For a variant that returns sin(x0)+cos(x0)*(x-x0), see taylor.
+    *
+    * \doctest
+    * >>> x = SX.sym("x"); y = SX.sym("y")
+    * >>> linearize(sin(x), x, y)
+    * SX((sin(y)+(cos(y)*x)))
+    * \enddoctest
+    *
+    * \doctest{matlab}
+    * >> x = SX.sym('x'); y = SX.sym('y');
+    * >> linearize(sin(x), x, y)
+    * (sin(y)+(cos(y)*x))
+    * \enddoctest
     *
     * \sa taylor, linear_coeff
 
@@ -807,26 +2313,76 @@ namespace casadi {
 #endif // WITH_DEPRECATED_FEATURES
 
     /** \brief Computes the Moore-Penrose pseudo-inverse
-     *
-     * If the matrix A is fat (size1<size2), mul(A, pinv(A)) is unity.
-     *
-     *  pinv(A)' = (AA')^(-1) A
-     *
-     *
-     * If the matrix A is slender (size1>size2), mul(pinv(A), A) is unity.
-     *
-     *  pinv(A) = (A'A)^(-1) A'
-     *
+
+        If the matrix A is fat (size1<size2), mul(A, pinv(A)) is unity.
+
+          pinv(A)' = (AA')^(-1) A
+
+        If the matrix A is slender (size1>size2), mul(pinv(A), A) is unity.
+
+          pinv(A) = (A'A)^(-1) A'
+
+        The normal equations are solved with solve, so \p A is assumed to have full rank.
+        For a square matrix this is the inverse.
+
+        \doctest
+        >>> A = DM([[1, 0, 0], [0, 2, 0]])
+        >>> pinv(A)
+        DM(
+        [[1, 0],
+         [0, 0.5],
+         [0, 0]])
+        >>> mtimes(A, pinv(A))
+        DM(
+        [[1, 0],
+         [0, 1]])
+        >>> pinv(SX.sym("A", 1, 2))
+        SX(@1=(sq(A_0)+sq(A_1)), [(A_0/@1), (A_1/@1)])
+        \enddoctest
+
+        \doctest{matlab}
+        >> A = DM([1 0 0; 0 2 0]);
+        >> pinv(A)
+        [[1, 0],
+         [0, 0.5],
+         [0, 0]]
+        >> A*pinv(A)
+        [[1, 0],
+         [0, 1]]
+        >> pinv(SX.sym('A', 1, 2))
+        @1=(sq(A_0)+sq(A_1)), [(A_0/@1), (A_1/@1)]
+        \enddoctest
+
+        \sa inv, solve, nullspace
+
         \identifier{1ct} */
     friend inline MatType pinv(const MatType& A) {
       return MatType::pinv(A);
     }
 
-    /** \brief Computes the Moore-Penrose pseudo-inverse
-     *
-     * If the matrix A is fat (size1>size2), mul(A, pinv(A)) is unity.
-     * If the matrix A is slender (size2<size1), mul(pinv(A), A) is unity.
-     *
+    /** \brief Computes the Moore-Penrose pseudo-inverse using a linear solver plugin
+
+        Same as pinv(A) but the normal equations are solved with the given Linsol plugin.
+        Available for DM and MX; SX raises an error.
+
+        \param lsolver Name of a Linsol plugin, e.g. "qr"
+        \param dict Options passed to the linear solver
+
+        \doctest
+        >>> pinv(DM([[1, 0, 0], [0, 2, 0]]), "qr")
+        DM(
+        [[1, 0],
+         [0, 0.5],
+         [0, 0]])
+        \enddoctest
+
+        \doctest{matlab}
+        >> pinv(DM([1 0 0; 0 2 0]), 'qr')
+        [[1, 0],
+         [0, 0.5],
+         [0, 0]]
+        \enddoctest
+
         \identifier{1cu} */
     friend inline MatType pinv(const MatType& A, const std::string& lsolver,
                                const Dict& dict = Dict()) {
@@ -835,12 +2391,14 @@ namespace casadi {
 
 
     /** \brief Calculate Matrix exponential
-     * 
-     * Computes expm(A*t) with A constant
-     * 
-     * \param A[in] Square matrix
-     * \param t[in] Scalar
-     *
+
+        Computes expm(A*t) with A constant, through the 'slicot' expm plugin, which must be
+        available in the build. Only defined for DM and MX (SX raises an error).
+
+        \param A Square matrix
+        \param t Scalar
+
+        \sa expm, expmsol
 
         \identifier{23v} */
     friend inline MatType expm_const(const MatType& A, const MatType& t) {
@@ -848,7 +2406,11 @@ namespace casadi {
     }
 
     /** \brief Calculate Matrix exponential
-     *
+
+        Computes expm(A) for a square matrix through the 'slicot' expm plugin, which must be
+        available in the build. Only defined for DM and MX (SX raises an error).
+
+        \sa expm_const, expmsol, mpower
 
         \identifier{23w} */
     friend inline MatType expm(const MatType& A) {
@@ -856,8 +2418,52 @@ namespace casadi {
     }
 
     /** \brief Calculate Jacobian
-     * 
-     * \return Sparse matrix
+
+        The derivative of \p ex with respect to \p arg, with both treated as column-major
+        vectors of their elements: the result is ex.numel()-by-arg.numel(), one row per
+        element of \p ex and one column per element of \p arg. Entries that are structurally
+        zero are left out of the sparsity pattern.
+
+        \p arg must be symbolic (for MX: symbolic primitives as created by MX.sym, or a
+        concatenation of them; elements of a primitive are rejected). Not defined for DM.
+
+        \param opts Options: "allow_forward" and "allow_reverse" (bool, default true) restrict
+        the AD mode; "symmetric" (bool, default false) hints that the Jacobian is symmetric;
+        "verbose"
+        \return Sparse matrix
+
+        \doctest
+        >>> x = SX.sym("x"); y = SX.sym("y")
+        >>> J = jacobian(vertcat(x*y, x**2), vertcat(x, y))
+        >>> J
+        SX(
+        [[y, x],
+         [(2.*x), 00]])
+        >>> J.dim(True)
+        '2x2,3nz'
+        >>> A = SX.sym("A", 2, 2)
+        >>> jacobian(2*A, A).dim()
+        '4x4'
+        >>> jacobian(SX(0, 1), vertcat(x, y)).dim()
+        '0x2'
+        \enddoctest
+
+        \doctest{matlab}
+        >> x = SX.sym('x'); y = SX.sym('y');
+        >> J = jacobian(vertcat(x*y, x^2), vertcat(x, y));
+        >> J
+        [[y, x],
+         [(2.*x), 00]]
+        >> J.dim(true)
+        2x2,3nz
+        >> A = SX.sym('A', 2, 2);
+        >> J = jacobian(2*A, A); disp(J.dim())
+        4x4
+        >> J = jacobian(SX(0, 1), vertcat(x, y)); disp(J.dim())
+        0x2
+        \enddoctest
+
+        \sa gradient, hessian, jtimes, jacobian_sparsity, Function::jacobian
 
         \identifier{1cv} */
     inline friend MatType jacobian(const MatType &ex, const MatType &arg,
@@ -865,19 +2471,66 @@ namespace casadi {
       return MatType::jacobian(ex, arg, opts);
     }
     /** \brief Calculate the gradient of an expression
-     * 
-     * \param ex[in] Scalar expression to take the gradient of
-     * \param arg[in] Vector expression of symbols
-     * \param opts[in] Options
-     * 
-     * \return Dense column vector
+
+        Computed with one reverse-mode sweep (jtimes with tr true) and projected onto the
+        sparsity of \p arg: the result has the shape and pattern of \p arg, also for a matrix
+        \p arg. A non-scalar \p ex raises an error (use jacobian).
+
+        \param ex Scalar expression to take the gradient of
+        \param arg Symbolic expression (any shape)
+        \param opts Options, see jacobian
+        \return Matrix with the sparsity of \p arg
+
+        \doctest
+        >>> x = SX.sym("x"); y = SX.sym("y")
+        >>> gradient(x*y + x**2, vertcat(x, y))
+        SX([((2.*x)+y), x])
+        >>> gradient(x**2, vertcat(x, y))
+        SX([(2.*x), 0])
+        >>> A = SX.sym("A", 2, 2)
+        >>> gradient(sumsqr(A), A)
+        SX(
+        [[(2.*A_0), (2.*A_2)],
+         [(2.*A_1), (2.*A_3)]])
+        \enddoctest
+
+        \doctest{matlab}
+        >> x = SX.sym('x'); y = SX.sym('y');
+        >> gradient(x*y + x^2, vertcat(x, y))
+        [((2.*x)+y), x]
+        >> gradient(x^2, vertcat(x, y))
+        [(2.*x), 0]
+        >> A = SX.sym('A', 2, 2);
+        >> gradient(sumsqr(A), A)
+        [[(2.*A_0), (2.*A_2)],
+         [(2.*A_1), (2.*A_3)]]
+        \enddoctest
+
+        \sa jacobian, hessian, jtimes
 
         \identifier{23x} */
     inline friend MatType gradient(const MatType &ex, const MatType &arg, const Dict& opts=Dict()) {
       return MatType::gradient(ex, arg, opts);
     }
     /** \brief Calculate the tangent of an expression
-     *
+
+        Derivative of \p ex with respect to a scalar \p arg, computed with one forward-mode
+        sweep and projected onto the sparsity of \p ex: the result has the shape and pattern
+        of \p ex. A non-scalar \p arg raises an error (use jacobian).
+
+        \doctest
+        >>> x = SX.sym("x")
+        >>> tangent(vertcat(x**2, 3*x), x)
+        SX([(2.*x), 3])
+        \enddoctest
+
+        \doctest{matlab}
+        >> x = SX.sym('x');
+        >> tangent(vertcat(x^2, 3*x), x)
+        [(2.*x), 3]
+        \enddoctest
+
+        \sa gradient, jacobian, jtimes
 
         \identifier{23y} */
     inline friend MatType tangent(const MatType &ex, const MatType &arg, const Dict& opts=Dict()) {
@@ -892,6 +2545,43 @@ namespace casadi {
         expressions, it will use directional derivatives which is typically (but
         not necessarily) more efficient if the complete Jacobian is not needed and v has few rows.
 
+        The matrix shapes of \p ex and \p arg are kept: \p v must have the shape of \p arg
+        (or of \p ex when \p tr is true), and several directions can be passed at once by
+        concatenating them horizontally, i.e. v.size2() a multiple of arg.size2(). The result
+        is ex.size1()-by-ex.size2()*n_dir (arg.size1()-by-arg.size2()*n_dir when \p tr is
+        true). An inconsistent shape of \p v raises an error.
+
+        \doctest
+        >>> x = SX.sym("x"); y = SX.sym("y")
+        >>> ex = vertcat(x*y, x**2); arg = vertcat(x, y)
+        >>> jtimes(ex, arg, DM([1, 0]))
+        SX([y, (2.*x)])
+        >>> jtimes(ex, arg, DM([1, 0]), True)
+        SX([y, x])
+        >>> jtimes(ex, arg, DM.eye(2))
+        SX(
+        [[y, x],
+         [(2.*x), 0]])
+        >>> jtimes(ex, arg, SX.sym("v", 2))
+        SX([((y*v_0)+(x*v_1)), ((2.*x)*v_0)])
+        \enddoctest
+
+        \doctest{matlab}
+        >> x = SX.sym('x'); y = SX.sym('y');
+        >> ex = vertcat(x*y, x^2); arg = vertcat(x, y);
+        >> jtimes(ex, arg, DM([1; 0]))
+        [y, (2.*x)]
+        >> jtimes(ex, arg, DM([1; 0]), true)
+        [y, x]
+        >> jtimes(ex, arg, DM.eye(2))
+        [[y, x],
+         [(2.*x), 0]]
+        >> jtimes(ex, arg, SX.sym('v', 2))
+        [((y*v_0)+(x*v_1)), ((2.*x)*v_0)]
+        \enddoctest
+
+        \sa jacobian, forward, reverse
+
         \identifier{1cw} */
     friend inline MatType jtimes(const MatType &ex, const MatType &arg,
                                  const MatType &v, bool tr=false, const Dict& opts=Dict()) {
@@ -899,6 +2589,38 @@ namespace casadi {
     }
 
     /** \brief Forward directional derivative
+
+        For each seed direction v[d] (a list with one seed per entry of \p arg, with matching
+        shapes), computes the forward sensitivities of every entry of \p ex: the result is a
+        list over directions of lists over \p ex, containing jtimes(ex[i], arg, v[d]) summed
+        over all arguments. Not defined for DM.
+
+        \param ex List of expressions
+        \param arg List of symbolic expressions
+        \param v List of directions, each a list of seeds matching \p arg
+        \param opts Options, see jacobian
+
+        \doctest
+        >>> x = SX.sym("x"); y = SX.sym("y")
+        >>> forward([x*y, x**2], [x, y], [[1, 0]])
+        [[SX(y), SX((2.*x))]]
+        >>> forward([x*y, x**2], [x, y], [[1, 0], [0, 1]])
+        [[SX(y), SX((2.*x))], [SX(x), SX(0)]]
+        \enddoctest
+
+        \doctest{matlab}
+        >> x = SX.sym('x'); y = SX.sym('y');
+        >> r = forward({x*y, x^2}, {x, y}, {{1, 0}});
+        >> r{1}{1}, r{1}{2}
+        y
+        (2.*x)
+        >> r = forward({x*y, x^2}, {x, y}, {{1, 0}, {0, 1}});
+        >> r{2}{1}, r{2}{2}
+        x
+        0
+        \enddoctest
+
+        \sa reverse, jtimes, Function::forward
 
         \identifier{1cx} */
     friend inline std::vector<std::vector<MatType> >
@@ -910,6 +2632,37 @@ namespace casadi {
 
     /** \brief Reverse directional derivative
 
+        For each adjoint seed v[d] (a list with one seed per entry of \p ex, with matching
+        shapes), computes the adjoint sensitivities with respect to every entry of \p arg:
+        the result is a list over directions of lists over \p arg. Not defined for DM.
+
+        \param ex List of expressions
+        \param arg List of symbolic expressions
+        \param v List of directions, each a list of seeds matching \p ex
+        \param opts Options, see jacobian
+
+        \doctest
+        >>> x = SX.sym("x"); y = SX.sym("y")
+        >>> reverse([x*y, x**2], [x, y], [[1, 0]])
+        [[SX(y), SX(x)]]
+        >>> reverse([x*y, x**2], [x, y], [[1, 1]])
+        [[SX(((2.*x)+y)), SX(x)]]
+        \enddoctest
+
+        \doctest{matlab}
+        >> x = SX.sym('x'); y = SX.sym('y');
+        >> r = reverse({x*y, x^2}, {x, y}, {{1, 0}});
+        >> r{1}{1}, r{1}{2}
+        y
+        x
+        >> r = reverse({x*y, x^2}, {x, y}, {{1, 1}});
+        >> r{1}{1}, r{1}{2}
+        ((2.*x)+y)
+        x
+        \enddoctest
+
+        \sa forward, jtimes, gradient, Function::reverse
+
         \identifier{1cy} */
     friend inline std::vector<std::vector<MatType> >
     reverse(const std::vector<MatType> &ex, const std::vector<MatType> &arg,
@@ -920,6 +2673,38 @@ namespace casadi {
 
     ///@{
     /** \brief Hessian and (optionally) gradient
+
+        Computes the gradient g = gradient(ex, arg) and the Hessian jacobian(g, arg), an
+        arg.numel()-by-arg.numel() symmetric matrix; the "symmetric" option is set unless
+        given in \p opts. \p ex must be scalar. The overload with \p output_g also returns
+        the gradient; in Python and MATLAB this is the variant that is exposed, so the
+        result is always the pair (H, g). Not defined for DM.
+
+        \param opts Options, see jacobian
+
+        \doctest
+        >>> x = SX.sym("x"); y = SX.sym("y")
+        >>> H, g = hessian(x**2*y, vertcat(x, y))
+        >>> H
+        SX(@1=(2.*x),
+        [[(2.*y), @1],
+         [@1, 00]])
+        >>> g
+        SX([((2.*x)*y), sq(x)])
+        \enddoctest
+
+        \doctest{matlab}
+        >> x = SX.sym('x'); y = SX.sym('y');
+        >> [H, g] = hessian(x^2*y, vertcat(x, y));
+        >> H
+        @1=(2.*x),
+        [[(2.*y), @1],
+         [@1, 00]]
+        >> g
+        [((2.*x)*y), sq(x)]
+        \enddoctest
+
+        \sa gradient, jacobian, Function::hessian
 
         \identifier{23z} */
     inline friend MatType hessian(const MatType &ex, const MatType &arg,
@@ -934,6 +2719,44 @@ namespace casadi {
 
     /** \brief Find out which variables enter with some order
 
+        Structural dependency check by sparsity propagation, without forming derivatives.
+        With \p order 1, an entry depends if the corresponding Jacobian entry is structurally
+        nonzero; with \p order 2, if it enters nonlinearly (second derivative structurally
+        nonzero). Operations whose derivative is structurally zero, such as floor or sign,
+        count as not depending.
+
+        \param expr Expression
+        \param var Symbolic expression
+        \param order 1 or 2; other values raise an error
+        \param tr When false, the result has one entry per element of \p var: does any
+        element of \p expr depend on it. When true, one entry per element of \p expr: does
+        it depend on any element of \p var.
+        \return List of booleans
+
+        \doctest
+        >>> x = SX.sym("x"); y = SX.sym("y")
+        >>> e = vertcat(x*y, x**2, 3*x)
+        >>> which_depends(e, vertcat(x, y), 1, False)
+        [True, True]
+        >>> which_depends(e, vertcat(x, y), 1, True)
+        [True, True, True]
+        >>> which_depends(e, vertcat(x, y), 2, True)
+        [True, True, False]
+        \enddoctest
+
+        \doctest{matlab}
+        >> x = SX.sym('x'); y = SX.sym('y');
+        >> e = vertcat(x*y, x^2, 3*x);
+        >> which_depends(e, vertcat(x, y), 1, false)
+        1 1
+        >> which_depends(e, vertcat(x, y), 1, true)
+        1 1 1
+        >> which_depends(e, vertcat(x, y), 2, true)
+        1 1 0
+        \enddoctest
+
+        \sa depends_on, is_linear, jacobian_sparsity
+
         \identifier{1cz} */
     inline friend std::vector<bool> which_depends(const MatType &expr, const MatType &var,
         casadi_int order, bool tr) {
@@ -941,8 +2764,22 @@ namespace casadi {
     }
 
     /** \brief Get the sparsity pattern of a jacobian
-     * 
-     * Equivalent to, but cheaper to compute than, jacobian(f,x).sparsity()
+
+        Equivalent to, but cheaper to compute than, jacobian(f,x).sparsity()
+
+        \doctest
+        >>> x = SX.sym("x"); y = SX.sym("y")
+        >>> jacobian_sparsity(vertcat(x*y, x**2, 3), vertcat(x, y))
+        Sparsity(3x2,3nz)
+        \enddoctest
+
+        \doctest{matlab}
+        >> x = SX.sym('x'); y = SX.sym('y');
+        >> jacobian_sparsity(vertcat(x*y, x^2, 3), vertcat(x, y))
+        3x2,3nz
+        \enddoctest
+
+        \sa jacobian, which_depends
 
         \identifier{259} */
     inline friend Sparsity jacobian_sparsity(const MatType &f, const MatType &x) {
@@ -951,9 +2788,31 @@ namespace casadi {
 
     /** \brief Is expr linear in var?
     *
-    * False negatives are possible
-    * (an expression may not be recognised as linear while it really is),
-    * false positives not.
+    * Defined as: no entry of \p expr depends on \p var with order 2 (see which_depends).
+    * Only the structure of the graph is inspected, not the values:
+    * false negatives are possible
+    * (an expression may not be recognised as linear while it really is, e.g. x*x/x).
+    * Operations whose derivative is structurally zero, such as floor, sign or comparisons,
+    * are treated as linear.
+    * A constant expression counts as linear.
+    *
+    * \doctest
+    * >>> x = SX.sym("x"); y = SX.sym("y")
+    * >>> is_linear(2*x + y, vertcat(x, y)), is_linear(x*y, vertcat(x, y))
+    * (True, False)
+    * >>> is_linear(sin(y)*x, x), is_linear(x*x/x, x)
+    * (True, False)
+    * \enddoctest
+    *
+    * \doctest{matlab}
+    * >> x = SX.sym('x'); y = SX.sym('y');
+    * >> fprintf('%d %d\n', is_linear(2*x + y, vertcat(x, y)), is_linear(x*y, vertcat(x, y)))
+    * 1 0
+    * >> fprintf('%d %d\n', is_linear(sin(y)*x, x), is_linear(x*x/x, x))
+    * 1 0
+    * \enddoctest
+    *
+    * \sa is_quadratic, linear_coeff, which_depends
 
         \identifier{1d0} */
     inline friend bool is_linear(const MatType &expr, const MatType &var) {
@@ -962,9 +2821,29 @@ namespace casadi {
 
     /** \brief Is expr quadratic in var?
     *
+    * Defined as: gradient(expr, var) is linear in \p var; hence \p expr must be scalar.
     * False negatives are possible
     * (an expression may not be recognised as quadratic while it really is),
-    * false positives not.
+    * see is_linear for the structural nature of the check.
+    * Linear and constant expressions count as quadratic.
+    *
+    * \doctest
+    * >>> x = SX.sym("x"); y = SX.sym("y")
+    * >>> is_quadratic(x*y + x**2, vertcat(x, y)), is_quadratic(x**3, x)
+    * (True, False)
+    * >>> is_quadratic(x, x)
+    * True
+    * \enddoctest
+    *
+    * \doctest{matlab}
+    * >> x = SX.sym('x'); y = SX.sym('y');
+    * >> fprintf('%d %d\n', is_quadratic(x*y + x^2, vertcat(x, y)), is_quadratic(x^3, x))
+    * 1 0
+    * >> is_quadratic(x, x)
+    * 1
+    * \enddoctest
+    *
+    * \sa is_linear, quadratic_coeff
 
         \identifier{1d1} */
     inline friend bool is_quadratic(const MatType &expr, const MatType &var) {
@@ -977,8 +2856,42 @@ namespace casadi {
     *
     * e = 0.5*bilin(A,x,x)+dot(b,x)+c
     *
-    * \param check[in] When true (default), A is checked to be independent of x.
+    * Returns A = hessian(expr, var), b = jacobian(expr, var) at var = 0 as a column, and
+    * c = expr at var = 0. A non-scalar \p expr raises an error.
+    *
+    * \param check[in] When true (default), A is checked to be independent of x and an
+    *                  error is raised otherwise ("called on non-quadratic expression").
     *                  Provided to deal with false positive dependency checks.
+    *
+    * \doctest
+    * >>> x = SX.sym("x"); y = SX.sym("y")
+    * >>> A, b, c = quadratic_coeff(x**2 + 2*x*y + 3*x + 4, vertcat(x, y))
+    * >>> A
+    * SX(@1=2,
+    * [[@1, @1],
+    *  [@1, 00]])
+    * >>> b, c
+    * (SX([3, 0]), SX(4))
+    * >>> try: quadratic_coeff(x**3, x)
+    * ... except Exception as e: print("error")
+    * error
+    * \enddoctest
+    *
+    * \doctest{matlab}
+    * >> x = SX.sym('x'); y = SX.sym('y');
+    * >> [A, b, c] = quadratic_coeff(x^2 + 2*x*y + 3*x + 4, vertcat(x, y));
+    * >> A
+    * @1=2,
+    * [[@1, @1],
+    *  [@1, 00]]
+    * >> b, c
+    * [3, 0]
+    * 4
+    * >> try, [A, b, c] = quadratic_coeff(x^3, x); catch e, disp('error'); end
+    * error
+    * \enddoctest
+    *
+    * \sa linear_coeff, is_quadratic, hessian
 
         \identifier{1d2} */
     inline friend void quadratic_coeff(const MatType &expr, const MatType &var,
@@ -990,8 +2903,35 @@ namespace casadi {
     *
     * A x + b
     *
-    * \param check[in] When true (default)m, A is checked to be independent of x.
+    * Returns A = jacobian(expr, var) at var = 0 and b = vec(expr) at var = 0.
+    * \p expr must be a vector (a matrix raises an error).
+    *
+    * \param check[in] When true (default), \p expr is checked to be linear in \p var
+    *                  (is_linear) and an error is raised otherwise.
     *                  Provided to deal with false positive dependency checks.
+    *
+    * \doctest
+    * >>> x = SX.sym("x"); y = SX.sym("y")
+    * >>> A, b = linear_coeff(vertcat(2*x + y + 1, 3*y), vertcat(x, y))
+    * >>> A
+    * SX(
+    * [[2, 1],
+    *  [00, 3]])
+    * >>> b
+    * SX([1, 0])
+    * \enddoctest
+    *
+    * \doctest{matlab}
+    * >> x = SX.sym('x'); y = SX.sym('y');
+    * >> [A, b] = linear_coeff(vertcat(2*x + y + 1, 3*y), vertcat(x, y));
+    * >> A
+    * [[2, 1],
+    *  [00, 3]]
+    * >> b
+    * [1, 0]
+    * \enddoctest
+    *
+    * \sa quadratic_coeff, is_linear, jacobian
 
         \identifier{1d3} */
     inline friend void linear_coeff(const MatType &expr, const MatType &var,
@@ -1000,21 +2940,21 @@ namespace casadi {
     }
 
     /** \brief Extract purely parametric parts from an expression graph
-     * 
+     *
      * The purpose of extract_parametric is ultimately to save on evaluation time of an expression,
      * by extracting out the parts that are only solely dependent on parameters.
-     * 
+     *
      * For any:
      * [expr_ret, symbols, parametric] = extract_parametric(expr, par)
      * It holds that:
      * substitute(expr_ret,symbols,parametric) == expr
-     * 
+     *
      * parametric is only dependant on par
      * expr_ret is not dependant on par, but is dependant on symbols
-     * 
+     *
      * Example:
      * [expr_ret, symbols, parametric] = extract_parametric((x-sqrt(p))*y+cos(p)**2, p)
-     * 
+     *
      * expr_ret: (((x-extracted1)*y)+extracted2)
      * symbols: [extracted1, extracted2]
      * parametric: [sqrt(p),cos(p)**2]
@@ -1023,11 +2963,48 @@ namespace casadi {
      *   - offset (int), default 0: Offset for new symbol counter
      *   - prefix (str), default 'e_': Prefix for new symbols
      *   - suffix (str), default '': Suffix for new symbols
-     * 
+     *
      * Option 'extract_trivial' controls the behaviour for extracted parts
      * that consist of pure symbols. If false (default),
      * these parts are not extracted.
      *
+     * \p expr may also be a list of expressions and \p par a list of parameter symbols
+     * (concatenated internally). An unknown option raises an error. Not defined for DM.
+     *
+     * \doctest
+     * >>> x = SX.sym("x"); y = SX.sym("y"); p = SX.sym("p")
+     * >>> expr_ret, symbols, parametric = extract_parametric((x - sqrt(p))*y + cos(p)**2, p)
+     * >>> expr_ret
+     * SX((((x-e_0)*y)+e_1))
+     * >>> symbols, parametric
+     * ([SX(e_0), SX(e_1)], [SX(sqrt(p)), SX(sq(cos(p)))])
+     * >>> extract_parametric(x*p, p)
+     * (SX((x*p)), [], [])
+     * >>> extract_parametric(x*p, p, {"extract_trivial": True})
+     * (SX((x*e_0)), [SX(e_0)], [SX(p)])
+     * \enddoctest
+     *
+     * \doctest{matlab}
+     * >> x = SX.sym('x'); y = SX.sym('y'); p = SX.sym('p');
+     * >> [expr_ret, symbols, parametric] = extract_parametric((x - sqrt(p))*y + cos(p)^2, p);
+     * >> expr_ret
+     * (((x-e_0)*y)+e_1)
+     * >> vertcat(symbols{:}), vertcat(parametric{:})
+     * [e_0, e_1]
+     * [sqrt(p), sq(cos(p))]
+     * >> [expr_ret, symbols, parametric] = extract_parametric(x*p, p);
+     * >> expr_ret, numel(symbols)
+     * (x*p)
+     * 0
+     * >> opts = struct('extract_trivial', true);
+     * >> [expr_ret, symbols, parametric] = extract_parametric(x*p, p, opts);
+     * >> expr_ret, symbols{1}, parametric{1}
+     * (x*e_0)
+     * e_0
+     * p
+     * \enddoctest
+     *
+     * \sa separate_linear, substitute
 
         \identifier{288} */
     inline friend void extract_parametric(const MatType &expr, const MatType& par,
@@ -1082,7 +3059,7 @@ namespace casadi {
       extract_parametric(expr, veccat(par), expr_ret, symbols, parametric, opts);
     }
 
-    /* \brief separate an expression into subuexpression that are linear, constant, and nonlinear
+    /** \brief Separate an expression into subexpressions that are constant, linear and nonlinear
     *
     * \param expr[in] The expression to be separated
     * \param sym_lin[in] The symbolic variables w.r.t. which linearity should be checked
@@ -1091,23 +3068,49 @@ namespace casadi {
     * \param expr_lin[out] The linear part of the expression
     * \param expr_nonlin[out] The nonlinear part of the expression
     *
-    * Expression dependencies that are not in sym_lin or sym_const are considered nonlinear
-    * 
+    * Every symbol in \p expr must be listed in \p sym_lin or \p sym_const; otherwise an
+    * error about free variables is raised.
+    *
     * A post condition is that the following holds:
     * expr = expr_const + expr_lin + expr_nonlin
     *
-    * Here, expr_const is not dependant on sym_const,
-    *       expr_lin is linear in sym_lin
+    * Here, expr_const is only dependant on sym_const,
+    *       expr_lin is linear in sym_lin (with coefficients that may depend on sym_const)
     *
     * Example:
-    *   
+    *
     * [expr_const,expr_lin,expr_nonlin] =
     *   separate_linear(cos(p)+7*x+x*y, vertcat(x,y), p)
     *
     * expr_const: cos(p)
     * expr_lin: 7*x
     * expr_nonlin: x*y
-    * 
+    *
+    * \p sym_lin and \p sym_const may also be lists of symbols. Not defined for DM.
+    *
+    * \doctest
+    * >>> x = SX.sym("x"); y = SX.sym("y"); p = SX.sym("p")
+    * >>> separate_linear(cos(p) + 7*x + x*y, vertcat(x, y), p)
+    * (SX(cos(p)), SX((7*x)), SX((x*y)))
+    * >>> separate_linear(p*x, x, p)
+    * (SX(0), SX((p*x)), SX(0))
+    * \enddoctest
+    *
+    * \doctest{matlab}
+    * >> x = SX.sym('x'); y = SX.sym('y'); p = SX.sym('p');
+    * >> [c, l, n] = separate_linear(cos(p) + 7*x + x*y, vertcat(x, y), p);
+    * >> c, l, n
+    * cos(p)
+    * (7*x)
+    * (x*y)
+    * >> [c, l, n] = separate_linear(p*x, x, p);
+    * >> c, l, n
+    * 0
+    * (p*x)
+    * 0
+    * \enddoctest
+    *
+    * \sa extract_parametric, linear_coeff
     */
     inline friend void separate_linear(const MatType &expr,
       const MatType &sym_lin, const MatType &sym_const,
@@ -1122,17 +3125,80 @@ namespace casadi {
         expr_const, expr_lin, expr_nonlin);
     }
 
-    /** Count number of nodes */
+    /** \brief Count the number of nodes in an expression graph
+
+        The number of nodes of the Function that evaluates the expression, which for SX
+        includes symbols and constants and for MX also output nodes. Shared subexpressions
+        are counted once; identical subexpressions built separately are counted separately
+        (use cse to merge them). Not defined for DM.
+
+        \doctest
+        >>> x = SX.sym("x"); y = SX.sym("y")
+        >>> n_nodes(x), n_nodes(x + y), n_nodes(vertcat(x + y, x + y))
+        (1, 3, 4)
+        >>> n_nodes(SX(0, 1))
+        0
+        \enddoctest
+
+        \doctest{matlab}
+        >> x = SX.sym('x'); y = SX.sym('y');
+        >> fprintf('%d %d %d\n', n_nodes(x), n_nodes(x + y), n_nodes(vertcat(x + y, x + y)))
+        1 3 4
+        >> n_nodes(SX(0, 1))
+        0
+        \enddoctest
+
+        \sa cse, Function::n_nodes
+     */
     inline friend casadi_int n_nodes(const MatType& A) {
       return MatType::n_nodes(A);
     }
 
-    /// Simplify an expression
+    /** \brief Simplify an expression
+
+        For SX, applies simplification passes such as constant folding and removal of
+        trivial operations. For MX and DM the expression is returned unchanged.
+
+        \doctest
+        >>> x = SX.sym("x"); y = SX.sym("y")
+        >>> simplify(x*2*3), simplify(x*0 + y*1)
+        (SX((6*x)), SX(y))
+        \enddoctest
+
+        \doctest{matlab}
+        >> x = SX.sym('x'); y = SX.sym('y');
+        >> simplify(x*2*3), simplify(x*0 + y*1)
+        (6*x)
+        y
+        \enddoctest
+
+        \sa transform, cse
+     */
     friend inline MatType simplify(const MatType &x) {
       return MatType::simplify(x);
     }
 
-    /// Apply transformation passes to an expression
+    /** \brief Apply transformation passes to an expression
+
+        Wraps the expression in a Function of its free symbols, applies Function::transform
+        and re-evaluates it on the original symbols. Each pass is a list starting with a
+        verb: "simplify" (followed by task names), "expand" or "external"; an unknown verb
+        raises an error. Without \p passes a default set of simplification passes is applied.
+
+        \doctest
+        >>> x = SX.sym("x")
+        >>> transform(x*2*3)
+        SX((6*x))
+        \enddoctest
+
+        \doctest{matlab}
+        >> x = SX.sym('x');
+        >> transform(x*2*3)
+        (6*x)
+        \enddoctest
+
+        \sa simplify, Function::transform
+     */
     ///@{
     friend inline MatType transform(const MatType &x, const Dict& opts = Dict()) {
       return MatType::transform(x, opts);
@@ -1153,6 +3219,29 @@ namespace casadi {
 
     /** \brief Get a string representation for a binary MatType, using custom arguments
 
+        Prints the operation at the root of a scalar expression with the given strings in
+        place of its operands. \p xb must be a unary or binary operation (a symbol or
+        constant raises an error for SX) and \p args must have one entry per operand.
+
+        \doctest
+        >>> x = SX.sym("x"); y = SX.sym("y")
+        >>> print_operator(x + y, ["a", "b"]), print_operator(sin(x), ["a"])
+        ('(a+b)', 'sin(a)')
+        >>> X = MX.sym("X"); Y = MX.sym("Y")
+        >>> print_operator(vertcat(X, Y), ["a", "b"])
+        'vertcat(a, b)'
+        \enddoctest
+
+        \doctest{matlab}
+        >> x = SX.sym('x'); y = SX.sym('y');
+        >> print_operator(x + y, {'a', 'b'}), print_operator(sin(x), {'a'})
+        (a+b)
+        sin(a)
+        >> X = MX.sym('X'); Y = MX.sym('Y');
+        >> print_operator(vertcat(X, Y), {'a', 'b'})
+        vertcat(a, b)
+        \enddoctest
+
         \identifier{1d4} */
     inline friend std::string
       print_operator(const MatType& xb, const std::vector<std::string>& args) {
@@ -1160,6 +3249,64 @@ namespace casadi {
     }
 
     /** \brief Introduce intermediate variables for selected nodes in a graph
+
+        Rewrites the expressions \p ex so that selected intermediate results are replaced by
+        new symbols \p v with definitions \p vdef (ex, v and vdef are outputs; in Python the
+        call is extract(ex, opts) -> (ex, v, vdef)). Substituting \p vdef for \p v in the
+        result gives back the original expressions. Only nodes that are physically shared in
+        the graph are detected: two separately constructed copies of x+y are distinct nodes
+        (apply cse first to merge them). Not defined for DM.
+
+        Options:
+          - lift_shared (bool), default true: extract nodes used more than once
+          - lift_calls (bool), default false: extract every Function call and its arguments
+            (MX only; SX raises for lift_calls true or lift_shared false)
+          - prefix (str), default 'v_', suffix (str), default '', offset (int), default 0:
+            naming of the new symbols
+
+        \doctest
+        >>> x = SX.sym("x"); y = SX.sym("y")
+        >>> e = x + y
+        >>> extract([sin(e), cos(e)])
+        ([SX(sin(v_0)), SX(cos(v_0))], [SX(v_0)], [SX((x+y))])
+        >>> extract([sin(e), cos(e)], {"prefix": "w_", "offset": 3})
+        ([SX(sin(w_3)), SX(cos(w_3))], [SX(w_3)], [SX((x+y))])
+        >>> extract([sin(x + y), cos(x + y)])
+        ([SX(sin((x+y))), SX(cos((x+y)))], [], [])
+        >>> X = MX.sym("X"); Y = MX.sym("Y")
+        >>> f = Function("f", [X], [sin(X)]); E = X + Y
+        >>> extract([f(E)*f(E)], {"lift_shared": False, "lift_calls": True})
+        ([MX((v_1*v_2))], [MX(v_0), MX(v_1), MX(v_2)], [MX((X+Y)), MX(f(v_0){0}), MX(f(v_0){0})])
+        \enddoctest
+
+        \doctest{matlab}
+        >> x = SX.sym('x'); y = SX.sym('y');
+        >> e = x + y;
+        >> [ex, v, vdef] = extract({sin(e), cos(e)});
+        >> ex{1}, ex{2}, v{1}, vdef{1}
+        sin(v_0)
+        cos(v_0)
+        v_0
+        (x+y)
+        >> [ex, v, vdef] = extract({sin(e), cos(e)}, struct('prefix', 'w_', 'offset', 3));
+        >> ex{1}, v{1}
+        sin(w_3)
+        w_3
+        >> [ex, v, vdef] = extract({sin(x + y), cos(x + y)});
+        >> ex{1}, numel(v)
+        sin((x+y))
+        0
+        >> X = MX.sym('X'); Y = MX.sym('Y');
+        >> f = Function('f', {X}, {sin(X)}); E = X + Y;
+        >> opts = struct('lift_shared', false, 'lift_calls', true);
+        >> [ex, v, vdef] = extract({f(E)*f(E)}, opts);
+        >> ex{1}, numel(v), vdef{2}
+        (v_1*v_2)
+        3
+        f(v_0){0}
+        \enddoctest
+
+        \sa shared, cse, substitute
 
         \identifier{1d5} */
     inline friend void extract(std::vector<MatType>& ex,
@@ -1170,6 +3317,36 @@ namespace casadi {
     }
 
     /** \brief Extract shared subexpressions from an set of expressions
+
+        Same as extract with the options lift_shared true and lift_calls false: every node
+        that is used more than once is replaced by a new symbol named \p v_prefix + counter
+        + \p v_suffix. In Python the call is shared(ex, v_prefix, v_suffix) -> (ex, v, vdef).
+
+        \doctest
+        >>> x = SX.sym("x"); y = SX.sym("y")
+        >>> e = x + y
+        >>> shared([sin(e)*cos(e) + e])
+        ([SX(((sin(v_0)*cos(v_0))+v_0))], [SX(v_0)], [SX((x+y))])
+        >>> shared([sin(e), cos(e)], "w_", "_s")
+        ([SX(sin(w_0_s)), SX(cos(w_0_s))], [SX(w_0_s)], [SX((x+y))])
+        \enddoctest
+
+        \doctest{matlab}
+        >> x = SX.sym('x'); y = SX.sym('y');
+        >> e = x + y;
+        >> [ex, v, vdef] = shared({sin(e)*cos(e) + e});
+        >> ex{1}, v{1}, vdef{1}
+        ((sin(v_0)*cos(v_0))+v_0)
+        v_0
+        (x+y)
+        >> [ex, v, vdef] = shared({sin(e), cos(e)}, 'w_', '_s');
+        >> ex{1}, ex{2}, v{1}
+        sin(w_0_s)
+        cos(w_0_s)
+        w_0_s
+        \enddoctest
+
+        \sa extract, cse
 
         \identifier{1d6} */
     inline friend void shared(std::vector<MatType>& ex,
@@ -1182,6 +3359,30 @@ namespace casadi {
 
     /** \brief Given a repeated matrix, computes the sum of repeated parts
 
+        Splits \p A into an n-by-m grid of equally sized blocks and returns their sum, a
+        matrix of size A.size1()/n by A.size2()/m. The inverse of repmat(x, n, m) in the
+        sense that repsum(repmat(x, n, m), n, m) == n*m*x. The dimensions of \p A must be
+        multiples of \p n and \p m.
+
+        \doctest
+        >>> repsum(DM([[1, 2, 3, 4], [5, 6, 7, 8]]), 1, 2)
+        DM(
+        [[4, 6],
+         [12, 14]])
+        >>> repsum(SX.sym("x", 4), 2)
+        SX([(x_0+x_2), (x_1+x_3)])
+        \enddoctest
+
+        \doctest{matlab}
+        >> repsum(DM([1 2 3 4; 5 6 7 8]), 1, 2)
+        [[4, 6],
+         [12, 14]]
+        >> repsum(SX.sym('x', 4), 2)
+        [(x_0+x_2), (x_1+x_3)]
+        \enddoctest
+
+        \sa repmat, blocksplit
+
         \identifier{1d7} */
     inline friend MatType repsum(const MatType &A, casadi_int n, casadi_int m=1) {
       return MatType::repsum(A, n, m);
@@ -1189,6 +3390,31 @@ namespace casadi {
 
     ///@{
     /** \brief Smallest element in a matrix
+
+        Over all entries, structural zeros included (so a sparse matrix with only positive
+        nonzeros has minimum 0). An empty matrix gives an empty 0-by-0 result. For SX a
+        chain of fmin operations is built; for MX a single node.
+
+        \doctest
+        >>> mmin(DM([[3, -1], [2, 5]])), mmax(DM([[3, -1], [2, 5]]))
+        (DM(-1), DM(5))
+        >>> mmin(DM(Sparsity.diag(2), [3, 4]))
+        DM(0)
+        >>> mmin(SX.sym("x", 3))
+        SX(fmin(fmin(x_0,x_1),x_2))
+        \enddoctest
+
+        \doctest{matlab}
+        >> mmin(DM([3 -1; 2 5])), mmax(DM([3 -1; 2 5]))
+        -1
+        5
+        >> mmin(DM(Sparsity.diag(2), [3; 4]))
+        0
+        >> mmin(SX.sym('x', 3))
+        fmin(fmin(x_0,x_1),x_2)
+        \enddoctest
+
+        \sa mmax, fmin, norm_inf
 
         \identifier{1d8} */
     friend inline MatType mmin(const MatType& x) {
@@ -1198,6 +3424,24 @@ namespace casadi {
 
     ///@{
     /** \brief Largest element in a matrix
+
+        Over all entries, structural zeros included. See mmin.
+
+        \doctest
+        >>> mmax(DM(Sparsity.diag(2), [-3, -4]))
+        DM(0)
+        >>> mmax(MX.sym("x", 3))
+        MX(max(x))
+        \enddoctest
+
+        \doctest{matlab}
+        >> mmax(DM(Sparsity.diag(2), [-3; -4]))
+        0
+        >> mmax(MX.sym('x', 3))
+        max(x)
+        \enddoctest
+
+        \sa mmin, fmax, logsumexp
 
         \identifier{1d9} */
     friend inline MatType mmax(const MatType& x) {
@@ -1229,12 +3473,50 @@ namespace casadi {
 
     /** \brief Create an nrow-by-ncol symbolic primitive
 
+        Creates a new, dense symbol; two symbols with the same name are still different
+        symbols. For SX each entry is a separate scalar symbol named name_k (k the
+        column-major index), while an MX symbol is a single node with the given name.
+        Only SX and MX have symbols; DM.sym raises an error.
+
+        \param name Name used for printing. For SX, a name of the form "[a,b,c]" assigns
+        individual names to the numel() entries.
+        \param nrow Number of rows, default 1
+        \param ncol Number of columns, default 1
+
+        \doctest
+        >>> SX.sym("x"), MX.sym("x", 2, 3).dim()
+        (SX(x), '2x3')
+        >>> SX.sym("x", 2, 2)
+        SX(
+        [[x_0, x_2],
+         [x_1, x_3]])
+        >>> SX.sym("[a,b,c]", 3)
+        SX([a, b, c])
+        >>> is_equal(SX.sym("x"), SX.sym("x"))
+        False
+        \enddoctest
+
+        \doctest{matlab}
+        >> SX.sym('x'), MX.sym('x', 2, 3).dim()
+        x
+        2x3
+        >> SX.sym('x', 2, 2)
+        [[x_0, x_2],
+         [x_1, x_3]]
+        >> SX.sym('[a,b,c]', 3)
+        [a, b, c]
+        >> is_equal(SX.sym('x'), SX.sym('x'))
+        0
+        \enddoctest
+
+        \sa symvar, zeros, ones
+
         \identifier{1da} */
     static MatType sym(const std::string& name, casadi_int nrow=1, casadi_int ncol=1) {
       return sym(name, Sparsity::dense(nrow, ncol));
     }
 
-    /** \brief  Construct a symbolic primitive with given dimensions
+    /** \brief  Construct a symbolic primitive with given dimensions, as a pair (nrow, ncol)
 
         \identifier{1db} */
     static MatType sym(const std::string& name, const std::pair<casadi_int, casadi_int> &rc) {
@@ -1243,19 +3525,64 @@ namespace casadi {
 
     /** \brief Create symbolic primitive with a given sparsity pattern
 
+        Only the structural nonzeros of \p sp become symbolic entries; for SX they are
+        numbered by nonzero index.
+
+        \doctest
+        >>> SX.sym("p", Sparsity.diag(2))
+        SX(
+        [[p_0, 00],
+         [00, p_1]])
+        >>> MX.sym("p", Sparsity.diag(2)).dim(True)
+        '2x2,2nz'
+        \enddoctest
+
+        \doctest{matlab}
+        >> SX.sym('p', Sparsity.diag(2))
+        [[p_0, 00],
+         [00, p_1]]
+        >> MX.sym('p', Sparsity.diag(2)).dim(true)
+        2x2,2nz
+        \enddoctest
+
         \identifier{1dc} */
     static MatType sym(const std::string& name, const Sparsity& sp) {
       return MatType::_sym(name, sp);
     }
 
-    /** \brief Create a vector of length p with with matrices
+    /** \brief Create a list of length p of symbolic primitives with a given sparsity
 
-     * with symbolic primitives of given sparsity
+        The k-th symbol is named name followed by k (no separator).
+
+        \doctest
+        >>> MX.sym("x", Sparsity.dense(2, 1), 3)
+        [MX(x0), MX(x1), MX(x2)]
+        \enddoctest
+
+        \doctest{matlab}
+        >> v = MX.sym('x', Sparsity.dense(2, 1), 3);
+        >> numel(v), v{1}, v{3}
+        3
+        x0
+        x2
+        \enddoctest
 
         \identifier{1dd} */
     static std::vector<MatType > sym(const std::string& name, const Sparsity& sp, casadi_int p);
 
-    /** \brief Create a vector of length p with nrow-by-ncol symbolic primitives
+    /** \brief Create a list of length p of nrow-by-ncol symbolic primitives
+
+        \doctest
+        >>> SX.sym("x", 1, 1, 2)
+        [SX(x0), SX(x1)]
+        \enddoctest
+
+        \doctest{matlab}
+        >> v = SX.sym('x', 1, 1, 2);
+        >> v{1}, v{2}
+        x0
+        x1
+        \enddoctest
 
         \identifier{1de} */
     static std::vector<MatType > sym(const std::string& name, casadi_int nrow,
@@ -1263,17 +3590,29 @@ namespace casadi {
       return sym(name, Sparsity::dense(nrow, ncol), p);
     }
 
-    /** \brief Create a vector of length r of vectors of length p with
+    /** \brief Create a list of length r of lists of length p of symbolic primitives
 
-     * symbolic primitives with given sparsity
+        with given sparsity. The symbol at outer index i and inner index k is named
+        name_ik.
 
         \identifier{1df} */
     static std::vector<std::vector<MatType> >
       sym(const std::string& name, const Sparsity& sp, casadi_int p, casadi_int r);
 
-    /** \brief Create a vector of length r of vectors of length p
+    /** \brief Create a list of length r of lists of length p of nrow-by-ncol symbolic primitives
 
-     * with nrow-by-ncol symbolic primitives
+        \doctest
+        >>> MX.sym("x", 1, 1, 2, 2)
+        [[MX(x_00), MX(x_01)], [MX(x_10), MX(x_11)]]
+        \enddoctest
+
+        \doctest{matlab}
+        >> v = MX.sym('x', 1, 1, 2, 2);
+        >> numel(v), v{1}{2}, v{2}{1}
+        2
+        x_01
+        x_10
+        \enddoctest
 
         \identifier{1dg} */
     static std::vector<std::vector<MatType> >
@@ -1284,6 +3623,27 @@ namespace casadi {
 
     ///@{
     /** \brief Create a dense matrix or a matrix with specified sparsity with all entries zero
+
+        zeros(nrow, ncol) stores nrow*ncol numerical zeros; zeros(sp) stores a zero at every
+        structural nonzero of \p sp. To get structural zeros instead, construct from a shape,
+        e.g. DM(2, 2).
+
+        \doctest
+        >>> DM.zeros(2, 2).nnz(), DM.zeros(Sparsity.diag(2)).nnz(), DM(2, 2).nnz()
+        (4, 2, 0)
+        >>> MX.zeros(2, 3)
+        MX(zeros(2x3))
+        \enddoctest
+
+        \doctest{matlab}
+        >> Z = DM.zeros(Sparsity.diag(2));
+        >> fprintf('%d %d %d\n', DM.zeros(2, 2).nnz(), Z.nnz(), DM(2, 2).nnz())
+        4 2 0
+        >> MX.zeros(2, 3)
+        zeros(2x3)
+        \enddoctest
+
+        \sa ones, Sparsity
 
         \identifier{1dh} */
     static MatType zeros(casadi_int nrow=1, casadi_int ncol=1) {
@@ -1297,6 +3657,31 @@ namespace casadi {
 
     ///@{
     /** \brief Create a dense matrix or a matrix with specified sparsity with all entries one
+
+        ones(sp) sets every structural nonzero of \p sp to one; other entries stay
+        structurally zero.
+
+        \doctest
+        >>> DM.ones(2, 3)
+        DM(
+        [[1, 1, 1],
+         [1, 1, 1]])
+        >>> DM.ones(Sparsity.diag(2))
+        DM(
+        [[1, 00],
+         [00, 1]])
+        \enddoctest
+
+        \doctest{matlab}
+        >> DM.ones(2, 3)
+        [[1, 1, 1],
+         [1, 1, 1]]
+        >> DM.ones(Sparsity.diag(2))
+        [[1, 00],
+         [00, 1]]
+        \enddoctest
+
+        \sa zeros, Sparsity
 
         \identifier{1di} */
     static MatType ones(casadi_int nrow=1, casadi_int ncol=1) {

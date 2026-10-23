@@ -36,12 +36,68 @@ namespace casadi {
 
   /** \brief Linear solver
 
-    * Create a solver for linear systems of equations
-    * Solves the linear system A*X = B or A^T*X = B for X
-    * with A square and non-singular
-    *
-    *  If A is structurally singular, an error will be thrown during init.
-    *  If A is numerically singular, the prepare step will fail.
+      Solves the square linear system A*X = B or A'*X = B for X with a sparse direct solver
+      plugin. A Linsol is created for a fixed sparsity pattern of A; the numerical values are
+      given at every call. A matrix with another sparsity pattern is projected onto the fixed
+      one (entries outside it are dropped). The solve is split in a symbolic factorization
+      (sfact, pivot selection from the pattern), a numeric factorization (nfact) and the
+      triangular solves (solve); solve(A, B) performs all three. A numerically singular matrix
+      makes nfact (or solve) raise an error for most plugins; for a symbolic (MX) A, solve
+      returns an expression node that is differentiable with respect to A and B.
+
+      Available plugins include "qr" and "ldl" (sparse direct QR and LDL, codegen support),
+      "symbolicqr" (QR as a symbolic expression), "csparse", "csparsecholesky", "lapacklu",
+      "lapackqr", "ma27", "mumps". neig and rank are only implemented by "ldl", det by "qr"
+      and "csparse". The constructor raises an error for a non-square pattern only when the
+      plugin checks it; otherwise the solve fails.
+
+      \doctest
+      >>> A = DM([[3, 1], [1, 2]]); b = DM([4, 3])
+      >>> L = Linsol("L", "qr", A.sparsity())
+      >>> L.plugin_name(), L.sparsity()
+      ('qr', Sparsity(2x2))
+      >>> L.solve(A, b), L.solve(DM([[1, 2], [0, 1]]), DM([1, 1]), True)
+      (DM([1, 1]), DM([1, -1]))
+      >>> L.solve(A, DM([[4, 1], [3, 0]]))
+      DM(
+      [[1, 0.4],
+       [1, -0.2]])
+      >>> L.det(A)
+      5.0
+      >>> try:
+      ...     L.solve(DM([[1, 1], [1, 1]]), b)
+      ... except RuntimeError as e:
+      ...     print("'nfact' failed" in str(e))
+      True
+      >>> Am = MX.sym("A", A.sparsity()); bm = MX.sym("b", 2)
+      >>> f = Function("f", [Am, bm], [L.solve(Am, bm), L.det(Am)])
+      >>> f(A, b)
+      (DM([1, 1]), DM(5))
+      \enddoctest
+
+      \doctest{matlab}
+      >> A = DM([3 1; 1 2]); b = DM([4; 3]);
+      >> L = Linsol('L', 'qr', A.sparsity());
+      >> L.plugin_name(), L.sparsity()
+      qr
+      2x2
+      >> L.solve(A, b), L.solve(DM([1 2; 0 1]), DM([1; 1]), true)
+      [1, 1]
+      [1, -1]
+      >> L.solve(A, DM([4 1; 3 0]))
+      [[1, 0.4],
+       [1, -0.2]]
+      >> round(L.det(A))
+      5
+      >> try, L.solve(DM([1 1; 1 1]), b); catch e, msg = e.message; end
+      >> contains(msg, '''nfact'' failed')
+      1
+      >> Am = MX.sym('A', A.sparsity()); bm = MX.sym('b', 2);
+      >> f = Function('f', {Am, bm}, {L.solve(Am, bm), L.det(Am)});
+      >> [xs, d] = f(A, b); disp(xs), disp(d)
+      [1, 1]
+      5
+      \enddoctest
 
       \generalsection{Linsol}
       \pluginssection{Linsol}
@@ -59,10 +115,36 @@ namespace casadi {
         \identifier{1ki} */
     static std::string type_name() {return "Linsol";}
 
-    /// Default constructor
+    /// Default constructor (a null object)
     Linsol();
 
-    /// Constructor
+    /** \brief Create a linear solver
+
+        \param name Name of the solver object
+        \param solver Plugin name, e.g. "qr", "ldl", "csparse"; see has_linsol
+        \param sp Sparsity pattern of A (square); the numerical values are given at every call
+        \param opts Options; an unknown option raises an error
+
+        \doctest
+        >>> L = Linsol("L", "ldl", Sparsity.dense(2, 2))
+        >>> L
+        Linsol(Linear solver LinsolLdl)
+        >>> try:
+        ...     Linsol("L", "qr", Sparsity.dense(2, 2), {"no_such_option": 1})
+        ... except RuntimeError as e:
+        ...     print("Unknown option" in str(e))
+        True
+        \enddoctest
+
+        \doctest{matlab}
+        >> L = Linsol('L', 'ldl', Sparsity.dense(2, 2)); disp(L)
+        Linear solver LinsolLdl
+        >> opts = struct('no_such_option', 1);
+        >> try, Linsol('L', 'qr', Sparsity.dense(2, 2), opts); catch e, msg = e.message; end
+        >> contains(msg, 'Unknown option')
+        1
+        \enddoctest
+    */
     explicit Linsol(const std::string& name, const std::string& solver,
                     const Sparsity& sp, const Dict& opts=Dict());
 
@@ -84,50 +166,212 @@ namespace casadi {
 #endif // SWIG
     /// \endcond
 
-    /// Check if a plugin is available
+    /** \brief Check if a plugin is available
+
+        Same as has_linsol.
+
+        \doctest
+        >>> Linsol.has_plugin("qr"), Linsol.has_plugin("no_such_plugin")
+        (True, False)
+        \enddoctest
+
+        \doctest{matlab}
+        >> Linsol.has_plugin('qr'), Linsol.has_plugin('no_such_plugin')
+        1
+        0
+        \enddoctest
+    */
     static bool has_plugin(const std::string& name);
 
-    /// Explicitly load a plugin dynamically
+    /** \brief Explicitly load a plugin dynamically
+
+        Same as load_linsol; raises an error when the plugin cannot be found.
+
+        \doctest
+        >>> try:
+        ...     Linsol.load_plugin("no_such_plugin")
+        ... except RuntimeError as e:
+        ...     print("no_such_plugin" in str(e))
+        True
+        \enddoctest
+
+        \doctest{matlab}
+        >> try, Linsol.load_plugin('no_such_plugin'); catch e, msg = e.message; end
+        >> contains(msg, 'no_such_plugin')
+        1
+        \enddoctest
+    */
     static void load_plugin(const std::string& name);
 
-    /// Get solver specific documentation
+    /** \brief Get solver specific documentation
+
+        Same as doc_linsol.
+
+        \doctest
+        >>> "LDL" in Linsol.doc("ldl")
+        True
+        \enddoctest
+
+        \doctest{matlab}
+        >> contains(Linsol.doc('ldl'), 'LDL')
+        1
+        \enddoctest
+    */
     static std::string doc(const std::string& name);
 
     /// Query plugin name
     std::string plugin_name() const;
 
-    /// Get linear system sparsity
+    /// Get the sparsity pattern of A fixed at construction
     const Sparsity& sparsity() const;
 
-    /// Symbolic factorization of the linear system, e.g. selecting pivots
+    /** \brief Symbolic factorization of the linear system, e.g. selecting pivots
+
+        Only uses the sparsity pattern of \p A. Called automatically by nfact and solve when
+        needed; raises an error when the plugin fails.
+    */
     void sfact(const DM& A) const;
 
-    /// Numeric factorization of the linear system
+    /** \brief Numeric factorization of the linear system
+
+        Factorizes the values of \p A (after sfact if not done yet), so that neig, rank and the
+        low-level solve can use the factorization. Raises an error when the factorization fails
+        with option "regularity_check" set; otherwise a failure is only reported by solve.
+
+        \doctest
+        >>> A = DM([[3, 1], [1, 2]])
+        >>> L = Linsol("L", "ldl", A.sparsity())
+        >>> L.nfact(A)
+        >>> L.neig(A), L.rank(A)
+        (0, 2)
+        >>> L.nfact(DM([[-1, 0], [0, 1]]))
+        >>> L.neig(DM([[-1, 0], [0, 1]]))
+        1
+        \enddoctest
+
+        \doctest{matlab}
+        >> A = DM([3 1; 1 2]); L = Linsol('L', 'ldl', A.sparsity());
+        >> L.nfact(A); fprintf('%d %d\n', L.neig(A), L.rank(A))
+        0 2
+        >> B = DM([-1 0; 0 1]); L.nfact(B); disp(L.neig(B))
+        1
+        \enddoctest
+    */
     void nfact(const DM& A) const;
 
     ///@{
-    /// Solve linear system of equations
+    /** \brief Solve the linear system A*X = B (or A'*X = B with \p tr true)
+
+        For DM arguments, factorizes \p A and solves for all columns of \p B at once; the result
+        is dense. For MX arguments, returns an expression node that is differentiable. The row
+        count of \p A and \p B must match.
+
+        \param A Square matrix with the sparsity pattern given at construction (projected
+               onto it otherwise)
+        \param B Right-hand side, one column per system to solve
+        \param tr Solve with the transpose of \p A instead
+        \return X with the shape of \p B
+
+        \doctest
+        >>> L = Linsol("L", "qr", Sparsity.dense(2, 2))
+        >>> L.solve(DM([[3, 1], [1, 2]]), DM([4, 3]))
+        DM([1, 1])
+        >>> try:
+        ...     L.solve(DM([[3, 1], [1, 2]]), DM([1, 2, 3]))
+        ... except RuntimeError as e:
+        ...     print("matching row count" in str(e))
+        True
+        \enddoctest
+
+        \doctest{matlab}
+        >> L = Linsol('L', 'qr', Sparsity.dense(2, 2));
+        >> L.solve(DM([3 1; 1 2]), DM([4; 3]))
+        [1, 1]
+        >> try, L.solve(DM([3 1; 1 2]), DM([1; 2; 3])); catch e, msg = e.message; end
+        >> contains(msg, 'matching row count')
+        1
+        \enddoctest
+    */
     DM solve(const DM& A, const DM& B, bool tr=false) const;
     MX solve(const MX& A, const MX& B, bool tr=false) const;
     ///@}
 
     /** \brief Number of negative eigenvalues
 
-      * Not available for all solvers
+      * Not available for all solvers (only "ldl"); uses the factorization of the most recent
+      * nfact call, which must have been made with the same matrix.
+
+        \doctest
+        >>> A = DM([[-2, 0], [0, 1]])
+        >>> L = Linsol("L", "ldl", A.sparsity())
+        >>> L.nfact(A)
+        >>> L.neig(A)
+        1
+        >>> try:
+        ...     Linsol("L", "qr", A.sparsity()).neig(A)
+        ... except RuntimeError as e:
+        ...     print("'neig' not defined" in str(e))
+        True
+        \enddoctest
+
+        \doctest{matlab}
+        >> A = DM([-2 0; 0 1]); L = Linsol('L', 'ldl', A.sparsity());
+        >> L.nfact(A); disp(L.neig(A))
+        1
+        >> L = Linsol('L', 'qr', A.sparsity());
+        >> try, L.neig(A); catch e, disp(contains(e.message, '''neig'' not defined')); end
+        1
+        \enddoctest
 
         \identifier{1kk} */
     casadi_int neig(const DM& A) const;
 
     /** \brief Matrix rank
 
-      * Not available for all solvers
+      * Not available for all solvers (only "ldl"); uses the factorization of the most recent
+      * nfact call, which must have been made with the same matrix.
+
+        A rank-deficient matrix also triggers a warning in nfact.
+
+        \doctest
+        >>> A = DM([[2, 1], [1, 3]])
+        >>> L = Linsol("L", "ldl", A.sparsity())
+        >>> L.nfact(A)
+        >>> L.rank(A)
+        2
+        \enddoctest
+
+        \doctest{matlab}
+        >> A = DM([2 1; 1 3]); L = Linsol('L', 'ldl', A.sparsity());
+        >> L.nfact(A); disp(L.rank(A))
+        2
+        \enddoctest
 
         \identifier{1kl} */
     casadi_int rank(const DM& A) const;
 
     /** \brief Matrix determinant
 
-      * Not available for all solvers
+      * Not available for all solvers ("qr" and "csparse"); factorizes \p A first.
+
+        \doctest
+        >>> A = DM([[3, 1], [1, 2]])
+        >>> Linsol("L", "qr", A.sparsity()).det(A)
+        5.0
+        >>> try:
+        ...     Linsol("L", "ldl", A.sparsity()).det(A)
+        ... except RuntimeError as e:
+        ...     print("'det' not defined" in str(e))
+        True
+        \enddoctest
+
+        \doctest{matlab}
+        >> A = DM([3 1; 1 2]); L = Linsol('L', 'qr', A.sparsity()); disp(round(L.det(A)))
+        5
+        >> L = Linsol('L', 'ldl', A.sparsity());
+        >> try, L.det(A); catch e, disp(contains(e.message, '''det'' not defined')); end
+        1
+        \enddoctest
 
         \identifier{2hw} */
     double det(const DM& A) const;
@@ -135,7 +379,30 @@ namespace casadi {
     /// Matrix determinant as an MX graph node
     MX det(const MX& A) const;
 
-   /// Get all statistics obtained at the end of the last evaluate call
+    /** \brief Get all statistics obtained at the end of the last evaluate call
+
+        Plugin-specific; empty for most plugins. Raises an error before the first solve.
+
+        \doctest
+        >>> L = Linsol("L", "qr", Sparsity.dense(1, 1))
+        >>> try:
+        ...     L.stats()
+        ... except RuntimeError as e:
+        ...     print("did not solve a problem yet" in str(e))
+        True
+        >>> L.solve(DM(2), DM(4)), L.stats()
+        (DM(2), {})
+        \enddoctest
+
+        \doctest{matlab}
+        >> L = Linsol('L', 'qr', Sparsity.dense(1, 1));
+        >> try, L.stats(); catch e, disp(contains(e.message, 'did not solve a problem yet')); end
+        1
+        >> L.solve(DM(2), DM(4)), isempty(fieldnames(L.stats()))
+        2
+        1
+        \enddoctest
+    */
     Dict stats(int mem=1) const;
 
     #ifndef SWIG
@@ -168,13 +435,58 @@ namespace casadi {
     #endif // SWIG
   };
 
-  /// Check if a particular plugin is available
+  /** \brief Check if a linear solver plugin is available
+
+      Tries to load the plugin \p name if it is not loaded yet; false when it is not found.
+
+      \doctest
+      >>> has_linsol("qr"), has_linsol("no_such_plugin")
+      (True, False)
+      \enddoctest
+
+      \doctest{matlab}
+      >> has_linsol('qr'), has_linsol('no_such_plugin')
+      1
+      0
+      \enddoctest
+  */
   CASADI_EXPORT bool has_linsol(const std::string& name);
 
-  /// Explicitly load a plugin dynamically
+  /** \brief Explicitly load a linear solver plugin
+
+      Normally plugins are loaded on first use; this raises an error when the plugin cannot be
+      found.
+
+      \doctest
+      >>> try:
+      ...     load_linsol("no_such_plugin")
+      ... except RuntimeError as e:
+      ...     print("no_such_plugin" in str(e))
+      True
+      \enddoctest
+
+      \doctest{matlab}
+      >> try, load_linsol('no_such_plugin'); catch e, msg = e.message; end
+      >> contains(msg, 'no_such_plugin')
+      1
+      \enddoctest
+  */
   CASADI_EXPORT void load_linsol(const std::string& name);
 
-  /// Get the documentation string for a plugin
+  /** \brief Get the documentation string of a linear solver plugin
+
+      The text includes the plugin-specific option table.
+
+      \doctest
+      >>> "QR" in doc_linsol("qr")
+      True
+      \enddoctest
+
+      \doctest{matlab}
+      >> contains(doc_linsol('qr'), 'QR')
+      1
+      \enddoctest
+  */
   CASADI_EXPORT std::string doc_linsol(const std::string& name);
 
 } // namespace casadi

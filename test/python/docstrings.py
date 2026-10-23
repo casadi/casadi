@@ -61,7 +61,7 @@ class DocStrings(casadiTestCase):
 
   def test_6(self):
     doc = ca.adj.__doc__ or ""
-    self.assertTrue("Matrix adjoint" in doc)
+    self.assertTrue("Adjugate" in doc)
 
   def test_7(self):
     doc = ca.taylor.__doc__ or ""

@@ -31,16 +31,158 @@ namespace casadi {
   /** Forward declaration of internal class */
   class CallbackInternal;
 
-  /** \brief Callback function functionality
+  /** \brief User-defined Function implemented by subclassing
 
-   This class provides a public API to the FunctionInternal class that
-   can be subclassed by the user, who is then able to implement the different
-   virtual method.
-   Note that the Function class also provides a public API to FunctionInternal,
-   but only allows calling, not being called.
+   A Callback is a Function whose numerical evaluation (and optionally its derivatives) is
+   written by the user in Python, MATLAB or C++ by overriding virtual methods. It can be
+   called like any Function, embedded in MX graphs, mapped, and used inside NLPs and
+   integrators.
 
-   The user is responsible for not deleting this class for the lifetime
-   of the internal function object.
+   A subclass must call the base constructor and then construct(name, opts) from its own
+   constructor; construct() queries the virtual methods below (get_n_in, get_n_out,
+   get_sparsity_in/out, get_name_in/out) and calls init() and finalize(), so all data
+   those methods need must be set before construct() runs. Only eval() is mandatory. Defaults:
+   one scalar input "i0" and one scalar output "o0".
+
+   Object lifetime: the Function side holds a raw pointer to the user object and does not
+   own it. The user must keep the Callback object alive (in Python: keep a reference) for
+   as long as any Function, expression or solver that uses it exists; otherwise evaluation
+   fails with "Callback object has been deleted". The same holds for objects returned from
+   get_jacobian/get_forward/get_reverse. Callback objects cannot be copied.
+
+   Derivatives: by default a Callback is not differentiable, so jacobian(), forward/reverse
+   sweeps and NLP solvers that need gradients fail with "Derivatives cannot be calculated".
+   Either override has_jacobian/get_jacobian, has_forward/get_forward or
+   has_reverse/get_reverse, or pass the option "enable_fd": True to construct() to use
+   finite differences ("fd_method": "central" (default), "forward", "backward" or
+   "smoothing"; "fd_options" such as {"h": 1e-6} tune the step). A user-provided Jacobian
+   is itself differentiated with finite differences only when it is a Callback with
+   "enable_fd"; a Function built from SX/MX gives exact second derivatives.
+
+   \doctest
+   >>> class MyCallback(Callback):
+   ...   def __init__(self, name, d, opts={}):
+   ...     Callback.__init__(self)
+   ...     self.d = d
+   ...     self.construct(name, opts)
+   ...   def get_n_in(self): return 1
+   ...   def get_n_out(self): return 1
+   ...   def eval(self, arg):
+   ...     return [sin(self.d*arg[0])]
+   >>> f = MyCallback("f", 0.5)
+   >>> f
+   Callback(f:(i0)->(o0) CallbackInternal)
+   >>> round(float(f(2)), 4)
+   0.8415
+   >>> x = MX.sym("x")
+   >>> f(x)
+   MX(f(x){0})
+   >>> try:
+   ...   jacobian(f(x), x)
+   ... except Exception as e:
+   ...   print("Derivatives cannot be calculated for f" in str(e))
+   True
+   >>> f = MyCallback("f", 0.5, {"enable_fd": True})
+   >>> J = Function("J", [x], [jacobian(f(x), x)])
+   >>> round(float(J(2)), 4)
+   0.2702
+   \enddoctest
+
+   \doctest{matlab}
+   >> c = {'classdef MyCallback < casadi.Callback', 'properties', 'd', 'end', 'methods'};
+   >> c = [c, {'function self = MyCallback(name, d, varargin)'}];
+   >> c = [c, {'self@casadi.Callback(); self.d = d; construct(self, name, varargin{:});'}];
+   >> c = [c, {'end'}];
+   >> c = [c, {'function r = eval(self, arg)', 'r = {sin(self.d*arg{1})};'}];
+   >> c = [c, {'end', 'end', 'end'}];
+   >> d = tempname; mkdir(d); addpath(d); fid = fopen(fullfile(d, 'MyCallback.m'), 'w');
+   >> fprintf(fid, '%s\n', c{:}); fclose(fid);
+   >> f = MyCallback('f', 0.5); disp(f)
+   f:(i0)->(o0) CallbackInternal
+   >> round(full(f(2)), 4)
+   0.8415
+   >> x = MX.sym('x'); disp(f(x))
+   f(x){0}
+   >> try, jacobian(f(x), x); catch e, disp(contains(e.message, 'Derivatives cannot be')); end
+   1
+   >> f = MyCallback('f', 0.5, struct('enable_fd', true));
+   >> J = Function('J', {x}, {jacobian(f(x), x)}); disp(round(full(J(2)), 4))
+   0.2702
+   >> rmpath(d); rmdir(d, 's');
+   \enddoctest
+
+   The Python object must outlive every use of the Function:
+
+   \doctest
+   >>> class Sq(Callback):
+   ...   def __init__(self, name, opts={}):
+   ...     Callback.__init__(self)
+   ...     self.construct(name, opts)
+   ...   def eval(self, arg):
+   ...     return [arg[0]**2]
+   >>> x = MX.sym("x")
+   >>> f = Sq("f")
+   >>> F = Function("F", [x], [f(x)])
+   >>> F(3)
+   DM(9)
+   >>> del f
+   >>> try:
+   ...   F(3)
+   ... except Exception as e:
+   ...   print(str(e).splitlines()[-1])
+   Callback object has been deleted
+   \enddoctest
+
+   \doctest{matlab}
+   >> c = {'classdef SqCb < casadi.Callback', 'methods'};
+   >> c = [c, {'function self = SqCb(name)', 'self@casadi.Callback(); construct(self, name);'}];
+   >> c = [c, {'end'}];
+   >> c = [c, {'function r = eval(self, arg)', 'r = {arg{1}^2};', 'end', 'end', 'end'}];
+   >> d = tempname; mkdir(d); addpath(d); fid = fopen(fullfile(d, 'SqCb.m'), 'w');
+   >> fprintf(fid, '%s\n', c{:}); fclose(fid);
+   >> x = MX.sym('x'); f = SqCb('f'); F = Function('F', {x}, {f(x)}); disp(F(3))
+   9
+   >> delete(f)
+   >> try, F(3); catch e, disp(contains(e.message, 'Callback object has been deleted')); end
+   ...
+   1
+   >> rmpath(d); rmdir(d, 's');
+   \enddoctest
+
+   Use in an NLP with finite differences:
+
+   \doctest
+   >>> class Sq(Callback):
+   ...   def __init__(self, name, opts={}):
+   ...     Callback.__init__(self)
+   ...     self.construct(name, opts)
+   ...   def eval(self, arg):
+   ...     return [arg[0]**2]
+   >>> f = Sq("f", {"enable_fd": True})
+   >>> opti = Opti()
+   >>> v = opti.variable()
+   >>> opti.minimize(f(v-1))
+   >>> opti.solver("ipopt", {"print_time": False}, {"print_level": 0, "sb": "yes"})
+   >>> round(opti.solve().value(v), 3)
+   1.0
+   \enddoctest
+
+   \doctest{matlab}
+   >> c = {'classdef SqFd < casadi.Callback', 'methods'};
+   >> c = [c, {'function self = SqFd(name, opts)'}];
+   >> c = [c, {'self@casadi.Callback(); construct(self, name, opts);', 'end'}];
+   >> c = [c, {'function r = eval(self, arg)', 'r = {arg{1}^2};', 'end', 'end', 'end'}];
+   >> d = tempname; mkdir(d); addpath(d); fid = fopen(fullfile(d, 'SqFd.m'), 'w');
+   >> fprintf(fid, '%s\n', c{:}); fclose(fid);
+   >> f = SqFd('f', struct('enable_fd', true));
+   >> opti = Opti(); v = opti.variable(); opti.minimize(f(v-1));
+   >> opti.solver('ipopt', struct('print_time', false), struct('print_level', 0, 'sb', 'yes'));
+   >> sol = opti.solve(); disp(round(sol.value(v), 3))
+   1
+   >> rmpath(d); rmdir(d, 's');
+   \enddoctest
+
+   \sa Function, external
 
    \author Joris Gillis, Joel Andersson
    \date 2015
@@ -55,120 +197,449 @@ namespace casadi {
 
     /** \brief Default constructor
 
+        Creates a null Function; construct() must be called before use.
+
         \identifier{o2} */
     Callback();
 
     /** \brief Copy constructor (throws an error)
+
+        Callback objects cannot be copied; share the Function instead.
+
+        \doctest
+        >>> class Sq(Callback):
+        ...   def __init__(self, name, opts={}):
+        ...     Callback.__init__(self)
+        ...     self.construct(name, opts)
+        ...   def eval(self, arg):
+        ...     return [arg[0]**2]
+        >>> f = Sq("f")
+        >>> try:
+        ...   Callback(f)
+        ... except Exception as e:
+        ...   print("Callback objects cannot be copied" in str(e))
+        True
+        \enddoctest
+
+        \doctest{matlab}
+        >> c = {'classdef SqCopy < casadi.Callback', 'methods'};
+        >> c = [c, {'function self = SqCopy(name)'}];
+        >> c = [c, {'self@casadi.Callback(); construct(self, name);', 'end'}];
+        >> c = [c, {'function r = eval(self, arg)', 'r = {arg{1}^2};', 'end', 'end', 'end'}];
+        >> d = tempname; mkdir(d); addpath(d); fid = fopen(fullfile(d, 'SqCopy.m'), 'w');
+        >> fprintf(fid, '%s\n', c{:}); fclose(fid);
+        >> f = SqCopy('f');
+        >> try, Callback(f); catch e, disp(contains(e.message, 'cannot be copied')); end
+        1
+        >> rmpath(d); rmdir(d, 's');
+        \enddoctest
 
         \identifier{o3} */
     Callback(const Callback& obj);
 
     /** \brief  Destructor
 
+        Detaches the user object; a Function that still references it fails afterwards.
+
         \identifier{o4} */
     virtual ~Callback();
 
-    /** \brief Construct internal object
+    /** \brief Construct the internal Function object
 
-     * This is the step that actually construct the internal object, as the
-     * class constructor only creates a null pointer.
-     * It should be called from the user constructor.
+        The class constructor only creates a null pointer; this call creates the Function.
+        It must be called once from the subclass constructor, after all data needed by
+        get_n_in/get_n_out/get_sparsity_in/get_sparsity_out/get_name_in/get_name_out is set,
+        because those methods are evaluated here. init() and finalize() are called at the
+        end. Calling it twice raises an error.
+
+        \param name Name of the Function
+        \param opts Function options, e.g. "enable_fd", "fd_method", "fd_options",
+               "enable_forward", "enable_reverse", "enable_jacobian"
+
+        \doctest
+        >>> class Sq(Callback):
+        ...   def __init__(self, name, opts={}):
+        ...     Callback.__init__(self)
+        ...     self.construct(name, opts)
+        ...   def eval(self, arg):
+        ...     return [arg[0]**2]
+        >>> f = Sq("f", {"enable_fd": True, "fd_method": "forward"})
+        >>> f.name(), f.n_in(), f.n_out()
+        ('f', 1, 1)
+        >>> try:
+        ...   f.construct("g")
+        ... except Exception as e:
+        ...   print("Internal class already created" in str(e))
+        True
+        \enddoctest
+
+        \doctest{matlab}
+        >> c = {'classdef SqOpts < casadi.Callback', 'methods'};
+        >> c = [c, {'function self = SqOpts(name, opts)'}];
+        >> c = [c, {'self@casadi.Callback(); construct(self, name, opts);', 'end'}];
+        >> c = [c, {'function r = eval(self, arg)', 'r = {arg{1}^2};', 'end', 'end', 'end'}];
+        >> d = tempname; mkdir(d); addpath(d); fid = fopen(fullfile(d, 'SqOpts.m'), 'w');
+        >> fprintf(fid, '%s\n', c{:}); fclose(fid);
+        >> f = SqOpts('f', struct('enable_fd', true, 'fd_method', 'forward'));
+        >> fprintf('%s %d %d\n', f.name(), f.n_in(), f.n_out())
+        f 1 1
+        >> try, f.construct('g'); catch e, disp(contains(e.message, 'already created')); end
+        1
+        >> rmpath(d); rmdir(d, 's');
+        \enddoctest
 
         \identifier{o5} */
     void construct(const std::string& name, const Dict& opts=Dict());
 
     /** \brief Initialize the object
 
-     * This function is called after the object construction (for the whole class
-     * hierarchy) is complete, but before the finalization step.
-     * It is called recursively for the whole class hierarchy, starting with the
-     * lowest level.
+        Called from construct() after the inputs and outputs are known and the options are
+        processed, before finalize(). Override to allocate data; the default does nothing.
+
+        \doctest
+        >>> class Sq(Callback):
+        ...   def __init__(self, name, opts={}):
+        ...     Callback.__init__(self)
+        ...     print("before construct")
+        ...     self.construct(name, opts)
+        ...     print("after construct")
+        ...   def init(self): print("init", self.n_in())
+        ...   def finalize(self): print("finalize")
+        ...   def eval(self, arg):
+        ...     return [arg[0]**2]
+        >>> f = Sq("f")
+        before construct
+        init 1
+        finalize
+        after construct
+        \enddoctest
+
+        \doctest{matlab}
+        >> c = {'classdef SqInit < casadi.Callback', 'methods'};
+        >> c = [c, {'function self = SqInit(name)'}];
+        >> c = [c, {'self@casadi.Callback(); disp(''before construct'');'}];
+        >> c = [c, {'construct(self, name); disp(''after construct'');', 'end'}];
+        >> c = [c, {'function init(self)', 'fprintf(''init %d\n'', self.n_in());', 'end'}];
+        >> c = [c, {'function finalize(self)', 'disp(''finalize'');', 'end'}];
+        >> c = [c, {'function r = eval(self, arg)', 'r = {arg{1}^2};', 'end', 'end', 'end'}];
+        >> d = tempname; mkdir(d); addpath(d); fid = fopen(fullfile(d, 'SqInit.m'), 'w');
+        >> fprintf(fid, '%s\n', c{:}); fclose(fid);
+        >> f = SqInit('f');
+        before construct
+        init 1
+        finalize
+        after construct
+        >> rmpath(d); rmdir(d, 's');
+        \enddoctest
 
         \identifier{o6} */
     virtual void init() {}
 
     /** \brief Finalize the object
 
-     * This function is called after the construction and init steps are completed,
-     * but before user functions are called.
-     * It is called recursively for the whole class hierarchy, starting with the
-     * highest level.
+        Called from construct() after init(), as the last step before the Function can be
+        evaluated. The default does nothing.
 
         \identifier{o7} */
     virtual void finalize() {}
 
-    /** \brief Evaluate numerically, using temporary matrices and work vectors
-     *
-     * This signature is not thread-safe.
-     * For guaranteed thread-safety, use `eval_buffer`
+    /** \brief Evaluate numerically
+
+        The method a subclass must implement. Receives one DM per input (with the sparsity
+        of get_sparsity_in) and must return a list with one entry per output; each entry is
+        converted to a DM and must match the shape of get_sparsity_out, otherwise the call
+        raises an error. Exceptions raised inside propagate to the caller. The default
+        implementation raises an error.
+
+        This signature is not thread-safe. For guaranteed thread-safety, use eval_buffer.
+
+        \param arg Input values
+        \return Output values
+
+        \doctest
+        >>> class Scale(Callback):
+        ...   def __init__(self, name, opts={}):
+        ...     Callback.__init__(self)
+        ...     self.construct(name, opts)
+        ...   def get_n_in(self): return 2
+        ...   def get_sparsity_in(self, i):
+        ...     return Sparsity.dense(2, 1) if i == 0 else Sparsity.dense(1, 1)
+        ...   def get_sparsity_out(self, i): return Sparsity.dense(2, 1)
+        ...   def eval(self, arg):
+        ...     return [arg[0]*arg[1]]
+        >>> f = Scale("f")
+        >>> f([1, 2], 3)
+        DM([3, 6])
+        >>> class Bad(Scale):
+        ...   def eval(self, arg):
+        ...     return [arg[1]]
+        >>> try:
+        ...   Bad("b")([1, 2], 3)
+        ... except Exception as e:
+        ...   print("Shape mismatch" in str(e))
+        True
+        \enddoctest
+
+        \doctest{matlab}
+        >> c = {'classdef Scale < casadi.Callback', 'methods'};
+        >> c = [c, {'function self = Scale(name)'}];
+        >> c = [c, {'self@casadi.Callback(); construct(self, name);', 'end'}];
+        >> c = [c, {'function n = get_n_in(self)', 'n = 2;', 'end'}];
+        >> c = [c, {'function sp = get_sparsity_in(self, i)'}];
+        >> c = [c, {'sp = casadi.Sparsity.dense(1, 1);'}];
+        >> c = [c, {'if i == 0, sp = casadi.Sparsity.dense(2, 1); end', 'end'}];
+        >> c = [c, {'function sp = get_sparsity_out(self, i)'}];
+        >> c = [c, {'sp = casadi.Sparsity.dense(2, 1);', 'end'}];
+        >> c = [c, {'function r = eval(self, arg)', 'r = {arg{1}*arg{2}};'}];
+        >> c = [c, {'end', 'end', 'end'}];
+        >> d = tempname; mkdir(d); addpath(d); fid = fopen(fullfile(d, 'Scale.m'), 'w');
+        >> fprintf(fid, '%s\n', c{:}); fclose(fid);
+        >> f = Scale('f'); disp(f([1; 2], 3))
+        [3, 6]
+        >> c = {'classdef BadScale < Scale', 'methods', 'function self = BadScale(name)'};
+        >> c = [c, {'self@Scale(name);', 'end', 'function r = eval(self, arg)', 'r = {arg{2}};'}];
+        >> c = [c, {'end', 'end', 'end'}]; fid = fopen(fullfile(d, 'BadScale.m'), 'w');
+        >> fprintf(fid, '%s\n', c{:}); fclose(fid); g = BadScale('b');
+        >> try, g([1; 2], 3); catch e, disp(contains(e.message, 'Shape mismatch')); end
+        1
+        >> rmpath(d); rmdir(d, 's');
+        \enddoctest
 
         \identifier{o8} */
     virtual std::vector<DM> eval(const std::vector<DM>& arg) const;
 
     /** \brief A copy-free low level interface
-     *
-     * In Python, you will be passed two tuples of memoryview objects
-     * Note that only the structural nonzeros are present in the memoryview objects/buffers.
-     *
-     * Make sure to override has_eval_buffer() to indicate support for this method.
+
+        Alternative to eval() that works on the raw nonzero buffers, avoiding DM allocation.
+        Override has_eval_buffer() to return true to activate it. In Python the method
+        receives two tuples of memoryview objects (inputs and outputs), each holding only
+        the structural nonzeros of the corresponding input or output in column-major order;
+        write the result into the output buffers and return 0.
+
+        \doctest
+        >>> class Sq(Callback):
+        ...   def __init__(self, name, opts={}):
+        ...     Callback.__init__(self)
+        ...     self.construct(name, opts)
+        ...   def get_sparsity_in(self, i): return Sparsity.dense(3, 1)
+        ...   def get_sparsity_out(self, i): return Sparsity.dense(3, 1)
+        ...   def has_eval_buffer(self): return True
+        ...   def eval_buffer(self, arg, res):
+        ...     a = np.frombuffer(arg[0], dtype=np.float64)
+        ...     r = np.frombuffer(res[0], dtype=np.float64)
+        ...     r[:] = a**2
+        ...     return 0
+        >>> f = Sq("f")
+        >>> f([1, 2, 3])
+        DM([1, 4, 9])
+        \enddoctest
 
         \identifier{o9} */
     virtual int eval_buffer(const double **arg, const std::vector<casadi_int>& sizes_arg,
                               double **res, const std::vector<casadi_int>& sizes_res) const;
     /** \brief Does the Callback class support a copy-free low level interface ?
-     *
+
+        Return true to have eval_buffer() called instead of eval(). Default: false.
 
         \identifier{265} */
     virtual bool has_eval_buffer() const;
 
     /** \brief Get the number of inputs
 
-     * This function is called during construction.
+        Called during construct(). Default: 1.
 
         \identifier{oa} */
     virtual casadi_int get_n_in();
 
     /** \brief Get the number of outputs
 
-     * This function is called during construction.
+        Called during construct(). Default: 1.
+
+        \doctest
+        >>> class Split(Callback):
+        ...   def __init__(self, name, opts={}):
+        ...     Callback.__init__(self)
+        ...     self.construct(name, opts)
+        ...   def get_n_in(self): return 1
+        ...   def get_n_out(self): return 2
+        ...   def eval(self, arg):
+        ...     return [arg[0]**2, -arg[0]]
+        >>> f = Split("f")
+        >>> f(3)
+        (DM(9), DM(-3))
+        \enddoctest
+
+        \doctest{matlab}
+        >> c = {'classdef SplitCb < casadi.Callback', 'methods'};
+        >> c = [c, {'function self = SplitCb(name)'}];
+        >> c = [c, {'self@casadi.Callback(); construct(self, name);', 'end'}];
+        >> c = [c, {'function n = get_n_out(self)', 'n = 2;', 'end'}];
+        >> c = [c, {'function r = eval(self, arg)', 'r = {arg{1}^2, -arg{1}};'}];
+        >> c = [c, {'end', 'end', 'end'}];
+        >> d = tempname; mkdir(d); addpath(d); fid = fopen(fullfile(d, 'SplitCb.m'), 'w');
+        >> fprintf(fid, '%s\n', c{:}); fclose(fid);
+        >> f = SplitCb('f'); [a, b] = f(3); disp(a), disp(b)
+        9
+        -3
+        >> rmpath(d); rmdir(d, 's');
+        \enddoctest
 
         \identifier{ob} */
     virtual casadi_int get_n_out();
 
     /** \brief Get the sparsity of an input
 
-     * This function is called during construction.
+        Called during construct() for i in 0..n_in-1. Default: scalar (1-by-1 dense).
+        Inputs are padded or projected to this pattern when the Function is called.
+
+        \doctest
+        >>> class Trace(Callback):
+        ...   def __init__(self, name, n, opts={}):
+        ...     Callback.__init__(self)
+        ...     self.n = n
+        ...     self.construct(name, opts)
+        ...   def get_sparsity_in(self, i): return Sparsity.diag(self.n)
+        ...   def eval(self, arg):
+        ...     return [sum1(diag(arg[0]))]
+        >>> f = Trace("f", 3)
+        >>> f.sparsity_in(0), f(DM.ones(3, 3))
+        (Sparsity(3x3,3nz), DM(3))
+        \enddoctest
+
+        \doctest{matlab}
+        >> c = {'classdef TraceCb < casadi.Callback', 'properties', 'n', 'end', 'methods'};
+        >> c = [c, {'function self = TraceCb(name, n)'}];
+        >> c = [c, {'self@casadi.Callback(); self.n = n; construct(self, name);', 'end'}];
+        >> c = [c, {'function sp = get_sparsity_in(self, i)'}];
+        >> c = [c, {'sp = casadi.Sparsity.diag(self.n);', 'end'}];
+        >> c = [c, {'function r = eval(self, arg)', 'r = {sum1(diag(arg{1}))};'}];
+        >> c = [c, {'end', 'end', 'end'}];
+        >> d = tempname; mkdir(d); addpath(d); fid = fopen(fullfile(d, 'TraceCb.m'), 'w');
+        >> fprintf(fid, '%s\n', c{:}); fclose(fid);
+        >> f = TraceCb('f', 3); disp(f.sparsity_in(0)), disp(f(DM.ones(3, 3)))
+        3x3,3nz
+        3
+        >> rmpath(d); rmdir(d, 's');
+        \enddoctest
 
         \identifier{oc} */
     virtual Sparsity get_sparsity_in(casadi_int i);
 
     /** \brief Get the sparsity of an output
 
-     * This function is called during construction.
+        Called during construct() for i in 0..n_out-1. Default: scalar (1-by-1 dense).
+        The value returned by eval() for output i must have this shape.
 
         \identifier{od} */
     virtual Sparsity get_sparsity_out(casadi_int i);
 
     /** \brief Get the name of an input
 
-     * This function is called during construction.
+        Called during construct(). Default: "i0", "i1", ... Names allow calling the Function
+        with keyword arguments.
+
+        \doctest
+        >>> class Lin(Callback):
+        ...   def __init__(self, name, opts={}):
+        ...     Callback.__init__(self)
+        ...     self.construct(name, opts)
+        ...   def get_n_in(self): return 2
+        ...   def get_name_in(self, i): return ["x", "a"][i]
+        ...   def get_name_out(self, i): return "y"
+        ...   def eval(self, arg):
+        ...     return [arg[1]*arg[0]]
+        >>> f = Lin("f")
+        >>> f
+        Callback(f:(x,a)->(y) CallbackInternal)
+        >>> f(x=2, a=3)
+        {'y': DM(6)}
+        \enddoctest
+
+        \doctest{matlab}
+        >> c = {'classdef Lin < casadi.Callback', 'methods'};
+        >> c = [c, {'function self = Lin(name)'}];
+        >> c = [c, {'self@casadi.Callback(); construct(self, name);', 'end'}];
+        >> c = [c, {'function n = get_n_in(self)', 'n = 2;', 'end'}];
+        >> c = [c, {'function s = get_name_in(self, i)'}];
+        >> c = [c, {'names = {''x'', ''a''}; s = names{i+1};', 'end'}];
+        >> c = [c, {'function s = get_name_out(self, i)', 's = ''y'';', 'end'}];
+        >> c = [c, {'function r = eval(self, arg)', 'r = {arg{2}*arg{1}};'}];
+        >> c = [c, {'end', 'end', 'end'}];
+        >> d = tempname; mkdir(d); addpath(d); fid = fopen(fullfile(d, 'Lin.m'), 'w');
+        >> fprintf(fid, '%s\n', c{:}); fclose(fid);
+        >> f = Lin('f'); disp(f)
+        f:(x,a)->(y) CallbackInternal
+        >> r = f('x', 2, 'a', 3); disp(r.y)
+        6
+        >> rmpath(d); rmdir(d, 's');
+        \enddoctest
 
         \identifier{oe} */
     virtual std::string get_name_in(casadi_int i);
 
     /** \brief Get the name of an output
 
-     * This function is called during construction.
+        Called during construct(). Default: "o0", "o1", ...
 
         \identifier{of} */
     virtual std::string get_name_out(casadi_int i);
 
     /** \brief Do the derivative functions need nondifferentiated outputs?
 
+        Derivative functions obtained from get_jacobian/get_forward/get_reverse receive the
+        nominal outputs as extra inputs. When this returns false (default) those inputs are
+        passed as empty (all-zero sparsity) placeholders; return true to receive the actual
+        output values, e.g. to reuse them in the derivative computation.
+
+        \doctest
+        >>> class Sq(Callback):
+        ...   def __init__(self, name, opts={}):
+        ...     Callback.__init__(self)
+        ...     self.construct(name, opts)
+        ...   def eval(self, arg):
+        ...     return [arg[0]**2]
+        ...   def has_jacobian(self): return True
+        ...   def get_jacobian(self, name, inames, onames, opts):
+        ...     x = SX.sym("x")
+        ...     y = SX.sym("y", self.sparsity_out(0) if self.uses_output() else Sparsity(1, 1))
+        ...     return Function(name, [x, y], [2*x], inames, onames, opts)
+        >>> class SqU(Sq):
+        ...   def uses_output(self): return True
+        >>> Sq("f").jacobian().sparsity_in(1), SqU("f").jacobian().sparsity_in(1)
+        (Sparsity(1x1,0nz), Sparsity(1x1))
+        \enddoctest
+
+        \doctest{matlab}
+        >> c = {'classdef SqJac < casadi.Callback', 'methods'};
+        >> c = [c, {'function self = SqJac(name)'}];
+        >> c = [c, {'self@casadi.Callback(); construct(self, name);', 'end'}];
+        >> c = [c, {'function r = eval(self, arg)', 'r = {arg{1}^2};', 'end'}];
+        >> c = [c, {'function b = has_jacobian(self)', 'b = true;', 'end'}];
+        >> c = [c, {'function J = get_jacobian(self, name, inames, onames, opts)'}];
+        >> c = [c, {'x = casadi.SX.sym(''x''); y = casadi.SX.sym(''y'', casadi.Sparsity(1, 1));'}];
+        >> c = [c, {'if self.uses_output(), y = casadi.SX.sym(''y'', self.sparsity_out(0)); end'}];
+        >> c = [c, {'J = casadi.Function(name, {x, y}, {2*x}, inames, onames, opts);'}];
+        >> c = [c, {'end', 'end', 'end'}];
+        >> d = tempname; mkdir(d); addpath(d); fid = fopen(fullfile(d, 'SqJac.m'), 'w');
+        >> fprintf(fid, '%s\n', c{:}); fclose(fid);
+        >> c = {'classdef SqJacU < SqJac', 'methods', 'function self = SqJacU(name)'};
+        >> c = [c, {'self@SqJac(name);', 'end', 'function b = uses_output(self)', 'b = true;'}];
+        >> c = [c, {'end', 'end', 'end'}]; fid = fopen(fullfile(d, 'SqJacU.m'), 'w');
+        >> fprintf(fid, '%s\n', c{:}); fclose(fid);
+        >> f = SqJac('f'); J = f.jacobian(); disp(J.sparsity_in(1))
+        1x1,0nz
+        >> g = SqJacU('g'); J = g.jacobian(); disp(J.sparsity_in(1))
+        1x1
+        >> rmpath(d); rmdir(d, 's');
+        \enddoctest
+
         \identifier{og} */
     virtual bool uses_output() const;
 
     /** \brief Customize calls to the function factory
+
+        Called when a derived function is requested by name through Function::factory;
+        the default delegates to the standard factory.
 
         \identifier{2de} */
     virtual Function get_factory(const std::string& name,
@@ -179,6 +650,76 @@ namespace casadi {
 
     ///@{
     /** \brief Return Jacobian of all input elements with respect to all output elements
+
+        Override has_jacobian() to return true and get_jacobian() to return a Function with
+        inputs [all nominal inputs, all nominal outputs] and one output per (output, input)
+        pair, each the dense or sparse Jacobian block of that output with respect to that
+        input (row-major over the pairs). Use the \p inames, \p onames and \p opts passed
+        in: they carry the expected names and the "derivative_of" option. The returned
+        Function may be an SX/MX Function (then higher derivatives are exact) or another
+        Callback (keep a reference to it).
+
+        \doctest
+        >>> class F43(Callback):
+        ...   def __init__(self, name, opts={}):
+        ...     Callback.__init__(self)
+        ...     self.construct(name, opts)
+        ...   def get_sparsity_in(self, i): return Sparsity.dense(4, 1)
+        ...   def get_sparsity_out(self, i): return Sparsity.dense(3, 1)
+        ...   def eval(self, arg):
+        ...     a, b, c, d = vertsplit(arg[0])
+        ...     return [vertcat(sin(c)*d+d**2, 2*a+c, b**2+5*c)]
+        ...   def has_jacobian(self): return True
+        ...   def get_jacobian(self, name, inames, onames, opts):
+        ...     print(name, inames, onames)
+        ...     x = SX.sym("x", 4)
+        ...     y = SX.sym("y", Sparsity(3, 1))
+        ...     a, b, c, d = vertsplit(x)
+        ...     J = blockcat([[0, 0, d*cos(c), sin(c)+2*d], [2, 0, 1, 0], [0, 2*b, 5, 0]])
+        ...     return Function(name, [x, y], [J], inames, onames, opts)
+        >>> f = F43("f")
+        >>> x = MX.sym("x", 4)
+        >>> J = Function("J", [x], [jacobian(f(x), x)])
+        jac_f ['i0', 'out_o0'] ['jac_o0_i0']
+        >>> J([1, 2, 0, 3])
+        DM(
+        [[0, 0, 3, 6],
+         [2, 0, 1, 0],
+         [0, 4, 5, 0]])
+        \enddoctest
+
+        \doctest{matlab}
+        >> c = {'classdef F43 < casadi.Callback', 'methods'};
+        >> c = [c, {'function self = F43(name)'}];
+        >> c = [c, {'self@casadi.Callback(); construct(self, name);', 'end'}];
+        >> c = [c, {'function sp = get_sparsity_in(self, i)'}];
+        >> c = [c, {'sp = casadi.Sparsity.dense(4, 1);', 'end'}];
+        >> c = [c, {'function sp = get_sparsity_out(self, i)'}];
+        >> c = [c, {'sp = casadi.Sparsity.dense(3, 1);', 'end'}];
+        >> c = [c, {'function r = eval(self, arg)'}];
+        >> c = [c, {'v = arg{1}; a = v(1); b = v(2); c = v(3); d = v(4);'}];
+        >> c = [c, {'r = {[sin(c)*d+d^2; 2*a+c; b^2+5*c]};', 'end'}];
+        >> c = [c, {'function b = has_jacobian(self)', 'b = true;', 'end'}];
+        >> c = [c, {'function J = get_jacobian(self, name, inames, onames, opts)'}];
+        >> c = [c, {'disp(name); disp(inames); disp(onames);'}];
+        >> c = [c, {'x = casadi.SX.sym(''x'', 4); a = x(1); b = x(2); c = x(3); d = x(4);'}];
+        >> c = [c, {'y = casadi.SX.sym(''y'', casadi.Sparsity(3, 1));'}];
+        >> c = [c, {'Jm = [0, 0, d*cos(c), sin(c)+2*d; 2, 0, 1, 0; 0, 2*b, 5, 0];'}];
+        >> c = [c, {'J = casadi.Function(name, {x, y}, {Jm}, inames, onames, opts);'}];
+        >> c = [c, {'end', 'end', 'end'}];
+        >> d = tempname; mkdir(d); addpath(d); fid = fopen(fullfile(d, 'F43.m'), 'w');
+        >> fprintf(fid, '%s\n', c{:}); fclose(fid);
+        >> f = F43('f'); x = MX.sym('x', 4); J = Function('J', {x}, {jacobian(f(x), x)});
+        jac_f
+        i0
+        out_o0
+        jac_o0_i0
+        >> J([1; 2; 0; 3])
+        [[0, 0, 3, 6],
+         [2, 0, 1, 0],
+         [0, 4, 5, 0]]
+        >> rmpath(d); rmdir(d, 's');
+        \enddoctest
 
         \identifier{oh} */
     virtual bool has_jacobian() const;
@@ -191,9 +732,57 @@ namespace casadi {
     ///@{
     /** \brief Return function that calculates forward derivatives
 
-     *    forward(nfwd) returns a cached instance if available,
-     *    and calls <tt>Function get_forward(casadi_int nfwd)</tt>
-     *    if no cached version is available.
+        Override has_forward(nfwd) to return true for the numbers of directions you support
+        (nfwd==1 is enough; CasADi then loops) and get_forward() to return a Function with
+        inputs [nominal inputs, nominal outputs, one forward seed per input] and one forward
+        sensitivity per output. For nfwd>1 the seeds and sensitivities are horizontally
+        stacked (n-by-nfwd*m). forward(nfwd) on the Function caches the result.
+
+        \doctest
+        >>> class Sq(Callback):
+        ...   def __init__(self, name, opts={}):
+        ...     Callback.__init__(self)
+        ...     self.construct(name, opts)
+        ...   def eval(self, arg):
+        ...     return [arg[0]**2]
+        ...   def has_forward(self, nfwd): return nfwd == 1
+        ...   def get_forward(self, nfwd, name, inames, onames, opts):
+        ...     print(nfwd, name, inames, onames)
+        ...     x, y, xd = SX.sym("x"), SX.sym("y", Sparsity(1, 1)), SX.sym("xd")
+        ...     return Function(name, [x, y, xd], [2*x*xd], inames, onames, opts)
+        >>> f = Sq("f")
+        >>> x = MX.sym("x")
+        >>> J = Function("J", [x], [jacobian(f(x), x)])
+        1 fwd1_f ['i0', 'out_o0', 'fwd_i0'] ['fwd_o0']
+        >>> J(3)
+        DM(6)
+        \enddoctest
+
+        \doctest{matlab}
+        >> c = {'classdef SqFwd < casadi.Callback', 'methods'};
+        >> c = [c, {'function self = SqFwd(name)'}];
+        >> c = [c, {'self@casadi.Callback(); construct(self, name);', 'end'}];
+        >> c = [c, {'function r = eval(self, arg)', 'r = {arg{1}^2};', 'end'}];
+        >> c = [c, {'function b = has_forward(self, nfwd)', 'b = nfwd == 1;', 'end'}];
+        >> c = [c, {'function F = get_forward(self, nfwd, name, inames, onames, opts)'}];
+        >> c = [c, {'disp(nfwd); disp(name); disp(inames); disp(onames);'}];
+        >> c = [c, {'x = casadi.SX.sym(''x''); y = casadi.SX.sym(''y'', casadi.Sparsity(1, 1));'}];
+        >> c = [c, {'xd = casadi.SX.sym(''xd'');'}];
+        >> c = [c, {'F = casadi.Function(name, {x, y, xd}, {2*x*xd}, inames, onames, opts);'}];
+        >> c = [c, {'end', 'end', 'end'}];
+        >> d = tempname; mkdir(d); addpath(d); fid = fopen(fullfile(d, 'SqFwd.m'), 'w');
+        >> fprintf(fid, '%s\n', c{:}); fclose(fid);
+        >> f = SqFwd('f'); x = MX.sym('x'); J = Function('J', {x}, {jacobian(f(x), x)});
+        1
+        fwd1_f
+        i0
+        out_o0
+        fwd_i0
+        fwd_o0
+        >> J(3)
+        6
+        >> rmpath(d); rmdir(d, 's');
+        \enddoctest
 
         \identifier{oi} */
     virtual bool has_forward(casadi_int nfwd) const;
@@ -206,9 +795,57 @@ namespace casadi {
     ///@{
     /** \brief Return function that calculates adjoint derivatives
 
-     *    reverse(nadj) returns a cached instance if available,
-     *    and calls <tt>Function get_reverse(casadi_int nadj)</tt>
-     *    if no cached version is available.
+        Override has_reverse(nadj) to return true for the numbers of directions you support
+        and get_reverse() to return a Function with inputs [nominal inputs, nominal outputs,
+        one adjoint seed per output] and one adjoint sensitivity per input. For nadj>1 the
+        seeds and sensitivities are horizontally stacked. Reverse mode is what gradient-based
+        NLP solvers use for the objective gradient. reverse(nadj) caches the result.
+
+        \doctest
+        >>> class Sq(Callback):
+        ...   def __init__(self, name, opts={}):
+        ...     Callback.__init__(self)
+        ...     self.construct(name, opts)
+        ...   def eval(self, arg):
+        ...     return [arg[0]**2]
+        ...   def has_reverse(self, nadj): return nadj == 1
+        ...   def get_reverse(self, nadj, name, inames, onames, opts):
+        ...     print(nadj, name, inames, onames)
+        ...     x, y, yb = SX.sym("x"), SX.sym("y", Sparsity(1, 1)), SX.sym("yb")
+        ...     return Function(name, [x, y, yb], [2*x*yb], inames, onames, opts)
+        >>> f = Sq("f")
+        >>> x = MX.sym("x")
+        >>> G = Function("G", [x], [gradient(f(x), x)])
+        1 adj1_f ['i0', 'out_o0', 'adj_o0'] ['adj_i0']
+        >>> G(3)
+        DM(6)
+        \enddoctest
+
+        \doctest{matlab}
+        >> c = {'classdef SqAdj < casadi.Callback', 'methods'};
+        >> c = [c, {'function self = SqAdj(name)'}];
+        >> c = [c, {'self@casadi.Callback(); construct(self, name);', 'end'}];
+        >> c = [c, {'function r = eval(self, arg)', 'r = {arg{1}^2};', 'end'}];
+        >> c = [c, {'function b = has_reverse(self, nadj)', 'b = nadj == 1;', 'end'}];
+        >> c = [c, {'function F = get_reverse(self, nadj, name, inames, onames, opts)'}];
+        >> c = [c, {'disp(nadj); disp(name); disp(inames); disp(onames);'}];
+        >> c = [c, {'x = casadi.SX.sym(''x''); y = casadi.SX.sym(''y'', casadi.Sparsity(1, 1));'}];
+        >> c = [c, {'yb = casadi.SX.sym(''yb'');'}];
+        >> c = [c, {'F = casadi.Function(name, {x, y, yb}, {2*x*yb}, inames, onames, opts);'}];
+        >> c = [c, {'end', 'end', 'end'}];
+        >> d = tempname; mkdir(d); addpath(d); fid = fopen(fullfile(d, 'SqAdj.m'), 'w');
+        >> fprintf(fid, '%s\n', c{:}); fclose(fid);
+        >> f = SqAdj('f'); x = MX.sym('x'); G = Function('G', {x}, {gradient(f(x), x)});
+        1
+        adj1_f
+        i0
+        out_o0
+        adj_o0
+        adj_i0
+        >> G(3)
+        6
+        >> rmpath(d); rmdir(d, 's');
+        \enddoctest
 
         \identifier{oj} */
     virtual bool has_reverse(casadi_int nadj) const;
@@ -221,7 +858,58 @@ namespace casadi {
     ///@{
     /** \brief Return sparsity of Jacobian of all input elements
 
-     * with respect to all output elements
+        with respect to all output elements. Override has_jac_sparsity(oind, iind) to
+        return true and get_jac_sparsity() to return the pattern of the Jacobian block of
+        output \p oind with respect to input \p iind. Without it the block is assumed dense.
+        Finite differencing exploits the pattern (fewer evaluations) and the result of
+        jacobian() carries it.
+
+        \doctest
+        >>> class Diag(Callback):
+        ...   def __init__(self, name, opts={}):
+        ...     Callback.__init__(self)
+        ...     self.construct(name, opts)
+        ...   def get_sparsity_in(self, i): return Sparsity.dense(3, 1)
+        ...   def get_sparsity_out(self, i): return Sparsity.dense(3, 1)
+        ...   def eval(self, arg):
+        ...     return [arg[0]**2]
+        ...   def has_jac_sparsity(self, oind, iind): return True
+        ...   def get_jac_sparsity(self, oind, iind, symmetric): return Sparsity.diag(3)
+        >>> f = Diag("f", {"enable_fd": True})
+        >>> x = MX.sym("x", 3)
+        >>> J = jacobian(f(x), x)
+        >>> J.sparsity()
+        Sparsity(3x3,3nz)
+        >>> Function("J", [x], [J])([1, 2, 3])
+        DM(
+        [[2, 00, 00],
+         [00, 4, 00],
+         [00, 00, 6]])
+        \enddoctest
+
+        \doctest{matlab}
+        >> c = {'classdef DiagCb < casadi.Callback', 'methods'};
+        >> c = [c, {'function self = DiagCb(name, opts)'}];
+        >> c = [c, {'self@casadi.Callback(); construct(self, name, opts);', 'end'}];
+        >> c = [c, {'function sp = get_sparsity_in(self, i)'}];
+        >> c = [c, {'sp = casadi.Sparsity.dense(3, 1);', 'end'}];
+        >> c = [c, {'function sp = get_sparsity_out(self, i)'}];
+        >> c = [c, {'sp = casadi.Sparsity.dense(3, 1);', 'end'}];
+        >> c = [c, {'function r = eval(self, arg)', 'r = {arg{1}.^2};', 'end'}];
+        >> c = [c, {'function b = has_jac_sparsity(self, oind, iind)', 'b = true;', 'end'}];
+        >> c = [c, {'function sp = get_jac_sparsity(self, oind, iind, symmetric)'}];
+        >> c = [c, {'sp = casadi.Sparsity.diag(3);', 'end', 'end', 'end'}];
+        >> d = tempname; mkdir(d); addpath(d); fid = fopen(fullfile(d, 'DiagCb.m'), 'w');
+        >> fprintf(fid, '%s\n', c{:}); fclose(fid);
+        >> f = DiagCb('f', struct('enable_fd', true)); x = MX.sym('x', 3); J = jacobian(f(x), x);
+        >> J.sparsity()
+        3x3,3nz
+        >> JF = Function('J', {x}, {J}); disp(JF([1; 2; 3]))
+        [[2, 00, 00],
+         [00, 4, 00],
+         [00, 00, 6]]
+        >> rmpath(d); rmdir(d, 's');
+        \enddoctest
 
         \identifier{ok} */
     virtual bool has_jac_sparsity(casadi_int oind, casadi_int iind) const { return false; }
