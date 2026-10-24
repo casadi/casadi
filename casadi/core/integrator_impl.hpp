@@ -201,6 +201,9 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
       \identifier{29o} */
   int calc_edot(IntegratorMemory* m) const;
 
+  /** \brief Calculate the quadrature right-hand side at m->t into m->tmp2 */
+  int calc_qdot(IntegratorMemory* m) const;
+
   /** \brief Predict next event time
 
       \identifier{29p} */
