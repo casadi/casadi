@@ -2526,8 +2526,8 @@ namespace casadi {
         \param row Row index of each entry
         \param col Column index of each entry
         \param d Dense vector of values, one per entry
-        \param nrow Number of rows of the result
-        \param ncol Number of columns of the result
+        \param nrow Number of rows of the result [default: largest row index plus one]
+        \param ncol Number of columns of the result [default: largest column index plus one]
 
         \doctest
         >>> DM.triplet([0, 1], [1, 0], [5, 6], 3, 3)
