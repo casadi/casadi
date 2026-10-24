@@ -1348,6 +1348,8 @@ namespace casadi {
     casadi_assert_dev(v.size() >= 2);
     casadi_int nrow = v[0];
     casadi_int ncol = v[1];
+    // Dense matrix - deviation from canonical form
+    if (v.size()==3 && v[2]==1) return Sparsity::dense(nrow, ncol);
     casadi_assert_dev(v.size() >= 2 + ncol+1);
     casadi_int nnz = v[2 + ncol];
     bool dense = v.size() == 2 + ncol+1 && nrow*ncol==nnz;
