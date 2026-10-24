@@ -2724,7 +2724,8 @@ namespace casadi {
     /** \brief Check whether an SX expression contains only smooth operations
 
         False when any node is a non-smooth operation such as floor, ceil, sign, a comparison
-        or if_else. Operations such as fabs, fmin and fmax count as smooth. Always true for DM.
+        or if_else, or a call to a Function whose outputs may jump in its inputs.
+        Operations such as fabs, fmin and fmax count as smooth. Always true for DM.
 
         \doctest
         >>> x = SX.sym("x")

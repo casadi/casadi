@@ -1429,6 +1429,17 @@ class SXtests(casadiTestCase):
       warnings.simplefilter("ignore")
       is_smooth(x)  # pyright: ignore[reportUndefinedVariable]
 
+  def test_is_smooth_call(self):
+    x = ca.SX.sym("x")
+    F = ca.Function("F",[x],[ca.floor(x)])
+    G = ca.Function("G",[x],[ca.sin(x)])
+    xm = ca.MX.sym("x")
+    H = ca.Function("H",[xm],[ca.floor(xm)])
+    self.assertFalse(F.call([x],False,True)[0].is_smooth())
+    self.assertTrue(G.call([x],False,True)[0].is_smooth())
+    self.assertFalse(H.call([x],False,True)[0].is_smooth())
+    self.assertFalse(ca.Function("FF",[x],[F(x)]).call([x],False,True)[0].is_smooth())
+
   def test_which_depends(self):
     for X in [ca.SX,ca.MX]:
       x = X.sym("x")

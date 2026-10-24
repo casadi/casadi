@@ -159,12 +159,33 @@ namespace casadi {
     trace << "]}\n";
   }
 
+  // Can any output of f jump in any of its inputs?
+  static bool may_jump(const Function& f) {
+    std::vector<std::vector<bvec_t>> seed(f.n_in()), sens(f.n_out());
+    std::vector<const bvec_t*> arg(f.n_in());
+    std::vector<bvec_t*> res(f.n_out());
+    for (casadi_int i=0; i<f.n_in(); ++i) {
+      seed[i].assign(f.nnz_in(i), 1);
+      arg[i] = get_ptr(seed[i]);
+    }
+    for (casadi_int i=0; i<f.n_out(); ++i) {
+      sens[i].assign(f.nnz_out(i), 0);
+      res[i] = get_ptr(sens[i]);
+    }
+    f.jump_fwd(arg, res);
+    for (auto&& s : sens) {
+      for (bvec_t b : s) if (b) return true;
+    }
+    return false;
+  }
+
   bool SXFunction::is_smooth() const {
     // Go through all nodes and check if any node is non-smooth
     for (auto&& a : algorithm_) {
       if (operation_checker<JumpChecker>(a.op)) {
         return false;
       }
+      if (a.op==OP_CALL && may_jump(call_.el.at(a.i1).f)) return false;
     }
     return true;
   }
