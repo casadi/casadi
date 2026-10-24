@@ -166,3 +166,14 @@ end
     @test C.str(C.der(dae, x)) == "der(x)"
     @test dae.der() == ["der(x)"]
 end
+
+@testset "builders keep the type of their pieces" begin
+    @test C.mtimes([DM([1 2]), DM([1 0; 0 2]), DM([1, 1])]) isa DM
+    @test C.veccat([DM([1 2; 3 4]), DM(5)]) isa DM
+    @test Vector(veccat(DM([1 2; 3 4]), 5)) == [1, 3, 2, 4, 5]
+    @test diagcat() isa DM && size(diagcat()) == (0, 0)
+    @test veccat(DM[]) isa DM && size(veccat(DM[])) == (0, 1)
+    @test veccat(SX[]) isa SX
+    @test Matrix(blockcat(1, 2, 3, 4)) == [1 2; 3 4]
+    @test C._horzcat([DM(1), DM(2)]) isa DM
+end

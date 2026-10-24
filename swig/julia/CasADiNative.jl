@@ -12,7 +12,7 @@ export SX, MX, DM, Sparsity, sym, nlpsol, jacobian, hessian
 # P1-3: high-value builders that live as C.* but were unreachable via `using`
 # (`reshape` is deliberately NOT exported: we extend Base.reshape, so a bare
 #  `reshape` resolves to Base with our methods; exporting would shadow it. P2-1)
-export blockcat, diagcat, sum1, sum2, repmat, dot, cross, norm, det, tr,
+export blockcat, diagcat, veccat, sum1, sum2, repmat, dot, cross, norm, det, tr,
     mtimes, gradient, jtimes, substitute, simplify,
     qpsol, conic, integrator, rootfinder, CodeGenerator, codegen,
     external, generate, save
@@ -226,9 +226,11 @@ end
 # when all args are DM/Real and SX when all are SX/Real.
 _catargs(xs::Tuple{AbstractVector}) = Base.collect(xs[1])  # single-vector call form
 _catargs(xs::Tuple) = Base.collect(xs)                     # varargs call form
+# no pieces: an empty matrix of the vector's element type (DM by default)
+_emptycat(xs, n) = (Base.eltype(xs) !== Union{} && Base.eltype(xs) <: _Cat ? Base.eltype(xs) : DM)(0, n)
 function _typedcat(builder, args...)
     xs = _catargs(args)
-    Base.isempty(xs) && return builder(xs)
+    Base.isempty(xs) && return _emptycat(args isa Tuple{AbstractVector} ? args[1] : xs, builder === C.veccat ? 1 : 0)
     T = _catpromote(xs)
     _restore(T, builder([_ascat(T, x) for x in xs]))
 end
@@ -236,13 +238,15 @@ end
 # is the list form (its elements are the pieces), as in Python.
 diagcat(args::_CatArg...) = _typedcat(C.diagcat, args...)
 diagcat(v::AbstractVector) = _typedcat(C.diagcat, v)
+veccat(args::_CatArg...) = _typedcat(C.veccat, args...)
+veccat(v::AbstractVector) = _typedcat(C.veccat, v)
 # blockcat takes a 2-D matrix-of-blocks; lower it to vertcat-of-horzcats
 function blockcat(rows::AbstractVector{<:AbstractVector})
     xs = Base.collect(Base.Iterators.flatten(rows))
     T = _catpromote(xs)
     _restore(T, C._vertcat([C._horzcat([_ascat(T, x) for x in r]) for r in rows]))
 end
-blockcat(A::_Cat, B::_Cat, C_::_Cat, D::_Cat) =
+blockcat(A::_CatArg, B::_CatArg, C_::_CatArg, D::_CatArg) =
     blockcat([[A, B], [C_, D]])
 # dot: promote both sides to a common type, then the matching generated method
 function dot(a::_Cat, b::_CatArg)
