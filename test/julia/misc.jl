@@ -158,3 +158,11 @@ end
         @test C.ng(o2) == 1 && C.ng(opti) == 0
     end
 end
+
+@testset "DaeBuilder der creates the derivative variable" begin
+    dae = C.DaeBuilder("m")
+    x = dae.add("x")
+    @test C.str(dae.der(x)) == "der(x)"
+    @test C.str(C.der(dae, x)) == "der(x)"
+    @test dae.der() == ["der(x)"]
+end
