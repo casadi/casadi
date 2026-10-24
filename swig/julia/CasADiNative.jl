@@ -523,6 +523,13 @@ Base.isequal(a::DM, b::DM) = Base.isequal(Base.Matrix{Float64}(a), Base.Matrix{F
 Base.hash(x::DM, h::UInt) = Base.hash(Base.Matrix{Float64}(x), h)
 Base.iszero(x::DM) = Base.iszero(Base.Matrix{Float64}(x))
 
+# a Sparsity is a pattern: equal when the patterns are
+Base.:(==)(a::Sparsity, b::Sparsity) =
+    C.is_null(a) || C.is_null(b) ? C.is_null(a) && C.is_null(b) : C.is_equal(a, b)
+Base.isequal(a::Sparsity, b::Sparsity) = a == b
+Base.hash(s::Sparsity, h::UInt) = C.is_null(s) ? Base.hash(nothing, h) :
+    Base.hash((C.size1(s), C.size2(s), C.colind(s), C.row(s)), h)
+
 # ---- Opti conveniences ----
 # variable/parameter/subject_to need no wrappers: they reach the generated Opti
 # methods directly (subject_to's opts is backend-defaulted) but stay EXPORTED so

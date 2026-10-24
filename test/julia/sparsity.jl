@@ -113,3 +113,12 @@ end
     @test C.nnz(d) == 3
     @test C.get_col(C.sparsity(d)) == C.get_col(sp)
 end
+
+@testset "== / isequal / hash compare patterns" begin
+    @test C.dense(_S, 2) == C.dense(_S, 2)
+    @test C.dense(_S, 2) != C.diag(_S, 2)
+    @test isequal(C.lower(_S, 3), C.lower(_S, 3))
+    @test hash(C.lower(_S, 3)) == hash(C.lower(_S, 3))
+    @test length(Set([C.dense(_S, 2), C.dense(_S, 2), C.diag(_S, 2)])) == 2
+    @test Sparsity() == Sparsity()
+end
