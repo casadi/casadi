@@ -192,3 +192,11 @@ end
     c = C.canon_expr(opti.debug, 0 <= (z <= 1))
     @test c.type == C.OPTI_DOUBLE_INEQUALITY && C.str(c.canon) == C.str(z)
 end
+
+@testset "DaeBuilder get returns a native value" begin
+    dae = C.DaeBuilder("m")
+    dae.add("x", Dict("start" => 1))
+    @test dae.get("x") == 1.0
+    dae.add("v", Dict("dimension" => [2], "start" => 3))
+    @test dae.get(["x", "v"]) == [1.0, [3.0, 3.0]]
+end

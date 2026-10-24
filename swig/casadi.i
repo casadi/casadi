@@ -2803,6 +2803,8 @@ namespace std {
 %julia_value_return(std::vector<std::vector<casadi::Sparsity> >)
 %julia_value_return(std::vector<std::vector<casadi_int> >)
 %julia_value_return(std::vector<std::vector<double> >)
+%julia_value_return(casadi::GenericType)
+%julia_value_return(std::vector<casadi::GenericType>)
 // std::size_t (hashes) like size_t
 %typemap(ctype, out="long long") std::size_t "jl_value_t*"
 %typemap(out) std::size_t %{ $result = (long long)$1; %}
