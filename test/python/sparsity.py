@@ -630,6 +630,13 @@ class Sparsitytests(casadiTestCase):
       self.assertEqual(len(v), 3)
       self.assertTrue(ca.Sparsity.compressed(v) == sp)
 
+  def test_repr_el_range(self):
+    sp = ca.Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3])
+    self.assertEqual(sp.repr_el(3), "nonzero index 3 (row 0, col 3)")
+    for k in [-1, 4, 5]:
+      with self.assertRaisesRegex(Exception, "out of range for 4 nonzeros"):
+        sp.repr_el(k)
+
   def test_eq_foreign_operand(self):
     # issue #4407: comparing against an unrelated type follows the Python data
     # model (NotImplemented -> False) instead of raising NotImplementedError.
