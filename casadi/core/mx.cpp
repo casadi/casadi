@@ -1488,6 +1488,8 @@ namespace casadi {
   }
 
   std::string MX::print_operator(const MX& x, const std::vector<std::string>& args) {
+    casadi_assert(args.size()>=x.n_dep(),
+      "Expected " + str(x.n_dep()) + " argument names, but got " + str(args.size()) + ".");
     return x->disp(args);
   }
 
