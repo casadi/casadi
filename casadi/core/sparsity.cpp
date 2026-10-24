@@ -752,6 +752,9 @@ namespace casadi {
   }
 
   void Sparsity::get_nz(std::vector<casadi_int>& indices) const {
+    for (casadi_int k : indices) {
+      casadi_assert(k<numel(), "Index " + str(k) + " out of bounds for " + dim() + " pattern.");
+    }
     (*this)->get_nz(indices);
   }
 

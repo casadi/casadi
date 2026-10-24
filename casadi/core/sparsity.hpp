@@ -1739,8 +1739,7 @@ namespace casadi {
 
         Each entry of \p indices is replaced by the nonzero index of that element, or by -1
         if the element is a structural zero. Entries that are already negative are left
-        alone. The indices need not be sorted. For a dense pattern the vector is returned
-        unchanged, without range checking.
+        alone. The indices need not be sorted. An index of numel() or more raises an error.
 
         \doctest
         >>> sp = Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3])
