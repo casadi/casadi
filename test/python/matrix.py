@@ -1436,6 +1436,11 @@ class Matrixtests(casadiTestCase):
     self.assertEqual(A.shape, (2, 2))
     self.checkarray(A, ca.DM([[0, 5], [6, 0]]))
 
+  def test_eye_negative(self):
+    for X in [ca.DM, ca.SX, ca.MX]:
+      with self.assertRaisesRegex(Exception, "Dimensions must be non-negative"):
+        X.eye(-1)
+
   def test_horzsplit_n(self):
     self.assertTrue(len(ca.horzsplit_n(ca.DM.rand(1,6),2))==2)
     self.assertTrue(len(ca.vertsplit_n(ca.DM.rand(6),2))==2)
