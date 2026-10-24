@@ -59,6 +59,9 @@ namespace casadi {
     static casadi_int get_coeff_size(casadi_int m, const std::vector<casadi_int>& offset,
       const std::vector<casadi_int>& degree);
 
+    static void check_coeffs(casadi_int n, casadi_int m, const std::vector<casadi_int>& offset,
+      const std::vector<casadi_int>& degree);
+
     template<class M>
     static M derivative_coeff(casadi_int i,
         const std::vector< std::vector<double> >& knots,
