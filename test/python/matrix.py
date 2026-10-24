@@ -1362,6 +1362,13 @@ class Matrixtests(casadiTestCase):
     with self.assertInException("offset1 and offset2 must have the same length"):
       ca.diagsplit(ca.DM.ones(4, 4), 1, 2)
 
+  def test_vertcat_columns(self):
+    with self.assertInException("Mismatching number of columns"):
+      ca.vertcat(ca.DM.ones(1, 2), ca.DM.ones(1, 3))
+    with self.assertInException("Mismatching number of columns"):
+      ca.blockcat([[ca.DM(1), ca.DM(2)], [ca.DM(3)]])
+    self.assertEqual(ca.blockcat([[ca.DM(1), ca.DM(2)], [ca.DM.ones(1, 2)]]).shape, (2, 2))
+
   def test_horzsplit_n(self):
     self.assertTrue(len(ca.horzsplit_n(ca.DM.rand(1,6),2))==2)
     self.assertTrue(len(ca.vertsplit_n(ca.DM.rand(6),2))==2)
