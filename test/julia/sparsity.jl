@@ -147,3 +147,14 @@ end
     @test C.get_nz(C.dense(_S, 2, 2), [0, 3]) == [0, 3]
     @test C.get_nz(C.diag(_S, 2), [1, 3]) == [-1, 1]
 end
+
+@testset "pattern algebra: + * .* ' and concatenation" begin
+    d = C.diag(_S, 2); D = C.dense(_S, 2, 2)
+    @test d + D == D
+    @test d .* D == d && d .+ D == D
+    @test C.diag(_S, 2) * C.dense(_S, 2, 1) == C.dense(_S, 2, 1)
+    @test C.lower(_S, 2)' == C.upper(_S, 2) && transpose(C.lower(_S, 2)) == C.upper(_S, 2)
+    @test size([d d]) == (2, 4) && size([d; d]) == (4, 2) && size([d D; D d]) == (4, 4)
+    @test C.nnz([d D; D d]) == 12
+    @test diagcat(d, d) == C.diag(_S, 4) && diagcat([d, d]) == C.diag(_S, 4)
+end

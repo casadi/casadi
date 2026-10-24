@@ -578,6 +578,23 @@ Base.isequal(a::Sparsity, b::Sparsity) = a == b
 Base.hash(s::Sparsity, h::UInt) = C.is_null(s) ? Base.hash(nothing, h) :
     Base.hash((C.size1(s), C.size2(s), C.colind(s), C.row(s)), h)
 
+# Pattern algebra with the meaning of the matrix operations: A + B, A * B (product),
+# A .* B (elementwise), A', [A B], [A; B], diagcat
+Base.:+(a::Sparsity, b::Sparsity) = C.unite(a, b)
+Base.:*(a::Sparsity, b::Sparsity) = C.mtimes(a, b)
+Base.broadcasted(::typeof(*), a::Sparsity, b::Sparsity) = C.intersect(a, b)
+Base.broadcasted(::typeof(+), a::Sparsity, b::Sparsity) = C.unite(a, b)
+Base.transpose(s::Sparsity) = C.T(s)
+Base.adjoint(s::Sparsity) = C.T(s)
+Base.hcat(x::Sparsity, xs::Sparsity...) = C._horzcat(Sparsity[x, xs...])
+Base.vcat(x::Sparsity, xs::Sparsity...) = C._vertcat(Sparsity[x, xs...])
+function Base.hvcat(rows::Tuple{Vararg{Int}}, x::Sparsity, xs::Sparsity...)
+    v = Sparsity[x, xs...]; k = 0
+    C._vertcat(Sparsity[(k += n; C._horzcat(v[k-n+1:k])) for n in rows])
+end
+diagcat(x::Sparsity, xs::Sparsity...) = C.diagcat(Sparsity[x, xs...])
+diagcat(v::AbstractVector{Sparsity}) = C.diagcat(v)
+
 # ---- Opti conveniences ----
 # variable/parameter/subject_to need no wrappers: they reach the generated Opti
 # methods directly (subject_to's opts is backend-defaulted) but stay EXPORTED so
