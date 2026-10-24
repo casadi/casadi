@@ -1478,8 +1478,8 @@ namespace casadi {
   }
 
   MX MX::polyval(const MX& p, const MX& x) {
-    casadi_assert(p.is_dense(), "polynomial coefficients vector must be a vector");
-    casadi_assert(p.is_column() && p.nnz()>0, "polynomial coefficients must be a vector");
+    casadi_assert(p.is_dense(), "polynomial coefficients vector must be dense");
+    casadi_assert(p.is_vector() && p.nnz()>0, "polynomial coefficients must be a vector");
     MX ret = p.nz(0);
     for (casadi_int i=1; i<p.nnz(); ++i) {
       ret = ret*x + p.nz(i);

@@ -2631,7 +2631,8 @@ namespace casadi {
   Matrix<Scalar> Matrix<Scalar>::polyval(const Matrix<Scalar>& p, const Matrix<Scalar>& x) {
     casadi_assert(p.is_dense(), "polynomial coefficients vector must be dense");
     casadi_assert(p.is_vector() && p.nnz()>0, "polynomial coefficients must be a vector");
-    Matrix<Scalar> ret = x;
+    // Structural zeros of x map to the constant term
+    Matrix<Scalar> ret = casadi_limits<Scalar>::is_zero(p->back()) ? x : densify(x);
     for (auto&& e : ret.nonzeros()) {
       e = casadi_polyval(p.ptr(), p.numel()-1, e);
     }
