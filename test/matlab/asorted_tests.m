@@ -1026,6 +1026,10 @@ assert(isequal(full(blockcat(1, 2, 3, 4)), [1 2; 3 4]));
 assert(strcmp(casadi.diagcat().dim(), '0x0'));
 assert(strcmp(casadi.veccat().dim(), '0x1'));
 
+% [] for a dimension in reshape
+assert(strcmp(reshape(DM.eye(2), [], 1).dim(), '4x1'));
+assert(strcmp(reshape(DM.eye(2), 1, []).dim(), '1x4'));
+
 disp('success')
 
 

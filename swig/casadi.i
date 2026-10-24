@@ -4704,6 +4704,17 @@ namespace casadi{
  return veccat(x);
  }
 #endif
+#if defined(SWIGMATLAB) && (FLAG & IS_MEMBER)
+ // [] for a dimension: deduce it, as reshape(x, [], 1) in MATLAB
+ DECL M casadi_reshape(const M& a, const std::vector<casadi_int>& nrow, casadi_int ncol) {
+ casadi_assert(nrow.size()<=1, "reshape: expected a scalar or [] for the number of rows");
+ return reshape(a, nrow.empty() ? -1 : nrow[0], ncol);
+ }
+ DECL M casadi_reshape(const M& a, casadi_int nrow, const std::vector<casadi_int>& ncol) {
+ casadi_assert(ncol.size()<=1, "reshape: expected a scalar or [] for the number of columns");
+ return reshape(a, nrow, ncol.empty() ? -1 : ncol[0]);
+ }
+#endif
 %enddef
 
 %define SPARSITY_INTERFACE_ALL(DECL, FLAG)
