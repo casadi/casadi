@@ -396,7 +396,7 @@ namespace casadi {
     return fname;
   }
 
-    void CodeGenerator::add(const Function& f, bool with_jac_sparsity) {
+    void CodeGenerator::add(const Function& f, bool with_jac_sparsity, bool with_jump_sparsity) {
     // Add if not already added
     std::string codegen_name = add_dependency(f);
     casadi_assert(!external_names_.count(f.name()),
@@ -431,6 +431,20 @@ namespace casadi {
       std::vector<Sparsity> jac = f.jac_sparsity();
       // Code generate the sparsity pattern
       add_io_sparsities("jac_" + f.name(), f->sparsity_in_, jac);
+
+      // Flush buffers
+      flush(this->body);
+    }
+
+    // Generate jump sparsity information
+    if (with_jump_sparsity) {
+      std::vector<Sparsity> jump;
+      for (casadi_int oind=0; oind<f.n_out(); ++oind) {
+        for (casadi_int iind=0; iind<f.n_in(); ++iind) {
+          jump.push_back(f.jump_sparsity(oind, iind));
+        }
+      }
+      add_io_sparsities("jump_" + f.name(), f->sparsity_in_, jump);
 
       // Flush buffers
       flush(this->body);

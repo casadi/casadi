@@ -4467,6 +4467,21 @@ class Functiontests(casadiTestCase):
       F = ca.Function("F",[x,y],[f.map(2)(ca.repmat(x,1,2),y)[0]],["x","y"],["g"])
       self.assertEqual(F.which_jump("x",["g"],True),[True,False,False]*2)
 
+    if not args.run_slow: return
+    # Generated code carries the jump sparsity, so a loaded External is not taken as jumping everywhere
+    x = ca.SX.sym("x",2)
+    y = ca.SX.sym("y")
+    f = ca.Function("f",[x,y],[ca.vertcat(ca.floor(x[0]),x[0]*x[1],ca.if_else(y>0,x[1],2*x[1])),ca.sign(y)*x],["x","y"],["g","h"])
+    inputs = [ca.DM.rand(f.sparsity_in(i)) for i in range(f.n_in())]
+    for with_jump_sparsity in [False, True]:
+      F = self.check_codegen(f,inputs=inputs,with_jump_sparsity=with_jump_sparsity)["F"]
+      for o in range(f.n_out()):
+        for i in range(f.n_in()):
+          ref = f.jump_sparsity(o,i) if with_jump_sparsity else F.jac_sparsity(o,i)
+          self.assertTrue(F.jump_sparsity(o,i)==ref)
+      xm = ca.MX.sym("x",2)
+      self.assertEqual(ca.which_jump(F(xm,ca.MX.sym("y"))[0],xm,True),[True,False,False] if with_jump_sparsity else [True,True,True])
+
    
   def test_cat_input(self):
 

@@ -647,6 +647,13 @@ namespace casadi {
     virtual Sparsity get_jac_sparsity(casadi_int oind, casadi_int iind, bool symmetric) const;
     ///@}
 
+    ///@{
+    /// Jump sparsity of a block known a priori (same layout as get_jac_sparsity)
+    virtual bool has_jump_sparsity(casadi_int oind, casadi_int iind) const { return false;}
+    virtual Sparsity get_jump_sparsity(casadi_int oind, casadi_int iind) const;
+    bool has_all_jump_sparsity() const;
+    ///@}
+
     /// Helper function: Get name of forward derivative function
     static std::string forward_name(const std::string& fcn, casadi_int nfwd) {
       return "fwd" + str(nfwd) + "_" + fcn;
