@@ -1428,6 +1428,12 @@ class Matrixtests(casadiTestCase):
     with self.assertInException("outside the diagonal blocks is unsupported"):
       ca.diagsplit(ca.MX.sym("x", 2, 2), 1)
 
+  def test_minor_cofactor_row_col(self):
+    A = ca.DM([[1, 2, 3], [0, 1, 4], [5, 6, 0]])
+    self.checkarray(ca.minor(A, 0, 1), ca.det(A[[1, 2], [0, 2]]))
+    self.checkarray(ca.cofactor(A, 0, 1), -ca.det(A[[1, 2], [0, 2]]))
+    self.checkarray(ca.adj(A), ca.det(A)*ca.inv(A))
+
   def test_horzsplit_n(self):
     self.assertTrue(len(ca.horzsplit_n(ca.DM.rand(1,6),2))==2)
     self.assertTrue(len(ca.vertsplit_n(ca.DM.rand(6),2))==2)
