@@ -2056,7 +2056,8 @@ namespace casadi {
   Matrix<Scalar>::blockcat(const std::vector< std::vector<Matrix<Scalar> > > &v) {
     std::vector< Matrix<Scalar> > ret;
     for (casadi_int i=0; i<v.size(); ++i)
-      ret.push_back(horzcat(v[i]));
+      if (!v[i].empty()) ret.push_back(horzcat(v[i]));
+    if (ret.empty()) return Matrix<Scalar>(0, 0);
     return vertcat(ret);
   }
 
@@ -2143,6 +2144,15 @@ namespace casadi {
     for (casadi_int i=0; i<n; ++i) {
       ret.push_back(x(Slice(offset1[i], offset1[i+1]), Slice(offset2[i], offset2[i+1])));
     }
+
+    // Entries outside the diagonal blocks must be zero
+    casadi_int n_dropped = 0;
+    for (auto&& e : x.nonzeros()) n_dropped += !casadi_limits<Scalar>::is_zero(e);
+    for (auto&& r : ret) {
+      for (auto&& e : r.nonzeros()) n_dropped -= !casadi_limits<Scalar>::is_zero(e);
+    }
+    casadi_assert(n_dropped==0,
+      "diagsplit: the presence of nonzeros outside the diagonal blocks is unsupported.");
 
     return ret;
   }

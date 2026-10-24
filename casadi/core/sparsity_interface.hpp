@@ -696,8 +696,8 @@ namespace casadi {
         Block i is \p x[output_offset1[i]:output_offset1[i+1],
         output_offset2[i]:output_offset2[i+1]]. Both lists must have the same length, start at 0,
         be non-decreasing and end at the row (column) count of \p x. Entries of \p x outside the
-        diagonal blocks are dropped for DM, SX and Sparsity; for MX they must be structurally
-        zero, otherwise an error is raised.
+        diagonal blocks must be zero (structurally zero for MX and Sparsity), otherwise an
+        error is raised.
         Inverse of diagcat: diagcat(diagsplit(x, ...)) == x for block-diagonal \p x.
 
         \param x Matrix (or Sparsity) to split; any shape
@@ -706,13 +706,13 @@ namespace casadi {
         \return List of matrices of the same type as \p x, one per block
 
         \doctest
-        >>> x = DM([[1, 2, 3], [4, 5, 6]])
+        >>> x = DM([[1, 2, 0], [0, 0, 6]])
         >>> diagsplit(x, [0, 1, 2], [0, 2, 3])
         [DM([[1, 2]]), DM(6)]
         \enddoctest
 
         \doctest{matlab}
-        >> x = DM([1 2 3; 4 5 6]);
+        >> x = DM([1 2 0; 0 0 6]);
         >> v = diagsplit(x, [0, 1, 2], [0, 2, 3]); disp(v{1}), disp(v{2})
         [[1, 2]]
         6
@@ -770,22 +770,22 @@ namespace casadi {
 
         Returns the consecutive \p incr-by-\p incr diagonal blocks of \p x; the last block is
         smaller when the dimension is not a multiple of \p incr. An error is raised when \p x is
-        not square. Entries outside the blocks are dropped (DM, SX, Sparsity) or must be
-        structurally zero (MX).
+        not square. Entries outside the blocks must be zero (structurally zero for MX and
+        Sparsity).
         Inverse of diagcat: diagcat(diagsplit(x, incr)) == x for block-diagonal \p x.
 
         \param x Square matrix (or Sparsity) to split
         \param incr Size of each block, must be positive
 
         \doctest
-        >>> diagsplit(DM([[1, 2], [3, 4]]))
+        >>> diagsplit(DM([[1, 0], [0, 4]]))
         [DM(1), DM(4)]
-        >>> diagsplit(SX.sym("x", 4, 4), 2)
+        >>> diagsplit(diagcat(SX.sym("a", 2, 2), SX.sym("b", 2, 2)), 2)
         [SX(
-        [[x_0, x_4],
-         [x_1, x_5]]), SX(
-        [[x_10, x_14],
-         [x_11, x_15]])]
+        [[a_0, a_2],
+         [a_1, a_3]]), SX(
+        [[b_0, b_2],
+         [b_1, b_3]])]
         >>> diagsplit(MX.sym("x", Sparsity.diag(4)), 2)
         [MX(diagsplit(x){0}), MX(diagsplit(x){1})]
         >>> diagsplit(MX.sym("x", 4, 4), 2)
@@ -795,14 +795,14 @@ namespace casadi {
         \enddoctest
 
         \doctest{matlab}
-        >> v = diagsplit(DM([1 2; 3 4])); disp(v{1}), disp(v{2})
+        >> v = diagsplit(DM([1 0; 0 4])); disp(v{1}), disp(v{2})
         1
         4
-        >> v = diagsplit(SX.sym('x', 4, 4), 2); disp(v{1}), disp(v{2})
-        [[x_0, x_4],
-         [x_1, x_5]]
-        [[x_10, x_14],
-         [x_11, x_15]]
+        >> v = diagsplit(diagcat(SX.sym('a', 2, 2), SX.sym('b', 2, 2)), 2); disp(v{1}), disp(v{2})
+        [[a_0, a_2],
+         [a_1, a_3]]
+        [[b_0, b_2],
+         [b_1, b_3]]
         >> v = diagsplit(MX.sym('x', Sparsity.diag(4)), 2); disp(v{1}), disp(v{2})
         diagsplit(x){0}
         diagsplit(x){1}
@@ -828,12 +828,12 @@ namespace casadi {
         \param incr2 Columns per block, must be positive
 
         \doctest
-        >>> diagsplit(DM([[1, 2, 3, 4], [5, 6, 7, 8]]), 1, 2)
+        >>> diagsplit(DM([[1, 2, 0, 0], [0, 0, 7, 8]]), 1, 2)
         [DM([[1, 2]]), DM([[7, 8]])]
         \enddoctest
 
         \doctest{matlab}
-        >> v = diagsplit(DM([1 2 3 4; 5 6 7 8]), 1, 2); disp(v{1}), disp(v{2})
+        >> v = diagsplit(DM([1 2 0 0; 0 0 7 8]), 1, 2); disp(v{1}), disp(v{2})
         [[1, 2]]
         [[7, 8]]
         \enddoctest

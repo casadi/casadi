@@ -1390,6 +1390,16 @@ class Matrixtests(casadiTestCase):
     with self.assertInException("must be non-negative"):
       ca.repmat(ca.DM([1, 2]), -1)
 
+  def test_blockcat_empty_diagsplit_offblock(self):
+    self.assertEqual(ca.blockcat([]).shape, (0, 0))
+    self.assertEqual(ca.blockcat([[]]).shape, (0, 0))
+    self.assertEqual(ca.blockcat([[], [ca.DM(1)]]).shape, (1, 1))
+    for X in [ca.DM([[1, 2], [3, 4]]), ca.SX.sym("x", 2, 2), ca.Sparsity.dense(2, 2)]:
+      with self.assertInException("outside the diagonal blocks"):
+        ca.diagsplit(X, 1)
+    with self.assertInException("outside the diagonal blocks is unsupported"):
+      ca.diagsplit(ca.MX.sym("x", 2, 2), 1)
+
   def test_horzsplit_n(self):
     self.assertTrue(len(ca.horzsplit_n(ca.DM.rand(1,6),2))==2)
     self.assertTrue(len(ca.vertsplit_n(ca.DM.rand(6),2))==2)
