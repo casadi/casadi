@@ -58,3 +58,12 @@ HAS_IPOPT && @testset "Opti free functions reach every overload" begin
     set_initial(opti, C.value_variables(sol))
     @test length(C.initial(opti)) == 1
 end
+
+@testset "Opti records the call site" begin
+    opti = Opti(); x = opti.variable(); p = parameter(opti)
+    opti.subject_to(x >= 1)
+    subject_to(opti, x <= 3, Dict{String,Any}())
+    @test haskey(C.user_dict(opti, x), "stacktrace") && haskey(C.user_dict(opti, p), "stacktrace")
+    @test occursin("called from", C.describe(opti.debug, x)) && occursin("opti.jl", C.describe(opti.debug, x))
+    @test occursin("opti.jl", C.g_describe(opti.debug, 0)) && occursin("opti.jl", C.g_describe(opti.debug, 1))
+end

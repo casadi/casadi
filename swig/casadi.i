@@ -6977,6 +6977,12 @@ opti_metadata_modifiers(casadi::Opti)
 }
 #endif
 #ifdef SWIGJULIA
+// variable/parameter/subject_to record the call site; the Julia layer wraps these
+%rename(_variable) casadi::Opti::variable;
+%rename(_parameter) casadi::Opti::parameter;
+%rename(_subject_to) casadi::Opti::subject_to;
+#endif
+#ifdef SWIGJULIA
 // opti.callback(fh): fh(i) runs every iteration; opti.callback() clears it.
 // The director is never freed: the node holds a raw pointer that other proxies share.
 %{

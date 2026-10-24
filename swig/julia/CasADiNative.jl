@@ -610,11 +610,42 @@ diagcat(x::Sparsity, xs::Sparsity...) = C.diagcat(Sparsity[x, xs...])
 diagcat(v::AbstractVector{Sparsity}) = C.diagcat(v)
 
 # ---- Opti conveniences ----
-# variable/parameter/subject_to need no wrappers: they reach the generated Opti
-# methods directly (subject_to's opts is backend-defaulted) but stay EXPORTED so
-# `using`-style bare calls resolve. Only the value-coercing ones keep a wrapper.
 export Opti, variable, parameter, subject_to, minimize, bounded, solver!, solve!, value
 const Opti = C.Opti
+# variable/parameter/subject_to record the user's call site ("stacktrace" metadata,
+# shown by describe), as in Python and MATLAB
+_ownfile(f) = (f = Base.string(f); f == (@__FILE__) || Base.endswith(f, "casadi.jl") || Base.startswith(f, "."))
+function _stacktrace(depth = typemax(Int))
+    st = Dict{String,Any}[]
+    for fr in Base.stacktrace()
+        (fr.from_c || _ownfile(fr.file)) && continue
+        Base.push!(st, Dict{String,Any}("file" => Base.string(fr.file), "line" => fr.line, "name" => Base.string(fr.func)))
+        Base.length(st) >= depth && break
+    end
+    st
+end
+for f in (:variable, :parameter)
+    @eval function $f(o::Opti, args...)
+        r = C.$(Symbol("_", f))(o, args...)
+        st = _stacktrace(1)
+        Base.isempty(st) || C.update_user_dict(o, r, Dict{String,Any}("stacktrace" => st))
+        r
+    end
+end
+function subject_to(o::Opti, args...)
+    Base.isempty(args) && return C._subject_to(o)
+    meta = Dict{String,Any}("stacktrace" => _stacktrace())
+    a = Any[args...]
+    if a[end] isa AbstractDict
+        a[end] = Base.merge(meta, a[end])
+    else
+        Base.push!(a, meta)
+    end
+    C._subject_to(o, a...)
+end
+for f in (:variable, :parameter, :subject_to)
+    @eval C._swig_getproperty(o::Opti, ::Val{$(QuoteNode(f))}) = C._SwigBound($f, o)
+end
 bounded(lb, ex::MX, ub) = C.bounded(C.Opti, convert(MX, lb), ex, convert(MX, ub))
 # casadi-style positional option dicts (plugin_options, solver_options), NOT kwargs.
 solver!(o::Opti, plugin::AbstractString, plugin_opts=Dict{String,Any}(), solver_opts=Dict{String,Any}()) =
