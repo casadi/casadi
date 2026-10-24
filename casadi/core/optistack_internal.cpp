@@ -1218,7 +1218,9 @@ void OptiNode::subject_to(const MX& g, const DM& linear_scale, const Dict& optio
                                   "You need a symbol to form a constraint.");
 
   // Store the meta-data
-  set_meta_con(g, canon_expr(g, linear_scale));
+  MetaCon con = canon_expr(g, linear_scale);
+  casadi_assert(con.type!=OPTI_UNKNOWN, "Constraint type unknown. Use ==, >= or <= .");
+  set_meta_con(g, con);
   register_dual(meta_con(g));
   g_.push_back(g);
 
