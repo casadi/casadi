@@ -389,6 +389,8 @@ namespace casadi {
     /** \brief Get all statistics obtained at the end of the last evaluate call
 
         Plugin-specific; empty for most plugins. Raises an error before the first solve.
+        With the option "record_time" set, it holds call counts and timings (n_call_*,
+        t_proc_*, t_wall_*) of sfact, nfact and solve.
 
         \doctest
         >>> L = Linsol("L", "qr", Sparsity.dense(1, 1))
@@ -399,6 +401,10 @@ namespace casadi {
         True
         >>> L.solve(DM(2), DM(4)), L.stats()
         (DM(2), {})
+        >>> L = Linsol("L", "qr", Sparsity.dense(1, 1), {"record_time": True})
+        >>> L.solve(DM(2), DM(4)); L.stats()["n_call_solve"]
+        DM(2)
+        1
         \enddoctest
 
         \doctest{matlab}

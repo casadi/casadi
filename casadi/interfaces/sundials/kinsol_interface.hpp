@@ -73,6 +73,9 @@ namespace casadi {
 
     // Current Jacobian
     double* jac;
+
+    // Return status
+    std::string return_status;
   };
 
   /** \brief \pluginbrief{Rootfinder,kinsol}
@@ -166,6 +169,9 @@ namespace casadi {
 
     /** \brief Initalize memory block */
     int init_mem(void* mem) const override;
+
+    /// Get all statistics
+    Dict get_stats(void* mem) const override;
 
     /** \brief Free memory block */
     void free_mem(void *mem) const override { delete static_cast<KinsolMemory*>(mem);}
