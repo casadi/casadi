@@ -509,8 +509,18 @@ Base.repeat(x::Union{SX,MX,DM}, m::Integer, n::Integer) = C.repmat(x, Int(m), In
 Base.repeat(x::Union{SX,MX,DM}, m::Integer) = C.repmat(x, Int(m), 1)
 # Base.reshape on our types -> C.reshape (coexists with the `reshape` const export,
 # which is C.reshape itself, so no ambiguity; Base method wins on Union{SX,MX,DM}).
-Base.reshape(x::Union{SX,MX,DM}, nrow::Integer, ncol::Integer) = C.reshape(x, Int(nrow), Int(ncol))
-Base.reshape(x::Union{SX,MX,DM}, dims::Tuple{Integer,Integer}) = C.reshape(x, Int(dims[1]), Int(dims[2]))
+# one dimension may be `:` (inferred), as for Julia arrays
+const _Dim = Union{Integer,Colon}
+function Base.reshape(x::_Cat, nrow::_Dim, ncol::_Dim)
+    n = C.numel(x)
+    _inf(d, other) = other isa Colon ? Base.throw(DimensionMismatch("only one dimension can be inferred")) :
+        (other != 0 && n % other == 0 ? n ÷ other : Base.throw(DimensionMismatch("cannot reshape $(n) elements into (:, $other)")))
+    r = nrow isa Colon ? _inf(nrow, ncol) : Int(nrow)
+    c = ncol isa Colon ? _inf(ncol, nrow) : Int(ncol)
+    C.reshape(x, r, c)
+end
+Base.reshape(x::_Cat, dims::Tuple{_Dim,_Dim}) = Base.reshape(x, dims[1], dims[2])
+Base.reshape(x::_Cat, sp::Sparsity) = C.reshape(x, sp)
 
 # ---- functor: f(args...) like Python ----
 # Julia arrays pass through as-is: the wrapper converts them like DM (`[]` -> empty).

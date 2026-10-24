@@ -51,3 +51,13 @@ end
     @test Matrix(mod.(DM([-1, 5]), 3)) == reshape([2.0, 2.0], 2, 1)
     @test_throws ArgumentError mod(DM([1, 2]), 3)
 end
+
+@testset "reshape with : and with a Sparsity" begin
+    A = DM([1 2 3; 4 5 6])
+    @test Matrix(reshape(A, :, 1)) == reshape([1 2 3; 4 5 6], :, 1)
+    @test Matrix(reshape(A, 3, :)) == reshape([1 2 3; 4 5 6], 3, :)
+    @test Matrix(reshape(A, (:, 2))) == reshape([1 2 3; 4 5 6], (:, 2))
+    @test_throws DimensionMismatch reshape(A, :, 4)
+    x = sym(SX, "x", 2, 2)
+    @test size(reshape(x, C.dense(Sparsity, 4, 1))) == (4, 1)
+end
