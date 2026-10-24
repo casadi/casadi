@@ -3756,8 +3756,8 @@ namespace casadi {
 
         Algorithm 4.1 in Gebremedhin, Manne and Pothen, What Color Is Your Jacobian?,
         SIAM Rev. 47(4), 2006. Exploits symmetry so that fewer colors than uni_coloring
-        are needed to recover all nonzeros of a Hessian. Symmetry is assumed, not checked;
-        a non-square pattern raises an error.
+        are needed to recover all nonzeros of a Hessian. A non-symmetric pattern raises an
+        error.
 
         \param ordering 0 for the natural column order, 1 (default) to color in
                largest_first() order

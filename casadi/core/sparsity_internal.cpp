@@ -3046,10 +3046,8 @@ namespace casadi {
   }
 
   Sparsity SparsityInternal::star_coloring2(casadi_int ordering, casadi_int cutoff) const {
-    if (!is_square()) {
-      // NOTE(@jaeandersson) Why warning and not error?
-      casadi_message("StarColoring requires a square matrix, got " + dim() + ".");
-    }
+    casadi_assert(is_symmetric(), "Star coloring requires a symmetric pattern, got "
+      + std::string(is_square() ? "a non-symmetric " : "a ") + dim() + " pattern.");
 
     // TODO(Joel): What we need here, is a distance-2 smallest last ordering
     // Reorder, if necessary
@@ -3398,10 +3396,8 @@ namespace casadi {
   }
 
   Sparsity SparsityInternal::star_coloring(casadi_int ordering, casadi_int cutoff) const {
-    if (!is_square()) {
-      // NOTE(@jaeandersson) Why warning and not error?
-      casadi_message("StarColoring requires a square matrix, got " + dim() + ".");
-    }
+    casadi_assert(is_symmetric(), "Star coloring requires a symmetric pattern, got "
+      + std::string(is_square() ? "a non-symmetric " : "a ") + dim() + " pattern.");
 
     // Reorder, if necessary
     if (ordering!=0) {
