@@ -1559,6 +1559,9 @@ class OptiStacktests(inherit_from):  # pyright: ignore[reportGeneralTypeIssues]
         with self.assertInException("Constraint type unknown"):
             opti.subject_to(x+y)
 
+    def test_optisol_no_debug(self):
+        self.assertFalse(hasattr(ca.OptiSol, "debug"))
+
     @requires_nlpsol("ipopt")
     def test_issue4020(self):
         for constr_fun in [lambda x,y: x**2 - y == 0, lambda x,y: 0==x**2 - y,lambda x,y: x**2 == y, lambda x,y: y==x**2]:
