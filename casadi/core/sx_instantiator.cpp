@@ -1575,7 +1575,7 @@ namespace casadi {
       SX ret = SX::vertcat({poly_roots(p(range(p.nnz()-1))), 0});
       return ret;
     } else {
-      casadi_error("poly_root(): can only solve cases for first or second order polynomial. "
+      casadi_error("poly_roots: polynomials of order at most 4 are supported. "
                    "Got order " + str(p.size1()-1) + ".");
     }
 
