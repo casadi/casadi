@@ -624,6 +624,12 @@ class Sparsitytests(casadiTestCase):
       coloring, _ = sp.star_coloring_new({"cutoff": 2, "new_algo": new_algo})
       self.assertTrue(coloring.is_null())
 
+  def test_compressed_dense_short_form(self):
+    for sp in [ca.Sparsity.dense(2, 3), ca.Sparsity.dense(2, 0), ca.Sparsity.dense(1, 1)]:
+      v = sp.compress(False)
+      self.assertEqual(len(v), 3)
+      self.assertTrue(ca.Sparsity.compressed(v) == sp)
+
   def test_eq_foreign_operand(self):
     # issue #4407: comparing against an unrelated type follows the Python data
     # model (NotImplemented -> False) instead of raising NotImplementedError.
