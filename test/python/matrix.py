@@ -1347,6 +1347,11 @@ class Matrixtests(casadiTestCase):
     with self.assertInException("Argument must be nonempty"):
       ca.logsumexp(ca.DM(0, 1))
 
+  def test_linspace_nsteps(self):
+    for n in [0, -1]:
+      with self.assertInException("must be at least 1"):
+        ca.linspace(ca.DM(0), ca.DM(1), n)
+
   def test_inplace(self):
     n = 10
     x = ca.MX.sym("x",n)

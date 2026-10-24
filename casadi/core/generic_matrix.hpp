@@ -3795,6 +3795,7 @@ namespace casadi {
 
   template<typename MatType>
   MatType GenericMatrix<MatType>::linspace(const MatType& a, const MatType& b, casadi_int nsteps) {
+    casadi_assert(nsteps>=1, "linspace: nsteps (" + str(nsteps) + ") must be at least 1");
     std::vector<MatType> ret(nsteps);
     ret[0] = a;
     MatType step = (b-a)/static_cast<MatType>(nsteps-1);
