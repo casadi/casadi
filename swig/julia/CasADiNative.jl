@@ -336,6 +336,28 @@ end
 Base.:!(a::_Cat) = _scal(a) ? C.logic_not(a) :
     Base.throw(ArgumentError("!A of a $(_shape(a)) $(typeof(a)) has no meaning in Julia; use .!A"))
 
+# Integer-style division of scalars with Julia's rounding (rem/% truncates, mod floors);
+# elementwise is rem.(A, B) etc., as for Julia arrays.
+function _scalar2(f, a, b)
+    _scal(a) && _scal(b) || Base.throw(ArgumentError("$f of arrays has no meaning in Julia; use $f.(A, B)"))
+    T = _catpromote((a, b))
+    _ascat(T, a), _ascat(T, b)
+end
+for f in (:rem, :mod, :fld, :cld, :div, :copysign)
+    @eval begin
+        Base.$f(a::_Cat, b::Union{_Cat,Real}) = _int_div(Base.$f, _scalar2($(QuoteNode(f)), a, b)...)
+        Base.$f(a::Real, b::_Cat) = _int_div(Base.$f, _scalar2($(QuoteNode(f)), a, b)...)
+    end
+end
+_int_div(::typeof(Base.rem), a, b) = C.fmod(a, b)
+_int_div(::typeof(Base.mod), a, b) = C.fmod(C.fmod(a, b) + b, b)
+_int_div(::typeof(Base.fld), a, b) = C.floor(a / b)
+_int_div(::typeof(Base.cld), a, b) = C.ceil(a / b)
+_int_div(::typeof(Base.div), a, b) = (q = a / b; C.sign(q) * C.floor(C.abs(q)))
+_int_div(::typeof(Base.copysign), a, b) = C.copysign(a, b)
+_bcop(::typeof(Base.rem)) = C.fmod
+_bcop(::typeof(Base.copysign)) = C.copysign
+
 # ifelse(c, a, b) on a casadi condition is casadi's if_else
 Base.ifelse(c::_Cat, a, b) = C.if_else(c, a, b)
 
