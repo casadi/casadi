@@ -4026,6 +4026,12 @@ inf: float
 // ergonomics layer); the builders stay reachable for it as _horzcat/_vertcat.
 %rename(_vertcat) casadi_vertcat;
 %rename(_horzcat) casadi_horzcat;
+// Python's names; Julia's own spelling is & | ! (and .& .| .!)
+%rename(logic_and) casadi_and;
+%rename(logic_or) casadi_or;
+%rename(logic_not) casadi_not;
+%rename(logic_all) casadi_all;
+%rename(logic_any) casadi_any;
 #endif // SWIGJULIA
 
 #ifdef SWIGPYTHON

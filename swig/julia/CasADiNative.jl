@@ -144,6 +144,9 @@ _bcop(::typeof(Base.min)) = C.fmin
 _bcop(::typeof(Base.hypot)) = C.hypot
 _bcop(::typeof(Base.atan)) = (a...) -> Base.length(a) == 2 ? C.atan2(a...) : C.atan(a...)
 _bcop(::typeof(Base.ifelse)) = C.if_else
+_bcop(::typeof(&)) = C.logic_and
+_bcop(::typeof(|)) = C.logic_or
+_bcop(::typeof(!)) = C.logic_not
 for fn in (:sin, :cos, :tan, :exp, :log, :sqrt, :abs, :tanh, :sinh, :cosh, :asin, :acos,
            :floor, :ceil, :sign, :log10, :log1p, :expm1, :asinh, :acosh, :atanh)
     @eval _bcop(::typeof(Base.$fn)) = C.$fn
@@ -317,6 +320,21 @@ function _maxmin(f, cf, a, b)
     _scal(a) && _scal(b) && return cf(a, b)
     Base.throw(ArgumentError("$f(A, B) of arrays is a lexicographic pick in Julia; use $f.(A, B) for elementwise"))
 end
+
+# & | ! of scalars, as for Julia Bools; elementwise is .& .| .!
+for (op, cfn) in ((:&, :logic_and), (:|, :logic_or))
+    @eval begin
+        Base.$op(a::_Cat, b::Union{_Cat,Real}) = _logic($(QuoteNode(op)), C.$cfn, a, b)
+        Base.$op(a::Real, b::_Cat) = _logic($(QuoteNode(op)), C.$cfn, a, b)
+    end
+end
+function _logic(op, cf, a, b)
+    _scal(a) && _scal(b) || Base.throw(ArgumentError("a $op b of arrays has no meaning in Julia; use a .$op b"))
+    T = _catpromote((a, b))
+    cf(_ascat(T, a), _ascat(T, b))
+end
+Base.:!(a::_Cat) = _scal(a) ? C.logic_not(a) :
+    Base.throw(ArgumentError("!A of a $(_shape(a)) $(typeof(a)) has no meaning in Julia; use .!A"))
 
 # ifelse(c, a, b) on a casadi condition is casadi's if_else
 Base.ifelse(c::_Cat, a, b) = C.if_else(c, a, b)

@@ -28,3 +28,16 @@ using LinearAlgebra: norm, det, tr
     @test atan(x[1], 1) isa MX && hypot(x[1], x[2]) isa MX
     @test Float64(log10(DM(100))) ≈ 2.0
 end
+
+@testset "logic: & | ! on scalars, .& .| .! elementwise" begin
+    x = sym(SX, "x"); y = sym(SX, "y")
+    @test C.str(x & y) == "(x&&y)" && C.str(x | y) == "(x||y)" && C.str(!x) == "(!x)"
+    @test Bool((DM(2) > 1) & (DM(1) > 3)) === false
+    @test Matrix(DM([1, 0]) .& DM([1, 1])) == reshape([1.0, 0.0], 2, 1)
+    @test Matrix(DM([1, 0]) .| [0, 0]) == reshape([1.0, 0.0], 2, 1)
+    @test Matrix(.!DM([1, 0])) == reshape([0.0, 1.0], 2, 1)
+    @test_throws ArgumentError DM([1, 0]) & DM([1, 1])
+    @test_throws ArgumentError !sym(MX, "z", 2)
+    @test Matrix(C.logic_and(DM([1, 0]), DM([1, 1]))) == reshape([1.0, 0.0], 2, 1)
+    @test Float64(C.logic_all(DM([1, 1]))) == 1
+end
