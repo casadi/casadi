@@ -1044,6 +1044,11 @@ assert(strcmp(C.dim(), '4x1'));
 B = bspline_dual([0.5 1.5], {[0 0 0 0 1 2 2 2 2]}, 3);
 assert(all(size(B) == [2 5]));
 
+% DaeBuilder variable lookup with the call syntax
+dae = DaeBuilder('m');
+xs = dae.add('x');
+assert(is_equal(dae('x'), xs));
+
 disp('success')
 
 

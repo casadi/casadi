@@ -6000,6 +6000,30 @@ namespace casadi{
     end
   %}
 }
+%extend DaeBuilder {
+  %matlabcode %{
+    function varargout = subsref(self,s)
+      if strcmp(s(1).type,'()')
+        ret = paren(self, s(1).subs{:});
+        if numel(s)==1
+          varargout{1} = ret;
+        else
+          [varargout{1:nargout}] = subsref(ret, s(2:end));
+        end
+      else
+        [varargout{1:nargout}] = builtin('subsref',self,s);
+      end
+    end
+    function n = numArgumentsFromSubscript(self,s,context)
+      % One output for e.g. fprintf('%g', dae.start_time); statements keep the default
+      if ~exist('OCTAVE_VERSION', 'builtin') && context==matlab.mixin.util.IndexingContext.Statement
+        n = builtin('numArgumentsFromSubscript',self,s,context);
+      else
+        n = 1;
+      end
+    end
+  %}
+}
 %extend Function {
   %matlabcode %{
     function varargout = subsref(self,s)
