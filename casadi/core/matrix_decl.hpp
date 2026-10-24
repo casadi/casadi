@@ -1122,31 +1122,30 @@ namespace casadi {
       return Matrix<Scalar>::adj(A);
     }
 
-    /** \brief Minor of a square matrix: determinant with one column and one row removed
+    /** \brief Minor of a square matrix: determinant with one row and one column removed
 
-        Note the argument order: \p i is the column that is removed, \p j the row.
         The input must be square; a 1-by-1 input gives 1.
 
         \param x Square matrix
-        \param i Column index to remove (zero-based)
-        \param j Row index to remove (zero-based)
+        \param i Row index to remove (zero-based)
+        \param j Column index to remove (zero-based)
 
         \doctest
         >>> A = DM([[1, 2, 3], [0, 1, 4], [5, 6, 0]])
         >>> minor(A, 0, 1)
-        DM(-18)
+        DM(-20)
         >>> X = SX.sym("X", 2, 2)
         >>> minor(X, 0, 1)
-        SX(X_2)
+        SX(X_1)
         \enddoctest
 
         \doctest{matlab}
         >> A = DM([1 2 3; 0 1 4; 5 6 0]);
         >> minor(A, 0, 1)
-        -18
+        -20
         >> X = SX.sym('X', 2, 2);
         >> minor(X, 0, 1)
-        X_2
+        X_1
         \enddoctest
 
         \sa cofactor, adj, det
@@ -1158,18 +1157,18 @@ namespace casadi {
 
     /** \brief Cofactor of a square matrix: (-1)^(i+j) times minor(x, i, j)
 
-        Same argument convention as minor: \p i is a column index, \p j a row index.
+        Same argument convention as minor: \p i is a row index, \p j a column index.
 
         \doctest
         >>> A = DM([[1, 2, 3], [0, 1, 4], [5, 6, 0]])
         >>> cofactor(A, 0, 1), cofactor(A, 0, 0)
-        (DM(18), DM(-24))
+        (DM(20), DM(-24))
         \enddoctest
 
         \doctest{matlab}
         >> A = DM([1 2 3; 0 1 4; 5 6 0]);
         >> cofactor(A, 0, 1), cofactor(A, 0, 0)
-        18
+        20
         -24
         \enddoctest
 
