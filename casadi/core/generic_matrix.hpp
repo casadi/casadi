@@ -1465,7 +1465,7 @@ namespace casadi {
         a scalar gives an empty 0-by-0 result.
 
         \param n Order, at least 1
-        \param axis 0 (rows), 1 (columns) or -1 (automatic)
+        \param axis 0 (rows), 1 (columns) or -1 (automatic); 1 and 2 in MATLAB
 
         \doctest
         >>> diff(DM([1, 4, 9, 16]))
@@ -1504,7 +1504,7 @@ namespace casadi {
 
         Running sum down the rows (axis 0) or along the columns (axis 1); the shape is
         preserved. With axis -1, the columns are summed for a row vector and the rows
-        otherwise.
+        otherwise. MATLAB numbers the axes 1 (rows) and 2 (columns).
 
         \doctest
         >>> cumsum(DM([1, 2, 3]))
