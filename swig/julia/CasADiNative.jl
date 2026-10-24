@@ -405,8 +405,11 @@ function Base.show(io::IO, ::_MIME, s::C.OptiSol)
 end
 
 # ---- size / conversion ----
-Base.size(x::Union{SX,MX,DM}) = (C.size1(x), C.size2(x))
-Base.length(x::Union{SX,MX,DM}) = C.numel(x)
+Base.size(x::Union{SX,MX,DM,Sparsity}) = (C.size1(x), C.size2(x))
+Base.size(x::Union{SX,MX,DM,Sparsity}, d::Integer) =
+    d < 1 ? Base.throw(BoundsError(Base.size(x), d)) : d <= 2 ? Base.size(x)[d] : 1
+Base.length(x::Union{SX,MX,DM,Sparsity}) = C.numel(x)
+Base.isempty(x::Union{SX,MX,DM,Sparsity}) = C.numel(x) == 0
 Base.Float64(d::DM) = (n = C.nonzeros(d); Base.length(n) == 1 ? n[1] :
     Base.error("DM is not scalar"))
 # P1-5: dense, shape-correct conversions (densify -> column-major nonzeros)
@@ -436,10 +439,6 @@ function _const_scalar_float(x::Union{SX,MX})
 end
 Base.Float64(x::SX) = _const_scalar_float(x)
 Base.Float64(x::MX) = _const_scalar_float(x)
-
-# ---- size(x, dim): 1->rows, 2->cols, else 1 (mirrors Base array semantics) ----
-Base.size(x::Union{SX,MX,DM}, d::Integer) =
-    d == 1 ? C.size1(x) : d == 2 ? C.size2(x) : 1
 
 # ---- collect / Array: dense Matrix of scalar SX/MX elements (NOT iterable, so
 # broadcasting's scalar-leaf treatment via broadcastable(x)=x is preserved) ----

@@ -122,3 +122,14 @@ end
     @test length(Set([C.dense(_S, 2), C.dense(_S, 2), C.diag(_S, 2)])) == 2
     @test Sparsity() == Sparsity()
 end
+
+@testset "size / length / isempty" begin
+    s = C.dense(_S, 2, 3)
+    @test size(s) == (2, 3) && size(s, 1) == 2 && size(s, 2) == 3 && size(s, 3) == 1
+    @test_throws BoundsError size(s, 0)
+    @test_throws BoundsError size(DM([1, 2]), 0)
+    @test length(s) == 6
+    @test !isempty(s) && isempty(Sparsity(2, 0))
+    @test isempty(SX()) && isempty(DM(Sparsity(0, 3))) && isempty(MX())
+    @test !isempty(sym(SX, "x")) && !isempty(DM([1, 2]))
+end
