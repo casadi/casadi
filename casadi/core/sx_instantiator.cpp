@@ -437,7 +437,7 @@ namespace casadi {
       f_val[i] = fcn(SX(xi[i])).at(0).scalar();
 
     // Weighted sum
-    SXElem sum;
+    SXElem sum = 0;
     for (casadi_int i=0; i<5; ++i)
       sum += wi[i]*f_val[i];
 
