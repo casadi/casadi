@@ -2286,7 +2286,7 @@ namespace casadi {
 
         \doctest{matlab}
         >> A = MX.sym('A', 6); B = MX.sym('B', 6);
-        >> C = MX.einstein(A, B, [2 3], [3 2], [2 2], [-1 -3], [-3 -2], [-1 -2]);
+        >> C = einstein(A, B, [2 3], [3 2], [2 2], [-1 -3], [-3 -2], [-1 -2]);
         >> size(C)
         4 1
         >> f = Function('f', {A, B}, {C});

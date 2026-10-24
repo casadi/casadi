@@ -4132,6 +4132,8 @@ def dcat(args):
 %rename(times) casadi::Sparsity::operator*;
 // inv is the matrix inverse in MATLAB; elementwise inverse is 1./x
 %ignore casadi::MX::inv() const;
+// Would hide the einstein method of GenericMatrixCommon for MX arguments
+%ignore casadi::MX::einstein;
 %feature("varargin","1") casadi_vertcat;
 %feature("varargin","1") casadi_horzcat;
 %feature("varargin","1") casadi_diagcat;
@@ -6128,6 +6130,16 @@ namespace casadi {
     GENERIC_MATRIX_ALL(inline, FLAG)
     MATRIX_ALL(inline, FLAG)
     MX_ALL(inline, FLAG)
+  }
+}
+
+%inline {
+  namespace casadi {
+    inline DM casadi_bspline_dual(const std::vector<double>& x,
+        const std::vector< std::vector<double> >& knots,
+        const std::vector<casadi_int>& degree, const Dict& opts=Dict()) {
+      return MX::bspline_dual(x, knots, degree, opts);
+    }
   }
 }
 
