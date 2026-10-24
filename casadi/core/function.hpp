@@ -139,9 +139,9 @@ namespace casadi {
         \identifier{1uy} */
     Function();
 
-    /** \brief Construct from a file; not implemented, raises an error
+    /** \brief Construct from a file
 
-        Use Function::load to read a file written by Function::save.
+        Same as Function::load: reads a file written by Function::save.
 
         \sa load, save
 

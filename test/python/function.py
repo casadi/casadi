@@ -5593,6 +5593,12 @@ class Functiontests(casadiTestCase):
     self.assertTrue(g.has_function("f"))
     self.assertFalse(g.has_function("h"))
 
+  def test_construct_from_file(self):
+    x = ca.SX.sym("x")
+    ca.Function("f", [x], [x**2]).save("f_from_file.casadi")
+    f = ca.Function("f_from_file.casadi")
+    self.checkarray(f(3), ca.DM(9))
+
   def test_activity(self):
     # issue #3019: value-level "signal activity" propagation (Function::activity).
     # True/active = possibly nonzero. The expected output activity is never hard-coded:

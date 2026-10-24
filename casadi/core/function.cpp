@@ -90,7 +90,7 @@ namespace casadi {
   }
 
   Function::Function(const std::string& fname) {
-    casadi_error("Not implemented");
+    *this = load(fname);
   }
 
   Function::Function(const std::string& name,
