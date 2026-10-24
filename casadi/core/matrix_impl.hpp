@@ -1462,8 +1462,9 @@ namespace casadi {
   Matrix<Scalar> Matrix<Scalar>::triplet(const std::vector<casadi_int>& row,
                                              const std::vector<casadi_int>& col,
                                              const Matrix<Scalar>& d) {
-    return triplet(row, col, d, *std::max_element(row.begin(), row.end()),
-                   *std::max_element(col.begin(), col.end()));
+    casadi_int nrow = row.empty() ? 0 : *std::max_element(row.begin(), row.end());
+    casadi_int ncol = col.empty() ? 0 : *std::max_element(col.begin(), col.end());
+    return triplet(row, col, d, nrow, ncol);
   }
 
   template<typename Scalar>
