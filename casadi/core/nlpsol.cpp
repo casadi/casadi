@@ -88,12 +88,13 @@ namespace casadi {
 
       // Check nonlinearity
       std::vector<bool> is_nonlin = which_depends(g, x, 2, true);
+      std::vector<bool> is_jump = which_jump(g, x, true);
 
       const casadi_int* row = sp.colind();
       for (casadi_int i=0;i<ng;++i) {
         // Check if each row of jac_g_x only depends on one column
         bool single_dependency = row[i+1]-row[i]==1;
-        is_simple[i] = single_dependency && !is_nonlin[i];
+        is_simple[i] = single_dependency && !is_nonlin[i] && !is_jump[i];
       }
 
       // Full-indices of all simple constraints

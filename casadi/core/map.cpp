@@ -187,6 +187,42 @@ namespace casadi {
     return 0;
   }
 
+  int Map::sp_forward_jump(const bvec_t** arg, bvec_t** res,
+      casadi_int* iw, bvec_t* w, void* mem) const {
+    const bvec_t** arg1 = arg+n_in_;
+    std::copy_n(arg, n_in_, arg1);
+    bvec_t** res1 = res+n_out_;
+    std::copy_n(res, n_out_, res1);
+    for (casadi_int i=0; i<n_; ++i) {
+      if (f_.jump_fwd(arg1, res1, iw, w)) return 1;
+      for (casadi_int j=0; j<n_in_; ++j) {
+        if (arg1[j]) arg1[j] += f_.nnz_in(j);
+      }
+      for (casadi_int j=0; j<n_out_; ++j) {
+        if (res1[j]) res1[j] += f_.nnz_out(j);
+      }
+    }
+    return 0;
+  }
+
+  int Map::sp_reverse_jump(bvec_t** arg, bvec_t** res,
+      casadi_int* iw, bvec_t* w, void* mem) const {
+    bvec_t** arg1 = arg+n_in_;
+    std::copy_n(arg, n_in_, arg1);
+    bvec_t** res1 = res+n_out_;
+    std::copy_n(res, n_out_, res1);
+    for (casadi_int i=0; i<n_; ++i) {
+      if (f_.jump_rev(arg1, res1, iw, w)) return 1;
+      for (casadi_int j=0; j<n_in_; ++j) {
+        if (arg1[j]) arg1[j] += f_.nnz_in(j);
+      }
+      for (casadi_int j=0; j<n_out_; ++j) {
+        if (res1[j]) res1[j] += f_.nnz_out(j);
+      }
+    }
+    return 0;
+  }
+
   void Map::codegen_declarations(CodeGenerator& g) const {
     g.add_dependency(f_);
   }

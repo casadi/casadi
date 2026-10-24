@@ -647,6 +647,13 @@ namespace casadi {
     virtual Sparsity get_jac_sparsity(casadi_int oind, casadi_int iind, bool symmetric) const;
     ///@}
 
+    ///@{
+    /// Jump sparsity of a block known a priori (same layout as get_jac_sparsity)
+    virtual bool has_jump_sparsity(casadi_int oind, casadi_int iind) const { return false;}
+    virtual Sparsity get_jump_sparsity(casadi_int oind, casadi_int iind) const;
+    bool has_all_jump_sparsity() const;
+    ///@}
+
     /// Helper function: Get name of forward derivative function
     static std::string forward_name(const std::string& fcn, casadi_int nfwd) {
       return "fwd" + str(nfwd) + "_" + fcn;
@@ -1061,9 +1068,12 @@ namespace casadi {
     /// Convert from compact Jacobian sparsity pattern
     Sparsity from_compact(casadi_int oind, casadi_int iind, const Sparsity& sp) const;
 
-    /// Get the sparsity pattern via sparsity seed propagation
-    template<bool fwd>
+    /// Get the sparsity pattern via sparsity seed propagation (jump: via jump propagation)
+    template<bool fwd, bool jump=false>
     Sparsity get_jac_sparsity_gen(casadi_int oind, casadi_int iind) const;
+
+    /// Compact pattern of the input nonzeros that may make an output nonzero jump
+    Sparsity jump_sparsity(casadi_int oind, casadi_int iind) const;
 
     /// A flavor of get_jac_sparsity_gen that does hierarchical block structure recognition
     Sparsity get_jac_sparsity_hierarchical(casadi_int oind, casadi_int iind) const;
@@ -1206,6 +1216,20 @@ namespace casadi {
 
         \identifier{my} */
     virtual int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, void* mem) const;
+
+    /** \brief Propagate jumps forward
+     *
+     * arg: dependency bits, res: jump bits (set = may jump).
+     * Default is the sound fallback: every dependency may jump. */
+    virtual int sp_forward_jump(const bvec_t** arg, bvec_t** res,
+                                casadi_int* iw, bvec_t* w, void* mem) const;
+
+    /** \brief Propagate jumps backwards
+     *
+     * res: dependency seeds (cleared), arg: jump sensitivities (accumulated).
+     * Default is the sound fallback: every dependency may jump. */
+    virtual int sp_reverse_jump(bvec_t** arg, bvec_t** res,
+                                casadi_int* iw, bvec_t* w, void* mem) const;
 
     /** \brief Get number of temporary variables needed
 

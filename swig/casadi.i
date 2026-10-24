@@ -5013,6 +5013,14 @@ DECL bool casadi_is_linear(const M& expr, const M& var) {
   return is_linear(expr, var);
 }
 
+DECL std::vector<bool> casadi_which_jump(const M& expr, const M& var, bool tr=false) {
+  return which_jump(expr, var, tr);
+}
+
+DECL bool casadi_jumps_in(const M& expr, const M& var) {
+  return jumps_in(expr, var);
+}
+
 DECL bool casadi_is_quadratic(const M& expr, const M& var) {
   return is_quadratic(expr, var);
 }

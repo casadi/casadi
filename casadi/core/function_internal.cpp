@@ -1334,14 +1334,34 @@ namespace casadi {
     }
   };
 
-  template<bool fwd>
+  template<bool fwd> struct JumpSparsityTraits {};
+  template<> struct JumpSparsityTraits<true> {
+    typedef const bvec_t* arg_t;
+    static inline void sp(const FunctionInternal *f,
+                          const bvec_t** arg, bvec_t** res,
+                          casadi_int* iw, bvec_t* w, void* mem) {
+      f->sp_forward_jump(arg, res, iw, w, mem);
+    }
+  };
+  template<> struct JumpSparsityTraits<false> {
+    typedef bvec_t* arg_t;
+    static inline void sp(const FunctionInternal *f,
+                          bvec_t** arg, bvec_t** res,
+                          casadi_int* iw, bvec_t* w, void* mem) {
+      f->sp_reverse_jump(arg, res, iw, w, mem);
+    }
+  };
+
+  template<bool fwd, bool jump>
   Sparsity FunctionInternal::get_jac_sparsity_gen(casadi_int oind, casadi_int iind) const {
+    typedef typename std::conditional<jump, JumpSparsityTraits<fwd>,
+                                      JacSparsityTraits<fwd>>::type Traits;
     // Number of nonzero inputs and outputs
     casadi_int nz_in = nnz_in(iind);
     casadi_int nz_out = nnz_out(oind);
 
     // Evaluation buffers
-    std::vector<typename JacSparsityTraits<fwd>::arg_t> arg(sz_arg(), nullptr);
+    std::vector<typename Traits::arg_t> arg(sz_arg(), nullptr);
     std::vector<bvec_t*> res(sz_res(), nullptr);
     std::vector<casadi_int> iw(sz_iw());
     std::vector<bvec_t> w(sz_w(), 0);
@@ -1394,8 +1414,7 @@ namespace casadi {
       }
 
       // Propagate the dependencies
-      JacSparsityTraits<fwd>::sp(this, get_ptr(arg), get_ptr(res),
-                                  get_ptr(iw), get_ptr(w), memory(0));
+      Traits::sp(this, get_ptr(arg), get_ptr(res), get_ptr(iw), get_ptr(w), memory(0));
 
       // Loop over the nonzeros of the output
       for (casadi_int el=0; el<sens.size(); ++el) {
@@ -1434,10 +1453,33 @@ namespace casadi {
     if (!fwd) swap(jrow, jcol);
     Sparsity ret = Sparsity::triplet(nz_out, nz_in, jcol, jrow);
     if (verbose_) {
-      casadi_message("Formed Jacobian sparsity pattern (dimension " + str(ret.size()) + ", "
+      casadi_message(std::string(jump ? "Formed jump" : "Formed Jacobian")
+          + " sparsity pattern (dimension " + str(ret.size()) + ", "
           + str(ret.nnz()) + " (" + str(ret.density()) + " %) nonzeros.");
     }
     return ret;
+  }
+
+  Sparsity FunctionInternal::get_jump_sparsity(casadi_int oind, casadi_int iind) const {
+    casadi_error("'get_jump_sparsity' not defined for " + class_name());
+  }
+
+  bool FunctionInternal::has_all_jump_sparsity() const {
+    for (casadi_int oind=0; oind<n_out_; ++oind) {
+      for (casadi_int iind=0; iind<n_in_; ++iind) {
+        if (!has_jump_sparsity(oind, iind)) return false;
+      }
+    }
+    return true;
+  }
+
+  Sparsity FunctionInternal::jump_sparsity(casadi_int oind, casadi_int iind) const {
+    if (has_jump_sparsity(oind, iind)) {
+      return to_compact(oind, iind, get_jump_sparsity(oind, iind));
+    }
+    // Fewest sweeps
+    if (nnz_in(iind) <= nnz_out(oind)) return get_jac_sparsity_gen<true, true>(oind, iind);
+    return get_jac_sparsity_gen<false, true>(oind, iind);
   }
 
   Sparsity FunctionInternal::get_jac_sparsity_hierarchical_symm(casadi_int oind,
@@ -3150,6 +3192,72 @@ namespace casadi {
 
       // Clear seeds
       casadi_clear(res[oind], nnz_out(oind));
+    }
+    return 0;
+  }
+
+  int FunctionInternal::
+  sp_forward_jump(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, void* mem) const {
+    if (has_all_jump_sparsity()) {
+      for (casadi_int oind=0; oind<n_out_; ++oind) {
+        if (res[oind]==nullptr) continue;
+        casadi_clear(res[oind], nnz_out(oind));
+        for (casadi_int iind=0; iind<n_in_; ++iind) {
+          if (arg[iind]==nullptr) continue;
+          Sparsity sp = jump_sparsity(oind, iind);
+          const casadi_int *colind = sp.colind(), *row = sp.row();
+          for (casadi_int cc=0; cc<sp.size2(); ++cc) {
+            for (casadi_int el=colind[cc]; el<colind[cc+1]; ++el) {
+              res[oind][row[el]] |= arg[iind][cc];
+            }
+          }
+        }
+      }
+      return 0;
+    }
+    // Every dependency may jump, including those dropped by is_diff_in/is_diff_out
+    if (all(is_diff_in_) && all(is_diff_out_)) return sp_forward(arg, res, iw, w, mem);
+    bvec_t a = 0;
+    for (casadi_int i=0; i<n_in_; ++i) {
+      if (arg[i]) a |= bvec_or(arg[i], nnz_in(i));
+    }
+    for (casadi_int i=0; i<n_out_; ++i) {
+      if (res[i]) std::fill_n(res[i], nnz_out(i), a);
+    }
+    return 0;
+  }
+
+  int FunctionInternal::
+  sp_reverse_jump(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, void* mem) const {
+    if (has_all_jump_sparsity()) {
+      for (casadi_int oind=0; oind<n_out_; ++oind) {
+        if (res[oind]==nullptr) continue;
+        for (casadi_int iind=0; iind<n_in_; ++iind) {
+          if (arg[iind]==nullptr) continue;
+          Sparsity sp = jump_sparsity(oind, iind);
+          const casadi_int *colind = sp.colind(), *row = sp.row();
+          for (casadi_int cc=0; cc<sp.size2(); ++cc) {
+            for (casadi_int el=colind[cc]; el<colind[cc+1]; ++el) {
+              arg[iind][cc] |= res[oind][row[el]];
+            }
+          }
+        }
+        casadi_clear(res[oind], nnz_out(oind));
+      }
+      return 0;
+    }
+    if (all(is_diff_in_) && all(is_diff_out_)) return sp_reverse(arg, res, iw, w, mem);
+    bvec_t s = 0;
+    for (casadi_int i=0; i<n_out_; ++i) {
+      if (res[i]) {
+        s |= bvec_or(res[i], nnz_out(i));
+        casadi_clear(res[i], nnz_out(i));
+      }
+    }
+    for (casadi_int i=0; i<n_in_; ++i) {
+      if (arg[i]) {
+        for (casadi_int k=0; k<nnz_in(i); ++k) arg[i][k] |= s;
+      }
     }
     return 0;
   }

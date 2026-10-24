@@ -187,6 +187,9 @@ template<> inline std::string matrixName<SXElem>() { return "SX"; }
   std::vector<bool> SX::which_depends(const SX &expr, const SX &var, casadi_int order, bool tr);
 
   template<>
+  std::vector<bool> SX::which_jump(const SX &expr, const SX &var, bool tr);
+
+  template<>
   Sparsity SX::jacobian_sparsity(const SX &f, const SX &x);
 
   template<>

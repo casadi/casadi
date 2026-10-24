@@ -1019,6 +1019,8 @@ namespace casadi {
             const Dict& opts = Dict());
     static std::vector<bool> which_depends(const Matrix<Scalar> &expr, const Matrix<Scalar> &var,
         casadi_int order=1, bool tr=false);
+    static std::vector<bool> which_jump(const Matrix<Scalar> &expr, const Matrix<Scalar> &var,
+        bool tr=false);
     static Matrix<Scalar> taylor(const Matrix<Scalar>& ex, const Matrix<Scalar>& x,
                                    const Matrix<Scalar>& a, casadi_int order);
     static Matrix<Scalar> mtaylor(const Matrix<Scalar>& ex, const Matrix<Scalar>& x,
@@ -2722,7 +2724,8 @@ namespace casadi {
     /** \brief Check whether an SX expression contains only smooth operations
 
         False when any node is a non-smooth operation such as floor, ceil, sign, a comparison
-        or if_else. Operations such as fabs, fmin and fmax count as smooth. Always true for DM.
+        or if_else, or a call to a Function whose outputs may jump in its inputs.
+        Operations such as fabs, fmin and fmax count as smooth. Always true for DM.
 
         \doctest
         >>> x = SX.sym("x")

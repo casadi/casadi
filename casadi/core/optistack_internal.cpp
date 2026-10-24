@@ -1558,6 +1558,7 @@ void OptiNode::set_value_internal(const MX& x, const DM& v,
 
   // Assert x is linear in its symbolic primitives
   for (bool b : which_depends(x, symbols_cat, 2, false)) casadi_assert(!b, failmessage);
+  casadi_assert(!jumps_in(x, symbols_cat), failmessage);
 
   // Evaluate jacobian of expr wrt symbols
   Dict opts = {{"compact", true}};

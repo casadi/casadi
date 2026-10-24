@@ -247,6 +247,14 @@ namespace casadi {
         \identifier{2m} */
     int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, void* mem) const override;
 
+    /** \brief Propagate jumps forward */
+    int sp_forward_jump(const bvec_t** arg, bvec_t** res,
+                        casadi_int* iw, bvec_t* w, void* mem) const override;
+
+    /** \brief Propagate jumps backwards */
+    int sp_reverse_jump(bvec_t** arg, bvec_t** res,
+                        casadi_int* iw, bvec_t* w, void* mem) const override;
+
     // print an element of an algorithm
     std::string print(const AlgEl& el) const;
 

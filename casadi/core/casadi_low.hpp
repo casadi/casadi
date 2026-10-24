@@ -89,6 +89,9 @@ namespace casadi {
         \identifier{15n} */
     casadi_int op() const override { return OP_LOW;}
 
+    /** \brief Piecewise constant: dependencies are dropped by sp_forward */
+    bool has_dense_jump() const override { return true;}
+
     /** \brief Generate code for the operation
 
         \identifier{15o} */

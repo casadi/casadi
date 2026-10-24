@@ -2338,6 +2338,31 @@ class NLPtests(casadiTestCase):
               
               self.checkfunction_light(solver,solver_ref,inputs=solver.convert_in(dict(lbg=lbg,ubg=ubg)))
 
+  @requires_nlpsol("ipopt")
+  def test_simple_bounds_jump(self):
+    for X in [ca.SX,ca.MX]:
+      x = X.sym("x",2)
+      g = ca.vertcat(ca.floor(x[0]),2*x[1])
+      [gi,lbx,ubx,lam_f,lam_b] = ca.detect_simple_bounds(x,X.sym("p",0),g,ca.DM([-inf,-1]),ca.DM([1.5,4]))
+      self.assertEqual(gi,[0])
+
+      x = X.sym("x")
+      nlp = {"x":x,"f":(x-0.5)**2,"g":ca.floor(x)}
+      solver_ref = ca.nlpsol("solver","ipopt",nlp)
+      solver = ca.nlpsol("solver","ipopt",nlp,{"detect_simple_bounds":True})
+      self.checkfunction_light(solver,solver_ref,inputs=solver.convert_in(dict(lbg=-inf,ubg=-1.5)))
+
+  @requires_nlpsol("bonmin")
+  def test_bonmin_jump_constraint_not_linear(self):
+    x = ca.SX.sym("x")
+    y = ca.SX.sym("y")
+    nlp = {"x":ca.vertcat(x,y),"f":(x-3)**2+(y-2.6)**2,"g":ca.vertcat(ca.floor(x)+y,x-y)}
+    solver = ca.nlpsol("solver","bonmin",nlp,{"discrete":[False,True],"pass_nonlinear_constraints":True,
+                                              "bonmin.algorithm":"B-OA"})
+    res = solver(x0=0,lbx=-10,ubx=10,lbg=-inf,ubg=ca.vertcat(4,0.5))
+    self.assertTrue(solver.stats()["success"])
+    self.checkarray(res["x"],ca.DM([2.5,2]),digits=6)
+
   @memory_heavy()
   @requires_nlpsol("ipopt")
   def test_simple_bounds_equality(self):

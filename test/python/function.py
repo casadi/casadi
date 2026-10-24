@@ -4445,7 +4445,43 @@ class Functiontests(casadiTestCase):
     if not args.run_slow: return
     cg = self.check_codegen(f,inputs=[ca.DM.rand(f.sparsity_in(i)) for i in range(f.n_in())],with_jac_sparsity=True,with_forward=True)
     mychecks(cg["F"],exempt=True)
-   
+
+  def test_which_jump(self):
+    for X in [ca.SX,ca.MX]:
+      x = X.sym("x",2)
+      y = X.sym("y")
+      g = ca.vertcat(ca.floor(x[0]), x[0]*x[1], ca.if_else(y>0, x[1], 2*x[1]))
+      f = ca.Function("f",[x,y],[g,ca.sign(y)*x],["x","y"],["g","h"])
+
+      self.checkarray(ca.DM(f.jump_sparsity(0,0),1),ca.DM([[1,0],[0,0],[0,0]]))
+      self.checkarray(ca.DM(f.jump_sparsity(0,1),1),ca.DM([0,0,1]))
+      self.checkarray(ca.DM(f.jump_sparsity(1,1),1),ca.DM([1,1]))
+      self.assertEqual(f.jump_sparsity(1,0).nnz(),0)
+
+      self.assertEqual(f.which_jump("x",["g"]),[True,False])
+      self.assertEqual(f.which_jump("x",["g"],True),[True,False,False])
+      self.assertEqual(f.which_jump("y",["g","h"]),[True])
+      self.assertEqual(f.which_jump("y",["g","h"],True),[False,False,True,True,True])
+
+      # Through a call node and a map
+      F = ca.Function("F",[x,y],[f.map(2)(ca.repmat(x,1,2),y)[0]],["x","y"],["g"])
+      self.assertEqual(F.which_jump("x",["g"],True),[True,False,False]*2)
+
+    if not args.run_slow: return
+    # Generated code carries the jump sparsity, so a loaded External is not taken as jumping everywhere
+    x = ca.SX.sym("x",2)
+    y = ca.SX.sym("y")
+    f = ca.Function("f",[x,y],[ca.vertcat(ca.floor(x[0]),x[0]*x[1],ca.if_else(y>0,x[1],2*x[1])),ca.sign(y)*x],["x","y"],["g","h"])
+    inputs = [ca.DM.rand(f.sparsity_in(i)) for i in range(f.n_in())]
+    for with_jump_sparsity in [False, True]:
+      F = self.check_codegen(f,inputs=inputs,with_jump_sparsity=with_jump_sparsity)["F"]
+      for o in range(f.n_out()):
+        for i in range(f.n_in()):
+          ref = f.jump_sparsity(o,i) if with_jump_sparsity else F.jac_sparsity(o,i)
+          self.assertTrue(F.jump_sparsity(o,i)==ref)
+      xm = ca.MX.sym("x",2)
+      self.assertEqual(ca.which_jump(F(xm,ca.MX.sym("y"))[0],xm,True),[True,False,False] if with_jump_sparsity else [True,True,True])
+
    
   def test_cat_input(self):
 

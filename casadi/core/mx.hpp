@@ -2360,6 +2360,7 @@ namespace casadi {
             const Dict& opts = Dict());
     static std::vector<bool> which_depends(const MX &expr, const MX &var,
         casadi_int order=1, bool tr=false);
+    static std::vector<bool> which_jump(const MX &expr, const MX &var, bool tr=false);
     static Sparsity jacobian_sparsity(const MX& f, const MX& x);
     static MX substitute(const MX& ex, const MX& v, const MX& vdef);
     static std::vector<MX> substitute(const std::vector<MX> &ex,

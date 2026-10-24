@@ -47,7 +47,7 @@ namespace casadi {
     CodeGenerator(const std::string& name, const Dict& opts = Dict());
 
     /// Add a function (name generated)
-    void add(const Function& f, bool with_jac_sparsity=false);
+    void add(const Function& f, bool with_jac_sparsity=false, bool with_jump_sparsity=false);
 
 #ifndef SWIG
     /// Generate the code to a stream
