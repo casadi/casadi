@@ -5164,8 +5164,9 @@ https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1990-L1995
 %feature("docstring")  casadi::Function::assert_sparsity_out(casadi_int i,
 const Sparsity &sp, casadi_int n=1, bool allow_all_zero_sparse=true) const "
 
-Raise an error unless output ``i`` has the sparsity ``sp`` repeated ``n``
-times horizontally.
+Raise an error unless output ``i`` has the sparsity ``sp`` repeated ``n``.
+
+times horizontally
 
 With ``allow_all_zero_sparse``, an output without nonzeros of the right
 shape passes. Used to check derivative functions.
@@ -5173,7 +5174,7 @@ shape passes. Used to check derivative functions.
 Extra doc: https://github.com/casadi/casadi/wiki/L_2ml
 
 Doc source:
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L3510
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L3511
 Implementation:
 https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1997-L2006
 ";
@@ -5207,7 +5208,7 @@ See also: release, stats, FunctionBuffer
 Extra doc: https://github.com/casadi/casadi/wiki/L_2mm
 
 Doc source:
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L3538
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L3539
 Implementation:
 https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1970-L1972
 ";
@@ -5217,7 +5218,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1970-L1972
 Give back a memory object obtained with checkout.
 
 Doc source:
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L3541
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L3542
 Implementation:
 https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1974-L1976
 ";
@@ -5227,7 +5228,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1974-L1976
 Get memory object.
 
 Doc source:
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L3545
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L3546
 Implementation:
 https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1978-L1980
 ";
@@ -5264,7 +5265,7 @@ See also: jacobian, forward, reverse
 Extra doc: https://github.com/casadi/casadi/wiki/L_26i
 
 Doc source:
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L3580
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L3581
 Implementation:
 https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L2032-L2039
 ";
@@ -5308,7 +5309,7 @@ See also: has_function, find_functions, oracle
 Extra doc: https://github.com/casadi/casadi/wiki/L_1y3
 
 Doc source:
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L3623
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L3624
 Implementation:
 https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L2041-L2048
 ";
@@ -5325,7 +5326,7 @@ See also: has_function, find_function
 Extra doc: https://github.com/casadi/casadi/wiki/L_1y4
 
 Doc source:
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L3630
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L3631
 Implementation:
 https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L2050-L2056
 ";
@@ -5346,7 +5347,7 @@ See also: get_function
 Extra doc: https://github.com/casadi/casadi/wiki/L_1y5
 
 Doc source:
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L3640
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L3641
 Implementation:
 https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L2058-L2065
 ";
@@ -5396,7 +5397,7 @@ See also: find_function, get_function
 Extra doc: https://github.com/casadi/casadi/wiki/L_1y6
 
 Doc source:
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L3685
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L3686
 Implementation:
 https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L2067-L2082
 ";
@@ -5419,7 +5420,7 @@ See also: find_functions
 Extra doc: https://github.com/casadi/casadi/wiki/L_1y7
 
 Doc source:
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L3695
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L3696
 Implementation:
 https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L2084-L2101
 ";
@@ -5445,7 +5446,7 @@ branch functions.
 Extra doc: https://github.com/casadi/casadi/wiki/L_2mn
 
 Doc source:
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L3709
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L3710
 Implementation:
 https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L2138-L2140
 ";
@@ -17120,8 +17121,9 @@ https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1990-L1995
 %feature("docstring")  casadi::Function::assert_sparsity_out(casadi_int i,
 const Sparsity &sp, casadi_int n=1, bool allow_all_zero_sparse=true) const "
 
-Raise an error unless output ``i`` has the sparsity ``sp`` repeated ``n``
-times horizontally.
+Raise an error unless output ``i`` has the sparsity ``sp`` repeated ``n``.
+
+times horizontally
 
 With ``allow_all_zero_sparse``, an output without nonzeros of the right
 shape passes. Used to check derivative functions.
@@ -17129,7 +17131,7 @@ shape passes. Used to check derivative functions.
 Extra doc: https://github.com/casadi/casadi/wiki/L_2ml
 
 Doc source:
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L3510
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L3511
 Implementation:
 https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1997-L2006
 ";
@@ -17163,7 +17165,7 @@ See also: release, stats, FunctionBuffer
 Extra doc: https://github.com/casadi/casadi/wiki/L_2mm
 
 Doc source:
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L3538
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L3539
 Implementation:
 https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1970-L1972
 ";
@@ -17173,7 +17175,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1970-L1972
 Give back a memory object obtained with checkout.
 
 Doc source:
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L3541
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L3542
 Implementation:
 https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1974-L1976
 ";
@@ -17183,7 +17185,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1974-L1976
 Get memory object.
 
 Doc source:
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L3545
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L3546
 Implementation:
 https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1978-L1980
 ";
@@ -17220,7 +17222,7 @@ See also: jacobian, forward, reverse
 Extra doc: https://github.com/casadi/casadi/wiki/L_26i
 
 Doc source:
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L3580
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L3581
 Implementation:
 https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L2032-L2039
 ";
@@ -17264,7 +17266,7 @@ See also: has_function, find_functions, oracle
 Extra doc: https://github.com/casadi/casadi/wiki/L_1y3
 
 Doc source:
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L3623
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L3624
 Implementation:
 https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L2041-L2048
 ";
@@ -17281,7 +17283,7 @@ See also: has_function, find_function
 Extra doc: https://github.com/casadi/casadi/wiki/L_1y4
 
 Doc source:
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L3630
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L3631
 Implementation:
 https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L2050-L2056
 ";
@@ -17302,7 +17304,7 @@ See also: get_function
 Extra doc: https://github.com/casadi/casadi/wiki/L_1y5
 
 Doc source:
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L3640
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L3641
 Implementation:
 https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L2058-L2065
 ";
@@ -17352,7 +17354,7 @@ See also: find_function, get_function
 Extra doc: https://github.com/casadi/casadi/wiki/L_1y6
 
 Doc source:
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L3685
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L3686
 Implementation:
 https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L2067-L2082
 ";
@@ -17375,7 +17377,7 @@ See also: find_functions
 Extra doc: https://github.com/casadi/casadi/wiki/L_1y7
 
 Doc source:
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L3695
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L3696
 Implementation:
 https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L2084-L2101
 ";
@@ -17401,7 +17403,7 @@ branch functions.
 Extra doc: https://github.com/casadi/casadi/wiki/L_2mn
 
 Doc source:
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L3709
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L3710
 Implementation:
 https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L2138-L2140
 ";
@@ -17530,7 +17532,7 @@ Create a buffer for ``f``, allocating its work vectors and a memory object.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1ya
 
 Doc source:
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L3810
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L3811
 Implementation:
 https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L2150-L2162
 ";
@@ -17548,7 +17550,7 @@ memoryview of a numpy array: set_arg(0, memoryview(a)).
 Extra doc: https://github.com/casadi/casadi/wiki/L_1yb
 
 Doc source:
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L3824
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L3825
 Implementation:
 https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L2204-L2209
 ";
@@ -17565,7 +17567,7 @@ set_res(0, memoryview(r)).
 Extra doc: https://github.com/casadi/casadi/wiki/L_1yc
 
 Doc source:
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L3833
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L3834
 Implementation:
 https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L2210-L2215
 ";
@@ -17575,7 +17577,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L2210-L2215
 Get the return code of the last evaluation (0 on success)
 
 Doc source:
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L3835
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L3836
 Implementation:
 https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L2223-L2225
 ";
@@ -17586,7 +17588,7 @@ Get the statistics of the memory object used by this buffer, see
 Function::stats.
 
 Doc source:
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L3839
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L3840
 Implementation:
 https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L2231-L2233
 ";

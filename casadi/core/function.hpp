@@ -3501,6 +3501,7 @@ namespace casadi {
     void assert_size_out(casadi_int i, casadi_int nrow, casadi_int ncol) const;
 
     /** \brief Raise an error unless output \p i has the sparsity \p sp repeated \p n
+
         times horizontally
 
         With \p allow_all_zero_sparse, an output without nonzeros of the right shape
