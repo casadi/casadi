@@ -2173,6 +2173,10 @@ class SXtests(casadiTestCase):
     self.checkarray(ca.evalf(ca.gauss_quadrature(x**2, x, 0, 1)), ca.DM(1./3))
     self.checkarray(ca.evalf(ca.gauss_quadrature(x**9, x, -1, 1)), ca.DM(0))
 
+  def test_poly_roots_order(self):
+    with self.assertRaisesRegex(Exception, "order at most 4.*Got order 5"):
+      ca.poly_roots(ca.SX([1, 2, 3, 4, 5, 6]))
+
   def test_large_whole_constants(self):
     # issue #4432: whole numbers beyond the int range must not saturate
     for v in [3e9, 6.02214076e23, -1e20, 2.0**31, -2.0**31-1, 2.0**63, 1e300]:
