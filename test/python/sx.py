@@ -2178,6 +2178,12 @@ class SXtests(casadiTestCase):
     with self.assertRaisesRegex(Exception, "order at most 4.*Got order 5"):
       ca.poly_roots(ca.SX([1, 2, 3, 4, 5, 6]))
 
+  def test_mtaylor_dimension(self):
+    x = ca.SX.sym("x")
+    y = ca.SX.sym("y")
+    with self.assertRaisesRegex(Exception, "expected a of shape 2x1"):
+      ca.mtaylor(x*y, ca.vertcat(x, y), 0, 1)
+
   def test_large_whole_constants(self):
     # issue #4432: whole numbers beyond the int range must not saturate
     for v in [3e9, 6.02214076e23, -1e20, 2.0**31, -2.0**31-1, 2.0**63, 1e300]:
