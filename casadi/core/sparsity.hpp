@@ -585,8 +585,8 @@ namespace casadi {
         is tridiagonal.
 
         \param n Size of the square pattern
-        \param p Half-bandwidth; must be smaller than \p n, otherwise an error is raised.
-               A negative \p p gives an all-zero pattern.
+        \param p Half-bandwidth; \p p >= n gives a dense pattern and a negative \p p an
+               all-zero pattern
 
         \doctest
         >>> DM(Sparsity.banded(4, 1), 1)
