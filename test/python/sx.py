@@ -952,8 +952,9 @@ class SXtests(casadiTestCase):
     self.assertTrue(ca.SX(ca.DM([0,1])).is_regular())
     self.assertFalse(ca.SX(ca.DM([0,inf])).is_regular())
     self.assertFalse(ca.vertcat(*[x,inf]).is_regular())
-    with self.assertRaises(Exception):
-      self.assertFalse(ca.vertcat(*[x,x]).is_regular())
+    self.assertTrue(ca.vertcat(*[x,x]).is_regular())
+    self.assertTrue(ca.vertcat(x, 1).is_regular())
+    self.assertFalse(ca.vertcat(float("nan"), x).is_regular())
 
 
   def test_symvar(self):
@@ -2167,6 +2168,21 @@ class SXtests(casadiTestCase):
     self.checkarray(ca.DM(f(-7, 2)), ca.DM([-0.6569865987, 2, -1, -2, 1, 7.2801098893, -7]))
     q, r = divmod(ca.DM(7), ca.DM(2))
     self.checkarray(ca.vertcat(q, r), ca.DM([3, 1]))
+
+  def test_gauss_quadrature(self):
+    x = ca.SX.sym("x")
+    self.checkarray(ca.evalf(ca.gauss_quadrature(x**2, x, 0, 1)), ca.DM(1./3))
+    self.checkarray(ca.evalf(ca.gauss_quadrature(x**9, x, -1, 1)), ca.DM(0))
+
+  def test_poly_roots_order(self):
+    with self.assertRaisesRegex(Exception, "order at most 4.*Got order 5"):
+      ca.poly_roots(ca.SX([1, 2, 3, 4, 5, 6]))
+
+  def test_mtaylor_dimension(self):
+    x = ca.SX.sym("x")
+    y = ca.SX.sym("y")
+    with self.assertRaisesRegex(Exception, "expected a of shape 2x1"):
+      ca.mtaylor(x*y, ca.vertcat(x, y), 0, 1)
 
   def test_large_whole_constants(self):
     # issue #4432: whole numbers beyond the int range must not saturate

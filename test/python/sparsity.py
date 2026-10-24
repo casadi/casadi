@@ -614,6 +614,60 @@ class Sparsitytests(casadiTestCase):
     sp_diag = ca.Sparsity.diag(4)
     self.assertFalse(sp_diag.is_compactible()[0])
 
+  def test_star_coloring_cutoff(self):
+    sp = ca.Sparsity.dense(4, 4)
+    for ordering in [0, 1]:
+      self.assertTrue(sp.star_coloring(ordering, 2).is_null())
+      self.assertTrue(sp.star_coloring2(ordering, 2).is_null())
+      self.assertEqual(sp.star_coloring(ordering, 4).size2(), 4)
+    for new_algo in [False, True]:
+      coloring, _ = sp.star_coloring_new({"cutoff": 2, "new_algo": new_algo})
+      self.assertTrue(coloring.is_null())
+
+  def test_compressed_dense_short_form(self):
+    for sp in [ca.Sparsity.dense(2, 3), ca.Sparsity.dense(2, 0), ca.Sparsity.dense(1, 1)]:
+      v = sp.compress(False)
+      self.assertEqual(len(v), 3)
+      self.assertTrue(ca.Sparsity.compressed(v) == sp)
+
+  def test_repr_el_range(self):
+    sp = ca.Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3])
+    self.assertEqual(sp.repr_el(3), "nonzero index 3 (row 0, col 3)")
+    for k in [-1, 4, 5]:
+      with self.assertRaisesRegex(Exception, "out of range for 4 nonzeros"):
+        sp.repr_el(k)
+
+  def test_get_nz_range(self):
+    for sp in [ca.Sparsity.dense(2, 2), ca.Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3])]:
+      with self.assertRaisesRegex(Exception, "out of bounds"):
+        sp.get_nz([0, 99])
+    self.assertEqual(ca.Sparsity.dense(2, 2).get_nz([3, -1]), [3, -1])
+
+  def test_star_coloring_symmetric(self):
+    for sp in [ca.Sparsity.upper(3), ca.Sparsity.dense(2, 3)]:
+      for f in [sp.star_coloring, sp.star_coloring2]:
+        with self.assertRaisesRegex(Exception, "requires a symmetric pattern"):
+          f()
+
+  def test_banded_wide(self):
+    self.assertTrue(ca.Sparsity.banded(4, 5) == ca.Sparsity.dense(4, 4))
+    self.assertTrue(ca.Sparsity.banded(4, 3) == ca.Sparsity.dense(4, 4))
+    self.assertEqual(ca.Sparsity.banded(0, 2).shape, (0, 0))
+    with self.assertRaisesRegex(Exception, "should be smaller than size"):
+      ca.Sparsity.band(4, 4)
+
+  def test_density_empty(self):
+    for sp in [ca.Sparsity(0, 3), ca.Sparsity(0, 0), ca.Sparsity.dense(3, 0)]:
+      self.assertEqual(sp.density(), 100)
+
+  def test_triplet_bounds_message(self):
+    with self.assertRaisesRegex(Exception, r"Row index \(2\) out of bounds \[0,2\["):
+      ca.Sparsity.triplet(2, 2, [2], [0])
+
+  def test_scc_square(self):
+    with self.assertRaisesRegex(Exception, "Expected a square pattern"):
+      ca.Sparsity.dense(2, 3).scc()
+
   def test_eq_foreign_operand(self):
     # issue #4407: comparing against an unrelated type follows the Python data
     # model (NotImplemented -> False) instead of raising NotImplementedError.

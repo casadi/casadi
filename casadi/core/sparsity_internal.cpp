@@ -3046,10 +3046,8 @@ namespace casadi {
   }
 
   Sparsity SparsityInternal::star_coloring2(casadi_int ordering, casadi_int cutoff) const {
-    if (!is_square()) {
-      // NOTE(@jaeandersson) Why warning and not error?
-      casadi_message("StarColoring requires a square matrix, got " + dim() + ".");
-    }
+    casadi_assert(is_symmetric(), "Star coloring requires a symmetric pattern, got "
+      + std::string(is_square() ? "a non-symmetric " : "a ") + dim() + " pattern.");
 
     // TODO(Joel): What we need here, is a distance-2 smallest last ordering
     // Reorder, if necessary
@@ -3065,7 +3063,8 @@ namespace casadi {
       Sparsity sp_permuted = pmult(ord, true, true, true);
 
       // Star coloring for the permuted matrix
-      Sparsity ret_permuted = sp_permuted.star_coloring2(0);
+      Sparsity ret_permuted = sp_permuted.star_coloring2(0, cutoff);
+      if (ret_permuted.is_null()) return ret_permuted;
 
       // Permute result back
       return ret_permuted.pmult(ord, true, false, false);
@@ -3326,6 +3325,7 @@ namespace casadi {
     } else {
       coloring = star_coloring(largest_first ? 1 : 0, cutoff);
     }
+    if (coloring.is_null()) return coloring;
 
     // Get the coloring
     casadi_int ncolor = coloring.size2();
@@ -3396,10 +3396,8 @@ namespace casadi {
   }
 
   Sparsity SparsityInternal::star_coloring(casadi_int ordering, casadi_int cutoff) const {
-    if (!is_square()) {
-      // NOTE(@jaeandersson) Why warning and not error?
-      casadi_message("StarColoring requires a square matrix, got " + dim() + ".");
-    }
+    casadi_assert(is_symmetric(), "Star coloring requires a symmetric pattern, got "
+      + std::string(is_square() ? "a non-symmetric " : "a ") + dim() + " pattern.");
 
     // Reorder, if necessary
     if (ordering!=0) {
@@ -3412,7 +3410,8 @@ namespace casadi {
       Sparsity sp_permuted = pmult(ord, true, true, true);
 
       // Star coloring for the permuted matrix
-      Sparsity ret_permuted = sp_permuted.star_coloring(0);
+      Sparsity ret_permuted = sp_permuted.star_coloring(0, cutoff);
+      if (ret_permuted.is_null()) return ret_permuted;
 
       // Permute result back
       return ret_permuted.pmult(ord, true, false, false);

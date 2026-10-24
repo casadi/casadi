@@ -48,6 +48,11 @@ for r in open("../../../swig/casadi.i","r"):
     m = re.match(r"\s*%rename\((\w+)\)\s+casadi_(\w+)\s*;", r)
     if m and not m.group(1).startswith("_"):
       renamed_tools[m.group(1)] = m.group(2)
+# DECL wrappers that call a friend of another name, e.g. casadi_power -> pow
+for r in open("../../../swig/casadi.i","r"):
+  m = re.search(r"\bcasadi_(\w+)\([^)]*\)\s*\{\s*(?:using [\w:]+;\s*)?return (\w+)\(", r)
+  if m and m.group(2) not in expression_tools:
+    renamed_tools.setdefault(m.group(2), m.group(1))
 
 # Classes whose friends/statics back the module-level casadi_<name> wrappers
 tool_classes = ("GenericMatrixCommon", "GenericExpressionCommon", "SparsityInterfaceCommon",
@@ -104,7 +109,8 @@ class Doxy2SWIG_X(Doxy2SWIG):
     self.groupdoc = kwargs["groupdoc"]
     del kwargs["groupdoc"]
     Doxy2SWIG.__init__(self,*args, **kwargs)
-    
+    # casadi_<name> wrappers already documented: the first (primary) overload wins
+    self.routed = set()
 
     # skip sharedobjectnode stuff
     for e in self.xmldoc.getElementsByTagName("compounddef"):
@@ -614,11 +620,12 @@ class Doxy2SWIG_X(Doxy2SWIG):
     cls = target.split("(")[0].split("::")[-2].replace(" ", "") if target.split("(")[0].count("::") >= 2 else ""
     if m and cls.startswith(tool_classes):  # skip namespace helpers and unrelated class members
       name = renamed_tools.get(m.group(1), m.group(1))
-      if name in expression_tools:
+      if name in expression_tools and name not in self.routed:
         content = [c.replace("[INTERNAL]","") for c in content]
         if "Functions called by friend functions defined" in " ".join(content):
             content = []
         content = [re.sub("Functions called by friend functions defined (here|for +\w+)\.?","",c) for c in content]
+        if "".join(content).strip(): self.routed.add(name)
         self.doc_target("casadi::casadi_" + name, content,correction=False)
         target = target.split("(")[0]
         target = "::".join(target.split("::")[:-1])

@@ -100,16 +100,12 @@ namespace casadi {
 
   template<>
   bool CASADI_EXPORT SX::is_regular() const {
-    // First pass: ignore symbolics
+    // Symbolic entries are ignored
     for (casadi_int i=0; i<nnz(); ++i) {
       const SXElem& x = nonzeros().at(i);
       if (x.is_constant()) {
         if (x.is_nan() || x.is_inf() || x.is_minus_inf()) return false;
       }
-    }
-    // Second pass: don't ignore symbolics
-    for (casadi_int i=0; i<nnz(); ++i) {
-      if (!nonzeros().at(i).is_regular()) return false;
     }
     return true;
   }
@@ -437,7 +433,7 @@ namespace casadi {
       f_val[i] = fcn(SX(xi[i])).at(0).scalar();
 
     // Weighted sum
-    SXElem sum;
+    SXElem sum = 0;
     for (casadi_int i=0; i<5; ++i)
       sum += wi[i]*f_val[i];
 
@@ -1288,6 +1284,9 @@ namespace casadi {
     casadi_assert(f.nnz()==f.numel() && x.nnz()==x.numel(),
                           "mtaylor: not implemented for sparse matrices");
 
+    casadi_assert(a.sparsity()==x.sparsity(),
+                  "mtaylor: expected a of shape " + x.dim() + ", but got " + a.dim() + ".");
+
     casadi_assert(x.nnz()==order_contributions.size(),
                           "mtaylor: number of non-zero elements in x (" + str(x.nnz())
                           + ") must match size of order_contributions ("
@@ -1575,7 +1574,7 @@ namespace casadi {
       SX ret = SX::vertcat({poly_roots(p(range(p.nnz()-1))), 0});
       return ret;
     } else {
-      casadi_error("poly_root(): can only solve cases for first or second order polynomial. "
+      casadi_error("poly_roots: polynomials of order at most 4 are supported. "
                    "Got order " + str(p.size1()-1) + ".");
     }
 

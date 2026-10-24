@@ -134,6 +134,8 @@ namespace casadi {
   }
 
   double Sparsity::density() const {
+    // Empty patterns are dense
+    if (numel()==0) return 100;
     double r = 100;
     r *= static_cast<double>(nnz());
     r /= static_cast<double>(size1());
@@ -569,6 +571,9 @@ namespace casadi {
   }
 
   Sparsity Sparsity::diag(casadi_int nrow, casadi_int ncol) {
+    casadi_assert(nrow>=0 && ncol>=0,
+      "Dimensions must be non-negative, got " + str(nrow) + "-by-" + str(ncol));
+
     // Smallest dimension
     casadi_int n = std::min(nrow, ncol);
 
@@ -608,6 +613,8 @@ namespace casadi {
   }
 
   std::string Sparsity::repr_el(casadi_int k) const {
+    casadi_assert(k>=0 && k<nnz(),
+      "Index " + str(k) + " out of range for " + str(nnz()) + " nonzeros.");
     return (*this)->repr_el(k);
   }
 
@@ -705,6 +712,7 @@ namespace casadi {
   }
 
   casadi_int Sparsity::scc(std::vector<casadi_int>& index, std::vector<casadi_int>& offset) const {
+    casadi_assert(is_square(), "Expected a square pattern, but got " + dim() + ".");
     return (*this)->scc(index, offset);
   }
 
@@ -747,6 +755,9 @@ namespace casadi {
   }
 
   void Sparsity::get_nz(std::vector<casadi_int>& indices) const {
+    for (casadi_int k : indices) {
+      casadi_assert(k<numel(), "Index " + str(k) + " out of bounds for " + dim() + " pattern.");
+    }
     (*this)->get_nz(indices);
   }
 
@@ -1088,7 +1099,7 @@ namespace casadi {
   Sparsity Sparsity::band(casadi_int n, casadi_int p) {
     casadi_assert(n>=0, "Sparsity::band expects a positive integer as argument");
     casadi_assert((p<0? -p : p)<n,
-                          "Sparsity::band: position of band schould be smaller then size argument");
+                          "Sparsity::band: position of band should be smaller than size argument");
 
     casadi_int nc = n-(p<0? -p : p);
 
@@ -1113,6 +1124,7 @@ namespace casadi {
   Sparsity Sparsity::banded(casadi_int n, casadi_int p) {
     // This is not an efficient implementation
     Sparsity ret = Sparsity(n, n);
+    p = std::min(p, n-1);
     for (casadi_int i=-p;i<=p;++i) {
       ret = ret + Sparsity::band(n, i);
     }
@@ -1163,7 +1175,7 @@ namespace casadi {
       casadi_assert(col[k]>=0 && col[k]<ncol,
         "Column index (" + str(col[k]) + ") out of bounds [0," + str(ncol) + "[");
       casadi_assert(row[k]>=0 && row[k]<nrow,
-        "Row index out of bounds (" + str(row[k]) + ") out of bounds [0," + str(nrow) + "[");
+        "Row index (" + str(row[k]) + ") out of bounds [0," + str(nrow) + "[");
 
       // Check if ordering is already perfect
       perfectly_ordered = perfectly_ordered && (col[k]<last_col ||
@@ -1345,6 +1357,8 @@ namespace casadi {
     casadi_assert_dev(v.size() >= 2);
     casadi_int nrow = v[0];
     casadi_int ncol = v[1];
+    // Dense matrix - deviation from canonical form
+    if (v.size()==3 && v[2]==1) return Sparsity::dense(nrow, ncol);
     casadi_assert_dev(v.size() >= 2 + ncol+1);
     casadi_int nnz = v[2 + ncol];
     bool dense = v.size() == 2 + ncol+1 && nrow*ncol==nnz;

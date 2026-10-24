@@ -585,8 +585,8 @@ namespace casadi {
         is tridiagonal.
 
         \param n Size of the square pattern
-        \param p Half-bandwidth; must be smaller than \p n, otherwise an error is raised.
-               A negative \p p gives an all-zero pattern.
+        \param p Half-bandwidth; \p p >= n gives a dense pattern and a negative \p p an
+               all-zero pattern
 
         \doctest
         >>> DM(Sparsity.banded(4, 1), 1)
@@ -1120,20 +1120,20 @@ namespace casadi {
     /** \brief Percentage of nonzeros: 100*nnz()/numel()
 
         Computed in floating point, so it does not overflow for large shapes.
-        An empty pattern (numel() == 0) gives NaN.
+        An empty pattern (numel() == 0) is dense and gives 100.
 
         \doctest
         >>> Sparsity.diag(4).density(), Sparsity.dense(2, 2).density()
         (25.0, 100.0)
         >>> Sparsity(0, 3).density()
-        nan
+        100.0
         \enddoctest
 
         \doctest{matlab}
         >> fprintf('%g %g\n', Sparsity.diag(4).density(), Sparsity.dense(2, 2).density())
         25 100
         >> Sparsity(0, 3).density()
-        NaN
+        100
         \enddoctest
 
         \sa nnz, numel, is_dense
@@ -1739,8 +1739,7 @@ namespace casadi {
 
         Each entry of \p indices is replaced by the nonzero index of that element, or by -1
         if the element is a structural zero. Entries that are already negative are left
-        alone. The indices need not be sorted. For a dense pattern the vector is returned
-        unchanged, without range checking.
+        alone. The indices need not be sorted. An index of numel() or more raises an error.
 
         \doctest
         >>> sp = Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3])
@@ -3757,13 +3756,13 @@ namespace casadi {
 
         Algorithm 4.1 in Gebremedhin, Manne and Pothen, What Color Is Your Jacobian?,
         SIAM Rev. 47(4), 2006. Exploits symmetry so that fewer colors than uni_coloring
-        are needed to recover all nonzeros of a Hessian. Symmetry is assumed, not checked;
-        a non-square pattern raises an error.
+        are needed to recover all nonzeros of a Hessian. A non-symmetric pattern raises an
+        error.
 
         \param ordering 0 for the natural column order, 1 (default) to color in
                largest_first() order
         \param cutoff If more than this many colors are needed, a null Sparsity is
-               returned (only honoured with \p ordering 0)
+               returned
         \return A size2()-by-ncolors pattern: column c lists the columns with color c
 
         \doctest
@@ -3776,7 +3775,7 @@ namespace casadi {
          [00, 00, 1]])
         >>> Sparsity.diag(5).star_coloring()
         Sparsity(5x1)
-        >>> Sparsity.dense(4, 4).star_coloring(0, 2).is_null()
+        >>> Sparsity.dense(4, 4).star_coloring(1, 2).is_null()
         True
         \enddoctest
 
@@ -3789,7 +3788,7 @@ namespace casadi {
         0 0 1
         >> Sparsity.diag(5).star_coloring()
         5x1
-        >> Sparsity.dense(4, 4).star_coloring(0, 2).is_null()
+        >> Sparsity.dense(4, 4).star_coloring(1, 2).is_null()
         1
         \enddoctest
 

@@ -1462,8 +1462,9 @@ namespace casadi {
   Matrix<Scalar> Matrix<Scalar>::triplet(const std::vector<casadi_int>& row,
                                              const std::vector<casadi_int>& col,
                                              const Matrix<Scalar>& d) {
-    return triplet(row, col, d, *std::max_element(row.begin(), row.end()),
-                   *std::max_element(col.begin(), col.end()));
+    casadi_int nrow = row.empty() ? 0 : *std::max_element(row.begin(), row.end()) + 1;
+    casadi_int ncol = col.empty() ? 0 : *std::max_element(col.begin(), col.end()) + 1;
+    return triplet(row, col, d, nrow, ncol);
   }
 
   template<typename Scalar>
@@ -1902,7 +1903,7 @@ namespace casadi {
 
       for (casadi_int k=0; k<row.nnz(); ++k) {
         // Sum up the cofactors
-        ret += row->at(k)*cofactor(x, col_i.at(k), j);
+        ret += row->at(k)*cofactor(x, j, col_i.at(k));
       }
       return ret;
     } else {
@@ -1915,7 +1916,7 @@ namespace casadi {
 
       for (casadi_int k=0; k<col.nnz(); ++k) {
         // Sum up the cofactors
-        ret += col->at(k)*cofactor(x, i, row_i[k]);
+        ret += col->at(k)*cofactor(x, row_i[k], i);
       }
       return ret;
     }
@@ -1948,22 +1949,22 @@ namespace casadi {
     // Trivial return if scalar
     if (n==1) return 1;
 
-    // Remove col i and row j
+    // Remove row i and col j
     Matrix<Scalar> M = Matrix<Scalar>(n-1, n-1);
 
     std::vector<casadi_int> col = x.sparsity().get_col();
     const casadi_int* row = x.sparsity().row();
 
     for (casadi_int k=0; k<x.nnz(); ++k) {
-      casadi_int i1 = col[k];
-      casadi_int j1 = row[k];
+      casadi_int i1 = row[k];
+      casadi_int j1 = col[k];
 
       if (i1 == i || j1 == j) continue;
 
       casadi_int i2 = (i1<i)?i1:i1-1;
       casadi_int j2 = (j1<j)?j1:j1-1;
 
-      M(j2, i2) = x(j1, i1);
+      M(i2, j2) = x(i1, j1);
     }
     return det(M);
   }
@@ -1992,7 +1993,7 @@ namespace casadi {
     for (casadi_int i=0; i<n; ++i)
       for (casadi_int j=0; j<n; ++j) {
         temp = cofactor(x, i, j);
-        if (!temp.is_zero()) C(j, i) = temp;
+        if (!temp.is_zero()) C(i, j) = temp;
       }
 
     return C.T();

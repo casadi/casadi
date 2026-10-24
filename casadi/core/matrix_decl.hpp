@@ -1122,31 +1122,30 @@ namespace casadi {
       return Matrix<Scalar>::adj(A);
     }
 
-    /** \brief Minor of a square matrix: determinant with one column and one row removed
+    /** \brief Minor of a square matrix: determinant with one row and one column removed
 
-        Note the argument order: \p i is the column that is removed, \p j the row.
         The input must be square; a 1-by-1 input gives 1.
 
         \param x Square matrix
-        \param i Column index to remove (zero-based)
-        \param j Row index to remove (zero-based)
+        \param i Row index to remove (zero-based)
+        \param j Column index to remove (zero-based)
 
         \doctest
         >>> A = DM([[1, 2, 3], [0, 1, 4], [5, 6, 0]])
         >>> minor(A, 0, 1)
-        DM(-18)
+        DM(-20)
         >>> X = SX.sym("X", 2, 2)
         >>> minor(X, 0, 1)
-        SX(X_2)
+        SX(X_1)
         \enddoctest
 
         \doctest{matlab}
         >> A = DM([1 2 3; 0 1 4; 5 6 0]);
         >> minor(A, 0, 1)
-        -18
+        -20
         >> X = SX.sym('X', 2, 2);
         >> minor(X, 0, 1)
-        X_2
+        X_1
         \enddoctest
 
         \sa cofactor, adj, det
@@ -1158,18 +1157,18 @@ namespace casadi {
 
     /** \brief Cofactor of a square matrix: (-1)^(i+j) times minor(x, i, j)
 
-        Same argument convention as minor: \p i is a column index, \p j a row index.
+        Same argument convention as minor: \p i is a row index, \p j a column index.
 
         \doctest
         >>> A = DM([[1, 2, 3], [0, 1, 4], [5, 6, 0]])
         >>> cofactor(A, 0, 1), cofactor(A, 0, 0)
-        (DM(18), DM(-24))
+        (DM(20), DM(-24))
         \enddoctest
 
         \doctest{matlab}
         >> A = DM([1 2 3; 0 1 4; 5 6 0]);
         >> cofactor(A, 0, 1), cofactor(A, 0, 0)
-        18
+        20
         -24
         \enddoctest
 
@@ -2526,8 +2525,8 @@ namespace casadi {
         \param row Row index of each entry
         \param col Column index of each entry
         \param d Dense vector of values, one per entry
-        \param nrow Number of rows of the result
-        \param ncol Number of columns of the result
+        \param nrow Number of rows of the result [default: largest row index plus one]
+        \param ncol Number of columns of the result [default: largest column index plus one]
 
         \doctest
         >>> DM.triplet([0, 1], [1, 0], [5, 6], 3, 3)
@@ -2689,18 +2688,16 @@ namespace casadi {
 
     /** \brief Check that no entry is nan, inf or -inf
 
-        Structural zeros are ignored. For SX, every entry must be a constant: the check
-        raises an error when it reaches a symbolic entry (an infinite constant found before
-        it still gives false).
+        Structural zeros are ignored. For SX, only constant entries are checked; symbolic
+        entries are ignored.
 
         \doctest
         >>> DM([1, 2]).is_regular(), DM([1, inf]).is_regular(), DM.nan(2, 2).is_regular()
         (True, False, False)
         >>> DM(2, 2).is_regular(), SX([1, 2]).is_regular()
         (True, True)
-        >>> try: SX.sym("x").is_regular()
-        ... except Exception as e: print("error")
-        error
+        >>> SX.sym("x").is_regular(), vertcat(SX.sym("x"), inf).is_regular()
+        (True, False)
         \enddoctest
 
         \doctest{matlab}
@@ -2710,8 +2707,8 @@ namespace casadi {
         0 1
         >> SX([1; 2]).is_regular()
         1
-        >> try, SX.sym('x').is_regular(); catch e, disp('error'); end
-        error
+        >> fprintf('%d %d\n', SX.sym('x').is_regular(), vertcat(SX.sym('x'), inf).is_regular())
+        1 0
         \enddoctest
 
         \sa nan, inf

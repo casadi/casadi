@@ -6843,6 +6843,22 @@ opti_metadata_modifiers(casadi::Opti);
 %enddef
 
 opti_metadata_modifiers(casadi::Opti)
+
+// solver() without arguments is the deprecated MATLAB name of casadi_solver()
+%rename(casadi_solver) casadi::OptiAdvanced::casadi_solver;
+%extend casadi::OptiAdvanced {
+  %matlabcode %{
+    function varargout = solver(self, varargin)
+      if isempty(varargin)
+        warning('casadi:deprecated', ...
+          'OptiAdvanced.solver() is deprecated, use casadi_solver() instead.');
+        [varargout{1:nargout}] = self.casadi_solver();
+      else
+        [varargout{1:nargout}] = solver@casadi.Opti(self, varargin{:});
+      end
+    end
+  %}
+}
 #endif
 #ifdef SWIGJULIA
 // opti.callback(fh): fh(i) runs every iteration; opti.callback() clears it.
