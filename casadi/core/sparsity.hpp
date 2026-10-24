@@ -2163,7 +2163,7 @@ namespace casadi {
         \doctest{matlab}
         >> a = Sparsity.diag(2);
         >> b = Sparsity.triplet(2, 2, [0, 1], [1, 1]);
-        >> a.combine(b, false, false) == a + b, a.combine(b, true, true) == a * b
+        >> a.combine(b, false, false) == a + b, a.combine(b, true, true) == a .* b
         1
         1
         >> full(DM(a.combine(b, true, false), 1))
@@ -2210,7 +2210,7 @@ namespace casadi {
         >> full(DM(a.unite(b), 1))
         1 1
         0 1
-        >> a + b == a.unite(b), a * b == a.intersect(b)
+        >> a + b == a.unite(b), a .* b == a.intersect(b)
         1
         1
         >> try, a + Sparsity.dense(3, 3); catch e, disp('dimension mismatch'); end
@@ -2231,7 +2231,8 @@ namespace casadi {
     /** \brief Intersection of two sparsity patterns of the same shape (also the * operator)
 
         The pattern of the elementwise product x * y for matrices with these patterns.
-        A shape mismatch raises an error.
+        A shape mismatch raises an error. In MATLAB this is the .* operator; * and mtimes
+        give the pattern of the matrix product.
 
         \doctest
         >>> a = Sparsity.diag(2)
