@@ -4130,6 +4130,11 @@ def dcat(args):
 %feature("python:maybecall") casadi_constpow;
 #endif // SWIGPYTHON
 
+#ifdef SWIGJULIA
+// inv is the matrix inverse in Julia; elementwise inverse is 1 ./ x
+%ignore casadi::MX::inv() const;
+#endif // SWIGJULIA
+
 #ifdef SWIGMATLAB
 %rename(uminus) operator-;
 %rename(uplus) operator+;

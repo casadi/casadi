@@ -126,6 +126,10 @@ end
     @test maximum(abs.(Matrix{Float64}(C.mtimes(C.inv(A), A)) .- [1.0 0.0; 0.0 1.0])) < 1e-12
     # det of a 3x3 with a known value.
     @test abs(Float64(C.det(DM([1.0 2.0 3.0; 0.0 1.0 4.0; 5.0 6.0 0.0]))) - 1.0) < 1e-10
+    # inv of an MX is the matrix inverse too
+    M = sym(MX, "M", 2, 2)
+    @test Matrix(C.evalf(C.substitute(inv(M), M, MX(A)))) ≈ [0.6 -0.2; -0.2 0.4]
+    @test Matrix(C.evalf(C.substitute(C.inv(M), M, MX(A)))) ≈ [0.6 -0.2; -0.2 0.4]
 end
 
 # ---- simplify doesn't crash and preserves value ----
