@@ -87,6 +87,13 @@ namespace casadi {
     return ret;
   }
 
+  void BSplineCommon::check_coeffs(casadi_int n, casadi_int m,
+      const std::vector<casadi_int>& offset, const std::vector<casadi_int>& degree) {
+    casadi_int expected = get_coeff_size(m, offset, degree);
+    casadi_assert(n==expected,
+      "Expected " + str(expected) + " coefficients, but got " + str(n) + ".");
+  }
+
   void BSplineCommon::prepare(casadi_int m, const std::vector<casadi_int>& offset,
       const std::vector<casadi_int>& degree, casadi_int &coeffs_size,
       std::vector<casadi_int>& coeffs_dims, std::vector<casadi_int>& strides) {
@@ -290,12 +297,15 @@ namespace casadi {
         do_inline_flag = op.second;
       } else if (op.first=="lookup_mode") {
         lookup_mode = op.second;
+      } else {
+        casadi_error("Unknown option '" + op.first + "'.");
       }
     }
 
     std::vector<casadi_int> offset;
     std::vector<double> stacked;
     Interpolant::stack_grid(knots, offset, stacked);
+    check_coeffs(coeffs.size(), m, offset, degree);
 
     std::vector<casadi_int> mode =
       Interpolant::interpret_lookup_mode(lookup_mode, stacked, offset, degree, degree);
@@ -327,12 +337,15 @@ namespace casadi {
         do_inline_flag = op.second;
       } else if (op.first=="lookup_mode") {
         lookup_mode = op.second;
+      } else {
+        casadi_error("Unknown option '" + op.first + "'.");
       }
     }
 
     std::vector<casadi_int> offset;
     std::vector<double> stacked;
     Interpolant::stack_grid(knots, offset, stacked);
+    check_coeffs(coeffs.numel(), m, offset, degree);
     std::vector<casadi_int> mode =
       Interpolant::interpret_lookup_mode(lookup_mode, stacked, offset, degree, degree);
 
@@ -361,6 +374,8 @@ namespace casadi {
     for (auto&& op : opts) {
       if (op.first=="lookup_mode") {
         lookup_mode = op.second;
+      } else if (op.first!="inline") {
+        casadi_error("Unknown option '" + op.first + "'.");
       }
     }
 
@@ -370,6 +385,7 @@ namespace casadi {
     for (casadi_int i=0; i<knots.size(); ++i) {
       offset[i+1] = offset[i] + knots[i].size1();
     }
+    check_coeffs(coeffs.numel(), m, offset, degree);
 
     std::vector<casadi_int> mode =
       Interpolant::interpret_lookup_mode(lookup_mode, std::vector<double>(),

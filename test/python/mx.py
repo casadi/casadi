@@ -5385,6 +5385,14 @@ class MXtests(casadiTestCase):
     f = ca.Function("f", [Z0], [Z])
     self.checkarray(f(ca.DM.zeros(3, 3)), ca.DM([[0, 0, 0], [0, 1, 0], [0, 0, 0]]))
 
+  def test_bspline_checks(self):
+    x = ca.MX.sym("x")
+    knots = [[0, 0, 0, 0, 1, 1, 1, 1]]
+    with self.assertInException("Expected 4 coefficients, but got 2"):
+      ca.bspline(x, ca.DM([1, 2]), knots, [3], 1, {})
+    with self.assertInException("Unknown option 'foo'"):
+      ca.bspline(x, ca.DM([1, 2, 3, 4]), knots, [3], 1, {"foo": 1})
+
   def test_set_precision(self):
     # Issue #4326: numeric MX constants honor DM::set_precision
     # (the value lives in a DM-like node, so MX printing piggybacks
