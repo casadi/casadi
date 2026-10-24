@@ -3944,8 +3944,10 @@ namespace casadi {
 
   template<typename MatType>
   MatType GenericMatrix<MatType>::repsum(const MatType& x, casadi_int n, casadi_int m) {
-    casadi_assert_dev(x.size1() % n==0);
-    casadi_assert_dev(x.size2() % m==0);
+    casadi_assert(n>0 && x.size1() % n==0,
+      "repsum: x.size1() (" + str(x.size1()) + ") must be a multiple of n (" + str(n) + ")");
+    casadi_assert(m>0 && x.size2() % m==0,
+      "repsum: x.size2() (" + str(x.size2()) + ") must be a multiple of m (" + str(m) + ")");
     std::vector< std::vector< MatType> > s =
       blocksplit(x, x.size1()/n, x.size2()/m);
     MatType sum = 0;
