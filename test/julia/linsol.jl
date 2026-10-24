@@ -34,6 +34,8 @@ for (plugin, req) in LIN_SOLVERS
         x = C.solve(ls, A, b, false)
         ref = _solve2(_Arow2(req.sym), [1.0, 0.5])
         @test maximum(abs.(Vector{Float64}(x) .- ref)) < req.tol
+        @test maximum(abs.(Vector{Float64}(C.solve(ls, A, b)) .- ref)) < req.tol
+        @test maximum(abs.(Vector{Float64}(ls.solve(A, b)) .- ref)) < req.tol
 
         # --- transpose solve A' x = b ---
         xt = C.solve(ls, A, b, true)
