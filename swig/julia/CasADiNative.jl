@@ -50,6 +50,7 @@ C.MX(v::AbstractVector{<:Real}) = C.MX(C.DM(collect(Float64, v)))
 # ---- conversion (promotion by DM < SX < MX rank); generated ctors handle reals ----
 # Julia numbers and arrays promote exactly like DM (`_Num`).
 const _Num = Union{Real,DM,AbstractArray{<:Real}}
+const _Proxy = Union{(t for (_, t) in casadi._proxy_types)...}
 Base.convert(::Type{SX}, v::_Num) = C.SX(v isa Real ? Float64(v) : v)
 Base.convert(::Type{MX}, v::_Num) = C.MX(v isa Real ? Float64(v) : v)
 Base.convert(::Type{DM}, v::Union{Real,AbstractArray{<:Real}}) = C.DM(v isa Real ? Float64(v) : v)
@@ -152,7 +153,7 @@ end
 # fused chain still maps to elementwise times rather than Base.:* (mtimes).
 _bceval(x) = x
 function _bceval(bc::Base.Broadcast.Broadcasted{CasadiStyle})
-    args = map(_bceval, bc.args)
+    args = Base.map(_bceval, bc.args)
     bc.f === Base.literal_pow && return _apply(bc.f, args...)
     # Float64.(dm) etc.: a numeric conversion broadcast over a single casadi matrix
     # escapes to a Julia array of converted scalars (not a casadi op).
@@ -166,7 +167,7 @@ function _bceval(bc::Base.Broadcast.Broadcasted{CasadiStyle})
 end
 # any other f is applied to each element, with Julia's broadcast shape rules
 function _bcelem(f, args)
-    r = Base.broadcast(f, map(a -> a isa _Cat ? Base.collect(a) : a, args)...)
+    r = Base.broadcast(f, Base.map(a -> a isa _Cat ? Base.collect(a) : a, args)...)
     r isa AbstractArray || return r
     T = _catpromote(Base.vec(r))
     _restore(T, C.reshape(C._vertcat(_cvec(Base.vec(r))), Base.size(r, 1), Base.size(r, 2)))
@@ -770,6 +771,8 @@ Base.convert(::Type{CasadiFunction}, cb::C.Callback) = CasadiFunction(cb)
 # A constructed Callback proxy is a casadi Function; call it like one (numeric or symbolic).
 (cb::C.Callback)(args...; kwargs...) = CasadiFunction(cb)(args...; kwargs...)
 
+det(a::Union{_Cat,C.Linsol}, args...) = C.det(a, args...)
+
 # ---- full-surface qualified access ----
 # `import CasADiNative as ca` -> `ca.<name>` for the ENTIRE generated surface, including
 # member-style methods (ca.str, ca.nnz, ca.size1, ...) that casadi does not `export` and
@@ -777,11 +780,22 @@ Base.convert(::Type{CasadiFunction}, cb::C.Callback) = CasadiFunction(cb)
 # via isdefined). Mirrors Python's `import casadi as ca`; `using CasADiNative` is `import *`.
 # `@__MODULE__` rather than a literal name: this file is also spliced, unwrapped, into
 # the CasADiNative.jl package's own module.
+# A casadi method named like a Base function (map, copy, get, min, ...) gets its own
+# `ca.` function: casadi's for a casadi object first argument, Base's otherwise.
 for _n in names(casadi; all=true)
     _s = Base.string(_n)
     (Base.isempty(_s) || _s[1] == '_' || _s[1] == '#' || _s[1] == '@') && continue
-    (Base.isdefined(@__MODULE__, _n) || !Base.isdefined(casadi, _n)) && continue
-    @eval const $_n = casadi.$_n
+    Base.isdefined(casadi, _n) || continue
+    if !Base.isdefined(@__MODULE__, _n)
+        @eval const $_n = casadi.$_n
+    elseif _n in (:eval, :include) || _n in Base.names(@__MODULE__; all=true)
+        continue
+    elseif (_f = Base.getfield(@__MODULE__, _n)) !== Base.getfield(casadi, _n) && _f isa Base.Function
+        @eval begin
+            $_n(a::_Proxy, args...; kw...) = casadi.$_n(a, args...; kw...)
+            $_n(args...; kw...) = $_f(args...; kw...)
+        end
+    end
 end
 
 end # module CasADiNative

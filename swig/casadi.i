@@ -6905,6 +6905,8 @@ casadi::OptiCallback* julia_opti_callback(jl_value_t* fh) { return new SwigDirec
   void callback(jl_value_t* fh) { $self->callback_class(julia_opti_callback(fh)); }
   void callback() { $self->callback_class(); }
 }
+// copy(::Opti) is an independent problem; the copy constructor shares it
+%feature("julia:copy", "copy") casadi::Opti;
 #endif
 
 %julia_convention_repair()

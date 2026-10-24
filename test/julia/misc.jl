@@ -136,3 +136,21 @@ end
     f = C.Function("f", [x], [s])
     @test abs(Float64(f(DM(3.0))) - 9.0) < 1e-12             # x^2 at x=3
 end
+
+@testset "ca.<name> of a casadi method named like a Base function" begin
+    CN = CasADiNative
+    x = sym(SX, "x"); f = C.Function("f", [x], [2 * x])
+    @test C.n_out(CN.map(f, 3)) == 1 && C.size2_in(CN.map(f, 3), 0) == 3
+    @test C.n_in(CN.reverse(f, 1)) == 3
+    @test CN.map(y -> y + 1, [1, 2]) == [2, 3]
+    @test CN.max(1, 2) == 2
+    @test C.nnz(CN.intersect(C.diag(Sparsity, 2), C.dense(Sparsity, 2, 2))) == 2
+    @test Float64(CN.det(DM([1 2; 3 4]), "qr")) ≈ -2
+    A = DM([3 1; 1 2])
+    @test Float64(CN.det(C.Linsol("L", "qr", C.sparsity(A)), A)) ≈ 5
+    opti = Opti(); y = opti.variable()
+    for o2 in (CN.copy(opti), copy(opti))
+        o2.subject_to(y >= 2)
+        @test C.ng(o2) == 1 && C.ng(opti) == 0
+    end
+end
