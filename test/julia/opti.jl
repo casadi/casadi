@@ -46,3 +46,15 @@ HAS_IPOPT && @testset "OptiSol/Opti stats() return a Julia Dict" begin
     @test st["success"] === true
     @test opti.stats()["return_status"] == "Solve_Succeeded"   # method-style on Opti
 end
+
+HAS_IPOPT && @testset "Opti free functions reach every overload" begin
+    opti = Opti(); x = opti.variable(); p = opti.parameter()
+    minimize(opti, (x - 3)^2, 2)
+    opti.set_value(p, 2)
+    solver!(opti, "ipopt", Dict("print_time" => false), Dict("print_level" => 0))
+    sol = solve!(opti)
+    @test abs(value(sol, x) - 3) < 1e-6
+    @test value(opti, x + p, [x == 1]) == 3
+    set_initial(opti, C.value_variables(sol))
+    @test length(C.initial(opti)) == 1
+end

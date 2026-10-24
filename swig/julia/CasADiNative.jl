@@ -615,17 +615,14 @@ diagcat(v::AbstractVector{Sparsity}) = C.diagcat(v)
 # `using`-style bare calls resolve. Only the value-coercing ones keep a wrapper.
 export Opti, variable, parameter, subject_to, minimize, bounded, solver!, solve!, value
 const Opti = C.Opti
-minimize(o::Opti, ex) = C.minimize(o, convert(MX, ex isa Union{SX,MX} ? ex : MX(ex)))
 bounded(lb, ex::MX, ub) = C.bounded(C.Opti, convert(MX, lb), ex, convert(MX, ub))
 # casadi-style positional option dicts (plugin_options, solver_options), NOT kwargs.
 solver!(o::Opti, plugin::AbstractString, plugin_opts=Dict{String,Any}(), solver_opts=Dict{String,Any}()) =
     C.solver(o, plugin, plugin_opts, solver_opts)
 solve!(o::Opti) = C.solve(o)
-# value() comes back as native Julia from the wrapper itself (native_DM typemap):
-# scalar Float64, row or column -> Vector, else Matrix -- also via `sol.value(x)`.
-value(sol, x) = C.value(sol, x)
+# value() comes back as native Julia (native_DM typemap): scalar Float64, row or
+# column -> Vector, else Matrix -- also via `sol.value(x)`.
 export set_initial
-set_initial(o::Opti, x, v) = C.set_initial(o, x, v)
 
 # ---- 1-based indexing: Julia ranges -> casadi Slice (0-based stop-exclusive) ----
 # Reject i < 1 (Julia/MATLAB are 1-based; never Python-style negative wraparound).
