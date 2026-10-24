@@ -77,6 +77,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>show_eval_warnings</td><td>OT_BOOL</td><td>Show warnings generated from function evaluations [true]</td><td>casadi::OracleFunction</td></tr>
@@ -166,6 +167,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>show_eval_warnings</td><td>OT_BOOL</td><td>Show warnings generated from function evaluations [true]</td><td>casadi::OracleFunction</td></tr>
@@ -254,6 +256,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>show_eval_warnings</td><td>OT_BOOL</td><td>Show warnings generated from function evaluations [true]</td><td>casadi::OracleFunction</td></tr>
@@ -352,6 +355,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>show_eval_warnings</td><td>OT_BOOL</td><td>Show warnings generated from function evaluations [true]</td><td>casadi::OracleFunction</td></tr>
@@ -700,6 +704,7 @@
 <tr><td>s_f</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
 <tr><td>s_theta</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
 <tr><td>schur</td><td>OT_BOOL</td><td>Use qpOASES Schur compliment approach</td><td>casadi::Blocksqp</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>show_eval_warnings</td><td>OT_BOOL</td><td>Show warnings generated from function evaluations [true]</td><td>casadi::OracleFunction</td></tr>
@@ -908,6 +913,7 @@
 <tr><td>s_f</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
 <tr><td>s_theta</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
 <tr><td>schur</td><td>OT_BOOL</td><td>Use qpOASES Schur compliment approach</td><td>casadi::Blocksqp</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>show_eval_warnings</td><td>OT_BOOL</td><td>Show warnings generated from function evaluations [true]</td><td>casadi::OracleFunction</td></tr>
@@ -1014,6 +1020,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>show_eval_warnings</td><td>OT_BOOL</td><td>Show warnings generated from function evaluations [true]</td><td>casadi::OracleFunction</td></tr>
@@ -1146,6 +1153,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>show_eval_warnings</td><td>OT_BOOL</td><td>Show warnings generated from function evaluations [true]</td><td>casadi::OracleFunction</td></tr>
@@ -1221,6 +1229,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Conic</td></tr>
 <tr><td>sens_min_lam</td><td>OT_DOUBLE</td><td>Minimum multiplier value for a constraint to be considered active in parametric sensitivities [0].</td><td>casadi::Conic</td></tr>
@@ -1304,6 +1313,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Conic</td></tr>
 <tr><td>sens_min_lam</td><td>OT_DOUBLE</td><td>Minimum multiplier value for a constraint to be considered active in parametric sensitivities [0].</td><td>casadi::Conic</td></tr>
@@ -1407,6 +1417,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Conic</td></tr>
 <tr><td>sens_min_lam</td><td>OT_DOUBLE</td><td>Minimum multiplier value for a constraint to be considered active in parametric sensitivities [0].</td><td>casadi::Conic</td></tr>
@@ -1482,6 +1493,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Conic</td></tr>
 <tr><td>sens_min_lam</td><td>OT_DOUBLE</td><td>Minimum multiplier value for a constraint to be considered active in parametric sensitivities [0].</td><td>casadi::Conic</td></tr>
@@ -1548,6 +1560,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Conic</td></tr>
 <tr><td>sens_min_lam</td><td>OT_DOUBLE</td><td>Minimum multiplier value for a constraint to be considered active in parametric sensitivities [0].</td><td>casadi::Conic</td></tr>
@@ -1623,6 +1636,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Conic</td></tr>
 <tr><td>sens_min_lam</td><td>OT_DOUBLE</td><td>Minimum multiplier value for a constraint to be considered active in parametric sensitivities [0].</td><td>casadi::Conic</td></tr>
@@ -1869,6 +1883,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Conic</td></tr>
 <tr><td>sens_min_lam</td><td>OT_DOUBLE</td><td>Minimum multiplier value for a constraint to be considered active in parametric sensitivities [0].</td><td>casadi::Conic</td></tr>
@@ -1934,6 +1949,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Conic</td></tr>
 <tr><td>sens_min_lam</td><td>OT_DOUBLE</td><td>Minimum multiplier value for a constraint to be considered active in parametric sensitivities [0].</td><td>casadi::Conic</td></tr>
@@ -2024,6 +2040,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>show_eval_warnings</td><td>OT_BOOL</td><td>Show warnings generated from function evaluations [true]</td><td>casadi::OracleFunction</td></tr>
@@ -2117,6 +2134,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>show_eval_warnings</td><td>OT_BOOL</td><td>Show warnings generated from function evaluations [true]</td><td>casadi::OracleFunction</td></tr>
@@ -2191,6 +2209,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Conic</td></tr>
 <tr><td>sens_min_lam</td><td>OT_DOUBLE</td><td>Minimum multiplier value for a constraint to be considered active in parametric sensitivities [0].</td><td>casadi::Conic</td></tr>
@@ -2288,6 +2307,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Conic</td></tr>
 <tr><td>sens_min_lam</td><td>OT_DOUBLE</td><td>Minimum multiplier value for a constraint to be considered active in parametric sensitivities [0].</td><td>casadi::Conic</td></tr>
@@ -2611,6 +2631,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Conic</td></tr>
 <tr><td>sens_min_lam</td><td>OT_DOUBLE</td><td>Minimum multiplier value for a constraint to be considered active in parametric sensitivities [0].</td><td>casadi::Conic</td></tr>
@@ -2686,6 +2707,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Conic</td></tr>
 <tr><td>sens_min_lam</td><td>OT_DOUBLE</td><td>Minimum multiplier value for a constraint to be considered active in parametric sensitivities [0].</td><td>casadi::Conic</td></tr>
@@ -2890,7 +2912,7 @@
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td><td>casadi::Integrator</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>
-<tr><td>quad_err_con</td><td>OT_BOOL</td><td>Adaptive steps: include the quadratures in the error control [false]</td><td>casadi::RuntimeIntegrator</td></tr>
+<tr><td>quad_err_con</td><td>OT_BOOL</td><td>Adaptive steps: include the quadratures in the error control [true]</td><td>casadi::RuntimeIntegrator</td></tr>
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reltol</td><td>OT_DOUBLE</td><td>Relative tolerance [1e-6]</td><td>casadi::RuntimeIntegrator</td></tr>
@@ -2924,7 +2946,7 @@
 <tr><td>max_tape_steps</td><td>OT_INT</td><td>Adaptive steps: capacity, in steps, of a tape in the work vector, for adjoint sensitivities; needed for code generation [0: tape of unbounded size]. With fixed steps, the tape is sized exactly.</td></tr>
 <tr><td>method</td><td>OT_STRING</td><td>Runge-Kutta method: 'rk45' (pair of order 5(4), adaptive unless step_size is set) or 'rk4' (classical, order 4, fixed steps only; default step_size (tf - t0)/20) [rk45]</td></tr>
 <tr><td>min_step_size</td><td>OT_DOUBLE</td><td>Adaptive steps: minimum step size [1e-14]</td></tr>
-<tr><td>quad_err_con</td><td>OT_BOOL</td><td>Adaptive steps: include the quadratures in the error control [false]</td></tr>
+<tr><td>quad_err_con</td><td>OT_BOOL</td><td>Adaptive steps: include the quadratures in the error control [true]</td></tr>
 <tr><td>reltol</td><td>OT_DOUBLE</td><td>Relative tolerance [1e-6]</td></tr>
 <tr><td>step0</td><td>OT_DOUBLE</td><td>Adaptive steps: initial step size [default: estimated]</td></tr>
 <tr><td>step_size</td><td>OT_DOUBLE</td><td>Fixed steps: each run of steps, over a control group or up to the end without controls, is divided into equal steps of at most step_size [0: adaptive steps]</td></tr>
@@ -3001,7 +3023,7 @@
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td><td>casadi::Integrator</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>
-<tr><td>quad_err_con</td><td>OT_BOOL</td><td>Adaptive steps: include the quadratures in the error control [false]</td><td>casadi::RuntimeIntegrator</td></tr>
+<tr><td>quad_err_con</td><td>OT_BOOL</td><td>Adaptive steps: include the quadratures in the error control [true]</td><td>casadi::RuntimeIntegrator</td></tr>
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reltol</td><td>OT_DOUBLE</td><td>Relative tolerance [1e-6]</td><td>casadi::RuntimeIntegrator</td></tr>
@@ -3358,6 +3380,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Conic</td></tr>
 <tr><td>sens_min_lam</td><td>OT_DOUBLE</td><td>Minimum multiplier value for a constraint to be considered active in parametric sensitivities [0].</td><td>casadi::Conic</td></tr>
@@ -3443,6 +3466,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Conic</td></tr>
 <tr><td>sens_min_lam</td><td>OT_DOUBLE</td><td>Minimum multiplier value for a constraint to be considered active in parametric sensitivities [0].</td><td>casadi::Conic</td></tr>
@@ -3538,6 +3562,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>show_eval_warnings</td><td>OT_BOOL</td><td>Show warnings generated from function evaluations [true]</td><td>casadi::OracleFunction</td></tr>
@@ -3652,6 +3677,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>show_eval_warnings</td><td>OT_BOOL</td><td>Show warnings generated from function evaluations [true]</td><td>casadi::OracleFunction</td></tr>
@@ -3765,6 +3791,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>show_eval_warnings</td><td>OT_BOOL</td><td>Show warnings generated from function evaluations [true]</td><td>casadi::OracleFunction</td></tr>
@@ -3939,6 +3966,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>show_eval_warnings</td><td>OT_BOOL</td><td>Show warnings generated from function evaluations [true]</td><td>casadi::OracleFunction</td></tr>
@@ -4466,6 +4494,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Conic</td></tr>
 <tr><td>sens_min_lam</td><td>OT_DOUBLE</td><td>Minimum multiplier value for a constraint to be considered active in parametric sensitivities [0].</td><td>casadi::Conic</td></tr>
@@ -4551,6 +4580,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Conic</td></tr>
 <tr><td>sens_min_lam</td><td>OT_DOUBLE</td><td>Minimum multiplier value for a constraint to be considered active in parametric sensitivities [0].</td><td>casadi::Conic</td></tr>
@@ -4621,6 +4651,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Conic</td></tr>
 <tr><td>sens_min_lam</td><td>OT_DOUBLE</td><td>Minimum multiplier value for a constraint to be considered active in parametric sensitivities [0].</td><td>casadi::Conic</td></tr>
@@ -4696,6 +4727,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Conic</td></tr>
 <tr><td>sens_min_lam</td><td>OT_DOUBLE</td><td>Minimum multiplier value for a constraint to be considered active in parametric sensitivities [0].</td><td>casadi::Conic</td></tr>
@@ -4767,6 +4799,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Conic</td></tr>
 <tr><td>sens_min_lam</td><td>OT_DOUBLE</td><td>Minimum multiplier value for a constraint to be considered active in parametric sensitivities [0].</td><td>casadi::Conic</td></tr>
@@ -4852,6 +4885,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Conic</td></tr>
 <tr><td>sens_min_lam</td><td>OT_DOUBLE</td><td>Minimum multiplier value for a constraint to be considered active in parametric sensitivities [0].</td><td>casadi::Conic</td></tr>
@@ -4926,6 +4960,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Conic</td></tr>
 <tr><td>sens_min_lam</td><td>OT_DOUBLE</td><td>Minimum multiplier value for a constraint to be considered active in parametric sensitivities [0].</td><td>casadi::Conic</td></tr>
@@ -5023,6 +5058,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Conic</td></tr>
 <tr><td>sens_min_lam</td><td>OT_DOUBLE</td><td>Minimum multiplier value for a constraint to be considered active in parametric sensitivities [0].</td><td>casadi::Conic</td></tr>
@@ -6007,6 +6043,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>show_eval_warnings</td><td>OT_BOOL</td><td>Show warnings generated from function evaluations [true]</td><td>casadi::OracleFunction</td></tr>
@@ -6139,6 +6176,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>show_eval_warnings</td><td>OT_BOOL</td><td>Show warnings generated from function evaluations [true]</td><td>casadi::OracleFunction</td></tr>
@@ -6218,6 +6256,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Conic</td></tr>
 <tr><td>sens_min_lam</td><td>OT_DOUBLE</td><td>Minimum multiplier value for a constraint to be considered active in parametric sensitivities [0].</td><td>casadi::Conic</td></tr>
@@ -6309,6 +6348,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Conic</td></tr>
 <tr><td>sens_min_lam</td><td>OT_DOUBLE</td><td>Minimum multiplier value for a constraint to be considered active in parametric sensitivities [0].</td><td>casadi::Conic</td></tr>
@@ -6655,6 +6695,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>show_eval_warnings</td><td>OT_BOOL</td><td>Show warnings generated from function evaluations [true]</td><td>casadi::OracleFunction</td></tr>
@@ -6761,6 +6802,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>show_eval_warnings</td><td>OT_BOOL</td><td>Show warnings generated from function evaluations [true]</td><td>casadi::OracleFunction</td></tr>
@@ -7383,6 +7425,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>show_eval_warnings</td><td>OT_BOOL</td><td>Show warnings generated from function evaluations [true]</td><td>casadi::OracleFunction</td></tr>
@@ -7491,6 +7534,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>show_eval_warnings</td><td>OT_BOOL</td><td>Show warnings generated from function evaluations [true]</td><td>casadi::OracleFunction</td></tr>
@@ -7582,6 +7626,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>show_eval_warnings</td><td>OT_BOOL</td><td>Show warnings generated from function evaluations [true]</td><td>casadi::OracleFunction</td></tr>
@@ -7684,6 +7729,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>show_eval_warnings</td><td>OT_BOOL</td><td>Show warnings generated from function evaluations [true]</td><td>casadi::OracleFunction</td></tr>
@@ -7752,6 +7798,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Conic</td></tr>
 <tr><td>sens_min_lam</td><td>OT_DOUBLE</td><td>Minimum multiplier value for a constraint to be considered active in parametric sensitivities [0].</td><td>casadi::Conic</td></tr>
@@ -7827,6 +7874,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Conic</td></tr>
 <tr><td>sens_min_lam</td><td>OT_DOUBLE</td><td>Minimum multiplier value for a constraint to be considered active in parametric sensitivities [0].</td><td>casadi::Conic</td></tr>
@@ -8118,6 +8166,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>show_eval_warnings</td><td>OT_BOOL</td><td>Show warnings generated from function evaluations [true]</td><td>casadi::OracleFunction</td></tr>
@@ -8206,6 +8255,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>show_eval_warnings</td><td>OT_BOOL</td><td>Show warnings generated from function evaluations [true]</td><td>casadi::OracleFunction</td></tr>
@@ -8570,6 +8620,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Conic</td></tr>
 <tr><td>sens_min_lam</td><td>OT_DOUBLE</td><td>Minimum multiplier value for a constraint to be considered active in parametric sensitivities [0].</td><td>casadi::Conic</td></tr>
@@ -8649,6 +8700,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Conic</td></tr>
 <tr><td>sens_min_lam</td><td>OT_DOUBLE</td><td>Minimum multiplier value for a constraint to be considered active in parametric sensitivities [0].</td><td>casadi::Conic</td></tr>
@@ -8780,6 +8832,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Conic</td></tr>
 <tr><td>sens_min_lam</td><td>OT_DOUBLE</td><td>Minimum multiplier value for a constraint to be considered active in parametric sensitivities [0].</td><td>casadi::Conic</td></tr>
@@ -8859,6 +8912,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Conic</td></tr>
 <tr><td>sens_min_lam</td><td>OT_DOUBLE</td><td>Minimum multiplier value for a constraint to be considered active in parametric sensitivities [0].</td><td>casadi::Conic</td></tr>
@@ -8927,6 +8981,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Conic</td></tr>
 <tr><td>sens_min_lam</td><td>OT_DOUBLE</td><td>Minimum multiplier value for a constraint to be considered active in parametric sensitivities [0].</td><td>casadi::Conic</td></tr>
@@ -9002,6 +9057,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Conic</td></tr>
 <tr><td>sens_min_lam</td><td>OT_DOUBLE</td><td>Minimum multiplier value for a constraint to be considered active in parametric sensitivities [0].</td><td>casadi::Conic</td></tr>
@@ -9083,6 +9139,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Conic</td></tr>
 <tr><td>sens_min_lam</td><td>OT_DOUBLE</td><td>Minimum multiplier value for a constraint to be considered active in parametric sensitivities [0].</td><td>casadi::Conic</td></tr>
@@ -9162,6 +9219,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Conic</td></tr>
 <tr><td>sens_min_lam</td><td>OT_DOUBLE</td><td>Minimum multiplier value for a constraint to be considered active in parametric sensitivities [0].</td><td>casadi::Conic</td></tr>
@@ -9231,6 +9289,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Conic</td></tr>
 <tr><td>sens_min_lam</td><td>OT_DOUBLE</td><td>Minimum multiplier value for a constraint to be considered active in parametric sensitivities [0].</td><td>casadi::Conic</td></tr>
@@ -9308,6 +9367,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Conic</td></tr>
 <tr><td>sens_min_lam</td><td>OT_DOUBLE</td><td>Minimum multiplier value for a constraint to be considered active in parametric sensitivities [0].</td><td>casadi::Conic</td></tr>
@@ -9408,6 +9468,7 @@
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>schur</td><td>OT_BOOL</td><td>Use Schur Complement Approach [false]</td><td>casadi::QpoasesInterface</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Conic</td></tr>
 <tr><td>sens_min_lam</td><td>OT_DOUBLE</td><td>Minimum multiplier value for a constraint to be considered active in parametric sensitivities [0].</td><td>casadi::Conic</td></tr>
@@ -9555,6 +9616,7 @@
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>schur</td><td>OT_BOOL</td><td>Use Schur Complement Approach [false]</td><td>casadi::QpoasesInterface</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Conic</td></tr>
 <tr><td>sens_min_lam</td><td>OT_DOUBLE</td><td>Minimum multiplier value for a constraint to be considered active in parametric sensitivities [0].</td><td>casadi::Conic</td></tr>
@@ -9630,6 +9692,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Conic</td></tr>
 <tr><td>sens_min_lam</td><td>OT_DOUBLE</td><td>Minimum multiplier value for a constraint to be considered active in parametric sensitivities [0].</td><td>casadi::Conic</td></tr>
@@ -9719,6 +9782,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Conic</td></tr>
 <tr><td>sens_min_lam</td><td>OT_DOUBLE</td><td>Minimum multiplier value for a constraint to be considered active in parametric sensitivities [0].</td><td>casadi::Conic</td></tr>
@@ -9819,6 +9883,7 @@
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularize</td><td>OT_BOOL</td><td>Automatic regularization of Lagrange Hessian.</td><td>casadi::Qrsqp</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>show_eval_warnings</td><td>OT_BOOL</td><td>Show warnings generated from function evaluations [true]</td><td>casadi::OracleFunction</td></tr>
@@ -9947,6 +10012,7 @@
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularize</td><td>OT_BOOL</td><td>Automatic regularization of Lagrange Hessian.</td><td>casadi::Qrsqp</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>show_eval_warnings</td><td>OT_BOOL</td><td>Show warnings generated from function evaluations [true]</td><td>casadi::OracleFunction</td></tr>
@@ -10172,7 +10238,7 @@
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td><td>casadi::Integrator</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>
-<tr><td>quad_err_con</td><td>OT_BOOL</td><td>Adaptive steps: include the quadratures in the error control [false]</td><td>casadi::RuntimeIntegrator</td></tr>
+<tr><td>quad_err_con</td><td>OT_BOOL</td><td>Adaptive steps: include the quadratures in the error control [true]</td><td>casadi::RuntimeIntegrator</td></tr>
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reltol</td><td>OT_DOUBLE</td><td>Relative tolerance [1e-6]</td><td>casadi::RuntimeIntegrator</td></tr>
@@ -10207,7 +10273,7 @@
 <tr><td>max_step_size</td><td>OT_DOUBLE</td><td>Adaptive steps: maximum step size [default: unbounded]</td></tr>
 <tr><td>max_tape_steps</td><td>OT_INT</td><td>Adaptive steps: capacity, in steps, of a tape in the work vector, for adjoint sensitivities; needed for code generation [0: tape of unbounded size]. With fixed steps, the tape is sized exactly.</td></tr>
 <tr><td>min_step_size</td><td>OT_DOUBLE</td><td>Adaptive steps: minimum step size [1e-14]</td></tr>
-<tr><td>quad_err_con</td><td>OT_BOOL</td><td>Adaptive steps: include the quadratures in the error control [false]</td></tr>
+<tr><td>quad_err_con</td><td>OT_BOOL</td><td>Adaptive steps: include the quadratures in the error control [true]</td></tr>
 <tr><td>reltol</td><td>OT_DOUBLE</td><td>Relative tolerance [1e-6]</td></tr>
 <tr><td>step0</td><td>OT_DOUBLE</td><td>Adaptive steps: initial step size [default: estimated]</td></tr>
 <tr><td>step_size</td><td>OT_DOUBLE</td><td>Fixed steps: each run of steps, over a control group or up to the end without controls, is divided into equal steps of at most step_size [0: adaptive steps]</td></tr>
@@ -10285,7 +10351,7 @@
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td><td>casadi::Integrator</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>
-<tr><td>quad_err_con</td><td>OT_BOOL</td><td>Adaptive steps: include the quadratures in the error control [false]</td><td>casadi::RuntimeIntegrator</td></tr>
+<tr><td>quad_err_con</td><td>OT_BOOL</td><td>Adaptive steps: include the quadratures in the error control [true]</td><td>casadi::RuntimeIntegrator</td></tr>
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reltol</td><td>OT_DOUBLE</td><td>Relative tolerance [1e-6]</td><td>casadi::RuntimeIntegrator</td></tr>
@@ -10376,7 +10442,7 @@
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td><td>casadi::Integrator</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>
-<tr><td>quad_err_con</td><td>OT_BOOL</td><td>Adaptive steps: include the quadratures in the error control [false]</td><td>casadi::RuntimeIntegrator</td></tr>
+<tr><td>quad_err_con</td><td>OT_BOOL</td><td>Adaptive steps: include the quadratures in the error control [true]</td><td>casadi::RuntimeIntegrator</td></tr>
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reltol</td><td>OT_DOUBLE</td><td>Relative tolerance [1e-6]</td><td>casadi::RuntimeIntegrator</td></tr>
@@ -10467,7 +10533,7 @@
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td><td>casadi::Integrator</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>
-<tr><td>quad_err_con</td><td>OT_BOOL</td><td>Adaptive steps: include the quadratures in the error control [false]</td><td>casadi::RuntimeIntegrator</td></tr>
+<tr><td>quad_err_con</td><td>OT_BOOL</td><td>Adaptive steps: include the quadratures in the error control [true]</td><td>casadi::RuntimeIntegrator</td></tr>
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reltol</td><td>OT_DOUBLE</td><td>Relative tolerance [1e-6]</td><td>casadi::RuntimeIntegrator</td></tr>
@@ -10568,6 +10634,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>show_eval_warnings</td><td>OT_BOOL</td><td>Show warnings generated from function evaluations [true]</td><td>casadi::OracleFunction</td></tr>
@@ -10660,6 +10727,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>show_eval_warnings</td><td>OT_BOOL</td><td>Show warnings generated from function evaluations [true]</td><td>casadi::OracleFunction</td></tr>
@@ -10833,6 +10901,7 @@
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularize</td><td>OT_BOOL</td><td>Automatic regularization of Lagrange Hessian.</td><td>casadi::Scpgen</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>show_eval_warnings</td><td>OT_BOOL</td><td>Show warnings generated from function evaluations [true]</td><td>casadi::OracleFunction</td></tr>
@@ -10969,6 +11038,7 @@
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularize</td><td>OT_BOOL</td><td>Automatic regularization of Lagrange Hessian.</td><td>casadi::Scpgen</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>show_eval_warnings</td><td>OT_BOOL</td><td>Show warnings generated from function evaluations [true]</td><td>casadi::OracleFunction</td></tr>
@@ -11278,6 +11348,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>show_eval_warnings</td><td>OT_BOOL</td><td>Show warnings generated from function evaluations [true]</td><td>casadi::OracleFunction</td></tr>
@@ -11378,6 +11449,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>show_eval_warnings</td><td>OT_BOOL</td><td>Show warnings generated from function evaluations [true]</td><td>casadi::OracleFunction</td></tr>
@@ -11493,6 +11565,7 @@
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>second_order_corrections</td><td>OT_BOOL</td><td>Enable second order corrections. These are used when a step is considered bad by the merit function and constraint norm (default: false).</td><td>casadi::Sqpmethod</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>show_eval_warnings</td><td>OT_BOOL</td><td>Show warnings generated from function evaluations [true]</td><td>casadi::OracleFunction</td></tr>
@@ -11643,6 +11716,7 @@
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>second_order_corrections</td><td>OT_BOOL</td><td>Enable second order corrections. These are used when a step is considered bad by the merit function and constraint norm (default: false).</td><td>casadi::Sqpmethod</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>show_eval_warnings</td><td>OT_BOOL</td><td>Show warnings generated from function evaluations [true]</td><td>casadi::OracleFunction</td></tr>
@@ -11918,6 +11992,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Conic</td></tr>
 <tr><td>sens_min_lam</td><td>OT_DOUBLE</td><td>Minimum multiplier value for a constraint to be considered active in parametric sensitivities [0].</td><td>casadi::Conic</td></tr>
@@ -11993,6 +12068,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Conic</td></tr>
 <tr><td>sens_min_lam</td><td>OT_DOUBLE</td><td>Minimum multiplier value for a constraint to be considered active in parametric sensitivities [0].</td><td>casadi::Conic</td></tr>
@@ -12207,6 +12283,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>show_eval_warnings</td><td>OT_BOOL</td><td>Show warnings generated from function evaluations [true]</td><td>casadi::OracleFunction</td></tr>
@@ -12305,6 +12382,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>show_eval_warnings</td><td>OT_BOOL</td><td>Show warnings generated from function evaluations [true]</td><td>casadi::OracleFunction</td></tr>
@@ -12394,6 +12472,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>show_eval_warnings</td><td>OT_BOOL</td><td>Show warnings generated from function evaluations [true]</td><td>casadi::OracleFunction</td></tr>
@@ -12492,6 +12571,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Nlpsol</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>show_eval_warnings</td><td>OT_BOOL</td><td>Show warnings generated from function evaluations [true]</td><td>casadi::OracleFunction</td></tr>
@@ -12563,6 +12643,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Conic</td></tr>
 <tr><td>sens_min_lam</td><td>OT_DOUBLE</td><td>Minimum multiplier value for a constraint to be considered active in parametric sensitivities [0].</td><td>casadi::Conic</td></tr>
@@ -12650,6 +12731,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>sens_force_equality</td><td>OT_BOOL</td><td>Treat constraints with equal bounds as active in parametric sensitivities, regardless of the multiplier, see issue #2545 [false].</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol</td><td>OT_STRING</td><td>Linear solver used for parametric sensitivities (default 'qr').</td><td>casadi::Conic</td></tr>
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Conic</td></tr>
 <tr><td>sens_min_lam</td><td>OT_DOUBLE</td><td>Minimum multiplier value for a constraint to be considered active in parametric sensitivities [0].</td><td>casadi::Conic</td></tr>

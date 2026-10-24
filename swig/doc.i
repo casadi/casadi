@@ -83983,6 +83983,17 @@ General information
 |                  |                 | reverse mode     |                  |
 |                  |                 | constructor      |                  |
 +------------------+-----------------+------------------+------------------+
+| sens_force_equal | OT_BOOL         | Treat            | casadi::Conic    |
+| ity              |                 | constraints with |                  |
+|                  |                 | equal bounds as  |                  |
+|                  |                 | active in        |                  |
+|                  |                 | parametric       |                  |
+|                  |                 | sensitivities,   |                  |
+|                  |                 | regardless of    |                  |
+|                  |                 | the multiplier,  |                  |
+|                  |                 | see issue #2545  |                  |
+|                  |                 | [false].         |                  |
++------------------+-----------------+------------------+------------------+
 | sens_linsol      | OT_STRING       | Linear solver    | casadi::Conic    |
 |                  |                 | used for         |                  |
 |                  |                 | parametric       |                  |
@@ -85280,9 +85291,9 @@ See also: conic_option_type, conic_option_info
 Extra doc: https://github.com/casadi/casadi/wiki/L_1ek
 
 Doc source:
-https://github.com/casadi/casadi/blob/main/casadi/core/conic.hpp#L597
+https://github.com/casadi/casadi/blob/main/casadi/core/conic.hpp#L604
 Implementation:
-https://github.com/casadi/casadi/blob/main/casadi/core/conic.cpp#L597-L599
+https://github.com/casadi/casadi/blob/main/casadi/core/conic.cpp#L604-L606
 ";
 
 %feature("docstring")  casadi::conic_option_type(const std::string &name,
@@ -85314,9 +85325,9 @@ Returns:
 Extra doc: https://github.com/casadi/casadi/wiki/L_1el
 
 Doc source:
-https://github.com/casadi/casadi/blob/main/casadi/core/conic.hpp#L601
+https://github.com/casadi/casadi/blob/main/casadi/core/conic.hpp#L608
 Implementation:
-https://github.com/casadi/casadi/blob/main/casadi/core/conic.cpp#L601-L603
+https://github.com/casadi/casadi/blob/main/casadi/core/conic.cpp#L608-L610
 ";
 
 %feature("docstring")  casadi::conic_option_info(const std::string &name,
@@ -85343,9 +85354,9 @@ Parameters:
 Extra doc: https://github.com/casadi/casadi/wiki/L_1em
 
 Doc source:
-https://github.com/casadi/casadi/blob/main/casadi/core/conic.hpp#L605
+https://github.com/casadi/casadi/blob/main/casadi/core/conic.hpp#L612
 Implementation:
-https://github.com/casadi/casadi/blob/main/casadi/core/conic.cpp#L605-L607
+https://github.com/casadi/casadi/blob/main/casadi/core/conic.cpp#L612-L614
 ";
 
 %feature("docstring")  casadi::has_dple(const std::string &name) "
@@ -88162,7 +88173,7 @@ Extra doc: https://github.com/casadi/casadi/wiki/L_2kb
 +--------------------+--------------+--------------------------------------+
 | quad_err_con       | OT_BOOL      | Adaptive steps: include the          |
 |                    |              | quadratures in the error control     |
-|                    |              | [false]                              |
+|                    |              | [true]                               |
 +--------------------+--------------+--------------------------------------+
 | reltol             | OT_DOUBLE    | Relative tolerance [1e-6]            |
 +--------------------+--------------+--------------------------------------+
@@ -88244,7 +88255,7 @@ Extra doc: https://github.com/casadi/casadi/wiki/L_2ka
 +--------------------+--------------+--------------------------------------+
 | quad_err_con       | OT_BOOL      | Adaptive steps: include the          |
 |                    |              | quadratures in the error control     |
-|                    |              | [false]                              |
+|                    |              | [true]                               |
 +--------------------+--------------+--------------------------------------+
 | reltol             | OT_DOUBLE    | Relative tolerance [1e-6]            |
 +--------------------+--------------+--------------------------------------+
@@ -90392,6 +90403,17 @@ General information
 |                  |                 | reverse mode     |                  |
 |                  |                 | constructor      |                  |
 +------------------+-----------------+------------------+------------------+
+| sens_force_equal | OT_BOOL         | Treat            | casadi::Nlpsol   |
+| ity              |                 | constraints with |                  |
+|                  |                 | equal bounds as  |                  |
+|                  |                 | active in        |                  |
+|                  |                 | parametric       |                  |
+|                  |                 | sensitivities,   |                  |
+|                  |                 | regardless of    |                  |
+|                  |                 | the multiplier,  |                  |
+|                  |                 | see issue #2545  |                  |
+|                  |                 | [false].         |                  |
++------------------+-----------------+------------------+------------------+
 | sens_linsol      | OT_STRING       | Linear solver    | casadi::Nlpsol   |
 |                  |                 | used for         |                  |
 |                  |                 | parametric       |                  |
@@ -91963,9 +91985,9 @@ See also: nlpsol_option_type, nlpsol_option_info
 Extra doc: https://github.com/casadi/casadi/wiki/L_1t5
 
 Doc source:
-https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.hpp#L924
+https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.hpp#L931
 Implementation:
-https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.cpp#L924-L926
+https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.cpp#L931-L933
 ";
 
 %feature("docstring")  casadi::nlpsol_option_type(const std::string &name,
@@ -91997,9 +92019,9 @@ Returns:
 Extra doc: https://github.com/casadi/casadi/wiki/L_1t6
 
 Doc source:
-https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.hpp#L928
+https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.hpp#L935
 Implementation:
-https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.cpp#L928-L930
+https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.cpp#L935-L937
 ";
 
 %feature("docstring")  casadi::nlpsol_option_info(const std::string &name,
@@ -92026,9 +92048,9 @@ Parameters:
 Extra doc: https://github.com/casadi/casadi/wiki/L_1t7
 
 Doc source:
-https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.hpp#L932
+https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.hpp#L939
 Implementation:
-https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.cpp#L932-L934
+https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.cpp#L939-L941
 ";
 
 %feature("docstring")  casadi::has_onnxbackend(const std::string &solver) "
