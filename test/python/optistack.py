@@ -1562,6 +1562,16 @@ class OptiStacktests(inherit_from):  # pyright: ignore[reportGeneralTypeIssues]
     def test_optisol_no_debug(self):
         self.assertFalse(hasattr(ca.OptiSol, "debug"))
 
+    def test_describe_range(self):
+        opti = ca.Opti()
+        x = opti.variable()
+        y = opti.variable()
+        opti.minimize(x**2+y**2)
+        with self.assertInException("Index 5 out of range for 2 decision variables"):
+            opti.debug.x_describe(5)
+        with self.assertInException("Index 0 out of range for 0 constraints"):
+            opti.debug.g_describe(0)
+
     @requires_nlpsol("ipopt")
     def test_issue4020(self):
         for constr_fun in [lambda x,y: x**2 - y == 0, lambda x,y: 0==x**2 - y,lambda x,y: x**2 == y, lambda x,y: y==x**2]:

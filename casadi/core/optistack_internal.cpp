@@ -230,8 +230,8 @@ std::string OptiNode::x_describe(casadi_int i, const Dict& opts) const {
 
 MX OptiNode::x_lookup(casadi_int i) const {
   if (problem_dirty()) return baked_copy().x_lookup(i);
-  casadi_assert_dev(i>=0);
-  casadi_assert_dev(i<nx());
+  casadi_assert(i>=0 && i<nx(),
+    "Index " + str(i) + " out of range for " + str(nx()) + " decision variables");
   std::vector<MX> x = active_symvar(OPTI_VAR);
   for (const auto& e : x) {
     const MetaVar& m = meta(e);
@@ -243,8 +243,8 @@ MX OptiNode::x_lookup(casadi_int i) const {
 
 MX OptiNode::g_lookup(casadi_int i) const {
   if (problem_dirty()) return baked_copy().g_lookup(i);
-  casadi_assert_dev(i>=0);
-  casadi_assert_dev(i<ng());
+  casadi_assert(i>=0 && i<ng(),
+    "Index " + str(i) + " out of range for " + str(ng()) + " constraints");
   for (const auto& e : g_) {
     const MetaCon& m = meta_con(e);
     if (i>=m.start && i<m.stop) return e;
