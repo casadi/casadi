@@ -46,7 +46,7 @@ namespace casadi {
     // Default options
     jit_ = true; // override default
     buffered_ = true;
-    enable_fd_ = true; // override default
+    enable_fd_op_ = true; // override default
   }
 
   const Options JitFunction::options_

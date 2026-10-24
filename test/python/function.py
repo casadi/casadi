@@ -5579,6 +5579,12 @@ class Functiontests(casadiTestCase):
       self.assertEqual(adj.size_in(4), (2, 0))
       self.assertEqual(adj.size_out(1), (2, 0))
 
+  @requiresPlugin(ca.Importer,"shell")
+  def test_jit_function_fd(self):
+    if not args.run_slow: return
+    f = ca.Function.jit("f", "b[0] = a[0]*a[0];", ["a"], ["b"], {"compiler": "shell"})
+    self.checkarray(f.jacobian()(3, 0), ca.DM(6), digits=5)
+
   def test_activity(self):
     # issue #3019: value-level "signal activity" propagation (Function::activity).
     # True/active = possibly nonzero. The expected output activity is never hard-coded:
