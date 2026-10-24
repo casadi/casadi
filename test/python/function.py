@@ -5593,6 +5593,10 @@ class Functiontests(casadiTestCase):
     self.assertTrue(g.has_function("f"))
     self.assertFalse(g.has_function("h"))
 
+  def test_string_ctor_hidden(self):
+    with self.assertRaises(NotImplementedError):
+      ca.Function("f")  # expect-error: reportArgumentType
+
   def test_activity(self):
     # issue #3019: value-level "signal activity" propagation (Function::activity).
     # True/active = possibly nonzero. The expected output activity is never hard-coded:

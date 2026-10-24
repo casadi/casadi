@@ -139,6 +139,7 @@ namespace casadi {
         \identifier{1uy} */
     Function();
 
+#ifndef SWIG
     /** \brief Construct from a file; not implemented, raises an error
 
         Use Function::load to read a file written by Function::save.
@@ -147,6 +148,7 @@ namespace casadi {
 
         \identifier{1uz} */
     Function(const std::string& fname);
+#endif // SWIG
 
     ///@{
     /** \brief Construct a function from SX input and output expressions
