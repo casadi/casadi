@@ -1362,6 +1362,9 @@ class Matrixtests(casadiTestCase):
     f = ca.Function("f", [x], [ca.polyval(ca.MX(ca.DM([[1, 2]])), x)])
     self.checkarray(f(3), ca.DM(5))
 
+  def test_det_empty_column(self):
+    self.checkarray(ca.det(ca.DM(ca.Sparsity.triplet(2, 2, [0, 1], [0, 0]), [1, 2])), ca.DM(0))
+
   def test_inplace(self):
     n = 10
     x = ca.MX.sym("x",n)

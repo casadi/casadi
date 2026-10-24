@@ -1883,7 +1883,7 @@ namespace casadi {
     Matrix<casadi_int> col_count = Matrix<casadi_int>::sum1(sp).T();
 
     // A blank col? determinant is structurally zero
-    if (!row_count.is_dense()) return 0;
+    if (!col_count.is_dense()) return 0;
 
     casadi_int min_row = std::distance(row_count.nonzeros().begin(),
                                 std::min_element(row_count.nonzeros().begin(),
