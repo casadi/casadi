@@ -5424,6 +5424,13 @@ class MXtests(casadiTestCase):
       with self.assertInException("Not a unary operation"):
         ca.MX.unary(op, y)
 
+  def test_print_operator_args(self):
+    x = ca.MX.sym("x")
+    y = ca.MX.sym("y")
+    with self.assertInException("Expected 2 argument names, but got 1"):
+      ca.print_operator(x+y, ["a"])
+    self.assertEqual(ca.print_operator(ca.sin(x), ["a", "b"]), "sin(a)")
+
   def test_set_precision(self):
     # Issue #4326: numeric MX constants honor DM::set_precision
     # (the value lives in a DM-like node, so MX printing piggybacks
