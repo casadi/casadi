@@ -134,6 +134,8 @@ namespace casadi {
   }
 
   double Sparsity::density() const {
+    // Empty patterns are dense
+    if (numel()==0) return 100;
     double r = 100;
     r *= static_cast<double>(nnz());
     r /= static_cast<double>(size1());

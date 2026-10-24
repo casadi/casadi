@@ -1120,20 +1120,20 @@ namespace casadi {
     /** \brief Percentage of nonzeros: 100*nnz()/numel()
 
         Computed in floating point, so it does not overflow for large shapes.
-        An empty pattern (numel() == 0) gives NaN.
+        An empty pattern (numel() == 0) is dense and gives 100.
 
         \doctest
         >>> Sparsity.diag(4).density(), Sparsity.dense(2, 2).density()
         (25.0, 100.0)
         >>> Sparsity(0, 3).density()
-        nan
+        100.0
         \enddoctest
 
         \doctest{matlab}
         >> fprintf('%g %g\n', Sparsity.diag(4).density(), Sparsity.dense(2, 2).density())
         25 100
         >> Sparsity(0, 3).density()
-        NaN
+        100
         \enddoctest
 
         \sa nnz, numel, is_dense
