@@ -582,7 +582,8 @@ namespace casadi {
     /** \brief Element-wise inverse, 1/x
 
         Not the matrix inverse: use inv or inv_node for that. Applied twice it returns
-        the original node.
+        the original node. Not available in MATLAB, where inv is the matrix inverse;
+        use 1./x there.
 
         \doctest
         >>> A = MX.sym("A", 2, 2)
@@ -590,16 +591,6 @@ namespace casadi {
         (MX((1./A)), MX(A))
         >>> evalf(MX(4).inv())
         DM(0.25)
-        \enddoctest
-
-        \doctest{matlab}
-        >> A = MX.sym('A', 2, 2);
-        >> B = A.inv();
-        >> B, B.inv()
-        (1./A)
-        A
-        >> evalf(MX(4).inv())
-        0.25
         \enddoctest
 
         \sa inv, inv_node

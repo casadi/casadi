@@ -4130,6 +4130,8 @@ def dcat(args):
 %rename(uplus) operator+;
 // Pattern intersection is elementwise; * and mtimes give the pattern of the matrix product
 %rename(times) casadi::Sparsity::operator*;
+// inv is the matrix inverse in MATLAB; elementwise inverse is 1./x
+%ignore casadi::MX::inv() const;
 %feature("varargin","1") casadi_vertcat;
 %feature("varargin","1") casadi_horzcat;
 %feature("varargin","1") casadi_diagcat;
