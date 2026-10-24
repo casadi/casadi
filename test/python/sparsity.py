@@ -637,6 +637,12 @@ class Sparsitytests(casadiTestCase):
       with self.assertRaisesRegex(Exception, "out of range for 4 nonzeros"):
         sp.repr_el(k)
 
+  def test_get_nz_range(self):
+    for sp in [ca.Sparsity.dense(2, 2), ca.Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3])]:
+      with self.assertRaisesRegex(Exception, "out of bounds"):
+        sp.get_nz([0, 99])
+    self.assertEqual(ca.Sparsity.dense(2, 2).get_nz([3, -1]), [3, -1])
+
   def test_eq_foreign_operand(self):
     # issue #4407: comparing against an unrelated type follows the Python data
     # model (NotImplemented -> False) instead of raising NotImplementedError.
