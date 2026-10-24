@@ -5884,6 +5884,14 @@ namespace casadi{
         [varargout{1:nargout}] = subsref(ret, s(2:end));
       end
     end
+    function n = numArgumentsFromSubscript(self,s,context)
+      % One output for e.g. disp(x.sparsity); statements keep the default
+      if ~exist('OCTAVE_VERSION', 'builtin') && context==matlab.mixin.util.IndexingContext.Statement
+        n = builtin('numArgumentsFromSubscript',self,s,context);
+      else
+        n = 1;
+      end
+    end
     function self = subsasgn(self,s,v)
       if numel(s)==1 && strcmp(s.type,'()')
         paren_asgn(self, v, s.subs{:});
