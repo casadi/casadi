@@ -1174,7 +1174,7 @@ namespace casadi {
       casadi_assert(col[k]>=0 && col[k]<ncol,
         "Column index (" + str(col[k]) + ") out of bounds [0," + str(ncol) + "[");
       casadi_assert(row[k]>=0 && row[k]<nrow,
-        "Row index out of bounds (" + str(row[k]) + ") out of bounds [0," + str(nrow) + "[");
+        "Row index (" + str(row[k]) + ") out of bounds [0," + str(nrow) + "[");
 
       // Check if ordering is already perfect
       perfectly_ordered = perfectly_ordered && (col[k]<last_col ||

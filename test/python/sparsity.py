@@ -660,6 +660,10 @@ class Sparsitytests(casadiTestCase):
     for sp in [ca.Sparsity(0, 3), ca.Sparsity(0, 0), ca.Sparsity.dense(3, 0)]:
       self.assertEqual(sp.density(), 100)
 
+  def test_triplet_bounds_message(self):
+    with self.assertRaisesRegex(Exception, r"Row index \(2\) out of bounds \[0,2\["):
+      ca.Sparsity.triplet(2, 2, [2], [0])
+
   def test_eq_foreign_operand(self):
     # issue #4407: comparing against an unrelated type follows the Python data
     # model (NotImplemented -> False) instead of raising NotImplementedError.
