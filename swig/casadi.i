@@ -4688,6 +4688,22 @@ namespace casadi{
  return sum1(x);
  }
 #endif
+#if defined(SWIGMATLAB) && (FLAG & IS_GLOBAL)
+ // Package functions for calls without a casadi object first, e.g. offset({...}) or diagcat()
+ DECL std::vector<casadi_int >
+ casadi_offset(const std::vector< M > &v, bool vert=true) {
+ return offset(v, vert);
+ }
+ DECL M casadi_blockcat(const M& A, const M& B, const M& C, const M& D) {
+ return vertcat(horzcat(A, B), horzcat(C, D));
+ }
+ DECL M casadi_diagcat(const std::vector< M > &A) {
+ return diagcat(A);
+ }
+ DECL M casadi_veccat(const std::vector< M >& x) {
+ return veccat(x);
+ }
+#endif
 %enddef
 
 %define SPARSITY_INTERFACE_ALL(DECL, FLAG)
