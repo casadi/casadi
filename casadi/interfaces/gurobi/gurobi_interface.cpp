@@ -252,35 +252,6 @@ namespace casadi {
     if (Conic::init_mem(mem)) return 1;
     auto m = static_cast<GurobiMemory*>(mem);
 
-    // Load environment
-    casadi_int flag;
-
-    auto output_flag = opts_.find("OutputFlag");
-    auto log_to_console = opts_.find("LogToConsole");
-
-    if (output_flag != opts_.end() && output_flag->second.as_int() == 0 &&
-    log_to_console != opts_.end() && log_to_console->second.as_int() == 0) {
-    // casadi_message("Suppressing all Gurobi outputs since "
-    //                "OutputFlag and LogToConsole are set to zero.")
-    flag = GRBemptyenv(&m->env);
-      casadi_assert(!flag && m->env,
-        "Failed to create empty GUROBI environment. Flag: " + str(flag));
-
-      flag = GRBsetintparam(m->env, "OutputFlag", 0);
-      casadi_assert(!flag, GRBgeterrormsg(m->env));
-
-      flag = GRBsetintparam(m->env, "LogToConsole", 0);
-      casadi_assert(!flag, GRBgeterrormsg(m->env));
-
-      flag = GRBstartenv(m->env);
-      casadi_assert(!flag, GRBgeterrormsg(m->env));
-    } else {
-      flag = GRBloadenv(&m->env, nullptr); // Standard behavior - loading Gurobi options in solve
-      casadi_assert(!flag && m->env,
-        "Failed to create GUROBI environment. Flag: " + str(flag)
-        + ":" + GRBgeterrormsg(m->env));
-    }
-
     m->pool_sol_nr = 0;
 
     m->sos_weights = sos_weights_;
@@ -361,6 +332,39 @@ namespace casadi {
     return "Unknown";
   }
 
+  void GurobiInterface::init_env(GurobiMemory* m) const {
+    if (m->env) return;
+
+    // Load environment
+    casadi_int flag;
+
+    auto output_flag = opts_.find("OutputFlag");
+    auto log_to_console = opts_.find("LogToConsole");
+
+    if (output_flag != opts_.end() && output_flag->second.as_int() == 0 &&
+    log_to_console != opts_.end() && log_to_console->second.as_int() == 0) {
+    // casadi_message("Suppressing all Gurobi outputs since "
+    //                "OutputFlag and LogToConsole are set to zero.")
+    flag = GRBemptyenv(&m->env);
+      casadi_assert(!flag && m->env,
+        "Failed to create empty GUROBI environment. Flag: " + str(flag));
+
+      flag = GRBsetintparam(m->env, "OutputFlag", 0);
+      casadi_assert(!flag, GRBgeterrormsg(m->env));
+
+      flag = GRBsetintparam(m->env, "LogToConsole", 0);
+      casadi_assert(!flag, GRBgeterrormsg(m->env));
+
+      flag = GRBstartenv(m->env);
+      casadi_assert(!flag, GRBgeterrormsg(m->env));
+    } else {
+      flag = GRBloadenv(&m->env, nullptr); // Standard behavior - loading Gurobi options in solve
+      casadi_assert(!flag && m->env,
+        "Failed to create GUROBI environment. Flag: " + str(flag)
+        + ":" + GRBgeterrormsg(m->env));
+    }
+  }
+
   int GurobiInterface::
   solve(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
     auto m = static_cast<GurobiMemory*>(mem);
@@ -371,6 +375,9 @@ namespace casadi {
 
     // Problem has not been solved at this point
     m->return_status = -1;
+
+    // Load environment on first use
+    init_env(m);
 
     if (inputs_check_) {
       check_inputs(arg[CONIC_LBX], arg[CONIC_UBX], arg[CONIC_LBA], arg[CONIC_UBA]);
