@@ -175,7 +175,8 @@ namespace casadi {
     if (ret.size()==size()) {
       return ret;
     } else {
-      casadi_assert_dev(ret.is_empty(true));
+      casadi_assert(ret.is_empty(true),
+        "Expected a primitive of dimension " + sparsity().dim() + ", but got " + ret.dim() + ".");
       return T(size());
     }
   }

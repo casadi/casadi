@@ -39,19 +39,19 @@ casadi_int einstein_process(const T& A, const T& B, const T& C,
   std::vector<casadi_int>& strides_a, std::vector<casadi_int>& strides_b, std::vector<casadi_int>& strides_c
 ) {
 
-    casadi_assert_dev(A.is_vector() && A.is_dense());
-    casadi_assert_dev(B.is_vector() && B.is_dense());
-    casadi_assert_dev(C.is_vector() && C.is_dense());
+    casadi_assert(A.is_vector() && A.is_dense(), "A must be a dense vector, got " + A.dim());
+    casadi_assert(B.is_vector() && B.is_dense(), "B must be a dense vector, got " + B.dim());
+    casadi_assert(C.is_vector() && C.is_dense(), "C must be a dense vector, got " + C.dim());
 
     // Dimension check
-    casadi_assert_dev(A.numel()==product(dim_a));
-    casadi_assert_dev(B.numel()==product(dim_b));
-    casadi_assert_dev(C.numel()==product(dim_c));
+    casadi_assert(A.numel()==product(dim_a), "Length of A must match dim_a " + str(dim_a));
+    casadi_assert(B.numel()==product(dim_b), "Length of B must match dim_b " + str(dim_b));
+    casadi_assert(C.numel()==product(dim_c), "Length of C must match dim_c " + str(dim_c));
 
-    casadi_assert_dev(dim_a.size()==a.size());
-    casadi_assert_dev(dim_b.size()==b.size());
+    casadi_assert(dim_a.size()==a.size(), "dim_a and a must have the same length");
+    casadi_assert(dim_b.size()==b.size(), "dim_b and b must have the same length");
 
-    casadi_assert_dev(c.size()<=a.size()+b.size());
+    casadi_assert(c.size()<=a.size()+b.size(), "c has more indices than a and b together");
 
     std::map<casadi_int, casadi_int> dim_map;
 
@@ -63,7 +63,7 @@ casadi_int einstein_process(const T& A, const T& B, const T& C,
       if (al==dim_map.end()) {
         dim_map[ai] = dim_a[i];
       } else {
-        casadi_assert_dev(al->second==dim_a[i]);
+        casadi_assert(al->second==dim_a[i], "Inconsistent dimensions for index " + str(ai));
       }
     }
 
@@ -74,7 +74,7 @@ casadi_int einstein_process(const T& A, const T& B, const T& C,
       if (bl==dim_map.end()) {
         dim_map[bi] = dim_b[i];
       } else {
-        casadi_assert_dev(bl->second==dim_b[i]);
+        casadi_assert(bl->second==dim_b[i], "Inconsistent dimensions for index " + str(bi));
       }
     }
 
@@ -85,7 +85,7 @@ casadi_int einstein_process(const T& A, const T& B, const T& C,
       if (cl==dim_map.end()) {
         dim_map[ci] = dim_c[i];
       } else {
-        casadi_assert_dev(cl->second==dim_c[i]);
+        casadi_assert(cl->second==dim_c[i], "Inconsistent dimensions for index " + str(ci));
       }
     }
 

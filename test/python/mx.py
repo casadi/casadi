@@ -5393,6 +5393,31 @@ class MXtests(casadiTestCase):
     with self.assertInException("Unknown option 'foo'"):
       ca.bspline(x, ca.DM([1, 2, 3, 4]), knots, [3], 1, {"foo": 1})
 
+  def test_user_errors(self):
+    x = ca.MX.sym("x", 2)
+    y = ca.MX.sym("y")
+    with self.assertInException("Expected a column vector with 3 nonzeros"):
+      ca.MX(ca.Sparsity.lower(2), ca.DM([1, 2]))
+    with self.assertInException("Expected a primitive of dimension"):
+      ca.vertcat(x, y).join_primitives([ca.DM.ones(3, 1), ca.DM(1)])
+    with self.assertInException("Expected 2 arguments, but got 1"):
+      (x[0]*y).eval_mx([y])
+    with self.assertInException("Not a binary operation"):
+      ca.MX.binary(999, y, y)
+    A = ca.MX.sym("A", 4)
+    with self.assertInException("Length of B must match dim_b"):
+      ca.MX.einstein(A, A, [2, 2], [3, 2], [2], [-1, -2], [-2, -3], [-1])
+    with self.assertInException("A must be a dense vector"):
+      ca.MX.einstein(ca.MX.sym("A", 2, 2), A, [2, 2], [2, 2], [2], [-1, -2], [-2, -3], [-1])
+    with self.assertInException("Expected 2 query vectors, but got 1"):
+      ca.MX.interpn_linear([ca.MX(ca.DM([0, 1])), ca.MX(ca.DM([0, 1]))], ca.MX.sym("v", 4), [y])
+    with self.assertInException("Grid must be a dense vector"):
+      ca.low(ca.MX.sym("v", ca.Sparsity.lower(2)), 0.5)
+    with self.assertInException("Expected 2 row indices, but got 3"):
+      x.enlarge(4, 1, [0, 1, 2], [0])
+    with self.assertInException("multiple of the number of dimensions"):
+      ca.MX.bspline_dual([0.5, 0.5, 0.1], [[0, 0, 0, 0, 1, 1, 1, 1]]*2, [3, 3])
+
   def test_set_precision(self):
     # Issue #4326: numeric MX constants honor DM::set_precision
     # (the value lives in a DM-like node, so MX printing piggybacks
