@@ -5567,6 +5567,18 @@ class Functiontests(casadiTestCase):
                 
     ca.DM.set_precision(6)
 
+  def test_forward_reverse_zero(self):
+    x = ca.SX.sym("x")
+    y = ca.SX.sym("y", 2)
+    f = ca.Function("f", [x, y], [x*y, ca.sin(x)])
+    for F in [f, f.wrap()]:
+      fwd = F.forward(0)
+      self.assertEqual(fwd.size_in(5), (2, 0))
+      self.assertEqual(fwd.size_out(0), (2, 0))
+      adj = F.reverse(0)
+      self.assertEqual(adj.size_in(4), (2, 0))
+      self.assertEqual(adj.size_out(1), (2, 0))
+
   def test_activity(self):
     # issue #3019: value-level "signal activity" propagation (Function::activity).
     # True/active = possibly nonzero. The expected output activity is never hard-coded:

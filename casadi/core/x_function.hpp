@@ -862,7 +862,7 @@ namespace casadi {
       std::vector<MatType> v(nfwd);
       for (casadi_int i=0; i<n_in_; ++i) {
         for (casadi_int d=0; d<nfwd; ++d) v[d] = fseed[d][i];
-        ret_in.at(n_in_ + n_out_ + i) = horzcat(v);
+        ret_in.at(n_in_ + n_out_ + i) = nfwd>0 ? horzcat(v) : MatType(size1_in(i), 0);
       }
 
       // All outputs of the return function
@@ -909,7 +909,7 @@ namespace casadi {
       std::vector<MatType> v(nadj);
       for (casadi_int i=0; i<n_out_; ++i) {
         for (casadi_int d=0; d<nadj; ++d) v[d] = aseed[d][i];
-        ret_in.at(n_in_ + n_out_ + i)  = horzcat(v);
+        ret_in.at(n_in_ + n_out_ + i)  = nadj>0 ? horzcat(v) : MatType(size1_out(i), 0);
       }
 
       // All outputs of the return function
