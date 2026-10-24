@@ -549,7 +549,8 @@ namespace casadi {
   }
 
   void Sparsity::enlargeColumns(casadi_int ncol, const std::vector<casadi_int>& cc, bool ind1) {
-    casadi_assert_dev(cc.size() == size2());
+    casadi_assert(cc.size()==size2(),
+      "Expected " + str(size2()) + " column indices, but got " + str(cc.size()) + ".");
     if (cc.empty()) {
       *this = Sparsity(size1(), ncol);
     } else {
@@ -558,7 +559,8 @@ namespace casadi {
   }
 
   void Sparsity::enlargeRows(casadi_int nrow, const std::vector<casadi_int>& rr, bool ind1) {
-    casadi_assert_dev(rr.size() == size1());
+    casadi_assert(rr.size()==size1(),
+      "Expected " + str(size1()) + " row indices, but got " + str(rr.size()) + ".");
     if (rr.empty()) {
       *this = Sparsity(nrow, size2());
     } else {

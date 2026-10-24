@@ -28,8 +28,8 @@
 namespace casadi {
 
   Low::Low(const MX& v, const MX& p, const Dict& opts) {
-    casadi_assert_dev(v.is_vector() && v.is_dense());
-    casadi_assert_dev(p.is_vector() && v.is_dense());
+    casadi_assert(v.is_vector() && v.is_dense(), "Grid must be a dense vector, got " + v.dim());
+    casadi_assert(p.is_vector(), "Query must be a vector, got " + p.dim() + ".");
     set_dep(v, p);
     set_sparsity(p.sparsity());
 

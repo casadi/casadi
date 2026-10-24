@@ -98,7 +98,8 @@ namespace casadi {
         own(ConstantMX::create(Sparsity(sp.size()), 0));
       }
     } else {
-      casadi_assert_dev(val.is_column() && sp.nnz()==val.size1());
+      casadi_assert(val.is_column() && sp.nnz()==val.size1(),
+        "Expected a column vector with " + str(sp.nnz()) + " nonzeros, but got " + val.dim() + ".");
       *this = densify(val)->get_nzref(sp, range(sp.nnz()));
     }
   }
@@ -531,6 +532,7 @@ namespace casadi {
   }
 
   MX MX::binary(casadi_int op, const MX &x, const MX &y, bool unique_x, bool unique_y) {
+    casadi_assert(casadi_math<double>::is_binary(op), "Not a binary operation: " + str(op));
     // Check, correct dimensions
     if (x.size()!=y.size() && !x.is_scalar() && !y.is_scalar()) {
       // x and y are horizontal multiples of each other?
@@ -3155,8 +3157,9 @@ namespace casadi {
       }
     }
 
-    casadi_assert_dev(xq.size()==n_dim);
-    casadi_assert_dev(v.is_vector());
+    casadi_assert(xq.size()==n_dim,
+      "Expected " + str(n_dim) + " query vectors, but got " + str(xq.size()) + ".");
+    casadi_assert(v.is_vector(), "Expected a vector of values, but got " + v.dim() + ".");
 
     // Extract grid dimensions
     std::vector<casadi_int> x_dims;
@@ -3222,6 +3225,8 @@ namespace casadi {
  void MX::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res,
     const std::vector<bool>& unique) const {
    try {
+     casadi_assert(arg.size()==n_dep(),
+       "Expected " + str(n_dep()) + " arguments, but got " + str(arg.size()) + ".");
      res.resize((*this)->nout());
      (*this)->eval_mx(arg, res, unique);
    } catch (std::exception& e) {

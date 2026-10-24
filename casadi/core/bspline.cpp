@@ -517,7 +517,8 @@ namespace casadi {
 
     casadi_int n_dims = degree.size();
     casadi_int N = x.size()/n_dims;
-    casadi_assert_dev(N*n_dims==x.size());
+    casadi_assert(N*n_dims==x.size(), "Number of point coordinates (" + str(x.size()) + ") "
+      "must be a multiple of the number of dimensions (" + str(n_dims) + ").");
 
     casadi_int coeffs_size;
     std::vector<casadi_int> coeffs_dims, strides;
