@@ -2790,6 +2790,11 @@ class NLPtests(casadiTestCase):
     self.assertTrue(solver.stats()["success"])
     self.checkfunction_light(ref_solver.get_function("nlp_jac_g"),solver.get_function("nlp_jac_g"),inputs=[ca.vertcat(0.11,0.3,0.7),0])
     
+  def test_nlp_signature(self):
+    x = ca.MX.sym("x")
+    with self.assertInException("must have inputs (x, p) and outputs (f, g)"):
+      ca.nlpsol("solver", "ipopt", ca.Function("nlp", [x], [x**2], ["a"], ["b"]))
+
   @requires_nlpsol("ipopt")
   def test_option_propagation(self):
     x = ca.MX.sym('x')

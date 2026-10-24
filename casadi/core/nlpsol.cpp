@@ -271,6 +271,10 @@ namespace casadi {
   Function nlpsol(const std::string& name, const std::string& solver,
                   const Function& nlp, const Dict& opts) {
     // Make sure that nlp is sound
+    casadi_assert(nlp.name_in()==std::vector<std::string>({"x", "p"})
+      && nlp.name_out()==std::vector<std::string>({"f", "g"}),
+      "Cannot create '" + name + "': the NLP function must have inputs (x, p) and outputs "
+      "(f, g), got " + str(nlp.name_in()) + " and " + str(nlp.name_out()) + ".");
     if (nlp.has_free()) {
       casadi_error("Cannot create '" + name + "' since " + str(nlp.get_free()) + " are free.");
     }
