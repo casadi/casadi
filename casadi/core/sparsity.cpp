@@ -1096,7 +1096,7 @@ namespace casadi {
   Sparsity Sparsity::band(casadi_int n, casadi_int p) {
     casadi_assert(n>=0, "Sparsity::band expects a positive integer as argument");
     casadi_assert((p<0? -p : p)<n,
-                          "Sparsity::band: position of band schould be smaller then size argument");
+                          "Sparsity::band: position of band should be smaller than size argument");
 
     casadi_int nc = n-(p<0? -p : p);
 
@@ -1121,6 +1121,7 @@ namespace casadi {
   Sparsity Sparsity::banded(casadi_int n, casadi_int p) {
     // This is not an efficient implementation
     Sparsity ret = Sparsity(n, n);
+    p = std::min(p, n-1);
     for (casadi_int i=-p;i<=p;++i) {
       ret = ret + Sparsity::band(n, i);
     }
