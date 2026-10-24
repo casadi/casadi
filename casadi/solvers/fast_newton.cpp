@@ -163,6 +163,7 @@ namespace casadi {
 
     m->success = m->return_status>0;
     if (m->return_status==0) m->unified_return_status = SOLVER_RET_LIMITED;
+    if (m->return_status==-1) m->unified_return_status = SOLVER_RET_NAN;
 
     return 0;
   }
@@ -232,6 +233,8 @@ namespace casadi {
 
   std::string return_code(casadi_int status) {
     switch (status) {
+      case -1:
+        return "non_finite";
       case 0:
         return "max_iteration_reached";
       case 1:

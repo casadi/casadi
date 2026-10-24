@@ -1876,6 +1876,7 @@ namespace casadi {
       this->auxiliaries << sanitize_source(casadi_ldl_str, inst);
       break;
     case AUX_NEWTON:
+      add_auxiliary(AUX_ISFINITE);
       add_auxiliary(AUX_COPY);
       add_auxiliary(AUX_AXPY);
       add_auxiliary(AUX_NORM_INF);
@@ -2071,7 +2072,7 @@ namespace casadi {
           "casadi_real casadi_isfinite(casadi_real x) {\n"
           "/* Pre-c99 compatibility */\n"
           "#if __STDC_VERSION__ < 199901L\n"
-          "  return x==x && x!=INFINITY && x!=-INFINITY;\n"
+          "  return x-x==0;\n"
           "#else\n"
           "  return isfinite(x);\n"
           "#endif\n"

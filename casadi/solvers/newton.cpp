@@ -127,6 +127,11 @@ namespace casadi {
      m->jac = w; w += sp_jac_.nnz();
   }
 
+  static bool all_finite(const double* x, casadi_int n) {
+    for (casadi_int i=0; i<n; ++i) if (!std::isfinite(x[i])) return false;
+    return true;
+  }
+
   int Newton::solve(void* mem) const {
     auto m = static_cast<NewtonMemory*>(mem);
 
@@ -157,7 +162,13 @@ namespace casadi {
       m->res[0] = m->jac;
       std::copy_n(m->ires, n_out_, m->res+1);
       m->res[1+iout_] = m->f;
-      calc_function(m, "jac_g_x");
+      if (calc_function(m, "jac_g_x")) {
+        if (verbose_) casadi_message("Evaluation failed.");
+        m->return_status = "non_finite";
+        m->unified_return_status = SOLVER_RET_NAN;
+        success = false;
+        break;
+      }
 
       // Check convergence
       double abstol = 0;
@@ -174,6 +185,15 @@ namespace casadi {
       // Factorize the linear solver with J
       linsol_.nfact(m->jac, mem_linsol);
       linsol_.solve(m->jac, m->f, 1, false, mem_linsol);
+
+      // Fail on a non-finite step
+      if (!all_finite(m->f, n_)) {
+        if (verbose_) casadi_message("Non-finite step.");
+        m->return_status = "non_finite";
+        m->unified_return_status = SOLVER_RET_NAN;
+        success = false;
+        break;
+      }
 
       // Check convergence again
       double abstolStep=0;

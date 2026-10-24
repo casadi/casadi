@@ -433,6 +433,15 @@ class ImplicitFunctiontests(casadiTestCase):
     self.check_codegen(g,[1.01])
     
     
+  def test_newton_nonfinite(self):
+    x = ca.SX.sym("x")
+    for solver in ["newton", "fast_newton"]:
+      G = ca.rootfinder("G", solver, {"x": x, "g": x**2-2}, {"error_on_fail": False})
+      G(x0=0)
+      self.assertFalse(G.stats()["success"])
+      self.assertEqual(G.stats()["unified_return_status"], "SOLVER_RET_NAN")
+      self.assertEqual(G.stats()["return_status"], "non_finite")
+
   def test_generic(self):
     a = ca.SX.sym("a")
     b = ca.SX.sym("b")

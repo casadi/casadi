@@ -41,9 +41,14 @@ struct casadi_newton_mem {
 };
 
 // C-REPLACE "casadi_newton_mem<T1>" "struct casadi_newton_mem"
+// C-REPLACE "isfinite" "casadi_isfinite"
 // SYMBOL "newton"
 template<typename T1>
 int casadi_newton(const casadi_newton_mem<T1>* m) {
+    casadi_int i;
+    // Fail on a non-finite residual
+    for (i=0; i<m->n; ++i) if (!isfinite(m->g[i])) return -1;
+
     // Check tolerance on residual
     if (m->abstol>0 && casadi_norm_inf(m->n, m->g) <= m->abstol) return 1;
 
@@ -54,6 +59,9 @@ int casadi_newton(const casadi_newton_mem<T1>* m) {
     // Solve J^(-1) g
     casadi_qr_solve(m->g, 1, 0, m->sp_v, m->lin_v, m->sp_r, m->lin_r, m->lin_beta,
                     m->prinv, m->pc, m->lin_w);
+
+    // Fail on a non-finite step
+    for (i=0; i<m->n; ++i) if (!isfinite(m->g[i])) return -1;
 
     // Update Xk+1 = Xk - J^(-1) g
     casadi_axpy(m->n, -1., m->g, m->x);
