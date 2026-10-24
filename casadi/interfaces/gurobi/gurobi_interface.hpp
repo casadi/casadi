@@ -145,6 +145,9 @@ namespace casadi {
     /** \brief Free memory block */
     void free_mem(void *mem) const override { delete static_cast<GurobiMemory*>(mem);}
 
+    /// Create the Gurobi environment on first use
+    void init_env(GurobiMemory* m) const;
+
     /// Solve the QP
     int solve(const double** arg, double** res,
       casadi_int* iw, double* w, void* mem) const override;
