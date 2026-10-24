@@ -1004,6 +1004,12 @@ assert(strcmp(B(1, :).dim(), '1x3'));
 assert(strcmp(B(2:1, :).dim(), '0x3'));
 v = SX.sym('v', 2);
 assert(strcmp(v(2).name(), 'v_1'));
+if ~is_octave
+  % Method reference without parentheses as a function argument
+  xe = DM.eye(2);
+  assert(strcmp(str(xe.sparsity), '2x2,2nz'));
+end
+
 disp('success')
 
 
