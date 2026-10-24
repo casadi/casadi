@@ -2099,6 +2099,15 @@ namespace casadi {
 
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::vertcat(const std::vector<Matrix<Scalar> > &v) {
+    // Consistency check
+    casadi_int ncol = 0;
+    for (auto&& e : v) {
+      if (e.size2()==0) continue;
+      casadi_assert(ncol==0 || e.size2()==ncol, "vertcat: Mismatching number of columns, "
+        "got " + str(ncol) + " and " + str(e.size2()));
+      ncol = e.size2();
+    }
+
     std::vector<Matrix<Scalar> > vT(v.size());
     for (casadi_int i=0; i<v.size(); ++i) vT[i] = v[i].T();
     return horzcat(vT).T();
