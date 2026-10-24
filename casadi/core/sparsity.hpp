@@ -3763,7 +3763,7 @@ namespace casadi {
         \param ordering 0 for the natural column order, 1 (default) to color in
                largest_first() order
         \param cutoff If more than this many colors are needed, a null Sparsity is
-               returned (only honoured with \p ordering 0)
+               returned
         \return A size2()-by-ncolors pattern: column c lists the columns with color c
 
         \doctest
@@ -3776,7 +3776,7 @@ namespace casadi {
          [00, 00, 1]])
         >>> Sparsity.diag(5).star_coloring()
         Sparsity(5x1)
-        >>> Sparsity.dense(4, 4).star_coloring(0, 2).is_null()
+        >>> Sparsity.dense(4, 4).star_coloring(1, 2).is_null()
         True
         \enddoctest
 
@@ -3789,7 +3789,7 @@ namespace casadi {
         0 0 1
         >> Sparsity.diag(5).star_coloring()
         5x1
-        >> Sparsity.dense(4, 4).star_coloring(0, 2).is_null()
+        >> Sparsity.dense(4, 4).star_coloring(1, 2).is_null()
         1
         \enddoctest
 
