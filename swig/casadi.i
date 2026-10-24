@@ -3564,6 +3564,11 @@ class ArrayInterfaceMX(ArrayInterface[MX]):
 %julia_convention_repair()
 
 #ifdef SWIGJULIA
+// an option value is any Julia value GenericType converts from
+%typemap(jlparam) const casadi::GenericType& option_value "Any"
+#endif // SWIGJULIA
+
+#ifdef SWIGJULIA
 // Julia argument annotations for the matrix types: a DM parameter takes
 // everything to_ptr(DM) converts from (numbers, Julia arrays, ranges), and SX/MX
 // parameters additionally take DM, as in Python.  The unions nest (DM-like is a
