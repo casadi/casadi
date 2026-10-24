@@ -433,6 +433,13 @@ class ImplicitFunctiontests(casadiTestCase):
     self.check_codegen(g,[1.01])
     
     
+  @requires_rootfinder("kinsol")
+  def test_kinsol_return_status(self):
+    x = ca.SX.sym("x")
+    G = ca.rootfinder("G", "kinsol", {"x": x, "g": x**2-2})
+    self.checkarray(G(x0=1)["x"], ca.DM(ca.sqrt(2)), digits=6)
+    self.assertEqual(G.stats()["return_status"], "KIN_SUCCESS")
+
   def test_generic(self):
     a = ca.SX.sym("a")
     b = ca.SX.sym("b")
