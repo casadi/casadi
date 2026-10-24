@@ -75,6 +75,9 @@ namespace casadi {
       "Linsol::solve: Dimension mismatch. A and b must have matching row count. "
       "Got " + A.dim() + " and " + B.dim() + ".");
 
+    // Quick return if possible
+    if (A.size1()==0) return densify(B);
+
     scoped_checkout<Linsol> mem(*this);
     auto *m = static_cast<LinsolMemory*>((*this)->memory(mem));
 
