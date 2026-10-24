@@ -1020,6 +1020,12 @@ assert(Sparsity.diag(2) .* Sparsity.dense(2, 2) == Sparsity.diag(2));
 assert(mtimes(Sparsity.diag(2), Sparsity.dense(2, 1)) == Sparsity.dense(2, 1));
 assert(Sparsity.diag(2) * Sparsity.dense(2, 1) == Sparsity.dense(2, 1));
 
+% Package functions without a casadi object first
+assert(isequal(casadi.offset({DM(1), DM([1; 2])}), [0 1 3]));
+assert(isequal(full(blockcat(1, 2, 3, 4)), [1 2; 3 4]));
+assert(strcmp(casadi.diagcat().dim(), '0x0'));
+assert(strcmp(casadi.veccat().dim(), '0x1'));
+
 disp('success')
 
 
