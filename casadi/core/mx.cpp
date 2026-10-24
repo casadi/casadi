@@ -1236,6 +1236,8 @@ namespace casadi {
     casadi_assert_dev(offset2.front()==0);
     casadi_assert_dev(offset2.back()==x.size2());
     casadi_assert_dev(is_monotone(offset2));
+    casadi_assert(offset1.size()==offset2.size(),
+      "diagsplit: offset1 and offset2 must have the same length");
 
     return x->get_diagsplit(offset1, offset2);
   }

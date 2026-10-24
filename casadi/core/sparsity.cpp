@@ -1700,7 +1700,8 @@ namespace casadi {
                           "(" + str(x.size2()) + ")");
     casadi_assert_dev(is_monotone(offset1));
     casadi_assert_dev(is_monotone(offset2));
-    casadi_assert_dev(offset1.size()==offset2.size());
+    casadi_assert(offset1.size()==offset2.size(),
+      "diagsplit: offset1 and offset2 must have the same length");
 
     // Number of outputs
     casadi_int n = offset1.size()-1;
