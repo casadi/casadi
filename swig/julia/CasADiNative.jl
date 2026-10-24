@@ -650,6 +650,31 @@ end
 _asval(::Type{T}, v::Real) where {T} = convert(T, v)
 _asval(::Type{T}, v::AbstractArray{<:Real}) where {T} = T(v)
 _asval(::Type{T}, v) where {T} = v
+# A symbolic MX index is 1-based like any other; a Sparsity index selects its pattern
+Base.getindex(x::MX, k::MX) = C.get(x, true, k)
+Base.getindex(x::MX, i::MX, j::MX) = C.get(x, true, i, j)
+Base.getindex(x::_Cat, sp::Sparsity) = C.get(x, false, sp)
+Base.setindex!(x::_Cat, v, sp::Sparsity) = (C.set(x, _asval(typeof(x), v), false, sp); x)
+
+# x.nz[k]: the structural nonzeros as a 1-based vector (Python's x.nz[k])
+struct NZ{T<:_Cat}
+    x::T
+end
+C._swig_getproperty(x::_Cat, ::Val{:nz}) = NZ(x)
+Base.length(n::NZ) = C.nnz(n.x)
+Base.lastindex(n::NZ) = C.nnz(n.x)
+Base.firstindex(n::NZ) = 1
+Base.getindex(n::NZ, i::_AnyInd) = i isa _Ind ?
+    (_ckhi(n.x, i, C.nnz(n.x)); C.get_nz(n.x, false, _slice(i))) :
+    C.get_nz(n.x, false, _ivec(n.x, i, C.nnz(n.x)))
+Base.getindex(n::NZ{MX}, k::MX) = C.get_nz(n.x, true, k)
+Base.setindex!(n::NZ{MX}, v, k::MX) = (C.set_nz(n.x, _asval(MX, v), true, k); n)
+function Base.setindex!(n::NZ, v, i::_AnyInd)
+    w = _asval(typeof(n.x), v)
+    i isa _Ind ? C.set_nz(n.x, w, false, _slice(i)) : C.set_nz(n.x, w, false, _ivec(n.x, i, C.nnz(n.x)))
+    n
+end
+
 Base.lastindex(x::Union{SX,MX,DM}) = Base.length(x)
 Base.lastindex(x::Union{SX,MX,DM}, d::Integer) = d == 1 ? C.size1(x) : C.size2(x)
 Base.firstindex(x::Union{SX,MX,DM}) = 1
