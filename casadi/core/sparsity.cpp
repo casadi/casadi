@@ -611,6 +611,8 @@ namespace casadi {
   }
 
   std::string Sparsity::repr_el(casadi_int k) const {
+    casadi_assert(k>=0 && k<nnz(),
+      "Index " + str(k) + " out of range for " + str(nnz()) + " nonzeros.");
     return (*this)->repr_el(k);
   }
 
