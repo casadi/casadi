@@ -2017,7 +2017,8 @@ namespace casadi {
     if (sp==x.sparsity()) return x;
 
     // make sure that the patterns match
-    casadi_assert_dev(sp.is_reshape(x.sparsity()));
+    casadi_assert(sp.is_reshape(x.sparsity()),
+      "Reshape mismatch: cannot reshape " + x.dim() + " to " + sp.dim(true));
 
     return Matrix<Scalar>(sp, x.nonzeros(), false);
   }
@@ -2027,7 +2028,8 @@ namespace casadi {
     // quick return if already the right shape
     if (sp==x.sparsity()) return x;
 
-    casadi_assert_dev(sp.nnz()==x.nnz());
+    casadi_assert(sp.nnz()==x.nnz(), "sparsity_cast: x has " + str(x.nnz()) + " nonzeros, "
+      "but the target pattern has " + str(sp.nnz()));
 
     return Matrix<Scalar>(sp, x.nonzeros(), false);
   }
@@ -2126,16 +2128,8 @@ namespace casadi {
   Matrix<Scalar>::diagsplit(const Matrix<Scalar>& x, const std::vector<casadi_int>& offset1,
                               const std::vector<casadi_int>& offset2) {
     // Consistency check
-    casadi_assert_dev(!offset1.empty());
-    casadi_assert_dev(offset1.front()==0);
-    casadi_assert_dev(offset1.back()==x.size1());
-    casadi_assert_dev(is_monotone(offset1));
-
-    // Consistency check
-    casadi_assert_dev(!offset2.empty());
-    casadi_assert_dev(offset2.front()==0);
-    casadi_assert_dev(offset2.back()==x.size2());
-    casadi_assert_dev(is_monotone(offset2));
+    check_offset(offset1, x.size1(), "diagsplit");
+    check_offset(offset2, x.size2(), "diagsplit");
     casadi_assert(offset1.size()==offset2.size(),
       "diagsplit: offset1 and offset2 must have the same length");
 

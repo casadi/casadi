@@ -87,6 +87,10 @@ private:
   CASADI_EXPORT bool is_range(const std::vector<casadi_int>& v,
     casadi_int start, casadi_int stop, casadi_int step=1);
 
+  /// Assert that offset starts at 0, is nondecreasing and ends at n
+  CASADI_EXPORT void check_offset(const std::vector<casadi_int>& offset, casadi_int n,
+    const std::string& fname);
+
   CASADI_EXPORT std::string join(const std::vector<std::string>& l, const std::string& delim=",");
 
   /// Checks if s starts with p

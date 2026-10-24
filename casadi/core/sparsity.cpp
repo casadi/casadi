@@ -1622,13 +1622,7 @@ namespace casadi {
   std::vector<Sparsity> Sparsity::horzsplit(const Sparsity& x,
       const std::vector<casadi_int>& offset) {
     // Consistency check
-    casadi_assert_dev(!offset.empty());
-    casadi_assert_dev(offset.front()==0);
-    casadi_assert(offset.back()==x.size2(),
-                          "horzsplit(Sparsity, std::vector<casadi_int>): Last elements of offset "
-                          "(" + str(offset.back()) + ") must equal the number of columns "
-                          "(" + str(x.size2()) + ")");
-    casadi_assert_dev(is_monotone(offset));
+    check_offset(offset, x.size2(), "horzsplit");
 
     // Number of outputs
     casadi_int n = offset.size()-1;
@@ -1688,18 +1682,8 @@ namespace casadi {
                                             const std::vector<casadi_int>& offset1,
                                             const std::vector<casadi_int>& offset2) {
     // Consistency check
-    casadi_assert_dev(!offset1.empty());
-    casadi_assert_dev(offset1.front()==0);
-    casadi_assert(offset1.back()==x.size1(),
-                          "diagsplit(Sparsity, offset1, offset2): Last elements of offset1 "
-                          "(" + str(offset1.back()) + ") must equal the number of rows "
-                          "(" + str(x.size1()) + ")");
-    casadi_assert(offset2.back()==x.size2(),
-                          "diagsplit(Sparsity, offset1, offset2): Last elements of offset2 "
-                          "(" + str(offset2.back()) + ") must equal the number of rows "
-                          "(" + str(x.size2()) + ")");
-    casadi_assert_dev(is_monotone(offset1));
-    casadi_assert_dev(is_monotone(offset2));
+    check_offset(offset1, x.size1(), "diagsplit");
+    check_offset(offset2, x.size2(), "diagsplit");
     casadi_assert(offset1.size()==offset2.size(),
       "diagsplit: offset1 and offset2 must have the same length");
 

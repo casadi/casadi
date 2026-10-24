@@ -224,7 +224,7 @@ namespace casadi {
         >>> horzsplit(x, [0, 2])
         Traceback (most recent call last):
           ...
-        RuntimeError: ...must equal the number of columns...
+        RuntimeError: ...must start at 0, be nondecreasing and end at 5...
         \enddoctest
 
         \doctest{matlab}
@@ -238,7 +238,7 @@ namespace casadi {
         >> v = horzsplit(x, [0, 0, 5]); disp(size(v{1}))
         2 0
         >> try, horzsplit(x, [0, 2]); catch e, disp(e.message); end
-        ...must equal the number of columns...
+        ...must start at 0, be nondecreasing and end at 5...
         \enddoctest
 
         \sa horzsplit_n, vertsplit, offset
@@ -1780,8 +1780,8 @@ namespace casadi {
   std::vector< std::vector< MatType > >
   SparsityInterface<MatType>::blocksplit(const MatType& x,
       casadi_int vert_incr, casadi_int horz_incr) {
-    casadi_assert_dev(horz_incr>=1);
-    casadi_assert_dev(vert_incr>=1);
+    casadi_assert(vert_incr>=1, "blocksplit: vert_incr (" + str(vert_incr) + ") must be positive");
+    casadi_assert(horz_incr>=1, "blocksplit: horz_incr (" + str(horz_incr) + ") must be positive");
     casadi_int sz1 = x.size1();
     std::vector<casadi_int> offset1 = range(0, sz1, vert_incr);
     offset1.push_back(sz1);
@@ -1828,7 +1828,7 @@ namespace casadi {
   template<typename MatType>
   std::vector< MatType >
   SparsityInterface<MatType>::diagsplit(const MatType& x, casadi_int incr) {
-    casadi_assert_dev(incr>=1);
+    casadi_assert(incr>=1, "diagsplit(x,incr): incr (" + str(incr) + ") must be positive");
     casadi_assert(x.is_square(), "diagsplit(x,incr)::input must be square but got "
                           + x.dim()  + ".");
     std::vector<casadi_int> offset2 = range(0, x.size2(), incr);
@@ -1839,8 +1839,8 @@ namespace casadi {
   template<typename MatType>
   std::vector< MatType >
   SparsityInterface<MatType>::diagsplit(const MatType& x, casadi_int incr1, casadi_int incr2) {
-    casadi_assert_dev(incr1>=1);
-    casadi_assert_dev(incr2>=1);
+    casadi_assert(incr1>=1, "diagsplit: incr1 (" + str(incr1) + ") must be positive");
+    casadi_assert(incr2>=1, "diagsplit: incr2 (" + str(incr2) + ") must be positive");
     std::vector<casadi_int> offset1 = range(0, x.size1(), incr1);
     offset1.push_back(x.size1());
     std::vector<casadi_int> offset2 = range(0, x.size2(), incr2);
@@ -1861,7 +1861,7 @@ namespace casadi {
 
   template<typename MatType>
   std::vector<MatType > SparsityInterface<MatType>::horzsplit(const MatType& x, casadi_int incr) {
-    casadi_assert_dev(incr>=1);
+    casadi_assert(incr>=1, "horzsplit(x,incr): incr (" + str(incr) + ") must be positive");
     casadi_int sz2 = x.size2();
     std::vector<casadi_int> offset2 = range(0, sz2, incr);
     offset2.push_back(sz2);
@@ -1870,7 +1870,7 @@ namespace casadi {
 
   template<typename MatType>
   std::vector<MatType > SparsityInterface<MatType>::vertsplit(const MatType& x, casadi_int incr) {
-    casadi_assert_dev(incr>=1);
+    casadi_assert(incr>=1, "vertsplit(x,incr): incr (" + str(incr) + ") must be positive");
     casadi_int sz1 = x.size1();
     std::vector<casadi_int> offset1 = range(0, sz1, incr);
     offset1.push_back(sz1);
