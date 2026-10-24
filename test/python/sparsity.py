@@ -643,6 +643,12 @@ class Sparsitytests(casadiTestCase):
         sp.get_nz([0, 99])
     self.assertEqual(ca.Sparsity.dense(2, 2).get_nz([3, -1]), [3, -1])
 
+  def test_star_coloring_symmetric(self):
+    for sp in [ca.Sparsity.upper(3), ca.Sparsity.dense(2, 3)]:
+      for f in [sp.star_coloring, sp.star_coloring2]:
+        with self.assertRaisesRegex(Exception, "requires a symmetric pattern"):
+          f()
+
   def test_eq_foreign_operand(self):
     # issue #4407: comparing against an unrelated type follows the Python data
     # model (NotImplemented -> False) instead of raising NotImplementedError.
