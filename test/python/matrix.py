@@ -1351,6 +1351,13 @@ class Matrixtests(casadiTestCase):
     self.assertTrue(f.sz_w()==n)
 
 
+  def test_split_n_zero(self):
+    x = ca.DM.ones(2, 4)
+    with self.assertInException("must be a multiple of n"):
+      ca.horzsplit_n(x, 0)
+    with self.assertInException("must be a multiple of n"):
+      ca.vertsplit_n(x.T, 0)
+
   def test_horzsplit_n(self):
     self.assertTrue(len(ca.horzsplit_n(ca.DM.rand(1,6),2))==2)
     self.assertTrue(len(ca.vertsplit_n(ca.DM.rand(6),2))==2)

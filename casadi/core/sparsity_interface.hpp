@@ -1880,7 +1880,7 @@ namespace casadi {
   std::vector<MatType > SparsityInterface<MatType>::horzsplit_n(const MatType& x, casadi_int n) {
     casadi_assert(n>=0, "horzsplit_n(x,n): n (" + str(n) + ") must be non-negative");
     if (x.size2()==0) return std::vector<MatType>(n, x);
-    casadi_assert(x.size2() % n==0, "horzsplit_n(x,n): x.size2() (" + str(x.size2()) +
+    casadi_assert(n>0 && x.size2() % n==0, "horzsplit_n(x,n): x.size2() (" + str(x.size2()) +
                      ") must be a multiple of n (" + str(n) + ")");
     return horzsplit(x, x.size2()/n);
   }
@@ -1888,7 +1888,7 @@ namespace casadi {
   std::vector<MatType > SparsityInterface<MatType>::vertsplit_n(const MatType& x, casadi_int n) {
     casadi_assert(n>=0, "vertsplit_n(x,n): n (" + str(n) + ") must be non-negative");
     if (x.size1()==0) return std::vector<MatType>(n, x);
-    casadi_assert(x.size1() % n==0, "vertsplit(x,n): x.size1() (" + str(x.size1()) +
+    casadi_assert(n>0 && x.size1() % n==0, "vertsplit_n(x,n): x.size1() (" + str(x.size1()) +
                      ") must be a multiple of n (" + str(n) + ")");
     return vertsplit(x, x.size1()/n);
   }
