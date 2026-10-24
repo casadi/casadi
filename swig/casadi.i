@@ -2220,6 +2220,11 @@ namespace std {
         return to_val(p_first, m ? &(**m).first : 0)
           && to_val(p_second, m ? &(**m).second : 0);
       }
+#elif defined(SWIGJULIA)
+      if (jl_is_tuple(p) && jl_nfields(p)==2) {
+        return to_val(jl_fieldref(p, 0), m ? &(**m).first : 0)
+          && to_val(jl_fieldref(p, 1), m ? &(**m).second : 0);
+      }
 #endif
       // No match
       return false;
@@ -3479,6 +3484,8 @@ class ArrayInterfaceMX(ArrayInterface[MX]):
 
 #ifdef MATLABSTYLE
 #define LABEL "[int,int]"
+#elif defined(SWIGJULIA)
+#define LABEL LPAIR(L_INT, L_INT)
 #else
 #define LABEL LPAIR("int","int")
 #endif
@@ -3533,9 +3540,9 @@ class ArrayInterfaceMX(ArrayInterface[MX]):
 // subset of SX-like and MX-like), so Julia's most-specific-method rule picks the
 // overload Python's typecheck precedence picks: fmax(x::MX, 0) -> MX,
 // fmax(DM, 0) -> DM, fmax(0, 0) -> double.
-%typemap(jlparam) casadi::Matrix<double>, const casadi::Matrix<double>& "Union{DM,Real,AbstractArray{<:Real}}"
-%typemap(jlparam) casadi::Matrix<casadi::SXElem>, const casadi::Matrix<casadi::SXElem>& "Union{SX,DM,Real,AbstractArray{<:Real}}"
-%typemap(jlparam) casadi::MX, const casadi::MX& "Union{MX,DM,Real,AbstractArray{<:Real}}"
+%typemap(jlparam) casadi::Matrix<double>, const casadi::Matrix<double>& "Union{DM,Real,AbstractArray{<:Real},Vector{Any}}"
+%typemap(jlparam) casadi::Matrix<casadi::SXElem>, const casadi::Matrix<casadi::SXElem>& "Union{SX,DM,Real,AbstractArray{<:Real},Vector{Any}}"
+%typemap(jlparam) casadi::MX, const casadi::MX& "Union{MX,DM,Real,AbstractArray{<:Real},Vector{Any}}"
 #endif // SWIGJULIA
 
 #ifdef SWIGWASMJS
