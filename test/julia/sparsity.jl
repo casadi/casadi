@@ -142,3 +142,8 @@ end
     T, m = C.transpose(C.lower(_S, 2), false)
     @test C.is_equal(T, C.T(C.lower(_S, 2))) && length(m) == 3
 end
+
+@testset "in/out arguments are returned" begin
+    @test C.get_nz(C.dense(_S, 2, 2), [0, 3]) == [0, 3]
+    @test C.get_nz(C.diag(_S, 2), [1, 3]) == [-1, 1]
+end

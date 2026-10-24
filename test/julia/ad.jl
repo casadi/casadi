@@ -101,3 +101,10 @@ end
     Jm = C.Function("Jm", [xm], [jacobian(build(xm), xm)])
     @test maximum(abs.(Vector{Float64}(Js(inp)) .- Vector{Float64}(Jm(inp)))) < 1e-12
 end
+
+@testset "substitute_inplace returns the updated expressions" begin
+    x = sym(SX, "x"); y = sym(SX, "y")
+    vd, ex = C.substitute_inplace([x, y], [y + 1, SX(3)], [x * y], false)
+    @test Float64(C.evalf(vd[1])) == 4 && Float64(C.evalf(vd[2])) == 3
+    @test Float64(C.evalf(ex[1])) == 12
+end
