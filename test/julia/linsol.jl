@@ -101,3 +101,11 @@ for (plugin, req) in LIN_SOLVERS
         end
     end
 end
+
+@testset "ldl / qr_sparse permutations feed ldl_solve / qr_solve" begin
+    D, LT, p = C.ldl(DM([4 2; 2 3]))
+    @test Vector{Float64}(C.ldl_solve(DM([1, 2]), D, LT, p)) ≈ [-0.125, 0.75]
+    A = DM([4 2; 2 3])
+    V, R, beta, prinv, pc = C.qr_sparse(A)
+    @test Vector{Float64}(C.qr_solve(DM([1, 2]), V, R, beta, prinv, pc)) ≈ [-0.125, 0.75]
+end
