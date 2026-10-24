@@ -3065,7 +3065,8 @@ namespace casadi {
       Sparsity sp_permuted = pmult(ord, true, true, true);
 
       // Star coloring for the permuted matrix
-      Sparsity ret_permuted = sp_permuted.star_coloring2(0);
+      Sparsity ret_permuted = sp_permuted.star_coloring2(0, cutoff);
+      if (ret_permuted.is_null()) return ret_permuted;
 
       // Permute result back
       return ret_permuted.pmult(ord, true, false, false);
@@ -3326,6 +3327,7 @@ namespace casadi {
     } else {
       coloring = star_coloring(largest_first ? 1 : 0, cutoff);
     }
+    if (coloring.is_null()) return coloring;
 
     // Get the coloring
     casadi_int ncolor = coloring.size2();
@@ -3412,7 +3414,8 @@ namespace casadi {
       Sparsity sp_permuted = pmult(ord, true, true, true);
 
       // Star coloring for the permuted matrix
-      Sparsity ret_permuted = sp_permuted.star_coloring(0);
+      Sparsity ret_permuted = sp_permuted.star_coloring(0, cutoff);
+      if (ret_permuted.is_null()) return ret_permuted;
 
       // Permute result back
       return ret_permuted.pmult(ord, true, false, false);
