@@ -102,7 +102,7 @@ function main()
             "ipopt.print_level" => 0, "print_time" => false)))
 
     # Solve
-    X_sol = solver(ca.zeros(ca.GenDM, nX * (num_nodes + 1), 1))
+    X_sol = solver(ca.zeros(ca.DM, nX * (num_nodes + 1), 1))
     println("-----")
     println("node-state solution (4 x ", num_nodes + 1, "):")
     println("X_sol = ", X_sol)

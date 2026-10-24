@@ -238,3 +238,15 @@ end
     @test repr(sym(SX, "x").nnz) == "nnz bound to a SX"
     @test Opti().variable isa Base.Function
 end
+
+@testset "errors speak Julia" begin
+    @test_throws DimensionMismatch [C.ones(DM, 2, 2) C.ones(DM, 3, 1)]
+    @test_throws DimensionMismatch [C.ones(DM, 2, 2); C.ones(DM, 1, 3)]
+    @test_throws DimensionMismatch [sym(SX, "a", 2) sym(SX, "b", 3)]
+    @test size([DM(1) DM(Sparsity(0, 0)) DM(2)]) == (1, 2)
+    e = try C.Function("f", [sym(SX, "x") + 1], [SX(0)]) catch err; err end
+    @test !occursin("Main.", repr(e))
+    @test CasADiNative.zeros(DM, C.diag(Sparsity, 2)) isa DM
+    @test repr(Vector{MX}) == "Vector{MX}" && repr(MX[]) == "MX[]"
+    @test repr((DM[DM(1), DM(2)], 0)) == "(DM[1, 2], 0)"
+end

@@ -168,10 +168,10 @@ function main()
 
     # Seeds: perturb P in two directions (its first and second nonzero)
     spx = ca.sparsity(sol["x"]); spg = ca.sparsity(sol["g"]); spP = ca.sparsity(P)
-    fwd_p = [ca.zeros(ca.GenDM, spP) for _ in 1:nfwd]
+    fwd_p = [ca.zeros(ca.DM, spP) for _ in 1:nfwd]
     fwd_p[1][1] = 1
     fwd_p[2][2] = 1
-    z(sp) = hcat([ca.zeros(ca.GenDM, sp) for _ in 1:nfwd]...)
+    z(sp) = hcat([ca.zeros(ca.DM, sp) for _ in 1:nfwd]...)
 
     sol_fwd = fwd_solver(out_x = sol["x"], out_lam_g = sol["lam_g"], out_lam_x = sol["lam_x"],
                          out_f = sol["f"], out_g = sol["g"], lbx = lbw, ubx = ubw, lbg = lbg, ubg = ubg,
@@ -210,8 +210,8 @@ function main()
     adj_solver = solver.reverse(nadj)   # `ca.reverse` would collide with Base.reverse
     println("adj_solver generated")
     spf = ca.sparsity(sol["f"])
-    adj_f = ca.zeros(ca.GenDM, spf); adj_f[1] = 1
-    za(sp) = ca.zeros(ca.GenDM, sp)
+    adj_f = ca.zeros(ca.DM, spf); adj_f[1] = 1
+    za(sp) = ca.zeros(ca.DM, sp)
 
     sol_adj = adj_solver(out_x = sol["x"], out_lam_g = sol["lam_g"], out_lam_x = sol["lam_x"],
                          out_f = sol["f"], out_g = sol["g"], lbx = lbw, ubx = ubw, lbg = lbg, ubg = ubg,

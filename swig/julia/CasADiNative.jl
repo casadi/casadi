@@ -188,7 +188,14 @@ _cvec(xs) = (T = _catpromote(xs); [_ascat(T, x) for x in xs])
 # generated _vertcat/_horzcat always return MX; restore the DM type for numeric cats
 _restore(::Type{DM}, r) = C.evalf(r)
 _restore(::Type{T}, r) where {T} = r
-_cat(builder, xs) = _restore(_catpromote(xs), builder(_cvec(xs)))
+_cat(builder, xs) = _restore(_catpromote(xs), builder(_catcheck(_cvec(xs), builder === C._horzcat ? 1 : 2)))
+# Julia's DimensionMismatch for pieces that do not line up (empty pieces are skipped, as in casadi)
+function _catcheck(cv, d)
+    n = [d == 1 ? C.size1(x) : C.size2(x) for x in cv if C.numel(x) > 0]
+    Base.all(==(Base.first(n, 1)...), n) || Base.throw(DimensionMismatch(
+        "number of $(d == 1 ? "rows" : "columns") of each array must match (got $(Base.Tuple(n)))"))
+    cv
+end
 # One vararg method per bracket form, over casadi values, numbers and Julia arrays:
 # a casadi operand may sit anywhere ([0; 0; v], [1 2 x], [A x; y' 0], vcat(w...)).
 # Calls without one keep reaching Base, whose Number/AbstractArray methods are
@@ -215,10 +222,10 @@ function _hvcat(rows, xs)
     blocks = Any[]
     k = 0
     for ncol in rows
-        Base.push!(blocks, C._horzcat(cv[(k + 1):(k + ncol)]))
+        Base.push!(blocks, C._horzcat(_catcheck(cv[(k + 1):(k + ncol)], 1)))
         k += ncol
     end
-    _restore(T, C._vertcat(blocks))
+    _restore(T, C._vertcat(_catcheck(blocks, 2)))
 end
 
 # ---- typed function-form cat/dot (R3): preserve DM/SX, MX otherwise ----
@@ -377,6 +384,19 @@ for (_, T) in casadi._proxy_types
     Base.hasmethod(C.str, Tuple{T}) || continue
     @eval Base.show(io::IO, x::$T) = print(io, C.str(x))
     @eval Base.show(io::IO, ::_MIME, x::$T) = print(io, _type_name(x), "(", C.str(x), ")")
+end
+
+# casadi types print by their name, not their internal module path (Vector{MX}, MethodErrors)
+for (_, T) in casadi._proxy_types
+    @eval Base.show(io::IO, ::Type{$T}) = print(io, $(Base.string(nameof(T))))
+    @eval function Base.show(io::IO, v::Vector{$T})
+        print(io, $(Base.string(nameof(T))), "[")
+        for (k, x) in enumerate(v)
+            k > 1 && print(io, ", ")
+            Base.show(io, x)
+        end
+        print(io, "]")
+    end
 end
 
 # ---- size / conversion ----
