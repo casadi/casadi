@@ -1546,6 +1546,12 @@ class OptiStacktests(inherit_from):  # pyright: ignore[reportGeneralTypeIssues]
             print(data)
 
 
+    def test_value_sx(self):
+        opti = ca.Opti()
+        self.checkarray(opti.value(ca.SX(3)), ca.DM(3))
+        with self.assertInException("Opti works with MX"):
+            opti.value(ca.SX.sym("z"))
+
     @requires_nlpsol("ipopt")
     def test_issue4020(self):
         for constr_fun in [lambda x,y: x**2 - y == 0, lambda x,y: 0==x**2 - y,lambda x,y: x**2 == y, lambda x,y: y==x**2]:

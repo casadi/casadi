@@ -122,7 +122,8 @@ public:
     const std::vector<MX>& values=std::vector<MX>(), bool scaled=false) const { return x; }
   DM value(const SX& x,
     const std::vector<MX>& values=std::vector<MX>(), bool scaled=false) const {
-    return DM::nan(x.sparsity());
+    casadi_assert(x.is_constant(), "Opti works with MX: cannot evaluate SX expression " + str(x));
+    return evalf(x);
   }
   /// @}
 
