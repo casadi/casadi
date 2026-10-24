@@ -610,7 +610,7 @@ diagcat(x::Sparsity, xs::Sparsity...) = C.diagcat(Sparsity[x, xs...])
 diagcat(v::AbstractVector{Sparsity}) = C.diagcat(v)
 
 # ---- Opti conveniences ----
-export Opti, variable, parameter, subject_to, minimize, bounded, solver!, solve!, value
+export Opti, variable, parameter, subject_to, minimize, bounded, solver, solve, value
 const Opti = C.Opti
 # variable/parameter/subject_to record the user's call site ("stacktrace" metadata,
 # shown by describe), as in Python and MATLAB
@@ -647,10 +647,6 @@ for f in (:variable, :parameter, :subject_to)
     @eval C._swig_getproperty(o::Opti, ::Val{$(QuoteNode(f))}) = C._SwigBound($f, o)
 end
 bounded(lb, ex::MX, ub) = C.bounded(C.Opti, convert(MX, lb), ex, convert(MX, ub))
-# casadi-style positional option dicts (plugin_options, solver_options), NOT kwargs.
-solver!(o::Opti, plugin::AbstractString, plugin_opts=Dict{String,Any}(), solver_opts=Dict{String,Any}()) =
-    C.solver(o, plugin, plugin_opts, solver_opts)
-solve!(o::Opti) = C.solve(o)
 # value() comes back as native Julia (native_DM typemap): scalar Float64, row or
 # column -> Vector, else Matrix -- also via `sol.value(x)`.
 export set_initial

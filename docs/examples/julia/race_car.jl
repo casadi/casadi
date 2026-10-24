@@ -56,7 +56,7 @@ ca.subject_to(opti, T >= 0)                   # time must be positive
 ca.set_initial(opti, speed, 1)
 ca.set_initial(opti, T, 1)
 
-ca.solver!(opti, "ipopt", Dict("ipopt" => Dict{String,Any}("print_level" => 0), "print_time" => false))
-sol = ca.solve!(opti)
+ca.solver(opti, "ipopt", Dict("ipopt" => Dict{String,Any}("print_level" => 0), "print_time" => false))
+sol = ca.solve(opti)
 
 println("minimal lap time: ", ca.value(sol, T))

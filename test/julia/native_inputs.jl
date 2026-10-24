@@ -81,8 +81,8 @@ HAS_IPOPT && @testset "native inputs: Opti" begin
     opti.set_initial(y, range(-1, 1; length = 3))
     opti.subject_to(y[1:2] == [1, 2])
     minimize(opti, C.sumsqr(y - p))
-    solver!(opti, "ipopt", Dict("print_time" => false, "ipopt" => Dict("print_level" => 0)))
-    sol = solve!(opti)
+    solver(opti, "ipopt", Dict("print_time" => false, "ipopt" => Dict("print_level" => 0)))
+    sol = solve(opti)
     @test sol.value(y) isa Vector{Float64}
     @test sol.value(y) ≈ [1.0, 2.0, 2.0] atol = 1e-6
     @test sol.value(y[3]) isa Float64

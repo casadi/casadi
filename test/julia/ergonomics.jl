@@ -115,8 +115,8 @@ HAS_IPOPT && @testset "method-style on OptiSol (R3-3)" begin
     o = C.Opti()
     xx = variable(o)
     minimize(o, (xx - 3.0)^2)
-    solver!(o, "ipopt", Dict("print_time" => false, "ipopt" => Dict("print_level" => 0, "sb" => "yes")))
-    sol = solve!(o)
+    solver(o, "ipopt", Dict("print_time" => false, "ipopt" => Dict("print_level" => 0, "sb" => "yes")))
+    sol = solve(o)
     @test sol isa C.OptiSol
     # sol.value(xx) method-style mirrors C.value(sol, xx, ...)
     @test Base.abs(Float64(sol.value(xx, MX[])) - 3.0) < 1e-6

@@ -6820,8 +6820,11 @@ make_property_opti(g_linear_scale, DM)
 make_property_opti(f_linear_scale, float)
 
 #ifdef SWIGPYTHON
-// (not for Julia: casadi_solver is renamed to solver there, the solver(...) method)
 make_property(casadi::Opti, casadi_solver, Function);
+#else
+// keep the casadi_ prefix: solver(...) is the setter
+%rename(casadi_solver) casadi::OptiAdvanced::casadi_solver;
+make_property(casadi::OptiAdvanced, casadi_solver, Function);
 #endif
 #endif // SWIGPYTHON || SWIGJULIA
 
