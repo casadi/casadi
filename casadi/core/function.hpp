@@ -3595,7 +3595,7 @@ namespace casadi {
         >>> f = Function("f", [x], [sin(x)]).expand()
         >>> g = Function("g", [x], [f(x) + 1])
         >>> g.get_function(), g.has_function("f")
-        (['f'], False)
+        (['f'], True)
         >>> g.get_function("f")
         Function(f:(i0)->(o0) SXFunction)
         >>> try:
@@ -3611,7 +3611,7 @@ namespace casadi {
         >> g = Function('g', {x}, {f(x) + 1});
         >> g.get_function(), g.has_function('f')
         f
-        0
+        1
         >> g.get_function('f')
         f:(i0)->(o0) SXFunction
         >> try, g.get_function('h'); catch e, disp(contains(e.message, 'No such function')); end
@@ -3630,10 +3630,9 @@ namespace casadi {
         \identifier{1y4} */
     Function get_function(const std::string &name) const;
 
-    /** \brief Check whether a solver object owns a helper function with the given name
+    /** \brief Check if a particular dependency exists
 
-        Only implemented for solver classes (nlpsol, rootfinder, integrator, ...); for
-        SXFunction, MXFunction and maps it always returns false, see get_function.
+        True if \p fname is among the names returned by get_function().
 
         \sa get_function
 

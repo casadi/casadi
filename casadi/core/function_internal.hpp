@@ -368,7 +368,7 @@ namespace casadi {
     virtual const Function& get_function(const std::string &name) const;
 
     // Check if a particular dependency exists
-    virtual bool has_function(const std::string& fname) const {return false;}
+    virtual bool has_function(const std::string& fname) const;
 
     // Add embedded function to map, helper function
     void add_embedded(std::map<FunctionInternal*, std::pair<Function, size_t> >& all_fun,
