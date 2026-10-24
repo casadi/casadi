@@ -177,3 +177,18 @@ end
     @test Matrix(blockcat(1, 2, 3, 4)) == [1 2; 3 4]
     @test C._horzcat([DM(1), DM(2)]) isa DM
 end
+
+@testset "nested-vector, dict, hash and data-member returns are wrapped" begin
+    @test C.blocksplit(DM([1 2; 3 4]), 1, 1) isa Vector{Vector{DM}}
+    x = sym(SX, "x")
+    @test C.str(C.forward([x^2], [x], [[SX(1)]])[1][1]) == "(2.*x)"
+    @test length(C.reverse([x^2], [x], [[SX(1)]])) == 1
+    @test size(C.sym(MX, "x", 1, 1, 2, 2)) == (2,) && C.sym(SX, "y", 2, 3, 2, 2)[1][1] isa SX
+    X = sym(MX, "X", 3, 3)
+    @test C.mapping(X[1, 2]) == reshape([3], 1, 1)
+    @test C.hash(C.dense(Sparsity, 2)) == C.hash(C.dense(Sparsity, 2))
+    @test CasADiNative.hash(C.dense(Sparsity, 2)) == C.hash(C.dense(Sparsity, 2))
+    opti = Opti(); z = opti.variable()
+    c = C.canon_expr(opti.debug, 0 <= (z <= 1))
+    @test c.type == C.OPTI_DOUBLE_INEQUALITY && C.str(c.canon) == C.str(z)
+end

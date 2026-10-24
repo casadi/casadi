@@ -2738,6 +2738,13 @@ namespace std {
  //           no translation layer.  Use TS syntax (e.g. "bigint",
  //           "string", "MX[]", "Record<string, GenericType>").
 #ifdef SWIGJULIA
+%define %julia_value_return(xType...)
+%typemap(ctype, out="jl_value_t*", fragment="casadi_all") xType, const xType& "jl_value_t*"
+%typemap(out, noblock=1) xType %{ if(!($result = casadi::from_ref($1))) SWIG_exception_fail(SWIG_TypeError,"Failed to convert output."); %}
+%typemap(out, noblock=1) const xType& %{ if(!($result = casadi::from_ptr($1))) SWIG_exception_fail(SWIG_TypeError,"Failed to convert output."); %}
+%typemap(jltype, out="Any") xType, const xType& "Any"
+%typemap(jlout) xType, const xType& "_check($call)"
+%enddef
 %define %julia_convention_repair()
 // Convention repair: %casadi_output_typemaps applied the class-return
 // convention (owned copy behind void*) to casadi-typemapped PRIMITIVES
@@ -2785,6 +2792,27 @@ namespace std {
 %typemap(out, noblock=1) const casadi::Dict& %{ if(!($result = casadi::from_ptr($1))) SWIG_exception_fail(SWIG_TypeError,"Failed to convert output to Dict."); %}
 %typemap(jltype, out="Any") casadi::Dict, const casadi::Dict& "Any"
 %typemap(jlout) casadi::Dict, const casadi::Dict& "_check($call)::AbstractDict"
+// Dicts and nested vectors: return the Julia value built by from_ptr
+%julia_value_return(std::map<std::string, casadi::Matrix<double> >)
+%julia_value_return(std::map<std::string, casadi::Matrix<casadi::SXElem> >)
+%julia_value_return(std::map<std::string, casadi::MX>)
+%julia_value_return(std::map<std::string, casadi::Sparsity>)
+%julia_value_return(std::vector<std::vector<casadi::Matrix<double> > >)
+%julia_value_return(std::vector<std::vector<casadi::Matrix<casadi::SXElem> > >)
+%julia_value_return(std::vector<std::vector<casadi::MX> >)
+%julia_value_return(std::vector<std::vector<casadi::Sparsity> >)
+%julia_value_return(std::vector<std::vector<casadi_int> >)
+%julia_value_return(std::vector<std::vector<double> >)
+// std::size_t (hashes) like size_t
+%typemap(ctype, out="long long") std::size_t "jl_value_t*"
+%typemap(out) std::size_t %{ $result = (long long)$1; %}
+%typemap(jltype, out="Clonglong") std::size_t "Any"
+%typemap(jlout) std::size_t "Int(_check($call))"
+// Matrix<casadi_int> as a Julia Matrix{Int}
+%typemap(ctype, out="void *") casadi::Matrix<casadi_int> "jl_value_t*"
+%typemap(out) casadi::Matrix<casadi_int> %{ $result = (void*) new casadi::Matrix<double>($1); %}
+%typemap(jltype, out="Ptr{Cvoid}") casadi::Matrix<casadi_int> "Any"
+%typemap(jlout) casadi::Matrix<casadi_int> "Base.round.(Int, Base.Matrix{Float64}(DM(_check($call))))"
 %enddef
 #else
 %define %julia_convention_repair() %enddef
