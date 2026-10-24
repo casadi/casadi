@@ -413,6 +413,10 @@ namespace casadi {
        {OT_DOUBLE,
         "Minimum multiplier value for a constraint to be considered active "
         "in parametric sensitivities [0]."}},
+      {"sens_force_equality",
+       {OT_BOOL,
+        "Treat constraints with equal bounds as active in parametric sensitivities, "
+        "regardless of the multiplier, see issue #2545 [false]."}},
       {"sens_linsol",
        {OT_STRING,
         "Linear solver used for parametric sensitivities (default 'qr')."}},
@@ -429,6 +433,7 @@ namespace casadi {
     print_problem_ = false;
     solver_version_check_ = true;
     sens_min_lam_ = 0;
+    sens_force_equality_ = false;
     sens_linsol_ = "qr";
 
     // Read options
@@ -443,6 +448,8 @@ namespace casadi {
         solver_version_check_ = op.second;
       } else if (op.first=="sens_min_lam") {
         sens_min_lam_ = op.second;
+      } else if (op.first=="sens_force_equality") {
+        sens_force_equality_ = op.second;
       } else if (op.first=="sens_linsol") {
         sens_linsol_ = op.second.to_string();
       } else if (op.first=="sens_linsol_options") {
@@ -611,11 +618,17 @@ namespace casadi {
   }
 
   MX Conic::sens_kkt(const MX& H, const MX& A, const MX& lam_x, const MX& lam_a,
-                     double min_lam, MX& lbIx, MX& ubIx, MX& lbIa, MX& ubIa) {
+                     const MX& lbx, const MX& ubx, const MX& lba, const MX& uba,
+                     double min_lam, bool force_equality,
+                     MX& lbIx, MX& ubIx, MX& lbIa, MX& ubIa) {
     ubIx = lam_x > min_lam;
     lbIx = lam_x < -min_lam;
     ubIa = lam_a > min_lam;
     lbIa = lam_a < -min_lam;
+    if (force_equality) {
+      lbIx = if_else(lbx==ubx, 1-ubIx, lbIx);
+      lbIa = if_else(lba==uba, 1-ubIa, lbIa);
+    }
     MX bIx = ubIx + lbIx, iIx = 1-bIx;
     MX bIa = ubIa + lbIa, iIa = 1-bIa;
     MX H_11 = mtimes(diag(iIx), H) + diag(bIx);
@@ -659,7 +672,9 @@ namespace casadi {
 
     // KKT matrix, active set given by the multiplier signs
     MX lbIx, ubIx, lbIa, ubIa;
-    MX H = sens_kkt(h, a, lam_x, lam_a, sens_min_lam_, lbIx, ubIx, lbIa, ubIa);
+    MX H = sens_kkt(h, a, lam_x, lam_a, arg[CONIC_LBX], arg[CONIC_UBX],
+                    arg[CONIC_LBA], arg[CONIC_UBA], sens_min_lam_, sens_force_equality_,
+                    lbIx, ubIx, lbIa, ubIa);
 
     // Sensitivity inputs
     std::vector<MX> fseed(CONIC_NUM_IN);
@@ -736,7 +751,9 @@ namespace casadi {
 
     // KKT matrix, active set given by the multiplier signs
     MX lbIx, ubIx, lbIa, ubIa;
-    MX H = sens_kkt(h, a, lam_x, lam_a, sens_min_lam_, lbIx, ubIx, lbIa, ubIa);
+    MX H = sens_kkt(h, a, lam_x, lam_a, arg[CONIC_LBX], arg[CONIC_UBX],
+                    arg[CONIC_LBA], arg[CONIC_UBA], sens_min_lam_, sens_force_equality_,
+                    lbIx, ubIx, lbIa, ubIa);
 
     // Sensitivity inputs
     std::vector<MX> aseed(CONIC_NUM_OUT);
@@ -950,7 +967,7 @@ namespace casadi {
   void Conic::serialize_body(SerializingStream &s) const {
     FunctionInternal::serialize_body(s);
 
-    s.version("Conic", 5);
+    s.version("Conic", 6);
     s.pack("Conic::discrete", discrete_);
     s.pack("Conic::equality", equality_);
     s.pack("Conic::print_problem", print_problem_);
@@ -958,6 +975,7 @@ namespace casadi {
     s.pack("Conic::sens_min_lam", sens_min_lam_);
     s.pack("Conic::sens_linsol", sens_linsol_);
     s.pack("Conic::sens_linsol_options", sens_linsol_options_);
+    s.pack("Conic::sens_force_equality", sens_force_equality_);
 
     s.pack("Conic::H", H_);
     s.pack("Conic::A", A_);
@@ -978,7 +996,7 @@ namespace casadi {
   }
 
   Conic::Conic(DeserializingStream & s) : FunctionInternal(s) {
-    int version = s.version("Conic", 1, 5);
+    int version = s.version("Conic", 1, 6);
     s.unpack("Conic::discrete", discrete_);
     if (version>=3) {
       s.unpack("Conic::equality", equality_);
@@ -996,6 +1014,11 @@ namespace casadi {
     } else {
       sens_min_lam_ = 0;
       sens_linsol_ = "qr";
+    }
+    if (version>=6) {
+      s.unpack("Conic::sens_force_equality", sens_force_equality_);
+    } else {
+      sens_force_equality_ = false;
     }
     if (version==1) {
       s.unpack("Conic::error_on_fail", error_on_fail_);

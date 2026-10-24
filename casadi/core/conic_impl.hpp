@@ -156,7 +156,9 @@ namespace casadi {
 
     // KKT matrix for parametric sensitivities, active set given by the multiplier signs
     static MX sens_kkt(const MX& H, const MX& A, const MX& lam_x, const MX& lam_a,
-                       double min_lam, MX& lbIx, MX& ubIx, MX& lbIa, MX& ubIa);
+                       const MX& lbx, const MX& ubx, const MX& lba, const MX& uba,
+                       double min_lam, bool force_equality,
+                       MX& lbIx, MX& ubIx, MX& lbIa, MX& ubIa);
 
     /** \brief Do the derivative functions need nondifferentiated outputs?
 
@@ -197,6 +199,7 @@ namespace casadi {
     bool print_problem_;
     bool solver_version_check_;
     double sens_min_lam_;
+    bool sens_force_equality_;
     std::string sens_linsol_;
     Dict sens_linsol_options_;
 

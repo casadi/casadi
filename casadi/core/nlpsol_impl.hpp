@@ -97,6 +97,7 @@ namespace casadi {
     bool calc_lam_x_, calc_lam_p_, calc_f_, calc_g_;
     bool bound_consistency_;
     double min_lam_;
+    bool sens_force_equality_;
     bool no_nlp_grad_;
     std::vector<bool> discrete_;
     std::vector<bool> equality_;

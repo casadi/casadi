@@ -1526,6 +1526,22 @@ class ConicTests(casadiTestCase):
       F = ca.Function("F",[p],[r["x"],r["f"],r["lam_g"],r["lam_x"]])
       self.checkfunction(F,R,inputs=[pv],digits=digits-less_digits)
 
+  def test_sensitivity_equality_zero_multiplier(self):
+    # Equality constraint and fixed variable with zero multipliers
+    x = ca.MX.sym("x",3)
+    p = ca.MX.sym("p")
+    qp = {"x":x,"p":p,"f":(x[0]-p)**2,"g":x[1]-x[0]}
+    R = ca.Function("R",[p],[ca.vertcat(p,p,p)])
+    for conic, qp_options, aux_options in conics:
+      if not aux_options["quadratic"] or not aux_options["dual"]: continue
+      if conic in ["nlpsol"]: continue
+      print("test_sensitivity_equality_zero_multiplier",conic,qp_options)
+      digits = 7 if conic in ["qrqp","qpoases","daqp","ipqp"] else 4
+      solver = ca.qpsol("solver",conic,qp,dict(qp_options,sens_min_lam=1e-6,sens_force_equality=True))
+      r = solver(p=p,lbg=0,ubg=0,lbx=ca.vertcat(-inf,-inf,p),ubx=ca.vertcat(inf,inf,p))
+      F = ca.Function("F",[p],[r["x"]])
+      self.checkfunction(F,R,inputs=[0.5],digits=digits-aux_options.get("less_digits",0))
+
   @requires_conic("osqp")
   def test_postpone_expand(self):
 

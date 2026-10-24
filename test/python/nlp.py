@@ -1859,6 +1859,24 @@ class NLPtests(casadiTestCase):
       self.checkfunction_light(f,f2,[0,0.5],digits=6)
 
   @requires_conic("qrqp")
+  def test_nlp_sensitivity_equality_zero_multiplier(self):
+    # Equality constraint and fixed variable with zero multipliers
+    x = ca.MX.sym("x",3)
+    p = ca.MX.sym("p")
+    nlp = {"x":x,"p":p,"f":(x[0]-p)**2,"g":x[1]-x[0]}
+    solver = ca.nlpsol("solver","sqpmethod",nlp,{"qpsol":"qrqp","qpsol_options":{"print_iter":False,"print_header":False},
+                                                 "print_iteration":False,"print_header":False,"print_status":False,
+                                                 "sens_force_equality":True})
+    r = solver(p=p,lbg=0,ubg=0,lbx=ca.vertcat(-inf,-inf,p),ubx=ca.vertcat(inf,inf,p))
+    lam = ca.Function("lam",[p],[ca.vertcat(r["lam_g"],r["lam_x"])])(0)
+    self.assertTrue(ca.norm_inf(lam)==0)
+    z = r["x"]
+    z2 = ca.vertcat(p,p,p)
+    f = ca.Function("f",[p],[z,ca.jacobian(z,p)])
+    f2 = ca.Function("f",[p],[z2,ca.jacobian(z2,p)])
+    self.checkfunction_light(f,f2,inputs=[0],digits=8)
+
+  @requires_conic("qrqp")
   def test_regularize_sqpmethod(self):
 
     # Test problem that is indefinite in direction of the constraint Jacobian
