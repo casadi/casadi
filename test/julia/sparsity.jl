@@ -158,3 +158,10 @@ end
     @test C.nnz([d D; D d]) == 12
     @test diagcat(d, d) == C.diag(_S, 4) && diagcat([d, d]) == C.diag(_S, 4)
 end
+
+@testset "coloring defaults" begin
+    @test C.size2(C.uni_coloring(C.diag(_S, 3))) == 1
+    @test C.size2(C.star_coloring(C.diag(_S, 5))) == 1
+    @test C.size2(C.star_coloring2(C.diag(_S, 5))) == 1
+    @test C.uni_coloring(C.diag(_S, 3), Sparsity()) == C.uni_coloring(C.diag(_S, 3))
+end
