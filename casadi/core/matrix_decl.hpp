@@ -2688,18 +2688,16 @@ namespace casadi {
 
     /** \brief Check that no entry is nan, inf or -inf
 
-        Structural zeros are ignored. For SX, every entry must be a constant: the check
-        raises an error when it reaches a symbolic entry (an infinite constant found before
-        it still gives false).
+        Structural zeros are ignored. For SX, only constant entries are checked; symbolic
+        entries are ignored.
 
         \doctest
         >>> DM([1, 2]).is_regular(), DM([1, inf]).is_regular(), DM.nan(2, 2).is_regular()
         (True, False, False)
         >>> DM(2, 2).is_regular(), SX([1, 2]).is_regular()
         (True, True)
-        >>> try: SX.sym("x").is_regular()
-        ... except Exception as e: print("error")
-        error
+        >>> SX.sym("x").is_regular(), vertcat(SX.sym("x"), inf).is_regular()
+        (True, False)
         \enddoctest
 
         \doctest{matlab}
@@ -2709,8 +2707,8 @@ namespace casadi {
         0 1
         >> SX([1; 2]).is_regular()
         1
-        >> try, SX.sym('x').is_regular(); catch e, disp('error'); end
-        error
+        >> fprintf('%d %d\n', SX.sym('x').is_regular(), vertcat(SX.sym('x'), inf).is_regular())
+        1 0
         \enddoctest
 
         \sa nan, inf

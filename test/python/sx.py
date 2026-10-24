@@ -952,8 +952,9 @@ class SXtests(casadiTestCase):
     self.assertTrue(ca.SX(ca.DM([0,1])).is_regular())
     self.assertFalse(ca.SX(ca.DM([0,inf])).is_regular())
     self.assertFalse(ca.vertcat(*[x,inf]).is_regular())
-    with self.assertRaises(Exception):
-      self.assertFalse(ca.vertcat(*[x,x]).is_regular())
+    self.assertTrue(ca.vertcat(*[x,x]).is_regular())
+    self.assertTrue(ca.vertcat(x, 1).is_regular())
+    self.assertFalse(ca.vertcat(float("nan"), x).is_regular())
 
 
   def test_symvar(self):

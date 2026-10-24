@@ -100,16 +100,12 @@ namespace casadi {
 
   template<>
   bool CASADI_EXPORT SX::is_regular() const {
-    // First pass: ignore symbolics
+    // Symbolic entries are ignored
     for (casadi_int i=0; i<nnz(); ++i) {
       const SXElem& x = nonzeros().at(i);
       if (x.is_constant()) {
         if (x.is_nan() || x.is_inf() || x.is_minus_inf()) return false;
       }
-    }
-    // Second pass: don't ignore symbolics
-    for (casadi_int i=0; i<nnz(); ++i) {
-      if (!nonzeros().at(i).is_regular()) return false;
     }
     return true;
   }
