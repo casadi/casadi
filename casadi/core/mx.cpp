@@ -314,7 +314,7 @@ namespace casadi {
 
   void MX::set(const MX& m, bool ind1, const Slice& rr) {
     // Fall back on IM
-    set(m, ind1, rr.all(size1(), ind1));
+    set(m, ind1, rr.all(numel(), ind1));
   }
 
   void MX::set(const MX& m, bool ind1, const Matrix<casadi_int>& rr) {

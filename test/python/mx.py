@@ -5374,6 +5374,17 @@ class MXtests(casadiTestCase):
       f = ca.Function("f",[y],[e]).transform([["simplify",0,"ref_count"]])
       self.assertTrue(f.call([y],True,False)[0].is_one())
 
+  def test_linear_slice_assign(self):
+    Y0 = ca.MX.sym("Y", 3, 3)
+    Y = ca.MX(Y0)
+    Y[:] = 1
+    self.checkarray(ca.Function("f", [Y0], [Y])(ca.DM.zeros(3, 3)), ca.DM.ones(3, 3))
+    Z0 = ca.MX.sym("Z", 3, 3)
+    Z = ca.MX(Z0)
+    Z[4] = 1
+    f = ca.Function("f", [Z0], [Z])
+    self.checkarray(f(ca.DM.zeros(3, 3)), ca.DM([[0, 0, 0], [0, 1, 0], [0, 0, 0]]))
+
   def test_set_precision(self):
     # Issue #4326: numeric MX constants honor DM::set_precision
     # (the value lives in a DM-like node, so MX printing piggybacks
