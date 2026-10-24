@@ -1697,6 +1697,24 @@ class SXtests(casadiTestCase):
       self.assertTrue(ca.is_linear(x*p**4,x))
       self.assertTrue(ca.is_linear(5*p**4,x))
 
+      # issue #4443: a zero derivative does not make a jump linear
+      xv = X.sym("x",2)
+      xs = ca.SX.sym("x")
+      F = ca.Function("F",[xs],[ca.floor(xs)])
+      for e,v in [(ca.floor(x),x),(ca.sign(x),x),(x>0,x),(ca.if_else(x>0,1,2),x),
+                  (ca.copysign(x,p),x),(ca.floor(xv),xv),(F(x),x)]:
+        self.assertFalse(ca.is_linear(e,v))
+      if X is ca.MX:
+        self.assertFalse(ca.is_linear(ca.floor(ca.stop_diff(x,1)),x))
+        self.assertFalse(ca.is_linear(ca.find(xv),xv))
+      self.assertTrue(ca.is_linear(ca.floor(p)+x,x))
+      self.assertTrue(ca.is_linear(ca.if_else(p>0,x,2*x),x))
+      self.assertFalse(ca.is_quadratic(ca.floor(x),x))
+      self.assertFalse(ca.is_quadratic(x*ca.fabs(x),x))
+      self.assertTrue(ca.is_quadratic(x**2*ca.floor(p),x))
+      with self.assertInException("non-linear"):
+        ca.linear_coeff(ca.floor(x),x,True)
+
 
 
       z = x**2+3*y**2 + 0.5*x*y + 7*x + 6*y+7

@@ -2805,12 +2805,13 @@ namespace casadi {
 
     /** \brief Is expr linear in var?
     *
-    * Defined as: no entry of \p expr depends on \p var with order 2 (see which_depends).
+    * Defined as: no entry of \p expr depends on \p var with order 2 (see which_depends)
+    * and \p expr cannot jump in \p var (see jumps_in).
     * Only the structure of the graph is inspected, not the values:
     * false negatives are possible
     * (an expression may not be recognised as linear while it really is, e.g. x*x/x).
     * Operations whose derivative is structurally zero, such as floor, sign or comparisons,
-    * are treated as linear.
+    * are not linear.
     * A constant expression counts as linear.
     *
     * \doctest
@@ -2838,7 +2839,8 @@ namespace casadi {
 
     /** \brief Is expr quadratic in var?
     *
-    * Defined as: gradient(expr, var) is linear in \p var; hence \p expr must be scalar.
+    * Defined as: \p expr cannot jump in \p var and gradient(expr, var) is linear in \p var;
+    * hence \p expr must be scalar.
     * False negatives are possible
     * (an expression may not be recognised as quadratic while it really is),
     * see is_linear for the structural nature of the check.
@@ -4183,12 +4185,12 @@ namespace casadi {
 
   template<typename MatType>
   bool GenericMatrix<MatType>::is_linear(const MatType &expr, const MatType &var) {
-    return !any(MatType::which_depends(expr, var, 2, true));
+    return !any(MatType::which_depends(expr, var, 2, true)) && !jumps_in(expr, var);
   }
 
   template<typename MatType>
   bool GenericMatrix<MatType>::is_quadratic(const MatType &expr, const MatType &var) {
-    return is_linear(gradient(expr, var), var);
+    return !jumps_in(expr, var) && is_linear(gradient(expr, var), var);
   }
 
   template<typename MatType>
