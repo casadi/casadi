@@ -5641,6 +5641,9 @@ namespace casadi{
         end
      end
   %}
+
+  // Transpose using the A' syntax in addition to A.'
+  Sparsity ctranspose() const { return $self->T();}
 }
 
 

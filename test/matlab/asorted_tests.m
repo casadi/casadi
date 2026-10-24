@@ -1010,6 +1010,11 @@ if ~is_octave
   assert(strcmp(str(xe.sparsity), '2x2,2nz'));
 end
 
+% Sparsity transpose
+sp = Sparsity.lower(2);
+assert(sp' == Sparsity.upper(2));
+assert(sp.' == Sparsity.upper(2));
+
 disp('success')
 
 
