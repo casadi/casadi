@@ -4018,6 +4018,7 @@ namespace casadi {
   MatType GenericMatrix<MatType>::logsumexp(const MatType& x) {
     casadi_assert(x.is_dense(), "Argument must be dense");
     casadi_assert(x.is_column(), "Argument must be column vector");
+    casadi_assert(!x.is_empty(), "Argument must be nonempty");
     // Call the class specific method
     return MatType::_logsumexp(x);
   }
