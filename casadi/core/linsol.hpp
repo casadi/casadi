@@ -51,6 +51,7 @@ namespace casadi {
       and "csparse". The constructor raises an error for a non-square pattern only when the
       plugin checks it; otherwise the solve fails.
 
+      \lang{python}
       \doctest
       >>> A = DM([[3, 1], [1, 2]]); b = DM([4, 3])
       >>> L = Linsol("L", "qr", A.sparsity())
@@ -74,8 +75,10 @@ namespace casadi {
       >>> f(A, b)
       (DM([1, 1]), DM(5))
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> A = DM([3 1; 1 2]); b = DM([4; 3]);
       >> L = Linsol('L', 'qr', A.sparsity());
       >> L.plugin_name(), L.sparsity()
@@ -98,6 +101,7 @@ namespace casadi {
       [1, 1]
       5
       \enddoctest
+      \endlang
 
       \generalsection{Linsol}
       \pluginssection{Linsol}
@@ -125,6 +129,7 @@ namespace casadi {
         \param sp Sparsity pattern of A (square); the numerical values are given at every call
         \param opts Options; an unknown option raises an error
 
+        \lang{python}
         \doctest
         >>> L = Linsol("L", "ldl", Sparsity.dense(2, 2))
         >>> L
@@ -135,8 +140,10 @@ namespace casadi {
         ...     print("Unknown option" in str(e))
         True
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> L = Linsol('L', 'ldl', Sparsity.dense(2, 2)); disp(L)
         Linear solver LinsolLdl
         >> opts = struct('no_such_option', 1);
@@ -144,6 +151,7 @@ namespace casadi {
         >> contains(msg, 'Unknown option')
         1
         \enddoctest
+        \endlang
 
         \identifier{2pe} */
     explicit Linsol(const std::string& name, const std::string& solver,
@@ -171,16 +179,20 @@ namespace casadi {
 
         Same as has_linsol.
 
+        \lang{python}
         \doctest
         >>> Linsol.has_plugin("qr"), Linsol.has_plugin("no_such_plugin")
         (True, False)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> Linsol.has_plugin('qr'), Linsol.has_plugin('no_such_plugin')
         1
         0
         \enddoctest
+        \endlang
 
         \identifier{2pf} */
     static bool has_plugin(const std::string& name);
@@ -189,6 +201,7 @@ namespace casadi {
 
         Same as load_linsol; raises an error when the plugin cannot be found.
 
+        \lang{python}
         \doctest
         >>> try:
         ...     Linsol.load_plugin("no_such_plugin")
@@ -196,12 +209,15 @@ namespace casadi {
         ...     print("no_such_plugin" in str(e))
         True
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> try, Linsol.load_plugin('no_such_plugin'); catch e, msg = e.message; end
         >> contains(msg, 'no_such_plugin')
         1
         \enddoctest
+        \endlang
 
         \identifier{2pg} */
     static void load_plugin(const std::string& name);
@@ -210,15 +226,19 @@ namespace casadi {
 
         Same as doc_linsol.
 
+        \lang{python}
         \doctest
         >>> "LDL" in Linsol.doc("ldl")
         True
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> contains(Linsol.doc('ldl'), 'LDL')
         1
         \enddoctest
+        \endlang
 
         \identifier{2ph} */
     static std::string doc(const std::string& name);
@@ -243,6 +263,7 @@ namespace casadi {
         low-level solve can use the factorization. Raises an error when the factorization fails
         with option "regularity_check" set; otherwise a failure is only reported by solve.
 
+        \lang{python}
         \doctest
         >>> A = DM([[3, 1], [1, 2]])
         >>> L = Linsol("L", "ldl", A.sparsity())
@@ -253,14 +274,17 @@ namespace casadi {
         >>> L.neig(DM([[-1, 0], [0, 1]]))
         1
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> A = DM([3 1; 1 2]); L = Linsol('L', 'ldl', A.sparsity());
         >> L.nfact(A); fprintf('%d %d\n', L.neig(A), L.rank(A))
         0 2
         >> B = DM([-1 0; 0 1]); L.nfact(B); disp(L.neig(B))
         1
         \enddoctest
+        \endlang
 
         \identifier{2pj} */
     void nfact(const DM& A) const;
@@ -278,6 +302,7 @@ namespace casadi {
         \param tr Solve with the transpose of \p A instead
         \return X with the shape of \p B
 
+        \lang{python}
         \doctest
         >>> L = Linsol("L", "qr", Sparsity.dense(2, 2))
         >>> L.solve(DM([[3, 1], [1, 2]]), DM([4, 3]))
@@ -288,8 +313,10 @@ namespace casadi {
         ...     print("matching row count" in str(e))
         True
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> L = Linsol('L', 'qr', Sparsity.dense(2, 2));
         >> L.solve(DM([3 1; 1 2]), DM([4; 3]))
         [1, 1]
@@ -297,6 +324,7 @@ namespace casadi {
         >> contains(msg, 'matching row count')
         1
         \enddoctest
+        \endlang
 
         \identifier{2pk} */
     DM solve(const DM& A, const DM& B, bool tr=false) const;
@@ -308,6 +336,7 @@ namespace casadi {
       * Not available for all solvers (only "ldl"); uses the factorization of the most recent
       * nfact call, which must have been made with the same matrix.
 
+        \lang{python}
         \doctest
         >>> A = DM([[-2, 0], [0, 1]])
         >>> L = Linsol("L", "ldl", A.sparsity())
@@ -320,8 +349,10 @@ namespace casadi {
         ...     print("'neig' not defined" in str(e))
         True
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> A = DM([-2 0; 0 1]); L = Linsol('L', 'ldl', A.sparsity());
         >> L.nfact(A); disp(L.neig(A))
         1
@@ -329,6 +360,7 @@ namespace casadi {
         >> try, L.neig(A); catch e, disp(contains(e.message, '''neig'' not defined')); end
         1
         \enddoctest
+        \endlang
 
         \identifier{1kk} */
     casadi_int neig(const DM& A) const;
@@ -340,6 +372,7 @@ namespace casadi {
 
         A rank-deficient matrix also triggers a warning in nfact.
 
+        \lang{python}
         \doctest
         >>> A = DM([[2, 1], [1, 3]])
         >>> L = Linsol("L", "ldl", A.sparsity())
@@ -347,12 +380,15 @@ namespace casadi {
         >>> L.rank(A)
         2
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> A = DM([2 1; 1 3]); L = Linsol('L', 'ldl', A.sparsity());
         >> L.nfact(A); disp(L.rank(A))
         2
         \enddoctest
+        \endlang
 
         \identifier{1kl} */
     casadi_int rank(const DM& A) const;
@@ -361,6 +397,7 @@ namespace casadi {
 
       * Not available for all solvers ("qr" and "csparse"); factorizes \p A first.
 
+        \lang{python}
         \doctest
         >>> A = DM([[3, 1], [1, 2]])
         >>> Linsol("L", "qr", A.sparsity()).det(A)
@@ -371,14 +408,17 @@ namespace casadi {
         ...     print("'det' not defined" in str(e))
         True
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> A = DM([3 1; 1 2]); L = Linsol('L', 'qr', A.sparsity()); disp(round(L.det(A)))
         5
         >> L = Linsol('L', 'ldl', A.sparsity());
         >> try, L.det(A); catch e, disp(contains(e.message, '''det'' not defined')); end
         1
         \enddoctest
+        \endlang
 
         \identifier{2hw} */
     double det(const DM& A) const;
@@ -392,6 +432,7 @@ namespace casadi {
         With the option "record_time" set, it holds call counts and timings (n_call_*,
         t_proc_*, t_wall_*) of sfact, nfact and solve.
 
+        \lang{python}
         \doctest
         >>> L = Linsol("L", "qr", Sparsity.dense(1, 1))
         >>> try:
@@ -406,8 +447,10 @@ namespace casadi {
         DM(2)
         1
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> L = Linsol('L', 'qr', Sparsity.dense(1, 1));
         >> try, L.stats(); catch e, disp(contains(e.message, 'did not solve a problem yet')); end
         1
@@ -415,6 +458,7 @@ namespace casadi {
         2
         1
         \enddoctest
+        \endlang
 
         \identifier{2pl} */
     Dict stats(int mem=1) const;
@@ -453,16 +497,20 @@ namespace casadi {
 
       Tries to load the plugin \p name if it is not loaded yet; false when it is not found.
 
+      \lang{python}
       \doctest
       >>> has_linsol("qr"), has_linsol("no_such_plugin")
       (True, False)
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> has_linsol('qr'), has_linsol('no_such_plugin')
       1
       0
       \enddoctest
+      \endlang
 
       \identifier{2pm} */
   CASADI_EXPORT bool has_linsol(const std::string& name);
@@ -472,6 +520,7 @@ namespace casadi {
       Normally plugins are loaded on first use; this raises an error when the plugin cannot be
       found.
 
+      \lang{python}
       \doctest
       >>> try:
       ...     load_linsol("no_such_plugin")
@@ -479,12 +528,15 @@ namespace casadi {
       ...     print("no_such_plugin" in str(e))
       True
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> try, load_linsol('no_such_plugin'); catch e, msg = e.message; end
       >> contains(msg, 'no_such_plugin')
       1
       \enddoctest
+      \endlang
 
       \identifier{2pn} */
   CASADI_EXPORT void load_linsol(const std::string& name);
@@ -493,15 +545,19 @@ namespace casadi {
 
       The text includes the plugin-specific option table.
 
+      \lang{python}
       \doctest
       >>> "QR" in doc_linsol("qr")
       True
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> contains(doc_linsol('qr'), 'QR')
       1
       \enddoctest
+      \endlang
 
       \identifier{2po} */
   CASADI_EXPORT std::string doc_linsol(const std::string& name);

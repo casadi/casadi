@@ -87,6 +87,7 @@ namespace casadi {
       every operation creates new nodes. Symbolic primitives are created with MX.sym;
       MX(...) creates constants.
 
+      \lang{python}
       \doctest
       >>> x = MX.sym("x", 2)
       >>> A = MX.sym("A", 2, 2)
@@ -99,8 +100,10 @@ namespace casadi {
       >>> f(DM([[1, 2], [3, 4]]), DM([1, 1]))
       DM([4, 8])
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> x = MX.sym('x', 2); A = MX.sym('A', 2, 2);
       >> e = A*x + 1;
       >> e
@@ -113,6 +116,7 @@ namespace casadi {
       >> f(DM([1 2; 3 4]), DM([1; 1]))
       [4, 8]
       \enddoctest
+      \endlang
 
       \sa SX, DM, Function
 
@@ -135,17 +139,21 @@ namespace casadi {
 
         The result is an empty constant, not a symbolic primitive (use MX.sym for that).
 
+        \lang{python}
         \doctest
         >>> MX(), MX().shape, MX().is_constant()
         (MX(0x0), (0, 0), True)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> MX(), size(MX()), MX().is_constant()
         0x0
         0 0
         1
         \enddoctest
+        \endlang
 
         \identifier{q0} */
     MX();
@@ -156,6 +164,7 @@ namespace casadi {
         It is the usual starting point for building a matrix by assignment: assigning to
         an element grows the sparsity pattern.
 
+        \lang{python}
         \doctest
         >>> Z = MX(2, 3)
         >>> Z, Z.nnz(), Z.is_zero()
@@ -164,8 +173,10 @@ namespace casadi {
         >>> Z.sparsity()
         Sparsity(2x3,1nz)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> Z = MX(2, 3);
         >> Z, Z.nnz(), Z.is_zero()
         zeros(2x3,0nz)
@@ -175,6 +186,7 @@ namespace casadi {
         >> Z.sparsity()
         2x3,1nz
         \enddoctest
+        \endlang
 
         \sa MX.zeros, MX.sym
 
@@ -192,6 +204,7 @@ namespace casadi {
 
         Same as MX::ones(sp).
 
+        \lang{python}
         \doctest
         >>> MX(Sparsity.lower(2))
         MX(ones(2x2,3nz))
@@ -200,14 +213,17 @@ namespace casadi {
         [[1, 00],
          [1, 1]])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> MX(Sparsity.lower(2))
         ones(2x2,3nz)
         >> evalf(MX(Sparsity.lower(2)))
         [[1, 00],
          [1, 1]]
         \enddoctest
+        \endlang
 
         \sa MX.ones
 
@@ -224,6 +240,7 @@ namespace casadi {
 
         \p val may be symbolic; the result is then an expression, not a constant.
 
+        \lang{python}
         \doctest
         >>> v = MX.sym("v", 3)
         >>> L = MX(Sparsity.lower(2), v)
@@ -238,8 +255,10 @@ namespace casadi {
         [[7, 00],
          [7, 7]])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> v = MX.sym('v', 3);
         >> L = MX(Sparsity.lower(2), v);
         >> L.sparsity(), L.is_constant()
@@ -253,6 +272,7 @@ namespace casadi {
         [[7, 00],
          [7, 7]]
         \enddoctest
+        \endlang
 
         \sa MX.sym, sparsity_cast
 
@@ -268,6 +288,7 @@ namespace casadi {
 
         \param fname Path of the file, read when the constructor runs
 
+        \lang{python}
         \doctest
         >>> try:
         ...   MX(Sparsity.lower(2), "no_such_file.txt")
@@ -275,11 +296,14 @@ namespace casadi {
         ...   print("Cannot open file" in str(e))
         True
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> try, MX(Sparsity.lower(2), 'no_such_file.txt'); catch e, disp('cannot open file'); end
         cannot open file
         \enddoctest
+        \endlang
 
         \identifier{q5} */
     MX(const Sparsity& sp, const std::string& fname);
@@ -291,6 +315,7 @@ namespace casadi {
         nonzeros are placed in a named double pool so that they can be changed after
         compilation. The node cannot be converted with to_DM.
 
+        \lang{python}
         \doctest
         >>> p = MX(DM([1, 2]), "p")
         >>> p, p.is_constant()
@@ -298,8 +323,10 @@ namespace casadi {
         >>> evalf(2*p)
         DM([2, 4])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> p = MX(DM([1; 2]), 'p');
         >> p, p.is_constant()
         constant_pool('p'): [1, 2]
@@ -307,6 +334,7 @@ namespace casadi {
         >> evalf(2*p)
         [2, 4]
         \enddoctest
+        \endlang
 
         \sa CodeGenerator
 
@@ -315,13 +343,16 @@ namespace casadi {
 
     /** \brief  Create a 1-by-1 constant (also used for implicit conversion from a number)
 
+        \lang{python}
         \doctest
         >>> c = MX(3.5)
         >>> c, c.is_constant(), c.shape, float(c)
         (MX(3.5), True, (1, 1), 3.5)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> c = MX(3.5);
         >> c, c.is_constant(), size(c), c.to_double()
         3.5
@@ -329,6 +360,7 @@ namespace casadi {
         1 1
         3.5000
         \enddoctest
+        \endlang
 
         \identifier{q6} */
     MX(double x);
@@ -345,6 +377,7 @@ namespace casadi {
         The sparsity pattern of \p x is kept. Lists and numpy arrays are accepted through
         the DM conversion. SX cannot be converted to MX this way.
 
+        \lang{python}
         \doctest
         >>> c = MX(DM(Sparsity.diag(2), [1, 2]))
         >>> c.sparsity(), c.is_constant()
@@ -356,8 +389,10 @@ namespace casadi {
         [[1, 2],
          [3, 4]])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> c = MX(DM(Sparsity.diag(2), [1; 2]));
         >> c.sparsity(), c.is_constant()
         2x2,2nz
@@ -368,6 +403,7 @@ namespace casadi {
         [[1, 2],
          [3, 4]]
         \enddoctest
+        \endlang
 
         \sa to_DM, evalf
 
@@ -398,20 +434,24 @@ namespace casadi {
 
         Every node has a fixed sparsity pattern, known at construction time.
 
+        \lang{python}
         \doctest
         >>> MX.sym("S", Sparsity.lower(2)).sparsity()
         Sparsity(2x2,3nz)
         >>> (MX.sym("S", Sparsity.lower(2)) + 1).sparsity()
         Sparsity(2x2)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> MX.sym('S', Sparsity.lower(2)).sparsity()
         2x2,3nz
         >> e = MX.sym('S', Sparsity.lower(2)) + 1;
         >> e.sparsity()
         2x2
         \enddoctest
+        \endlang
 
         \identifier{qc} */
     const Sparsity& sparsity() const;
@@ -437,6 +477,7 @@ namespace casadi {
         Nonzero constants are true, zero is false. Symbolic expressions and non-scalar
         constants raise an error: use a Function or evalf to evaluate first.
 
+        \lang{python}
         \doctest
         >>> bool(MX(2)), bool(MX(0))
         (True, False)
@@ -446,6 +487,7 @@ namespace casadi {
         ...   print("Can only determine truth value of a numeric MX" in str(e))
         True
         \enddoctest
+        \endlang
 
         \identifier{2pp} */
     bool __nonzero__() const;
@@ -477,20 +519,24 @@ namespace casadi {
         \param cc Column indices to erase
         \param ind1 True for 1-based indices (MATLAB), default 0-based
 
+        \lang{python}
         \doctest
         >>> B = MX.sym("B", 3, 3)
         >>> B.erase([0], [1])
         >>> B.sparsity(), B.shape
         (Sparsity(3x3,8nz), (3, 3))
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> B = MX.sym('B', 3, 3);
         >> B.erase(1, 2, true);
         >> B.sparsity(), size(B)
         3x3,8nz
         3 3
         \enddoctest
+        \endlang
 
         \sa enlarge, Sparsity.erase
 
@@ -503,19 +549,23 @@ namespace casadi {
         Same as the two-index overload, but \p rr holds linear (column-major) element
         indices.
 
+        \lang{python}
         \doctest
         >>> B = MX.sym("B", 3, 3)
         >>> B.erase([0, 4])
         >>> B.sparsity()
         Sparsity(3x3,7nz)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> B = MX.sym('B', 3, 3);
         >> B.erase([1, 5], true);
         >> B.sparsity()
         3x3,7nz
         \enddoctest
+        \endlang
 
         \identifier{qf} */
     void erase(const std::vector<casadi_int>& rr, bool ind1=false);
@@ -533,14 +583,17 @@ namespace casadi {
                per existing column
         \param ind1 True for 1-based indices (MATLAB), default 0-based
 
+        \lang{python}
         \doctest
         >>> B = MX.sym("B", 2, 2)
         >>> B.enlarge(3, 3, [0, 2], [0, 2])
         >>> B.shape, B.nnz(), B.sparsity().row()
         ((3, 3), 4, [0, 2, 0, 2])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> B = MX.sym('B', 2, 2);
         >> B.enlarge(3, 3, [1, 3], [1, 3], true);
         >> size(B), B.nnz(), B.sparsity().row()
@@ -548,6 +601,7 @@ namespace casadi {
         4
         0 2 0 2
         \enddoctest
+        \endlang
 
         \sa erase, Sparsity.enlarge
 
@@ -560,18 +614,22 @@ namespace casadi {
 
         Negating a negation returns the original node.
 
+        \lang{python}
         \doctest
         >>> x = MX.sym("x")
         >>> -x, -(-x)
         (MX((-x)), MX(x))
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = MX.sym('x');
         >> -x, -(-x)
         (-x)
         x
         \enddoctest
+        \endlang
 
         \identifier{2pq} */
     MX operator-() const;
@@ -585,6 +643,7 @@ namespace casadi {
         the original node. Not available in MATLAB, where inv is the matrix inverse;
         use 1./x there.
 
+        \lang{python}
         \doctest
         >>> A = MX.sym("A", 2, 2)
         >>> A.inv(), A.inv().inv()
@@ -592,6 +651,7 @@ namespace casadi {
         >>> evalf(MX(4).inv())
         DM(0.25)
         \enddoctest
+        \endlang
 
         \sa inv, inv_node
 
@@ -621,6 +681,7 @@ namespace casadi {
 
         \param ch Index in [0, n_dep()); out of range raises an error
 
+        \lang{python}
         \doctest
         >>> x = MX.sym("x")
         >>> y = MX.sym("y")
@@ -630,8 +691,10 @@ namespace casadi {
         >>> e.dep(1).dep(0), x.n_dep()
         (MX(x), 0)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = MX.sym('x'); y = MX.sym('y');
         >> e = x*y + 1;
         >> e.n_dep(), e.dep(0), e.dep(1)
@@ -642,6 +705,7 @@ namespace casadi {
         x
         0
         \enddoctest
+        \endlang
 
         \sa n_dep, op, is_op
 
@@ -654,6 +718,7 @@ namespace casadi {
         several outputs. Every other node, including the OutputNode that selects one
         output of such a call, reports 1.
 
+        \lang{python}
         \doctest
         >>> a = SX.sym("a")
         >>> f = Function("f", [a], [a + 1, 2*a])
@@ -663,8 +728,10 @@ namespace casadi {
         >>> call, call.n_out(), r0.n_out()
         (MX(f(x)), 2, 1)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> a = SX.sym('a');
         >> f = Function('f', {a}, {a + 1, 2*a});
         >> x = MX.sym('x');
@@ -675,6 +742,7 @@ namespace casadi {
         2
         1
         \enddoctest
+        \endlang
 
         \sa get_output, has_output, is_output
 
@@ -687,6 +755,7 @@ namespace casadi {
         output \p oind. For any other node only \p oind == 0 is valid and the node itself is
         returned.
 
+        \lang{python}
         \doctest
         >>> a = SX.sym("a")
         >>> f = Function("f", [a], [a + 1, 2*a])
@@ -698,8 +767,10 @@ namespace casadi {
         >>> x.get_output(0)
         MX(x)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> a = SX.sym('a');
         >> f = Function('f', {a}, {a + 1, 2*a});
         >> x = MX.sym('x');
@@ -711,6 +782,7 @@ namespace casadi {
         >> x.get_output(0)
         x
         \enddoctest
+        \endlang
 
         \sa n_out, which_output
 
@@ -723,6 +795,7 @@ namespace casadi {
         projections, two for binary operations, the number of arguments for
         concatenations and Function calls.
 
+        \lang{python}
         \doctest
         >>> x = MX.sym("x")
         >>> A = MX.sym("A", 2, 2)
@@ -731,8 +804,10 @@ namespace casadi {
         >>> (A @ A).n_dep(), A[0, 0].n_dep(), MX(1).n_dep()
         (3, 1, 0)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = MX.sym('x'); A = MX.sym('A', 2, 2);
         >> e = x + 1; v = vertcat(x, x, x);
         >> x.n_dep(), sin(x).n_dep(), e.n_dep(), v.n_dep()
@@ -746,6 +821,7 @@ namespace casadi {
         1
         0
         \enddoctest
+        \endlang
 
         \sa dep
 
@@ -757,6 +833,7 @@ namespace casadi {
         Only defined for nodes created by MX.sym; any other node raises an error.
         Check with is_symbolic first.
 
+        \lang{python}
         \doctest
         >>> x = MX.sym("x", 2)
         >>> x.name()
@@ -767,8 +844,10 @@ namespace casadi {
         ...   print("'name' not defined" in str(e))
         True
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = MX.sym('x', 2);
         >> x.name()
         x
@@ -776,6 +855,7 @@ namespace casadi {
         >> try, e.name(); catch err, disp('error'); end
         error
         \enddoctest
+        \endlang
 
         \sa is_symbolic, symvar
 
@@ -786,6 +866,7 @@ namespace casadi {
 
         Raises an error for symbolic nodes and for constants that are not 1-by-1.
 
+        \lang{python}
         \doctest
         >>> float(MX(2))
         2.0
@@ -795,13 +876,16 @@ namespace casadi {
         ...   print("'to_double' not defined" in str(e))
         True
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> MX(2).to_double()
         2
         >> try, MX.sym('x').to_double(); catch e, disp('error'); end
         error
         \enddoctest
+        \endlang
 
         \sa to_DM, evalf
 
@@ -814,6 +898,7 @@ namespace casadi {
         free symbols use evalf instead. Not defined for constants created from a file or
         with a pool name.
 
+        \lang{python}
         \doctest
         >>> MX(DM([[1, 2], [3, 4]])).to_DM()
         DM(
@@ -825,8 +910,10 @@ namespace casadi {
         ...   print("'get_DM' not defined" in str(e))
         True
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> MX(DM([1 2; 3 4])).to_DM()
         [[1, 2],
          [3, 4]]
@@ -834,6 +921,7 @@ namespace casadi {
         >> try, e.to_DM(); catch err, disp('error'); end
         error
         \enddoctest
+        \endlang
 
         \sa evalf, is_constant
 
@@ -846,6 +934,7 @@ namespace casadi {
         primitives (use is_valid_input for those). A symbol without nonzeros, e.g.
         MX.sym("x", 2, 0), is stored as an empty constant and is not symbolic.
 
+        \lang{python}
         \doctest
         >>> x = MX.sym("x")
         >>> x.is_symbolic(), (x + 1).is_symbolic(), vertcat(x, x).is_symbolic()
@@ -853,8 +942,10 @@ namespace casadi {
         >>> MX.sym("e", 2, 0).is_symbolic()
         False
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = MX.sym('x'); e = x + 1; v = vertcat(x, x);
         >> x.is_symbolic(), e.is_symbolic(), v.is_symbolic()
         1
@@ -863,6 +954,7 @@ namespace casadi {
         >> MX.sym('e', 2, 0).is_symbolic()
         0
         \enddoctest
+        \endlang
 
         \sa is_constant, is_valid_input, name
 
@@ -875,14 +967,17 @@ namespace casadi {
         constant where possible, but an expression without symbols is not constant in
         general (e.g. a Function call with constant arguments); use evalf to evaluate it.
 
+        \lang{python}
         \doctest
         >>> MX(1).is_constant(), MX(2, 2).is_constant(), MX.sym("x").is_constant()
         (True, True, False)
         >>> (MX(1) + MX(2)).is_constant()
         True
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> MX(1).is_constant(), MX(2, 2).is_constant(), MX.sym('x').is_constant()
         1
         1
@@ -891,6 +986,7 @@ namespace casadi {
         >> e.is_constant()
         1
         \enddoctest
+        \endlang
 
         \sa is_symbolic, to_DM, evalf
 
@@ -901,17 +997,21 @@ namespace casadi {
 
         False for non-constant nodes.
 
+        \lang{python}
         \doctest
         >>> MX(3).is_integer(), MX(3.5).is_integer(), MX.sym("x").is_integer()
         (True, False, False)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> MX(3).is_integer(), MX(3.5).is_integer(), MX.sym('x').is_integer()
         1
         0
         0
         \enddoctest
+        \endlang
 
         \identifier{2pw} */
     bool is_integer() const;
@@ -921,14 +1021,17 @@ namespace casadi {
         True for x + x (which is stored as a doubling node) and for 2*x, and for a sum
         whose two operands compare equal up to get_max_depth.
 
+        \lang{python}
         \doctest
         >>> x = MX.sym("x")
         >>> y = MX.sym("y")
         >>> (x + x).is_doubled(), (2*x).is_doubled(), (x + y).is_doubled()
         (True, True, False)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = MX.sym('x'); y = MX.sym('y');
         >> a = x + x; b = 2*x; c = x + y;
         >> a.is_doubled(), b.is_doubled(), c.is_doubled()
@@ -936,6 +1039,7 @@ namespace casadi {
         1
         0
         \enddoctest
+        \endlang
 
         \identifier{2e0} */
     bool is_doubled() const;
@@ -947,6 +1051,7 @@ namespace casadi {
         MX Functions are inlined when called with MX arguments unless never_inline is set,
         so no call node appears in that case.
 
+        \lang{python}
         \doctest
         >>> a = SX.sym("a")
         >>> f = Function("f", [a], [a + 1, 2*a])
@@ -957,8 +1062,10 @@ namespace casadi {
         >>> r0.dep(0).which_function().name()
         'f'
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> a = SX.sym('a');
         >> f = Function('f', {a}, {a + 1, 2*a});
         >> x = MX.sym('x');
@@ -971,6 +1078,7 @@ namespace casadi {
         >> call.which_function().name()
         f
         \enddoctest
+        \endlang
 
         \sa which_function, is_output, which_output, n_out
 
@@ -982,6 +1090,7 @@ namespace casadi {
         Only valid when is_call() is true; raises an error otherwise, also for the
         OutputNode of a call (use dep(0) to reach the call node).
 
+        \lang{python}
         \doctest
         >>> a = SX.sym("a")
         >>> f = Function("f", [a], [2*a])
@@ -995,8 +1104,10 @@ namespace casadi {
         ...   print("'which_function' not defined" in str(e))
         True
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> a = SX.sym('a');
         >> f = Function('f', {a}, {2*a});
         >> x = MX.sym('x');
@@ -1007,6 +1118,7 @@ namespace casadi {
         >> try, r.which_function(); catch e, disp('error'); end
         error
         \enddoctest
+        \endlang
 
         \sa is_call
 
@@ -1018,6 +1130,7 @@ namespace casadi {
         The expressions obtained by calling a Function with several outputs are OutputNodes:
         they have one dependency, the call node, and which_output gives the index.
 
+        \lang{python}
         \doctest
         >>> a = SX.sym("a")
         >>> f = Function("f", [a], [a + 1, 2*a])
@@ -1028,8 +1141,10 @@ namespace casadi {
         >>> x.is_output(), (x + 1).is_output()
         (False, False)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> a = SX.sym('a');
         >> f = Function('f', {a}, {a + 1, 2*a});
         >> x = MX.sym('x');
@@ -1044,6 +1159,7 @@ namespace casadi {
         0
         0
         \enddoctest
+        \endlang
 
         \sa which_output, is_call, has_output
 
@@ -1055,6 +1171,7 @@ namespace casadi {
         True for the call node of a Function with several outputs. Such a node cannot be
         used directly in expressions; select an output with get_output.
 
+        \lang{python}
         \doctest
         >>> a = SX.sym("a")
         >>> f = Function("f", [a], [a + 1, 2*a])
@@ -1063,8 +1180,10 @@ namespace casadi {
         >>> r0.dep(0).has_output(), r0.has_output(), x.has_output()
         (True, False, False)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> a = SX.sym('a');
         >> f = Function('f', {a}, {a + 1, 2*a});
         >> x = MX.sym('x');
@@ -1075,6 +1194,7 @@ namespace casadi {
         0
         0
         \enddoctest
+        \endlang
 
         \sa n_out, get_output, is_output
 
@@ -1085,6 +1205,7 @@ namespace casadi {
 
         Only valid when is_output() is true; raises an error otherwise.
 
+        \lang{python}
         \doctest
         >>> a = SX.sym("a")
         >>> f = Function("f", [a], [a + 1, 2*a])
@@ -1093,8 +1214,10 @@ namespace casadi {
         >>> r0.which_output(), r1.which_output()
         (0, 1)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> a = SX.sym('a');
         >> f = Function('f', {a}, {a + 1, 2*a});
         >> x = MX.sym('x');
@@ -1103,6 +1226,7 @@ namespace casadi {
         0
         1
         \enddoctest
+        \endlang
 
         \sa is_output
 
@@ -1113,6 +1237,7 @@ namespace casadi {
 
         \param op One of the OP_* constants (OP_ADD, OP_SIN, OP_CALL, OP_GETNONZEROS, ...)
 
+        \lang{python}
         \doctest
         >>> x = MX.sym("x", 2)
         >>> (x + 1).is_op(OP_ADD), sin(x).is_op(OP_SIN), x.is_op(OP_PARAMETER)
@@ -1120,8 +1245,10 @@ namespace casadi {
         >>> x[0].is_op(OP_GETNONZEROS), MX(1).is_op(OP_CONST)
         (True, True)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = MX.sym('x', 2);
         >> a = x + 1; b = sin(x);
         >> a.is_op(OP_ADD), b.is_op(OP_SIN), x.is_op(OP_PARAMETER)
@@ -1133,6 +1260,7 @@ namespace casadi {
         1
         1
         \enddoctest
+        \endlang
 
         \sa op
 
@@ -1143,19 +1271,23 @@ namespace casadi {
 
         Elementwise multiplication does not count.
 
+        \lang{python}
         \doctest
         >>> A = MX.sym("A", 2, 2)
         >>> (A @ A).is_multiplication(), (A * A).is_multiplication()
         (True, False)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> A = MX.sym('A', 2, 2);
         >> a = A*A; b = A.*A;
         >> a.is_multiplication(), b.is_multiplication()
         1
         0
         \enddoctest
+        \endlang
 
         \identifier{2q2} */
     bool is_multiplication() const;
@@ -1164,20 +1296,24 @@ namespace casadi {
 
         Unary operations count as commutative. Any other node raises an error.
 
+        \lang{python}
         \doctest
         >>> x = MX.sym("x")
         >>> y = MX.sym("y")
         >>> (x + y).is_commutative(), (x - y).is_commutative()
         (True, False)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = MX.sym('x'); y = MX.sym('y');
         >> a = x + y; b = x - y;
         >> a.is_commutative(), b.is_commutative()
         1
         0
         \enddoctest
+        \endlang
 
         \sa is_binary, is_unary
 
@@ -1186,13 +1322,16 @@ namespace casadi {
 
     /** \brief Check if the node is a norm (norm_1, norm_2, norm_inf or norm_fro)
 
+        \lang{python}
         \doctest
         >>> A = MX.sym("A", 2, 2)
         >>> norm_2(A).is_norm(), norm_fro(A).is_norm(), sqrt(dot(A, A)).is_norm()
         (True, True, False)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> A = MX.sym('A', 2, 2);
         >> a = norm_2(A); b = norm_fro(A); c = sqrt(dot(A, A));
         >> a.is_norm(), b.is_norm(), c.is_norm()
@@ -1200,6 +1339,7 @@ namespace casadi {
         1
         0
         \enddoctest
+        \endlang
 
         \identifier{2q4} */
     bool is_norm() const;
@@ -1211,6 +1351,7 @@ namespace casadi {
         accepted. An expression that is not a valid input raises an error when passed as a
         Function input.
 
+        \lang{python}
         \doctest
         >>> x = MX.sym("x", 2)
         >>> y = MX.sym("y", 3)
@@ -1219,8 +1360,10 @@ namespace casadi {
         >>> (x + 1).is_valid_input(), MX(1).is_valid_input(), MX(2, 2).is_valid_input()
         (False, False, True)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = MX.sym('x', 2); y = MX.sym('y', 3);
         >> v = [x; y]; vt = v';
         >> v.is_valid_input(), vt.is_valid_input()
@@ -1232,6 +1375,7 @@ namespace casadi {
         0
         1
         \enddoctest
+        \endlang
 
         \sa primitives, n_primitives, is_symbolic
 
@@ -1243,20 +1387,24 @@ namespace casadi {
         For an expression that is not a valid input the count is 1 (the expression
         itself); check is_valid_input first.
 
+        \lang{python}
         \doctest
         >>> x = MX.sym("x", 2)
         >>> y = MX.sym("y", 3)
         >>> vertcat(x, y).n_primitives(), x.n_primitives()
         (2, 1)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = MX.sym('x', 2); y = MX.sym('y', 3);
         >> v = [x; y];
         >> v.n_primitives(), x.n_primitives()
         2
         1
         \enddoctest
+        \endlang
 
         \sa primitives, is_valid_input
 
@@ -1269,6 +1417,7 @@ namespace casadi {
         concatenation. For an expression that is not a valid input, the expression itself
         is returned.
 
+        \lang{python}
         \doctest
         >>> x = MX.sym("x", 2)
         >>> y = MX.sym("y", 3)
@@ -1277,8 +1426,10 @@ namespace casadi {
         >>> reshape(x, 1, 2).primitives()
         [MX(x)]
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = MX.sym('x', 2); y = MX.sym('y', 3);
         >> v = [x; y];
         >> p = v.primitives();
@@ -1291,6 +1442,7 @@ namespace casadi {
         1
         x
         \enddoctest
+        \endlang
 
         \sa n_primitives, split_primitives, join_primitives, is_valid_input
 
@@ -1306,6 +1458,7 @@ namespace casadi {
         variables it was concatenated from. Works with numeric (DM), SX and MX values.
         A shape mismatch raises an error.
 
+        \lang{python}
         \doctest
         >>> x = MX.sym("x", 2)
         >>> y = MX.sym("y", 3)
@@ -1315,8 +1468,10 @@ namespace casadi {
         >>> X.split_primitives(SX.sym("z", 5))
         [SX([z_0, z_1]), SX([z_2, z_3, z_4])]
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = MX.sym('x', 2); y = MX.sym('y', 3);
         >> X = [x; y];
         >> parts = X.split_primitives(DM([1; 2; 3; 4; 5]));
@@ -1328,6 +1483,7 @@ namespace casadi {
         [z_0, z_1]
         [z_2, z_3, z_4]
         \enddoctest
+        \endlang
 
         \sa join_primitives, primitives
 
@@ -1344,6 +1500,7 @@ namespace casadi {
         that primitive, and the result has the shape of this expression. A wrong number of
         pieces raises an error.
 
+        \lang{python}
         \doctest
         >>> x = MX.sym("x", 2)
         >>> y = MX.sym("y", 3)
@@ -1356,8 +1513,10 @@ namespace casadi {
         ...   print("Wrong number of primitives" in str(e))
         True
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = MX.sym('x', 2); y = MX.sym('y', 3);
         >> X = [x; y];
         >> X.join_primitives({DM([1; 2]), DM([3; 4; 5])})
@@ -1365,6 +1524,7 @@ namespace casadi {
         >> try, X.join_primitives({DM([1; 2])}); catch e, disp('wrong number of primitives'); end
         wrong number of primitives
         \enddoctest
+        \endlang
 
         \sa split_primitives, primitives
 
@@ -1383,6 +1543,7 @@ namespace casadi {
         Note: marks the visited primitives using MX::set_temp; call reset_input()
         afterwards.
 
+        \lang{python}
         \doctest
         >>> x = MX.sym("x", 2)
         >>> vertcat(x, x).has_duplicates()
@@ -1391,8 +1552,10 @@ namespace casadi {
         >>> vertcat(x, MX.sym("y")).has_duplicates()
         False
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = MX.sym('x', 2);
         >> vertcat(x, x).has_duplicates()
         ...
@@ -1401,6 +1564,7 @@ namespace casadi {
         >> vertcat(x, MX.sym('y')).has_duplicates()
         0
         \enddoctest
+        \endlang
 
         \sa reset_input, is_valid_input
 
@@ -1419,17 +1583,21 @@ namespace casadi {
         constant that happens to equal the identity is not detected. A 1-by-1 constant one
         counts.
 
+        \lang{python}
         \doctest
         >>> MX.eye(2).is_eye(), MX(DM([[1, 0], [0, 1]])).is_eye(), MX(1).is_eye()
         (True, False, True)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> MX.eye(2).is_eye(), MX(DM([1 0; 0 1])).is_eye(), MX(1).is_eye()
         1
         0
         1
         \enddoctest
+        \endlang
 
         \identifier{qu} */
     bool is_eye() const;
@@ -1440,6 +1608,7 @@ namespace casadi {
         whether symbolic or not. Expressions that simplify to zero (x - x, 0*x) are folded
         to a constant at construction and therefore report true.
 
+        \lang{python}
         \doctest
         >>> x = MX.sym("x")
         >>> MX(0).is_zero(), MX(2, 2).is_zero(), (x - x).is_zero(), x.is_zero()
@@ -1447,8 +1616,10 @@ namespace casadi {
         >>> MX.sym("e", 2, 0).is_zero()
         True
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = MX.sym('x'); e = x - x;
         >> MX(0).is_zero(), MX(2, 2).is_zero(), e.is_zero(), x.is_zero()
         1
@@ -1458,6 +1629,7 @@ namespace casadi {
         >> MX.sym('e', 2, 0).is_zero()
         1
         \enddoctest
+        \endlang
 
         \identifier{qv} */
     bool is_zero() const;
@@ -1467,35 +1639,43 @@ namespace casadi {
         Structural zeros are ignored: MX(Sparsity.lower(2)) is not "one" because it has
         structural zeros that would be zero when densified.
 
+        \lang{python}
         \doctest
         >>> MX(1).is_one(), MX.ones(2, 2).is_one(), MX(Sparsity.lower(2)).is_one()
         (True, True, False)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> MX(1).is_one(), MX.ones(2, 2).is_one(), MX(Sparsity.lower(2)).is_one()
         1
         1
         0
         \enddoctest
+        \endlang
 
         \identifier{qw} */
     bool is_one() const;
 
     /** \brief  Check if the node is a constant with all nonzeros -1 (false negatives possible)
 
+        \lang{python}
         \doctest
         >>> MX(-1).is_minus_one(), (-MX(1)).is_minus_one(), MX(1).is_minus_one()
         (True, True, False)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> m = -MX(1);
         >> MX(-1).is_minus_one(), m.is_minus_one(), MX(1).is_minus_one()
         1
         1
         0
         \enddoctest
+        \endlang
 
         \identifier{qx} */
     bool is_minus_one() const;
@@ -1510,14 +1690,17 @@ namespace casadi {
         False negatives are possible: only constant nodes are inspected; symbolic
         expressions always give false.
 
+        \lang{python}
         \doctest
         >>> MX(3).is_value(3), MX(DM([3, 3])).is_value(3), MX(DM([3, 4])).is_value(3)
         (True, True, False)
         >>> MX.sym("x").is_value(3)
         False
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> MX(3).is_value(3), MX(DM([3; 3])).is_value(3)
         1
         1
@@ -1526,23 +1709,28 @@ namespace casadi {
         >> MX.sym('x').is_value(3)
         0
         \enddoctest
+        \endlang
 
         \identifier{2eq} */
     bool is_value(double val) const;
 
     /** \brief  Check if the node is a constant with all nonzeros +inf (false negatives possible)
 
+        \lang{python}
         \doctest
         >>> MX.inf().is_inf(), MX.inf(2, 2).is_inf(), MX(1).is_inf()
         (True, True, False)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> MX.inf().is_inf(), MX.inf(2, 2).is_inf(), MX(1).is_inf()
         1
         1
         0
         \enddoctest
+        \endlang
 
         \sa is_minus_inf, MX.inf
 
@@ -1551,17 +1739,21 @@ namespace casadi {
 
     /** \brief  Check if the node is a constant with all nonzeros -inf (false negatives possible)
 
+        \lang{python}
         \doctest
         >>> (-MX.inf()).is_minus_inf(), MX.inf().is_minus_inf()
         (True, False)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> m = -MX.inf();
         >> m.is_minus_inf(), MX.inf().is_minus_inf()
         1
         0
         \enddoctest
+        \endlang
 
         \identifier{2e2} */
     bool is_minus_inf() const;
@@ -1571,19 +1763,23 @@ namespace casadi {
         The transpose of a scalar is the scalar itself and that of a vector is a reshape,
         so only transposes of genuine matrices create a transpose node.
 
+        \lang{python}
         \doctest
         >>> A = MX.sym("A", 2, 2)
         >>> A.T.is_transpose(), A.is_transpose(), MX.sym("v", 2).T.is_transpose()
         (True, False, False)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> A = MX.sym('A', 2, 2); At = A'; vt = MX.sym('v', 2)';
         >> At.is_transpose(), A.is_transpose(), vt.is_transpose()
         1
         0
         0
         \enddoctest
+        \endlang
 
         \sa T
 
@@ -1594,6 +1790,7 @@ namespace casadi {
 
         Only defined for constant nodes; a symbolic expression raises an error.
 
+        \lang{python}
         \doctest
         >>> MX(1).is_regular(), MX.inf().is_regular(), MX(DM([1, float("nan")])).is_regular()
         (True, False, False)
@@ -1603,8 +1800,10 @@ namespace casadi {
         ...   print("Cannot check regularity for symbolic MX" in str(e))
         True
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> MX(1).is_regular(), MX.inf().is_regular()
         1
         0
@@ -1613,6 +1812,7 @@ namespace casadi {
         >> try, MX.sym('x').is_regular(); catch e, disp('error'); end
         error
         \enddoctest
+        \endlang
 
         \identifier{2q5} */
     bool is_regular() const;
@@ -1623,6 +1823,7 @@ namespace casadi {
         Matrix products, concatenations and calls are not binary nodes. Note that x + x
         and x*x are stored as unary nodes (doubling, square).
 
+        \lang{python}
         \doctest
         >>> x = MX.sym("x")
         >>> y = MX.sym("y")
@@ -1630,8 +1831,10 @@ namespace casadi {
         >>> (x + y).is_binary(), (x**y).is_binary(), (A @ A).is_binary(), (x + x).is_binary()
         (True, True, False, False)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = MX.sym('x'); y = MX.sym('y'); A = MX.sym('A', 2, 2);
         >> a = x + y; b = x^y; c = A*A; d = x + x;
         >> a.is_binary(), b.is_binary(), c.is_binary(), d.is_binary()
@@ -1640,6 +1843,7 @@ namespace casadi {
         0
         0
         \enddoctest
+        \endlang
 
         \sa is_unary, op
 
@@ -1651,6 +1855,7 @@ namespace casadi {
         Recognizes nonnegative constants and operations with a nonnegative range such as
         squares, absolute values, exponentials and square roots.
 
+        \lang{python}
         \doctest
         >>> x = MX.sym("x")
         >>> (x**2).is_nonnegative(), fabs(x).is_nonnegative(), exp(x).is_nonnegative()
@@ -1658,8 +1863,10 @@ namespace casadi {
         >>> x.is_nonnegative(), MX(-3).is_nonnegative(), MX(0).is_nonnegative()
         (False, False, True)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = MX.sym('x');
         >> a = x^2; b = abs(x); c = exp(x);
         >> a.is_nonnegative(), b.is_nonnegative(), c.is_nonnegative()
@@ -1671,6 +1878,7 @@ namespace casadi {
         0
         1
         \enddoctest
+        \endlang
 
         \identifier{2e3} */
     bool is_nonnegative() const;
@@ -1680,14 +1888,17 @@ namespace casadi {
         OP_SIN, OP_NEG, OP_SQ, ... Transposes, reshapes and projections are not unary
         nodes even though they have one dependency.
 
+        \lang{python}
         \doctest
         >>> x = MX.sym("x")
         >>> A = MX.sym("A", 2, 2)
         >>> sin(x).is_unary(), (-x).is_unary(), x.is_unary(), A.T.is_unary()
         (True, True, False, False)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = MX.sym('x'); A = MX.sym('A', 2, 2);
         >> a = sin(x); b = -x; c = A';
         >> a.is_unary(), b.is_unary(), x.is_unary(), c.is_unary()
@@ -1696,6 +1907,7 @@ namespace casadi {
         0
         0
         \enddoctest
+        \endlang
 
         \sa is_binary, op
 
@@ -1708,6 +1920,7 @@ namespace casadi {
         has an operation code (OP_PARAMETER, OP_CONST, OP_CALL, OP_MTIMES,
         OP_GETNONZEROS, ...). Function print_operator shows the symbol of an operation.
 
+        \lang{python}
         \doctest
         >>> x = MX.sym("x")
         >>> x.op() == OP_PARAMETER, (x + 1).op() == OP_ADD, MX(1).op() == OP_CONST
@@ -1715,8 +1928,10 @@ namespace casadi {
         >>> print_operator(x + 1, ["a", "b"])
         '(a+b)'
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = MX.sym('x'); e = x + 1;
         >> x.op() == OP_PARAMETER, e.op() == OP_ADD, MX(1).op() == OP_CONST
         1
@@ -1725,6 +1940,7 @@ namespace casadi {
         >> print_operator(x + 1, {'a', 'b'})
         (a+b)
         \enddoctest
+        \endlang
 
         \sa is_op, print_operator
 
@@ -1736,6 +1952,7 @@ namespace casadi {
         The contents depend on the node type; most nodes return an empty dictionary.
         For example, a slicing node reports the slice it takes.
 
+        \lang{python}
         \doctest
         >>> X = MX.sym("X", 2, 2)
         >>> X[0, 1].info()
@@ -1743,8 +1960,10 @@ namespace casadi {
         >>> X.info()
         {}
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> X = MX.sym('X', 2, 2);
         >> e = X(1, 2); s = e.info();
         >> s.slice
@@ -1754,6 +1973,7 @@ namespace casadi {
         >> isempty(fieldnames(X.info()))
         1
         \enddoctest
+        \endlang
 
         \identifier{2q9} */
     Dict info() const;
@@ -1763,6 +1983,7 @@ namespace casadi {
         From Python, serialize through StringSerializer, FileSerializer or pickle
         within a pickle context; the stream object is not constructed directly.
 
+        \lang{python}
         \doctest
         >>> x = MX.sym("x")
         >>> s = StringSerializer()
@@ -1771,8 +1992,10 @@ namespace casadi {
         >>> d.unpack()
         MX((1+x))
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = MX.sym('x');
         >> s = StringSerializer();
         >> s.pack(x + 1);
@@ -1780,6 +2003,7 @@ namespace casadi {
         >> d.unpack()
         (1+x)
         \enddoctest
+        \endlang
 
         \sa deserialize, StringSerializer
 
@@ -1812,6 +2036,7 @@ namespace casadi {
         \param op One of the OP_* constants
         \param unique_x,unique_y Internal hints for in-place simplification; leave false
 
+        \lang{python}
         \doctest
         >>> x = MX.sym("x")
         >>> y = MX.sym("y")
@@ -1825,8 +2050,10 @@ namespace casadi {
         ...   print("Dimension mismatch" in str(e))
         True
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = MX.sym('x'); y = MX.sym('y');
         >> MX.binary(OP_ADD, x, y), MX.unary(OP_SIN, x)
         (x+y)
@@ -1837,6 +2064,7 @@ namespace casadi {
         >> try, MX.binary(OP_ADD, v, w); catch e, disp('dimension mismatch'); end
         dimension mismatch
         \enddoctest
+        \endlang
 
         \sa op
 
@@ -1851,17 +2079,21 @@ namespace casadi {
 
         Dense \p nrow-by-\p ncol (default 1-by-1), or with the given sparsity pattern.
 
+        \lang{python}
         \doctest
         >>> MX.inf(), MX.inf(2, 1), MX.inf(Sparsity.lower(2))
         (MX(inf), MX(inf(2x1)), MX(inf(2x2,3nz)))
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> MX.inf(), MX.inf(2, 1), MX.inf(Sparsity.lower(2))
         inf
         inf(2x1)
         inf(2x2,3nz)
         \enddoctest
+        \endlang
 
         \sa is_inf, nan
 
@@ -1876,16 +2108,20 @@ namespace casadi {
 
         Dense \p nrow-by-\p ncol (default 1-by-1), or with the given sparsity pattern.
 
+        \lang{python}
         \doctest
         >>> MX.nan(), MX.nan(Sparsity.lower(2))
         (MX(nan), MX(nan(2x2,3nz)))
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> MX.nan(), MX.nan(Sparsity.lower(2))
         nan
         nan(2x2,3nz)
         \enddoctest
+        \endlang
 
         \sa inf
 
@@ -1897,16 +2133,20 @@ namespace casadi {
 
     /** \brief  Identity matrix constant of size \p n-by-\p n, with a diagonal sparsity pattern
 
+        \lang{python}
         \doctest
         >>> MX.eye(2), MX.eye(2).is_eye()
         (MX(ones(2x2,2nz)), True)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> MX.eye(2), MX.eye(2).is_eye()
         ones(2x2,2nz)
         1
         \enddoctest
+        \endlang
 
         \identifier{r4} */
     static MX eye(casadi_int n);
@@ -1941,6 +2181,7 @@ namespace casadi {
         \param ind1 True for 1-based indices (MATLAB), false for 0-based
         \param rr Element indices
 
+        \lang{python}
         \doctest
         >>> X = MX.sym("X", 3, 3)
         >>> X[4], X[-1], X[[0, 4]], X[1:3].shape
@@ -1960,8 +2201,10 @@ namespace casadi {
         >>> v[k], Function("f", [v, k], [v[k]])(DM([10, 20, 30, 40]), 1.7)
         (MX(v[k]), DM(20))
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> X = MX.sym('X', 3, 3);
         >> a = X(5); b = X(end); c = X([1, 5]); d = X([2; 3]);
         >> a, b, c, size(d)
@@ -1984,6 +2227,7 @@ namespace casadi {
         v[(k-1)]
         20
         \enddoctest
+        \endlang
 
         \sa set, get_nz, nz
 
@@ -2005,6 +2249,7 @@ namespace casadi {
         corresponding part of the sparsity pattern. Out-of-range indices raise an error.
         An MX index is only allowed for dense expressions and selects at run time.
 
+        \lang{python}
         \doctest
         >>> X = MX.sym("X", 3, 3)
         >>> X[0, 1], X[1, :].shape, X[[0, 2], [0, 2]].shape
@@ -2016,8 +2261,10 @@ namespace casadi {
         >>> X[k, 1]
         MX(X[(k;3:6:3)])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> X = MX.sym('X', 3, 3);
         >> a = X(1, 2); b = X(2, :); c = X([1 3], [1 3]);
         >> a, size(b), size(c)
@@ -2033,6 +2280,7 @@ namespace casadi {
         >> X(k, 2)
         X[((k-1);3)]
         \enddoctest
+        \endlang
 
         \sa set
 
@@ -2071,6 +2319,7 @@ namespace casadi {
         index assigns to the nonzero positions of that pattern. An MX index is only
         supported for the nonzero (x.nz[k]) form.
 
+        \lang{python}
         \doctest
         >>> Y = MX.sym("Y", 3, 3)
         >>> alias, copy, twice = Y, MX(Y), 2*Y
@@ -2088,8 +2337,10 @@ namespace casadi {
         >>> Y
         MX((Y[0, 1, 2, 4, 5, 8] = ones(6x1)))
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> Y = MX.sym('Y', 3, 3);
         >> alias = Y; copy = MX(Y); twice = 2*Y;
         >> Y(5) = 5;
@@ -2111,6 +2362,7 @@ namespace casadi {
         >> Y
         (Y[0, 1, 2, 4, 5, 8] = ones(6x1))
         \enddoctest
+        \endlang
 
         \sa get, set_nz
 
@@ -2126,6 +2378,7 @@ namespace casadi {
         Same semantics as the single-index form. \p m must be len(rr)-by-len(cc), a
         scalar, or the transpose of a vector block.
 
+        \lang{python}
         \doctest
         >>> Y = MX.sym("Y", 3, 3)
         >>> Y[:, 0] = MX.sym("c", 1, 3)
@@ -2140,8 +2393,10 @@ namespace casadi {
         ...   print("Dimension mismatch" in str(e))
         True
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> Y = MX.sym('Y', 3, 3);
         >> Y(:, 1) = MX.sym('c', 1, 3);
         >> Y
@@ -2152,6 +2407,7 @@ namespace casadi {
         >> try, Y(:, 1) = MX.sym('d', 2); catch e, disp('dimension mismatch'); end
         dimension mismatch
         \enddoctest
+        \endlang
 
         \sa get
 
@@ -2171,6 +2427,7 @@ namespace casadi {
         is resolved at evaluation time; such a node has no derivative with respect to the
         index. For dense expressions x[k] and x.nz[k] coincide.
 
+        \lang{python}
         \doctest
         >>> S = MX.sym("S", Sparsity.lower(3))
         >>> S.nz[1], S.nz[:].shape, len(S.nz)
@@ -2181,8 +2438,10 @@ namespace casadi {
         >>> MX.sym("x", 2, 2).nz[[]].shape
         (0, 1)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> S = MX.sym('S', Sparsity.lower(3));
         >> a = S.get_nz(true, 2); b = S.get_nz(true, Slice());
         >> a, size(b), S.nnz()
@@ -2195,6 +2454,7 @@ namespace casadi {
         >> size(MX.sym('x', 2, 2).get_nz(true, []))
         0 0
         \enddoctest
+        \endlang
 
         \sa set_nz, get
 
@@ -2217,6 +2477,7 @@ namespace casadi {
         \p m must have as many nonzeros as the index set or be a scalar. With an MX index
         the assignment is parametric and resolved at evaluation time.
 
+        \lang{python}
         \doctest
         >>> Y = MX.sym("Y", 3, 3)
         >>> Y.nz[0] = 7
@@ -2227,8 +2488,10 @@ namespace casadi {
         >>> Y, Y.is_op(OP_SETNONZEROS_PARAM)
         (MX(((Y[0] = 7)[k] = 8)), True)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> Y = MX.sym('Y', 3, 3);
         >> Y.set_nz(7, true, 1);
         >> Y
@@ -2239,6 +2502,7 @@ namespace casadi {
         ((Y[0] = 7)[(k-1)] = 8)
         1
         \enddoctest
+        \endlang
 
         \sa get_nz, set
 
@@ -2269,6 +2533,7 @@ namespace casadi {
         Inconsistent dimensions or labels are not validated with a user-facing message.
         Also available for SX and DM.
 
+        \lang{python}
         \doctest
         >>> A = MX.sym("A", 6)
         >>> B = MX.sym("B", 6)
@@ -2283,8 +2548,10 @@ namespace casadi {
         [[22, 49],
          [28, 64]])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> A = MX.sym('A', 6); B = MX.sym('B', 6);
         >> C = einstein(A, B, [2 3], [3 2], [2 2], [-1 -3], [-3 -2], [-1 -2]);
         >> size(C)
@@ -2296,6 +2563,7 @@ namespace casadi {
         [[22, 49],
          [28, 64]]
         \enddoctest
+        \endlang
 
         \identifier{r5} */
     static MX einstein(const MX& A, const MX& B, const MX& C,
@@ -2505,6 +2773,7 @@ namespace casadi {
         \param opts "lookup_mode": list with one of "linear", "exact", "binary" per dimension
         \return n_points-by-n_coeffs DM
 
+        \lang{python}
         \doctest
         >>> knots = [[0, 0, 0, 0, 1, 2, 3, 3, 3, 3]]
         >>> B = MX.bspline_dual([0.5, 1.5], knots, [3])
@@ -2513,8 +2782,10 @@ namespace casadi {
         >>> B @ DM(range(6))
         DM([1.17708, 2.5])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> knots = {[0 0 0 0 1 2 3 3 3 3]};
         >> B = MX.bspline_dual([0.5, 1.5], knots, 3);
         >> size(B), sum2(B)
@@ -2523,6 +2794,7 @@ namespace casadi {
         >> B * DM((0:5)')
         [1.17708, 2.5]
         \enddoctest
+        \endlang
 
         \sa bspline
 
@@ -2548,6 +2820,7 @@ namespace casadi {
                (default) per dimension, see low
         \return nq-by-m matrix
 
+        \lang{python}
         \doctest
         >>> g = MX.sym("g", 3)
         >>> v = MX.sym("v", 3)
@@ -2562,8 +2835,10 @@ namespace casadi {
         ...   print("Dimension mismatch" in str(e))
         True
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> g = MX.sym('g', 3); v = MX.sym('v', 3); xq = MX.sym('xq', 2);
         >> e = MX.interpn_linear({g}, v, {xq});
         >> f = Function('f', {g, v, xq}, {e});
@@ -2573,6 +2848,7 @@ namespace casadi {
         >> try, MX.interpn_linear({g}, w, {xq}); catch e, disp('dimension mismatch'); end
         dimension mismatch
         \enddoctest
+        \endlang
 
         \sa interpolant, low
 
@@ -2588,6 +2864,7 @@ namespace casadi {
         inside a Function. The printing is not part of the returned value and not seen by
         the doctest runner's output capture.
 
+        \lang{python}
         \doctest
         >>> x = MX.sym("x")
         >>> y = MX.sym("y")
@@ -2595,14 +2872,17 @@ namespace casadi {
         >>> e, e.is_op(OP_PRINTME)
         (MX(printme(x,y)), True)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = MX.sym('x'); y = MX.sym('y');
         >> e = x.printme(y);
         >> e, e.is_op(OP_PRINTME)
         printme(x,y)
         1
         \enddoctest
+        \endlang
 
         \sa monitor, attachAssert
 
@@ -2621,6 +2901,7 @@ namespace casadi {
         Structural zeros are skipped. The result is piecewise constant, so its derivative
         is zero. \p x must be a column or row vector; matrices raise an error.
 
+        \lang{python}
         \doctest
         >>> v = MX.sym("v", 3)
         >>> f = Function("f", [v], [find(v)])
@@ -2634,8 +2915,10 @@ namespace casadi {
         ...   print("Argument must be vector" in str(e))
         True
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> v = MX.sym('v', 3);
         >> f = Function('f', {v}, {find(v)});
         >> size(find(v)), f(DM([0; 3; 1])), f(DM([0; 0; 0]))
@@ -2647,6 +2930,7 @@ namespace casadi {
         >> try, find(MX.sym('A', 2, 2)); catch e, disp('argument must be vector'); end
         argument must be vector
         \enddoctest
+        \endlang
 
         \sa low
 
@@ -2670,6 +2954,7 @@ namespace casadi {
                "auto" (default: "binary" for grids longer than 100 entries, else "linear").
                Any other key or mode raises an error.
 
+        \lang{python}
         \doctest
         >>> g = MX.sym("g", 4)
         >>> p = MX.sym("p", 5)
@@ -2684,8 +2969,10 @@ namespace casadi {
         ...   print("Invalid lookup mode" in str(e))
         True
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> g = MX.sym('g', 4); p = MX.sym('p', 5);
         >> f = Function('f', {g, p}, {low(g, p)});
         >> f(DM([0; 1; 2; 3]), DM([-1; 0; 1.5; 3; 4]))
@@ -2696,6 +2983,7 @@ namespace casadi {
         >> try, low(g, p, struct('lookup_mode', 'foo')); catch e, disp('invalid lookup mode'); end
         invalid lookup mode
         \enddoctest
+        \endlang
 
         \sa find, interpn_linear, interpolant
 
@@ -2718,6 +3006,7 @@ namespace casadi {
         \param vdef Replacements, same length as \p v
         \param updated Set to true if any substitution took place (C++ only)
 
+        \lang{python}
         \doctest
         >>> x = MX.sym("x")
         >>> y = MX.sym("y")
@@ -2738,8 +3027,10 @@ namespace casadi {
         ...   print("Inconsistent shapes" in str(err))
         True
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = MX.sym('x'); y = MX.sym('y');
         >> s = x + y;
         >> e = sin(s) + s;
@@ -2753,6 +3044,7 @@ namespace casadi {
         >> try, graph_substitute(e, {s}, {z}); catch err, disp('inconsistent shapes'); end
         inconsistent shapes
         \enddoctest
+        \endlang
 
         \sa substitute
 
@@ -2772,14 +3064,17 @@ namespace casadi {
         Same as the single-expression overload, applied to a list of expressions sharing
         one traversal.
 
+        \lang{python}
         \doctest
         >>> x = MX.sym("x")
         >>> s = x + 1
         >>> graph_substitute([sin(s), 2*s], [s], [MX(3)])
         [MX(0.14112), MX(6)]
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = MX.sym('x');
         >> s = x + 1;
         >> r = graph_substitute({sin(s), 2*s}, {s}, {MX(3)});
@@ -2787,6 +3082,7 @@ namespace casadi {
         0.14112
         6
         \enddoctest
+        \endlang
 
         \identifier{ra} */
     inline friend std::vector<MX>
@@ -2816,6 +3112,7 @@ namespace casadi {
         \param options Options for the SXFunction, forwarded to Function.expand
         \return An OutputNode of the SXFunction call
 
+        \lang{python}
         \doctest
         >>> x = MX.sym("x")
         >>> g = Function("g", [x], [x**2 + 1])
@@ -2830,8 +3127,10 @@ namespace casadi {
         >>> matrix_expand(e, [sx]).dep(0).which_function()
         Function(expand_tmp_matrix_expand:(i0,i1)->(o0) SXFunction)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = MX.sym('x');
         >> g = Function('g', {x}, {x^2 + 1});
         >> sx = sin(x);
@@ -2848,6 +3147,7 @@ namespace casadi {
         >> r.dep(0).which_function()
         expand_tmp_matrix_expand:(i0,i1)->(o0) SXFunction
         \enddoctest
+        \endlang
 
         \sa Function.expand
 
@@ -2887,6 +3187,7 @@ namespace casadi {
         \param opts "lookup_mode" (see low) and "inline" (bool, default false: build an
                explicit expression instead of a BSpline node). Unknown keys are ignored.
 
+        \lang{python}
         \doctest
         >>> x = MX.sym("x")
         >>> knots = [[0, 0, 0, 0, 1, 2, 3, 3, 3, 3]]
@@ -2903,8 +3204,10 @@ namespace casadi {
         ...   print("must match" in str(e))
         True
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = MX.sym('x');
         >> knots = {[0 0 0 0 1 2 3 3 3 3]};
         >> c = DM((0:5)');
@@ -2920,6 +3223,7 @@ namespace casadi {
         >> try, bspline(MX.sym('v', 2), c, knots, 3, 1); catch e, disp('must match'); end
         must match
         \enddoctest
+        \endlang
 
         \sa bspline_dual, interpolant
 
@@ -2938,6 +3242,7 @@ namespace casadi {
         Same as the fixed-coefficient overload, but \p coeffs may be symbolic, so the
         spline is differentiable with respect to its coefficients as well.
 
+        \lang{python}
         \doctest
         >>> x = MX.sym("x")
         >>> C = MX.sym("C", 6)
@@ -2948,8 +3253,10 @@ namespace casadi {
         >>> Function("f", [x, C], [y])(1.5, DM(range(6)))
         DM(2.5)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = MX.sym('x');
         >> C = MX.sym('C', 6);
         >> knots = {[0 0 0 0 1 2 3 3 3 3]};
@@ -2960,6 +3267,7 @@ namespace casadi {
         >> f(1.5, DM((0:5)'))
         2.5
         \enddoctest
+        \endlang
 
         \identifier{2qj} */
     inline friend MX bspline(const MX& x, const MX& coeffs,
@@ -2974,6 +3282,7 @@ namespace casadi {
 
         With symbolic knots the evaluation is always inlined into explicit MX operations.
 
+        \lang{python}
         \doctest
         >>> x = MX.sym("x")
         >>> C = MX.sym("C", 6)
@@ -2983,8 +3292,10 @@ namespace casadi {
         >>> f(1.5, DM(range(6)), DM([0, 0, 0, 0, 1, 2, 3, 3, 3, 3]))
         DM(2.5)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = MX.sym('x');
         >> C = MX.sym('C', 6);
         >> K = MX.sym('K', 10);
@@ -2993,6 +3304,7 @@ namespace casadi {
         >> f(1.5, DM((0:5)'), DM([0; 0; 0; 0; 1; 2; 3; 3; 3; 3]))
         2.5
         \enddoctest
+        \endlang
 
         \identifier{2qk} */
     inline friend MX bspline(const MX& x, const MX& coeffs,
@@ -3029,6 +3341,7 @@ namespace casadi {
                "verbose": print the block structure found.
                Unknown keys raise an error.
 
+        \lang{python}
         \doctest
         >>> H = MX.sym("H", 2, 2)
         >>> f = Function("f", [H], [convexify(H)])
@@ -3052,8 +3365,10 @@ namespace casadi {
         ...   print("Invalid convexify strategy" in str(e))
         True
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> H = MX.sym('H', 2, 2);
         >> f = Function('f', {H}, {convexify(H)});
         >> f(DM([1 0; 0 -2]))
@@ -3070,6 +3385,7 @@ namespace casadi {
         >> try, convexify(H, struct('strategy', 'foo')); catch e, disp('invalid strategy'); end
         invalid strategy
         \enddoctest
+        \endlang
 
         \sa nlpsol
 
@@ -3097,6 +3413,7 @@ namespace casadi {
         numerically or expanded to SX; it is meant as a placeholder in symbolic
         manipulations. For an inverse that can be evaluated use inv or solve.
 
+        \lang{python}
         \doctest
         >>> A = MX.sym("A", 2, 2)
         >>> inv_node(A), inv_node(A).is_op(OP_INVERSE), jacobian(inv_node(A), A).shape
@@ -3107,8 +3424,10 @@ namespace casadi {
         ...   print("must be square" in str(e))
         True
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> A = MX.sym('A', 2, 2);
         >> e = inv_node(A); J = jacobian(e, A);
         >> e, e.is_op(OP_INVERSE), size(J)
@@ -3118,6 +3437,7 @@ namespace casadi {
         >> try, inv_node(MX.sym('B', 2, 3)); catch e, disp('must be square'); end
         must be square
         \enddoctest
+        \endlang
 
         \sa inv, solve
 
@@ -3132,6 +3452,7 @@ namespace casadi {
         calls, solver calls and sparse constants are handled. An error is raised when the
         expression depends on a symbolic primitive.
 
+        \lang{python}
         \doctest
         >>> evalf(MX(DM([[1, 2], [3, 4]])) @ MX([1, 1]))
         DM([3, 7])
@@ -3145,8 +3466,10 @@ namespace casadi {
         ...   print("are free" in str(e))
         True
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> evalf(MX(DM([1 2; 3 4])) * MX([1; 1]))
         [3, 7]
         >> evalf(MX(Sparsity.lower(2)) * 2)
@@ -3155,6 +3478,7 @@ namespace casadi {
         >> try, evalf(MX.sym('x') + 1); catch e, disp('free variables'); end
         free variables
         \enddoctest
+        \endlang
 
         \sa to_DM, Function
 
@@ -3171,14 +3495,17 @@ namespace casadi {
         are propagated normally but second derivatives are zero. Other orders raise an
         error.
 
+        \lang{python}
         \doctest
         >>> x = MX.sym("x")
         >>> e = x * stop_diff(x**2, 1)
         >>> Function("f", [x], [e, jacobian(e, x)])(3)
         (DM(27), DM(9))
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = MX.sym('x');
         >> e = x * stop_diff(x^2, 1);
         >> f = Function('f', {x}, {e, jacobian(e, x)});
@@ -3187,6 +3514,7 @@ namespace casadi {
         27
         9
         \enddoctest
+        \endlang
 
         \sa no_grad, no_hess
 
@@ -3200,6 +3528,7 @@ namespace casadi {
         Same as stop_diff(expr, 1): the value is unchanged but all derivatives with
         respect to the symbols in \p expr are zero.
 
+        \lang{python}
         \doctest
         >>> x = MX.sym("x")
         >>> y = no_grad(x**2)
@@ -3208,8 +3537,10 @@ namespace casadi {
         >>> Function("f", [x], [jacobian(x * y, x)])(3)
         DM(9)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = MX.sym('x');
         >> y = no_grad(x^2); J = jacobian(y, x);
         >> f = Function('f', {x}, {y});
@@ -3220,6 +3551,7 @@ namespace casadi {
         >> f(3)
         9
         \enddoctest
+        \endlang
 
         \sa stop_diff, no_hess
 
@@ -3233,14 +3565,17 @@ namespace casadi {
         Same as stop_diff(expr, 2): first derivatives are exact, the Hessian contribution
         is zero. Useful for Gauss-Newton-type Hessians.
 
+        \lang{python}
         \doctest
         >>> x = MX.sym("x")
         >>> y = no_hess(x**3)
         >>> Function("f", [x], [jacobian(y, x)])(2), hessian(y, x)[0].nnz()
         (DM(12), 0)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = MX.sym('x');
         >> y = no_hess(x^3);
         >> f = Function('f', {x}, {jacobian(y, x)});
@@ -3249,6 +3584,7 @@ namespace casadi {
         12
         0
         \enddoctest
+        \endlang
 
         \sa stop_diff, no_grad
 
@@ -3264,6 +3600,7 @@ namespace casadi {
         occurring in \p var are stopped; derivatives with respect to the other symbols are
         propagated. Emits a warning that this variant is not well tested.
 
+        \lang{python}
         \doctest
         >>> x = MX.sym("x")
         >>> y = MX.sym("y")
@@ -3271,8 +3608,10 @@ namespace casadi {
         >>> jacobian(e, x).nnz(), Function("f", [x, y], [jacobian(e, y)])(2, 3)
         (0, DM(2))
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = MX.sym('x'); y = MX.sym('y');
         >> e = stop_diff(x * y, x, 1);
         ...
@@ -3282,6 +3621,7 @@ namespace casadi {
         0
         2
         \enddoctest
+        \endlang
 
         \identifier{25o} */
     inline friend MX stop_diff(const MX& expr, const MX& var, casadi_int order) {
@@ -3293,14 +3633,17 @@ namespace casadi {
         Comparison is by node identity, not by value: two separately built expressions
         with the same formula are different nodes. Duplicates in \p a are kept.
 
+        \lang{python}
         \doctest
         >>> x = MX.sym("x")
         >>> y = MX.sym("y")
         >>> difference([x, y, x], [y]), difference([x + 1], [x + 1])
         ([MX(x), MX(x)], [MX((1+x))])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = MX.sym('x'); y = MX.sym('y');
         >> d = difference({x, y, x}, {y});
         >> numel(d), d{1}, d{2}
@@ -3312,6 +3655,7 @@ namespace casadi {
         1
         (1+x)
         \enddoctest
+        \endlang
 
         \sa symvar
 
@@ -3330,6 +3674,7 @@ namespace casadi {
         raised unless \p y equals 1. Useful to check preconditions inside a Function.
         A non-scalar \p y raises an error at construction.
 
+        \lang{python}
         \doctest
         >>> x = MX.sym("x")
         >>> e = x.attachAssert(x > 0, "x must be positive")
@@ -3344,8 +3689,10 @@ namespace casadi {
         ...   print("Assertion error: x must be positive" in str(e))
         True
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = MX.sym('x');
         >> e = x.attachAssert(x > 0, 'x must be positive');
         >> e
@@ -3356,6 +3703,7 @@ namespace casadi {
         >> try, f(-1); catch err, disp('assertion error'); end
         assertion error
         \enddoctest
+        \endlang
 
         \sa monitor, printme
 
@@ -3368,20 +3716,24 @@ namespace casadi {
         printed to standard output. The value is unchanged. A matrix without nonzeros is
         returned as is.
 
+        \lang{python}
         \doctest
         >>> x = MX.sym("x")
         >>> e = x.monitor("value of x")
         >>> e, e.is_op(OP_MONITOR)
         (MX(monitor(x, value of x)), True)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = MX.sym('x');
         >> e = x.monitor('value of x');
         >> e, e.is_op(OP_MONITOR)
         monitor(x, value of x)
         1
         \enddoctest
+        \endlang
 
         \sa printme, dump, attachAssert
 
@@ -3413,13 +3765,16 @@ namespace casadi {
         reshape node and matrices a transpose node. Transposing twice returns the
         original node.
 
+        \lang{python}
         \doctest
         >>> A = MX.sym("A", 2, 3)
         >>> A.T, A.T.shape, A.T.T
         (MX(A'), (3, 2), MX(A))
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> A = MX.sym('A', 2, 3);
         >> At = A';
         >> At, size(At), At'
@@ -3427,6 +3782,7 @@ namespace casadi {
         3 2
         A
         \enddoctest
+        \endlang
 
         \sa is_transpose, transpose
 
@@ -3439,6 +3795,7 @@ namespace casadi {
         dependency that make up the result; for an assignment node, the target indices.
         Any other node raises an error.
 
+        \lang{python}
         \doctest
         >>> X = MX.sym("X", 3, 3)
         >>> X[0, 1].mapping(), X[:, 1].mapping()
@@ -3449,8 +3806,10 @@ namespace casadi {
         ...   print("'mapping' not defined" in str(e))
         True
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> X = MX.sym('X', 3, 3);
         >> a = X(1, 2); b = X(:, 2);
         >> a.mapping(), b.mapping()
@@ -3459,6 +3818,7 @@ namespace casadi {
         >> try, X.mapping(); catch e, disp('error'); end
         error
         \enddoctest
+        \endlang
 
         \sa info
 
@@ -3474,6 +3834,7 @@ namespace casadi {
         depths find more simplifications at a cost per created node. Calling without an
         argument restores the default.
 
+        \lang{python}
         \doctest
         >>> x = MX.sym("x")
         >>> y = MX.sym("y")
@@ -3486,8 +3847,10 @@ namespace casadi {
         >>> MX.get_max_depth()
         1
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = MX.sym('x'); y = MX.sym('y');
         >> MX.get_max_depth(), (x + y) - (x + y)
         1
@@ -3499,6 +3862,7 @@ namespace casadi {
         >> MX.get_max_depth()
         1
         \enddoctest
+        \endlang
 
         \sa get_max_depth, is_equal
 
@@ -3520,14 +3884,17 @@ namespace casadi {
         Same as f.mx_in(). For an MX Function these are the original input expressions;
         for other Functions fresh symbols with the input names and sparsities.
 
+        \lang{python}
         \doctest
         >>> x = MX.sym("x")
         >>> f = Function("f", [x], [2*x])
         >>> MX.get_input(f), is_equal(MX.get_input(f)[0], x)
         ([MX(x)], True)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = MX.sym('x');
         >> f = Function('f', {x}, {2*x});
         >> v = MX.get_input(f);
@@ -3536,6 +3903,7 @@ namespace casadi {
         x
         1
         \enddoctest
+        \endlang
 
         \sa Function.mx_in, get_free
 
@@ -3548,6 +3916,7 @@ namespace casadi {
         Function without being an input. Such a Function can only be created with the
         option "allow_free" and cannot be evaluated until the free variables are bound.
 
+        \lang{python}
         \doctest
         >>> x = MX.sym("x")
         >>> y = MX.sym("y")
@@ -3560,8 +3929,10 @@ namespace casadi {
         ...   print("variables [y] are free" in str(e))
         True
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = MX.sym('x'); y = MX.sym('y');
         >> f = Function('f', {x}, {x + y}, struct('allow_free', true));
         >> v = MX.get_free(f);
@@ -3573,6 +3944,7 @@ namespace casadi {
         >> try, Function('f', {x}, {x + y}); catch e, disp('free variables'); end
         free variables
         \enddoctest
+        \endlang
 
         \sa Function.free_mx, symvar
 
@@ -3596,6 +3968,7 @@ namespace casadi {
                leave empty
         \return List with n_out() results
 
+        \lang{python}
         \doctest
         >>> x = MX.sym("x")
         >>> y = MX.sym("y")
@@ -3604,8 +3977,10 @@ namespace casadi {
         >>> MX.sym("v", 3)[1].eval_mx([MX([4, 5, 6])])
         [MX([4, 5, 6][1])]
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = MX.sym('x'); y = MX.sym('y');
         >> e = x * y; r = e.eval_mx({MX(2), MX(3)});
         >> numel(r), r{1}
@@ -3618,6 +3993,7 @@ namespace casadi {
         >> r{1}
         [4, 5, 6][1]
         \enddoctest
+        \endlang
 
         \sa dep, n_dep, graph_substitute
 
@@ -3678,6 +4054,7 @@ namespace casadi {
       Closes the AD algebra of kron under arbitrary-order differentiation. A shape that
       is not a multiple raises an error.
 
+      \lang{python}
       \doctest
       >>> M = MX.sym("M", 4, 4)
       >>> X = MX.sym("X", 2, 2)
@@ -3689,8 +4066,10 @@ namespace casadi {
       [[10, 12],
        [18, 20]]))
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> M = MX.sym('M', 4, 4); X = MX.sym('X', 2, 2);
       >> f = Function('f', {M, X}, {kron_contract(M, X, true), kron_contract(M, X, false)});
       >> [a, b] = f(DM(reshape(0:15, 4, 4)'), DM.eye(2));
@@ -3700,6 +4079,7 @@ namespace casadi {
       [[10, 12],
        [18, 20]]
       \enddoctest
+      \endlang
 
       \sa kron
 

@@ -107,6 +107,7 @@ namespace casadi {
       - "print_time", "verbose", "monitor", "common_options", "specific_options": diagnostics and
         options of the generated derivative functions, as for nlpsol.
 
+      \lang{python}
       \doctest
       >>> x = SX.sym("x"); p = SX.sym("p")
       >>> dae = {"x": x, "p": p, "ode": -p*x, "quad": x}
@@ -123,8 +124,10 @@ namespace casadi {
       >>> xf.shape, zf.shape, adj_x0.shape
       ((1, 3), (0, 3), (0, 0))
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> x = SX.sym('x'); p = SX.sym('p');
       >> dae = struct('x', x, 'p', p, 'ode', -p*x, 'quad', x);
       >> F = integrator('F', 'cvodes', dae); disp(F)
@@ -140,7 +143,9 @@ namespace casadi {
       0 3
       0 0
       \enddoctest
+      \endlang
 
+      \lang{python}
       \doctest
       >>> x = SX.sym("x"); z = SX.sym("z"); u = SX.sym("u")
       >>> F = integrator("F", "idas", {"x": x, "z": z, "ode": -z, "alg": z**2 - x})
@@ -163,8 +168,10 @@ namespace casadi {
       ...     print("Dimension mismatch for 'ode'" in str(e))
       True
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> x = SX.sym('x'); z = SX.sym('z'); u = SX.sym('u');
       >> F = integrator('F', 'idas', struct('x', x, 'z', z, 'ode', -z, 'alg', z^2 - x));
       >> r = F('x0', 1, 'z0', 1); fprintf('%.3f %.3f\n', full(r.xf), full(r.zf))
@@ -185,7 +192,9 @@ namespace casadi {
       >> contains(msg, 'Dimension mismatch for ''ode''')
       1
       \enddoctest
+      \endlang
 
+      \lang{python}
       \doctest
       >>> x = SX.sym("x"); p = SX.sym("p")
       >>> dae = {"x": x, "p": p, "ode": -p*x, "quad": x}
@@ -201,8 +210,10 @@ namespace casadi {
       >>> round(float(J(1)), 4)
       -0.3679
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> x = SX.sym('x'); p = SX.sym('p');
       >> dae = struct('x', x, 'p', p, 'ode', -p*x, 'quad', x);
       >> F = integrator('F', 'cvodes', dae, struct('nadj', 1)); disp(F)
@@ -213,6 +224,7 @@ namespace casadi {
       >> J = Function('J', {pm}, {jacobian(r.xf, pm)}); fprintf('%.4f\n', full(J(1)))
       -0.3679
       \enddoctest
+      \endlang
 
       \generalsection{Integrator}
       \pluginssection{Integrator}
@@ -257,16 +269,20 @@ namespace casadi {
 
       Tries to load the plugin \p name if it is not loaded yet; false when it is not found.
 
+      \lang{python}
       \doctest
       >>> has_integrator("rk"), has_integrator("no_such_plugin")
       (True, False)
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> has_integrator('rk'), has_integrator('no_such_plugin')
       1
       0
       \enddoctest
+      \endlang
 
       \identifier{2oi} */
   CASADI_EXPORT bool has_integrator(const std::string& name);
@@ -276,6 +292,7 @@ namespace casadi {
       Normally plugins are loaded on first use; this raises an error when the plugin cannot be
       found.
 
+      \lang{python}
       \doctest
       >>> try:
       ...     load_integrator("no_such_plugin")
@@ -283,12 +300,15 @@ namespace casadi {
       ...     print("no_such_plugin" in str(e))
       True
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> try, load_integrator('no_such_plugin'); catch e, msg = e.message; end
       >> contains(msg, 'no_such_plugin')
       1
       \enddoctest
+      \endlang
 
       \identifier{2oj} */
   CASADI_EXPORT void load_integrator(const std::string& name);
@@ -297,15 +317,19 @@ namespace casadi {
 
       The text includes the plugin-specific option table.
 
+      \lang{python}
       \doctest
       >>> "Runge-Kutta" in doc_integrator("rk")
       True
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> contains(doc_integrator('rk'), 'Runge-Kutta')
       1
       \enddoctest
+      \endlang
 
       \identifier{2ok} */
   CASADI_EXPORT std::string doc_integrator(const std::string& name);
@@ -315,12 +339,15 @@ namespace casadi {
       Returns the names of the 7 inputs of a Function created by integrator, in order:
       x0, z0, p, u, adj_xf, adj_zf, adj_qf.
 
+      \lang{python}
       \doctest
       >>> integrator_in()
       ['x0', 'z0', 'p', 'u', 'adj_xf', 'adj_zf', 'adj_qf']
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> integrator_in()
       x0
       z0
@@ -330,6 +357,7 @@ namespace casadi {
       adj_zf
       adj_qf
       \enddoctest
+      \endlang
 
       \sa integrator_out, integrator_n_in
 
@@ -341,12 +369,15 @@ namespace casadi {
       Returns the names of the 7 outputs of a Function created by integrator, in order:
       xf, zf, qf, adj_x0, adj_z0, adj_p, adj_u.
 
+      \lang{python}
       \doctest
       >>> integrator_out()
       ['xf', 'zf', 'qf', 'adj_x0', 'adj_z0', 'adj_p', 'adj_u']
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> integrator_out()
       xf
       zf
@@ -356,6 +387,7 @@ namespace casadi {
       adj_p
       adj_u
       \enddoctest
+      \endlang
 
       \sa integrator_in, integrator_n_out
 
@@ -366,17 +398,21 @@ namespace casadi {
 
       \param ind Index in 0..integrator_n_in()-1; any other value gives an empty string
 
+      \lang{python}
       \doctest
       >>> integrator_in(0), integrator_in(6), repr(integrator_in(7))
       ('x0', 'adj_qf', "''")
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> integrator_in(0), integrator_in(6), isempty(integrator_in(7))
       x0
       adj_qf
       1
       \enddoctest
+      \endlang
 
       \identifier{7d} */
   CASADI_EXPORT std::string integrator_in(casadi_int ind);
@@ -385,47 +421,59 @@ namespace casadi {
 
       \param ind Index in 0..integrator_n_out()-1; any other value gives an empty string
 
+      \lang{python}
       \doctest
       >>> integrator_out(0), integrator_out(6), repr(integrator_out(7))
       ('xf', 'adj_u', "''")
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> integrator_out(0), integrator_out(6), isempty(integrator_out(7))
       xf
       adj_u
       1
       \enddoctest
+      \endlang
 
       \identifier{7e} */
   CASADI_EXPORT std::string integrator_out(casadi_int ind);
 
   /** \brief Get the number of integrator inputs
 
+      \lang{python}
       \doctest
       >>> integrator_n_in()
       7
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> integrator_n_in()
       7
       \enddoctest
+      \endlang
 
       \identifier{7f} */
   CASADI_EXPORT casadi_int integrator_n_in();
 
   /** \brief Get the number of integrator outputs
 
+      \lang{python}
       \doctest
       >>> integrator_n_out()
       7
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> integrator_n_out()
       7
       \enddoctest
+      \endlang
 
       \identifier{7g} */
   CASADI_EXPORT casadi_int integrator_n_out();
@@ -435,12 +483,15 @@ namespace casadi {
       Returns the names of the 5 inputs of a DAE Function as expected by integrator, in order:
       t, x, z, p, u. These are also the dictionary keys accepted by integrator.
 
+      \lang{python}
       \doctest
       >>> dyn_in()
       ['t', 'x', 'z', 'p', 'u']
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> dyn_in()
       t
       x
@@ -448,6 +499,7 @@ namespace casadi {
       p
       u
       \enddoctest
+      \endlang
 
       \sa dyn_out, integrator
 
@@ -459,6 +511,7 @@ namespace casadi {
       Returns the names of the 4 outputs of a DAE Function as expected by integrator, in order:
       ode, alg, quad, zero.
 
+      \lang{python}
       \doctest
       >>> dyn_out()
       ['ode', 'alg', 'quad', 'zero']
@@ -467,8 +520,10 @@ namespace casadi {
       >>> round(float(integrator("F", "rk", dae)(x0=1)["xf"]), 4)
       0.3679
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> dyn_out()
       ode
       alg
@@ -479,6 +534,7 @@ namespace casadi {
       >> F = integrator('F', 'rk', dae); r = F('x0', 1); fprintf('%.4f\n', full(r.xf))
       0.3679
       \enddoctest
+      \endlang
 
       \sa dyn_in, integrator
 
@@ -489,16 +545,20 @@ namespace casadi {
 
       \param ind Index in 0..dyn_n_in()-1; any other value gives an empty string
 
+      \lang{python}
       \doctest
       >>> dyn_in(1), repr(dyn_in(5))
       ('x', "''")
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> dyn_in(1), isempty(dyn_in(5))
       x
       1
       \enddoctest
+      \endlang
 
       \identifier{25r} */
   CASADI_EXPORT std::string dyn_in(casadi_int ind);
@@ -507,46 +567,58 @@ namespace casadi {
 
       \param ind Index in 0..dyn_n_out()-1; any other value gives an empty string
 
+      \lang{python}
       \doctest
       >>> dyn_out(0), repr(dyn_out(4))
       ('ode', "''")
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> dyn_out(0), isempty(dyn_out(4))
       ode
       1
       \enddoctest
+      \endlang
 
       \identifier{25s} */
   CASADI_EXPORT std::string dyn_out(casadi_int ind);
 
   /** \brief Get the number of inputs of a DAE function
 
+      \lang{python}
       \doctest
       >>> dyn_n_in()
       5
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> dyn_n_in()
       5
       \enddoctest
+      \endlang
 
       \identifier{25t} */
   CASADI_EXPORT casadi_int dyn_n_in();
 
   /** \brief Get the number of outputs of a DAE function
 
+      \lang{python}
       \doctest
       >>> dyn_n_out()
       4
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> dyn_n_out()
       4
       \enddoctest
+      \endlang
 
       \identifier{25u} */
   CASADI_EXPORT casadi_int dyn_n_out();
@@ -556,12 +628,15 @@ namespace casadi {
       Returns the names of the inputs of the Function passed as option "transition" to
       integrator: index (of the triggered "zero" indicator), t, x, z, p, u.
 
+      \lang{python}
       \doctest
       >>> event_in()
       ['index', 't', 'x', 'z', 'p', 'u']
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> event_in()
       index
       t
@@ -570,6 +645,7 @@ namespace casadi {
       p
       u
       \enddoctest
+      \endlang
 
       \sa event_out
 
@@ -581,16 +657,20 @@ namespace casadi {
       Returns the names of the outputs of a transition Function: post_x, post_z, the values of
       x and z right after the event.
 
+      \lang{python}
       \doctest
       >>> event_out()
       ['post_x', 'post_z']
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> event_out()
       post_x
       post_z
       \enddoctest
+      \endlang
 
       \sa event_in
 

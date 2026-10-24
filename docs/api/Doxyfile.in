@@ -193,8 +193,9 @@ ALIASES                += pluginbrief{2}="'\2' plugin for \1"
 ALIASES                += generalsection{1}="### General information ^^ @copydoc general_\1 ^^ @copydoc scheme_\1Input ^^ @copydoc scheme_\1Output ^^"
 ALIASES                += structargument{1}="^^ \parblock ^^ Problem structure. @copydoc scheme_\1Struct ^^ \endparblock"
 
-ALIASES                += doctest="\htmlonly <div class='doctest doctest-python'> \endhtmlonly \verbatim"
-ALIASES                += doctest{1}="\htmlonly <div class='doctest doctest-\1'> \endhtmlonly \verbatim"
+ALIASES                += lang{1}="\htmlonly <div class='lang lang-\1'> \endhtmlonly \xmlonly <casadilang name='\1'/> \endxmlonly"
+ALIASES                += endlang="\htmlonly </div> \endhtmlonly \xmlonly <casadiendlang/> \endxmlonly"
+ALIASES                += doctest="\htmlonly <div class='doctest'> \endhtmlonly \verbatim"
 ALIASES                += enddoctest="\endverbatim \htmlonly </div> \endhtmlonly"
 ALIASES                += identifier{1}="Extra doc: https://github.com/casadi/casadi/wiki/L_\1"
 

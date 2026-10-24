@@ -2,7 +2,7 @@
 //
 // Usage: node docs/api/extra/doctest_js.js <blocks.txt>
 // The file holds blocks separated by lines `#### <name>`; each block is the text between
-// \doctest{javascript} and \enddoctest. The module is build-wasm/swig/wasm-js/casadi.js
+// \doctest and \enddoctest of a \lang{javascript} group. The module is build-wasm/swig/wasm-js/casadi.js
 // (override with CASADI_WASM_JS). Exit code = number of failing blocks.
 const fs = require("fs");
 const path = require("path");

@@ -79,6 +79,7 @@ class GenericExpression : public GenericExpressionCommon {
       operands are evaluated, symbolic ones (SX, MX) build an expression; DM and SX or MX can
       be mixed, SX and MX cannot.
 
+      \lang{python}
       \doctest
       >>> plus(DM([1, 2]), DM([10, 20]))
       DM([11, 22])
@@ -103,8 +104,10 @@ class GenericExpression : public GenericExpressionCommon {
         ...
       RuntimeError: ...Dimension mismatch...
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> plus(DM([1; 2]), DM([10; 20]))
       [11, 22]
       >> DM([1; 2]) + 1
@@ -123,6 +126,7 @@ class GenericExpression : public GenericExpressionCommon {
       >> try, DM.ones(2, 2) + DM.ones(1, 2); catch e, disp(e.message); end
       ...Dimension mismatch...
       \enddoctest
+      \endlang
 
       \identifier{on} */
   static ExType plus(const ExType &x, const ExType &y) {
@@ -143,6 +147,7 @@ class GenericExpression : public GenericExpressionCommon {
       Elementwise difference; shape and sparsity rules as for plus. For symbolic arguments,
       x - x with the same node simplifies to 0.
 
+      \lang{python}
       \doctest
       >>> minus(DM([5, 6]), DM([1, 2]))
       DM([4, 4])
@@ -154,8 +159,10 @@ class GenericExpression : public GenericExpressionCommon {
       >>> x - x
       SX(0)
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> minus(DM([5; 6]), DM([1; 2]))
       [4, 4]
       >> DM.eye(2) - 1
@@ -165,6 +172,7 @@ class GenericExpression : public GenericExpressionCommon {
       >> x - x
       0
       \enddoctest
+      \endlang
 
       \identifier{oo} */
   static ExType minus(const ExType &x, const ExType &y) {
@@ -186,6 +194,7 @@ class GenericExpression : public GenericExpressionCommon {
       as for plus. The result is structurally zero wherever either operand is, so the sparsity
       pattern is the intersection of the patterns.
 
+      \lang{python}
       \doctest
       >>> times(DM([1, 2]), DM([3, 4]))
       DM([3, 8])
@@ -198,8 +207,10 @@ class GenericExpression : public GenericExpressionCommon {
       [[1, 00],
        [00, 1]])
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> times(DM([1; 2]), DM([3; 4]))
       [3, 8]
       >> DM([1 2; 3 4]) .* DM([1 2; 3 4])
@@ -212,6 +223,7 @@ class GenericExpression : public GenericExpressionCommon {
       [[1, 00],
        [00, 1]]
       \enddoctest
+      \endlang
 
       \sa mtimes
 
@@ -235,6 +247,7 @@ class GenericExpression : public GenericExpressionCommon {
       for plus. Division by zero follows IEEE arithmetic (inf or nan), no error is raised.
       Structural zeros of \p x stay structural zeros; dividing by a sparse \p y densifies.
 
+      \lang{python}
       \doctest
       >>> rdivide(DM([1, 2]), 4)
       DM([0.25, 0.5])
@@ -249,8 +262,10 @@ class GenericExpression : public GenericExpressionCommon {
       [[0.5, 00],
        [00, 0.5]])
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> rdivide(DM([1; 2]), 4)
       [0.25, 0.5]
       >> DM([1; 2]) ./ DM([4; 8])
@@ -262,6 +277,7 @@ class GenericExpression : public GenericExpressionCommon {
       [[0.5, 00],
        [00, 0.5]]
       \enddoctest
+      \endlang
 
       \sa mldivide, mrdivide, solve
 
@@ -287,6 +303,7 @@ class GenericExpression : public GenericExpressionCommon {
       decided at evaluation time. Comparisons with NaN are false. The result is sparse where
       both operands are structurally zero (0 < 0 is false).
 
+      \lang{python}
       \doctest
       >>> lt(DM([1, 2, 3]), 2)
       DM([1, 0, 0])
@@ -299,8 +316,10 @@ class GenericExpression : public GenericExpressionCommon {
       [[0, 1],
        [1, 0]])
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> lt(DM([1; 2; 3]), 2)
       [1, 0, 0]
       >> DM([1; 2; 3]) < DM([3; 2; 1])
@@ -311,6 +330,7 @@ class GenericExpression : public GenericExpressionCommon {
       [[0, 1],
        [1, 0]]
       \enddoctest
+      \endlang
 
       \sa le, gt, ge, eq, ne, if_else
 
@@ -332,6 +352,7 @@ class GenericExpression : public GenericExpressionCommon {
       Elementwise comparison with 0/1 result, see lt. Chained inequalities such as
       lb <= (x <= ub) are recognised by Opti as bound constraints.
 
+      \lang{python}
       \doctest
       >>> le(DM([1, 2, 3]), 2)
       DM([1, 1, 0])
@@ -339,14 +360,17 @@ class GenericExpression : public GenericExpressionCommon {
       >>> x <= x
       SX(1)
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> le(DM([1; 2; 3]), 2)
       [1, 1, 0]
       >> x = SX.sym('x');
       >> x <= x
       1
       \enddoctest
+      \endlang
 
       \sa lt
 
@@ -368,19 +392,23 @@ class GenericExpression : public GenericExpressionCommon {
       Elementwise comparison with 0/1 result, see lt. Implemented as y < x, which is how a
       symbolic expression prints.
 
+      \lang{python}
       \doctest
       >>> gt(DM([1, 2, 3]), 2)
       DM([0, 0, 1])
       >>> gt(SX.sym("x"), SX.sym("y"))
       SX((y<x))
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> gt(DM([1; 2; 3]), 2)
       [0, 0, 1]
       >> SX.sym('x') > SX.sym('y')
       (y<x)
       \enddoctest
+      \endlang
 
       \sa lt
 
@@ -401,19 +429,23 @@ class GenericExpression : public GenericExpressionCommon {
 
       Elementwise comparison with 0/1 result, see lt. Implemented as y <= x.
 
+      \lang{python}
       \doctest
       >>> ge(DM([1, 2, 3]), 2)
       DM([0, 1, 1])
       >>> ge(MX.sym("x"), MX.sym("y"))
       MX((y<=x))
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> ge(DM([1; 2; 3]), 2)
       [0, 1, 1]
       >> MX.sym('x') >= MX.sym('y')
       (y<=x)
       \enddoctest
+      \endlang
 
       \sa lt
 
@@ -437,6 +469,7 @@ class GenericExpression : public GenericExpressionCommon {
       the same. For symbolic operands x == x with the same node simplifies to 1. NaN is not
       equal to anything, including itself.
 
+      \lang{python}
       \doctest
       >>> eq(DM([1, 2, 3]), 2)
       DM([0, 1, 0])
@@ -450,8 +483,10 @@ class GenericExpression : public GenericExpressionCommon {
       >>> DM(float("nan")) == DM(float("nan"))
       DM(0)
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> eq(DM([1; 2; 3]), 2)
       [0, 1, 0]
       >> DM.eye(2) == DM([1 0; 0 1])
@@ -464,6 +499,7 @@ class GenericExpression : public GenericExpressionCommon {
       >> DM(nan) == DM(nan)
       0
       \enddoctest
+      \endlang
 
       \sa ne, is_equal
 
@@ -485,6 +521,7 @@ class GenericExpression : public GenericExpressionCommon {
       Elementwise comparison with 0/1 result, see lt and eq. For symbolic operands x != x with
       the same node simplifies to 0, so it cannot be used to detect NaN symbolically.
 
+      \lang{python}
       \doctest
       >>> ne(DM([1, 2, 3]), 2)
       DM([1, 0, 1])
@@ -492,14 +529,17 @@ class GenericExpression : public GenericExpressionCommon {
       >>> x != x
       MX(0)
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> ne(DM([1; 2; 3]), 2)
       [1, 0, 1]
       >> x = MX.sym('x');
       >> x ~= x
       0
       \enddoctest
+      \endlang
 
       \sa eq
 
@@ -525,6 +565,7 @@ class GenericExpression : public GenericExpressionCommon {
       structurally zero wherever either operand is. The Python keyword `and` does not work on
       matrices (it needs a single truth value); use this function.
 
+      \lang{python}
       \doctest
       >>> logic_and(DM([1, 2, 0]), DM([3, 0, 0]))
       DM([1, 0, 0])
@@ -535,8 +576,10 @@ class GenericExpression : public GenericExpressionCommon {
       [[1, 00],
        [00, 1]])
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> DM([1; 2; 0]) & DM([3; 0; 0])
       [1, 0, 0]
       >> SX.sym('x') & SX.sym('y')
@@ -545,6 +588,7 @@ class GenericExpression : public GenericExpressionCommon {
       [[1, 00],
        [00, 1]]
       \enddoctest
+      \endlang
 
       \sa logic_or, logic_not
 
@@ -568,19 +612,23 @@ class GenericExpression : public GenericExpressionCommon {
 
       Shape rules as for plus; the result is structurally zero where both operands are.
 
+      \lang{python}
       \doctest
       >>> logic_or(DM([1, 0, 0]), DM([0, 0, 2]))
       DM([1, 0, 1])
       >>> logic_or(MX.sym("x"), MX.sym("y"))
       MX((x||y))
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> DM([1; 0; 0]) | DM([0; 0; 2])
       [1, 0, 1]
       >> or(MX.sym('x'), MX.sym('y'))
       (x||y)
       \enddoctest
+      \endlang
 
       \sa logic_and, logic_not
 
@@ -605,6 +653,7 @@ class GenericExpression : public GenericExpressionCommon {
       Structural zeros map to 1, so a sparse input gives a dense result. The Python keyword
       `not` does not work on matrices; use this function.
 
+      \lang{python}
       \doctest
       >>> logic_not(DM([1, 0, -1]))
       DM([0, 1, 0])
@@ -615,8 +664,10 @@ class GenericExpression : public GenericExpressionCommon {
       >>> logic_not(SX.sym("x"))
       SX((!x))
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> ~DM([1; 0; -1])
       [0, 1, 0]
       >> not(DM.eye(2))
@@ -625,6 +676,7 @@ class GenericExpression : public GenericExpressionCommon {
       >> ~SX.sym('x')
       (!x)
       \enddoctest
+      \endlang
 
       \sa logic_and, logic_or
 
@@ -650,6 +702,7 @@ class GenericExpression : public GenericExpressionCommon {
         cosh, exp, log, log10, acos, acosh, logic_not) return a dense result. Named fabs in
         Python, where the built-in abs also applies.
 
+        \lang{python}
         \doctest
         >>> fabs(DM([-1, 0, 2]))
         DM([1, 0, 2])
@@ -660,8 +713,10 @@ class GenericExpression : public GenericExpressionCommon {
         >>> abs(SX.sym("x"))
         SX(fabs(x))
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> abs(DM([-1; 0; 2]))
         [1, 0, 2]
         >> abs(-DM.eye(2))
@@ -670,6 +725,7 @@ class GenericExpression : public GenericExpressionCommon {
         >> abs(SX.sym('x'))
         fabs(x)
         \enddoctest
+        \endlang
 
         \sa sign, copysign
 
@@ -691,19 +747,23 @@ class GenericExpression : public GenericExpressionCommon {
         Elementwise; sparsity preserved. A negative argument gives NaN, no error is raised.
         A symbolic power x**0.5 simplifies to sqrt(x).
 
+        \lang{python}
         \doctest
         >>> sqrt(DM([4, 9]))
         DM([2, 3])
         >>> SX.sym("x")**0.5
         SX(sqrt(x))
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> sqrt(DM([4; 9]))
         [2, 3]
         >> SX.sym('x').^0.5
         sqrt(x)
         \enddoctest
+        \endlang
 
         \sa sq, pow
 
@@ -722,15 +782,19 @@ class GenericExpression : public GenericExpressionCommon {
         Elementwise; sparsity preserved. Not exposed as a function in Python; a symbolic
         power with exponent 2 is turned into this operation.
 
+        \lang{python}
         \doctest
         >>> SX.sym("x")**2
         SX(sq(x))
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> SX.sym('x').^2
         sq(x)
         \enddoctest
+        \endlang
 
         \sa sqrt, pow
 
@@ -748,6 +812,7 @@ class GenericExpression : public GenericExpressionCommon {
 
         Elementwise; sparsity preserved (sin(0) == 0).
 
+        \lang{python}
         \doctest
         >>> sin(DM.eye(2))
         DM(
@@ -756,14 +821,17 @@ class GenericExpression : public GenericExpressionCommon {
         >>> sin(MX.sym("x", 2))
         MX(sin(x))
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> sin(DM.eye(2))
         [[0.841471, 00],
          [00, 0.841471]]
         >> sin(MX.sym('x', 2))
         sin(x)
         \enddoctest
+        \endlang
 
         \sa cos, tan, asin
 
@@ -781,6 +849,7 @@ class GenericExpression : public GenericExpressionCommon {
 
         Elementwise; structural zeros become 1, so the result is dense.
 
+        \lang{python}
         \doctest
         >>> cos(DM.eye(2))
         DM(
@@ -791,8 +860,10 @@ class GenericExpression : public GenericExpressionCommon {
         [[cos(s_0), @1],
          [@1, cos(s_1)]])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> cos(DM.eye(2))
         [[0.540302, 1],
          [1, 0.540302]]
@@ -801,6 +872,7 @@ class GenericExpression : public GenericExpressionCommon {
         [[cos(s_0), @1],
          [@1, cos(s_1)]]
         \enddoctest
+        \endlang
 
         \sa sin, tan, acos
 
@@ -818,15 +890,19 @@ class GenericExpression : public GenericExpressionCommon {
 
         Elementwise; sparsity preserved.
 
+        \lang{python}
         \doctest
         >>> tan(DM([0, 1]))
         DM([0, 1.55741])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> tan(DM([0; 1]))
         [0, 1.55741]
         \enddoctest
+        \endlang
 
         \sa atan, sin, cos
 
@@ -845,15 +921,19 @@ class GenericExpression : public GenericExpressionCommon {
         Elementwise; sparsity preserved. Result in (-pi/2, pi/2); use atan2 for a
         quadrant-aware angle.
 
+        \lang{python}
         \doctest
         >>> atan(DM([0, 1]))
         DM([0, 0.785398])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> atan(DM([0; 1]))
         [0, 0.785398]
         \enddoctest
+        \endlang
 
         \sa atan2, tan
 
@@ -871,15 +951,19 @@ class GenericExpression : public GenericExpressionCommon {
 
         Elementwise; sparsity preserved. Arguments outside [-1, 1] give NaN.
 
+        \lang{python}
         \doctest
         >>> asin(DM([0, 1]))
         DM([0, 1.5708])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> asin(DM([0; 1]))
         [0, 1.5708]
         \enddoctest
+        \endlang
 
         \sa sin, acos
 
@@ -897,15 +981,19 @@ class GenericExpression : public GenericExpressionCommon {
 
         Elementwise; the result is dense (acos(0) == pi/2). Arguments outside [-1, 1] give NaN.
 
+        \lang{python}
         \doctest
         >>> acos(DM([0, 1]))
         DM([1.5708, 0])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> acos(DM([0; 1]))
         [1.5708, 0]
         \enddoctest
+        \endlang
 
         \sa cos, asin
 
@@ -923,15 +1011,19 @@ class GenericExpression : public GenericExpressionCommon {
 
         Elementwise; sparsity preserved.
 
+        \lang{python}
         \doctest
         >>> tanh(DM([0, 1]))
         DM([0, 0.761594])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> tanh(DM([0; 1]))
         [0, 0.761594]
         \enddoctest
+        \endlang
 
         \sa atanh, sinh, cosh
 
@@ -949,15 +1041,19 @@ class GenericExpression : public GenericExpressionCommon {
 
         Elementwise; sparsity preserved.
 
+        \lang{python}
         \doctest
         >>> sinh(DM([0, 1]))
         DM([0, 1.1752])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> sinh(DM([0; 1]))
         [0, 1.1752]
         \enddoctest
+        \endlang
 
         \sa asinh, cosh, tanh
 
@@ -975,15 +1071,19 @@ class GenericExpression : public GenericExpressionCommon {
 
         Elementwise; the result is dense (cosh(0) == 1).
 
+        \lang{python}
         \doctest
         >>> cosh(DM([0, 1]))
         DM([1, 1.54308])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> cosh(DM([0; 1]))
         [1, 1.54308]
         \enddoctest
+        \endlang
 
         \sa acosh, sinh, tanh
 
@@ -1001,15 +1101,19 @@ class GenericExpression : public GenericExpressionCommon {
 
         Elementwise; sparsity preserved. Defined for |x| < 1, infinite at +-1.
 
+        \lang{python}
         \doctest
         >>> atanh(DM([0, 0.5]))
         DM([0, 0.549306])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> atanh(DM([0; 0.5]))
         [0, 0.549306]
         \enddoctest
+        \endlang
 
         \sa tanh
 
@@ -1027,15 +1131,19 @@ class GenericExpression : public GenericExpressionCommon {
 
         Elementwise; sparsity preserved.
 
+        \lang{python}
         \doctest
         >>> asinh(DM([-1, 1]))
         DM([-0.881374, 0.881374])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> asinh(DM([-1; 1]))
         [-0.881374, 0.881374]
         \enddoctest
+        \endlang
 
         \sa sinh
 
@@ -1053,15 +1161,19 @@ class GenericExpression : public GenericExpressionCommon {
 
         Elementwise; the result is dense. Defined for x >= 1, NaN below.
 
+        \lang{python}
         \doctest
         >>> acosh(DM([1, 2]))
         DM([0, 1.31696])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> acosh(DM([1; 2]))
         [0, 1.31696]
         \enddoctest
+        \endlang
 
         \sa cosh
 
@@ -1079,6 +1191,7 @@ class GenericExpression : public GenericExpressionCommon {
 
         Elementwise; the result is dense (exp(0) == 1).
 
+        \lang{python}
         \doctest
         >>> exp(DM.eye(2))
         DM(
@@ -1087,14 +1200,17 @@ class GenericExpression : public GenericExpressionCommon {
         >>> exp(MX.sym("m", Sparsity.diag(2)))
         MX(exp(dense(m)))
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> exp(DM.eye(2))
         [[2.71828, 1],
          [1, 2.71828]]
         >> exp(MX.sym('m', Sparsity.diag(2)))
         exp(dense(m))
         \enddoctest
+        \endlang
 
         \sa log, expm1
 
@@ -1113,19 +1229,23 @@ class GenericExpression : public GenericExpressionCommon {
         Elementwise; the result is dense with -inf at structural zeros. Negative arguments
         give NaN; no error is raised.
 
+        \lang{python}
         \doctest
         >>> log(DM([1, 0]))
         DM([0, -inf])
         >>> log(SX.sym("x"))
         SX(log(x))
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> log(DM([1; 0]))
         [0, -inf]
         >> log(SX.sym('x'))
         log(x)
         \enddoctest
+        \endlang
 
         \sa exp, log10, log1p
 
@@ -1144,19 +1264,23 @@ class GenericExpression : public GenericExpressionCommon {
         Computed as log(x) * (1 / log(10)); there is no dedicated operation, which is visible
         in symbolic expressions. Dense result like log.
 
+        \lang{python}
         \doctest
         >>> log10(DM([1, 10, 1000]))
         DM([0, 1, 3])
         >>> log10(SX.sym("x"))
         SX((0.434294*log(x)))
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> log10(DM([1; 10; 1000]))
         [0, 1, 3]
         >> log10(SX.sym('x'))
         (0.434294*log(x))
         \enddoctest
+        \endlang
 
         \sa log
 
@@ -1175,19 +1299,23 @@ class GenericExpression : public GenericExpressionCommon {
         Elementwise; accurate for small x where log(1 + x) would lose digits. Sparsity
         preserved (log1p(0) == 0).
 
+        \lang{python}
         \doctest
         >>> log1p(DM([0, 1e-10]))
         DM([0, 1e-10])
         >>> log1p(SX.sym("x"))
         SX(log1p(x))
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> log1p(DM([0; 1e-10]))
         [0, 1e-10]
         >> log1p(SX.sym('x'))
         log1p(x)
         \enddoctest
+        \endlang
 
         \sa log, expm1
 
@@ -1206,15 +1334,19 @@ class GenericExpression : public GenericExpressionCommon {
         Elementwise; accurate for small x where exp(x) - 1 would lose digits. Sparsity
         preserved (expm1(0) == 0).
 
+        \lang{python}
         \doctest
         >>> expm1(DM([0, 1e-10]))
         DM([0, 1e-10])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> expm1(DM([0; 1e-10]))
         [0, 1e-10]
         \enddoctest
+        \endlang
 
         \sa exp, log1p
 
@@ -1233,6 +1365,7 @@ class GenericExpression : public GenericExpressionCommon {
         Elementwise, towards minus infinity; sparsity preserved. The derivative is zero
         everywhere. Floor division x // y in Python is floor(x / y).
 
+        \lang{python}
         \doctest
         >>> floor(DM([-1.5, 1.5]))
         DM([-2, 1])
@@ -1241,8 +1374,10 @@ class GenericExpression : public GenericExpressionCommon {
         >>> SX.sym("x") // 2
         SX(floor((x/2)))
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> floor(DM([-1.5; 1.5]))
         [-2, 1]
         >> floor(DM([7; -7]) ./ 2)
@@ -1250,6 +1385,7 @@ class GenericExpression : public GenericExpressionCommon {
         >> floor(SX.sym('x') / 2)
         floor((x/2))
         \enddoctest
+        \endlang
 
         \sa ceil, sign
 
@@ -1268,15 +1404,19 @@ class GenericExpression : public GenericExpressionCommon {
         Elementwise, towards plus infinity; sparsity preserved. The derivative is zero
         everywhere.
 
+        \lang{python}
         \doctest
         >>> ceil(DM([-1.5, 1.5]))
         DM([-1, 2])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> ceil(DM([-1.5; 1.5]))
         [-1, 2]
         \enddoctest
+        \endlang
 
         \sa floor
 
@@ -1294,15 +1434,19 @@ class GenericExpression : public GenericExpressionCommon {
 
         Elementwise; sparsity preserved (erf(0) == 0). Range (-1, 1).
 
+        \lang{python}
         \doctest
         >>> erf(DM([0, 1]))
         DM([0, 0.842701])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> erf(DM([0; 1]))
         [0, 0.842701]
         \enddoctest
+        \endlang
 
         \sa erfinv
 
@@ -1321,15 +1465,19 @@ class GenericExpression : public GenericExpressionCommon {
         Elementwise; sparsity preserved. Defined on [-1, 1] with erfinv(+-1) infinite;
         arguments outside give NaN.
 
+        \lang{python}
         \doctest
         >>> erfinv(DM([0, 0.5, 1]))
         DM([0, 0.476936, inf])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> erfinv(DM([0; 0.5; 1]))
         [0, 0.476936, inf]
         \enddoctest
+        \endlang
 
         \sa erf
 
@@ -1352,19 +1500,23 @@ class GenericExpression : public GenericExpressionCommon {
 
         Elementwise; sparsity preserved. The derivative is zero everywhere.
 
+        \lang{python}
         \doctest
         >>> sign(DM([-2, 0, 3]))
         DM([-1, 0, 1])
         >>> sign(SX.sym("x"))
         SX(sign(x))
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> sign(DM([-2; 0; 3]))
         [-1, 0, 1]
         >> sign(SX.sym('x'))
         sign(x)
         \enddoctest
+        \endlang
 
         \sa abs, copysign
 
@@ -1386,6 +1538,7 @@ class GenericExpression : public GenericExpressionCommon {
         constants a constpow operation. Structural zeros of \p x stay zero for a nonzero
         exponent; x**0 is dense (0**0 == 1).
 
+        \lang{python}
         \doctest
         >>> power(DM([1, 2, 3]), 2)
         DM([1, 4, 9])
@@ -1397,8 +1550,10 @@ class GenericExpression : public GenericExpressionCommon {
         >>> x**2.5
         SX(pow(x,2.5))
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> power(DM([1; 2; 3]), 2)
         [1, 4, 9]
         >> DM([1; 2; 3]).^DM([3; 2; 1]), 2.^DM([1; 2; 3])
@@ -1413,6 +1568,7 @@ class GenericExpression : public GenericExpressionCommon {
         >> x.^2.5
         pow(x,2.5)
         \enddoctest
+        \endlang
 
         \sa sq, sqrt, constpow, mpower
 
@@ -1436,6 +1592,7 @@ class GenericExpression : public GenericExpressionCommon {
     (result with the sign of \p y). Elementwise, shape rules as for plus; structural zeros of
     \p x stay zero. A zero divisor gives NaN.
 
+    \lang{python}
     \doctest
     >>> fmod(DM([5, 5, -5, -5]), DM([3, -3, 3, -3]))
     DM([2, 2, -2, -2])
@@ -1444,8 +1601,10 @@ class GenericExpression : public GenericExpressionCommon {
     >>> fmod(SX.sym("x"), 2), SX.sym("x") % 2
     (SX(fmod(x,2)), SX((x-(2.*floor((x/2))))))
     \enddoctest
+    \endlang
 
-    \doctest{matlab}
+    \lang{matlab}
+    \doctest
     >> x = DM([5; 5; -5; -5]); y = DM([3; -3; 3; -3]);
     >> fmod(x, y)
     [2, 2, -2, -2]
@@ -1456,6 +1615,7 @@ class GenericExpression : public GenericExpressionCommon {
     >> rem(SX.sym('x'), 2)
     fmod(x,2)
     \enddoctest
+    \endlang
 
     \sa remainder, floor
 
@@ -1487,6 +1647,7 @@ class GenericExpression : public GenericExpressionCommon {
     This is equivalent to Python's math.remainder. There is no equivalence in Matlab.
     Elementwise, shape rules as for plus; structural zeros of \p x stay zero.
 
+    \lang{python}
     \doctest
     >>> remainder(DM([5, 5, -5, -5]), DM([3, -3, 3, -3]))
     DM([-1, -1, 1, 1])
@@ -1495,8 +1656,10 @@ class GenericExpression : public GenericExpressionCommon {
     >>> remainder(MX.sym("x"), 2)
     MX(remainder(x,2))
     \enddoctest
+    \endlang
 
-    \doctest{matlab}
+    \lang{matlab}
+    \doctest
     >> remainder(DM([5; 5; -5; -5]), DM([3; -3; 3; -3]))
     [-1, -1, 1, 1]
     >> remainder(DM([2.5; 3.5]), 2)
@@ -1504,6 +1667,7 @@ class GenericExpression : public GenericExpressionCommon {
     >> remainder(MX.sym('x'), 2)
     remainder(x,2)
     \enddoctest
+    \endlang
 
     \sa fmod
 
@@ -1525,19 +1689,23 @@ class GenericExpression : public GenericExpressionCommon {
         argument is the y coordinate, as in C and numpy. Elementwise, shape rules as for plus.
         atan2(0, 0) is 0.
 
+        \lang{python}
         \doctest
         >>> atan2(DM([1, -1, 0]), DM([-1, -1, 1]))
         DM([2.35619, -2.35619, 0])
         >>> atan2(SX.sym("y"), SX.sym("x"))
         SX(atan2(y,x))
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> atan2(DM([1; -1; 0]), DM([-1; -1; 1]))
         [2.35619, -2.35619, 0]
         >> atan2(SX.sym('y'), SX.sym('x'))
         atan2(y,x)
         \enddoctest
+        \endlang
 
         \sa atan
 
@@ -1579,6 +1747,7 @@ class GenericExpression : public GenericExpressionCommon {
         where both operands are structurally zero; fmin with a negative scalar densifies.
         For the minimum over the entries of one matrix use mmin.
 
+        \lang{python}
         \doctest
         >>> fmin(DM([1, 5]), DM([3, 2]))
         DM([1, 2])
@@ -1591,8 +1760,10 @@ class GenericExpression : public GenericExpressionCommon {
         >>> fmin(SX.sym("x"), SX.sym("y"))
         SX(fmin(x,y))
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> fmin(DM([1; 5]), DM([3; 2]))
         [1, 2]
         >> min(DM([1; 5]), DM([3; 2]))
@@ -1605,6 +1776,7 @@ class GenericExpression : public GenericExpressionCommon {
         >> min(SX.sym('x'), SX.sym('y'))
         fmin(x,y)
         \enddoctest
+        \endlang
 
         \sa fmax, mmin
 
@@ -1624,6 +1796,7 @@ class GenericExpression : public GenericExpressionCommon {
         the other is returned. The derivative is 1 with respect to the larger operand (split
         evenly on ties). For the maximum over the entries of one matrix use mmax.
 
+        \lang{python}
         \doctest
         >>> fmax(DM([1, 5]), DM([3, 2]))
         DM([3, 5])
@@ -1634,8 +1807,10 @@ class GenericExpression : public GenericExpressionCommon {
         >>> fmax(MX.sym("x"), MX.sym("y"))
         MX(fmax(x,y))
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> fmax(DM([1; 5]), DM([3; 2]))
         [3, 5]
         >> max(DM([1; 5]), 3)
@@ -1645,6 +1820,7 @@ class GenericExpression : public GenericExpressionCommon {
         >> max(MX.sym('x'), MX.sym('y'))
         fmax(x,y)
         \enddoctest
+        \endlang
 
         \sa fmin, mmax
 
@@ -1677,6 +1853,7 @@ class GenericExpression : public GenericExpressionCommon {
         \param y Second expression
         \param depth Number of levels of the expression graph to compare, 0 for identity
 
+        \lang{python}
         \doctest
         >>> x = SX.sym("x")
         >>> is_equal(x, x), is_equal(x, SX.sym("x"))
@@ -1689,8 +1866,10 @@ class GenericExpression : public GenericExpressionCommon {
         >>> is_equal(y * y, y * y), is_equal(y * y, y * y, 1)
         (False, True)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x');
         >> is_equal(x, x), is_equal(x, SX.sym('x'))
         1
@@ -1706,6 +1885,7 @@ class GenericExpression : public GenericExpressionCommon {
         0
         1
         \enddoctest
+        \endlang
 
         \sa eq
 
@@ -1722,6 +1902,7 @@ class GenericExpression : public GenericExpressionCommon {
          a negative zero \p y counts as negative. Shape rules as for plus. The derivative with
          respect to \p y is zero.
 
+         \lang{python}
          \doctest
          >>> copysign(DM([1, -2]), DM([-1, 1]))
          DM([-1, 2])
@@ -1730,8 +1911,10 @@ class GenericExpression : public GenericExpressionCommon {
          >>> copysign(SX.sym("x"), SX.sym("y"))
          SX(copysign(x,y))
          \enddoctest
+         \endlang
 
-         \doctest{matlab}
+         \lang{matlab}
+         \doctest
          >> copysign(DM([1; -2]), DM([-1; 1]))
          [-1, 2]
          >> copysign(DM(3), DM(-0.0))
@@ -1739,6 +1922,7 @@ class GenericExpression : public GenericExpressionCommon {
          >> copysign(SX.sym('x'), SX.sym('y'))
          copysign(x,y)
          \enddoctest
+         \endlang
 
          \sa sign, abs
 
@@ -1759,6 +1943,7 @@ class GenericExpression : public GenericExpressionCommon {
          constant exponent, so it is rarely needed directly. Passing a symbolic exponent
          gives a wrong derivative for MX; SX falls back to pow.
 
+         \lang{python}
          \doctest
          >>> constpow(DM(2), 3)
          DM(8)
@@ -1766,8 +1951,10 @@ class GenericExpression : public GenericExpressionCommon {
          >>> constpow(x, 2.5), jacobian(constpow(x, 2.5), x)
          (MX(pow(x,2.5)), MX((2.5*pow(x,1.5))))
          \enddoctest
+         \endlang
 
-         \doctest{matlab}
+         \lang{matlab}
+         \doctest
          >> constpow(DM(2), 3)
          8
          >> x = MX.sym('x');
@@ -1775,6 +1962,7 @@ class GenericExpression : public GenericExpressionCommon {
          pow(x,2.5)
          (2.5*pow(x,1.5))
          \enddoctest
+         \endlang
 
          \sa pow
 
@@ -1796,6 +1984,7 @@ class GenericExpression : public GenericExpressionCommon {
          choice to tell several printme nodes apart. Available as a method x.printme(y) in
          Python; the derivative is that of \p x. Use monitor to print a whole matrix at once.
 
+         \lang{python}
          \doctest
          >>> x = MX.sym("x")
          >>> f = Function("f", [x], [x.printme(7) * 2])
@@ -1803,14 +1992,17 @@ class GenericExpression : public GenericExpressionCommon {
          |> 7 : 3.0000000000000000e+00
          DM(6)
          \enddoctest
+         \endlang
 
-         \doctest{matlab}
+         \lang{matlab}
+         \doctest
          >> x = MX.sym('x');
          >> f = Function('f', {x}, {x.printme(7) * 2});
          >> f(3)
          |> 7 : 3.0000000000000000e+00
          6
          \enddoctest
+         \endlang
 
          \identifier{2on} */
      static ExType printme(const ExType& x, const ExType& y) {
@@ -1827,6 +2019,7 @@ class GenericExpression : public GenericExpressionCommon {
         Elementwise; avoids the overflow and underflow of forming the squares, as C hypot.
         Shape rules as for plus; the result is structurally zero where both operands are.
 
+        \lang{python}
         \doctest
         >>> hypot(DM(3), DM(4))
         DM(5)
@@ -1835,8 +2028,10 @@ class GenericExpression : public GenericExpressionCommon {
         >>> hypot(SX.sym("x"), SX.sym("y"))
         SX(hypot(x,y))
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> hypot(DM(3), DM(4))
         5
         >> hypot(DM(1e200), DM(1e200))
@@ -1844,6 +2039,7 @@ class GenericExpression : public GenericExpressionCommon {
         >> hypot(SX.sym('x'), SX.sym('y'))
         hypot(x,y)
         \enddoctest
+        \endlang
 
         \sa norm_2
 

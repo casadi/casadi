@@ -105,6 +105,7 @@ namespace casadi {
       Function can be embedded in an MX expression and differentiated: the sensitivities of the
       primal-dual solution with respect to any input follow from the KKT conditions.
 
+      \lang{python}
       \doctest
       >>> x = SX.sym("x"); y = SX.sym("y"); p = SX.sym("p")
       >>> nlp = {"x": vertcat(x, y), "p": p, "f": (1 - x)**2 + p*(y - x**2)**2, "g": x + y}
@@ -123,8 +124,10 @@ namespace casadi {
       >>> S(p=100)["x"]
       DM([1, 1])
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> x = SX.sym('x'); y = SX.sym('y'); p = SX.sym('p');
       >> nlp = struct('x', vertcat(x, y), 'p', p, 'f', (1 - x)^2 + p*(y - x^2)^2, 'g', x + y);
       >> opts = struct('print_time', false, 'ipopt', struct('print_level', 0, 'sb', 'yes'));
@@ -142,7 +145,9 @@ namespace casadi {
       >> sol = S('p', 100); disp(sol.x)
       [1, 1]
       \enddoctest
+      \endlang
 
+      \lang{python}
       \doctest
       >>> x = SX.sym("x"); p = SX.sym("p")
       >>> opts = {"ipopt.print_level": 0, "ipopt.sb": "yes", "print_time": False}
@@ -159,8 +164,10 @@ namespace casadi {
       >>> dxdp(5)
       DM(1)
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> x = SX.sym('x'); p = SX.sym('p');
       >> opts = struct('print_time', false, 'ipopt', struct('print_level', 0, 'sb', 'yes'));
       >> S = nlpsol('S', 'ipopt', struct('x', x, 'p', p, 'f', (x - p)^2 + 3*p, 'g', 2*x), opts);
@@ -174,7 +181,9 @@ namespace casadi {
       >> dxdp = Function('dxdp', {pm}, {jacobian(sol.x, pm)}); disp(dxdp(5))
       1
       \enddoctest
+      \endlang
 
+      \lang{python}
       \doctest
       >>> x = SX.sym("x")
       >>> opts = {"ipopt.print_level": 0, "ipopt.sb": "yes", "print_time": False}
@@ -199,8 +208,10 @@ namespace casadi {
       ...     print("No such field: h" in str(e))
       True
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> x = SX.sym('x');
       >> opts = struct('print_time', false, 'ipopt', struct('print_level', 0, 'sb', 'yes'));
       >> S = nlpsol('S', 'ipopt', struct('x', x, 'f', x, 'g', x), opts);
@@ -221,6 +232,7 @@ namespace casadi {
       >> contains(msg, 'No such field: h')
       1
       \enddoctest
+      \endlang
 
       \generalsection{Nlpsol}
       \pluginssection{Nlpsol}
@@ -263,12 +275,15 @@ namespace casadi {
   * @copydoc scheme_NlpsolInput
   * \endif
 
+      \lang{python}
       \doctest
       >>> nlpsol_in()
       ['x0', 'p', 'lbx', 'ubx', 'lbg', 'ubg', 'lam_x0', 'lam_g0']
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> nlpsol_in()
       x0
       p
@@ -279,6 +294,7 @@ namespace casadi {
       lam_x0
       lam_g0
       \enddoctest
+      \endlang
 
       \sa nlpsol_out, nlpsol_n_in, nlpsol_default_in
 
@@ -294,12 +310,15 @@ namespace casadi {
   * @copydoc scheme_NlpsolOutput
   * \endif
 
+      \lang{python}
       \doctest
       >>> nlpsol_out()
       ['x', 'f', 'g', 'lam_x', 'lam_g', 'lam_p']
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> nlpsol_out()
       x
       f
@@ -308,6 +327,7 @@ namespace casadi {
       lam_g
       lam_p
       \enddoctest
+      \endlang
 
       \sa nlpsol_in, nlpsol_n_out
 
@@ -322,17 +342,21 @@ namespace casadi {
   * @copydoc scheme_NlpsolInput
   * \endif
 
+      \lang{python}
       \doctest
       >>> nlpsol_in(0), nlpsol_in(7), repr(nlpsol_in(8))
       ('x0', 'lam_g0', "''")
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> nlpsol_in(0), nlpsol_in(7), isempty(nlpsol_in(8))
       x0
       lam_g0
       1
       \enddoctest
+      \endlang
 
       \identifier{1t0} */
   CASADI_EXPORT std::string nlpsol_in(casadi_int ind);
@@ -345,47 +369,59 @@ namespace casadi {
   * @copydoc scheme_NlpsolOutput
   * \endif
 
+      \lang{python}
       \doctest
       >>> nlpsol_out(0), nlpsol_out(5), repr(nlpsol_out(6))
       ('x', 'lam_p', "''")
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> nlpsol_out(0), nlpsol_out(5), isempty(nlpsol_out(6))
       x
       lam_p
       1
       \enddoctest
+      \endlang
 
       \identifier{1t1} */
   CASADI_EXPORT std::string nlpsol_out(casadi_int ind);
 
   /** \brief Number of NLP solver inputs
 
+      \lang{python}
       \doctest
       >>> nlpsol_n_in(), len(nlpsol_in())
       (8, 8)
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> fprintf('%d %d\n', nlpsol_n_in(), numel(cellstr(nlpsol_in())))
       8 8
       \enddoctest
+      \endlang
 
       \identifier{1t2} */
   CASADI_EXPORT casadi_int nlpsol_n_in();
 
   /** \brief Number of NLP solver outputs
 
+      \lang{python}
       \doctest
       >>> nlpsol_n_out(), len(nlpsol_out())
       (6, 6)
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> fprintf('%d %d\n', nlpsol_n_out(), numel(cellstr(nlpsol_out())))
       6 6
       \enddoctest
+      \endlang
 
       \identifier{1t3} */
   CASADI_EXPORT casadi_int nlpsol_n_out();
@@ -398,19 +434,23 @@ namespace casadi {
 
       \param ind Input index as in nlpsol_in; without argument, the list of all 8 defaults
 
+      \lang{python}
       \doctest
       >>> nlpsol_default_in()
       [0.0, 0.0, -inf, inf, -inf, inf, 0.0, 0.0]
       >>> nlpsol_default_in(3)
       inf
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> nlpsol_default_in()
       0 0 -Inf Inf -Inf Inf 0 0
       >> nlpsol_default_in(3)
       Inf
       \enddoctest
+      \endlang
 
       \identifier{1t4} */
   CASADI_EXPORT double nlpsol_default_in(casadi_int ind);
@@ -422,17 +462,21 @@ namespace casadi {
       Returns the names of the plugin-specific options only; the options shared by all plugins
       (e.g. "print_time", "calc_lam_x") are not included. Raises an error for an unknown plugin.
 
+      \lang{python}
       \doctest
       >>> opts = nlpsol_options("sqpmethod")
       >>> "max_iter" in opts, "qpsol" in opts, "print_time" in opts
       (True, True, False)
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> opts = cellstr(nlpsol_options('sqpmethod'));
       >> ismember({'max_iter', 'qpsol', 'print_time'}, opts)
       1 1 0
       \enddoctest
+      \endlang
 
       \sa nlpsol_option_type, nlpsol_option_info
 
@@ -445,17 +489,21 @@ namespace casadi {
       \param op Option name; an unknown option raises an error
       \return Type name such as "OT_INT", "OT_BOOL", "OT_DICT"
 
+      \lang{python}
       \doctest
       >>> nlpsol_option_type("sqpmethod", "max_iter"), nlpsol_option_type("ipopt", "ipopt")
       ('OT_INT', 'OT_DICT')
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> nlpsol_option_type('sqpmethod', 'max_iter')
       OT_INT
       >> nlpsol_option_type('ipopt', 'ipopt')
       OT_DICT
       \enddoctest
+      \endlang
 
       \identifier{1t6} */
   CASADI_EXPORT std::string nlpsol_option_type(const std::string& name, const std::string& op);
@@ -465,15 +513,19 @@ namespace casadi {
       \param name Plugin name
       \param op Option name; an unknown option raises an error
 
+      \lang{python}
       \doctest
       >>> nlpsol_option_info("sqpmethod", "max_iter")
       'Maximum number of SQP iterations'
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> nlpsol_option_info('sqpmethod', 'max_iter')
       Maximum number of SQP iterations
       \enddoctest
+      \endlang
 
       \identifier{1t7} */
   CASADI_EXPORT std::string nlpsol_option_info(const std::string& name, const std::string& op);
@@ -482,16 +534,20 @@ namespace casadi {
 
       Tries to load the plugin \p name if it is not loaded yet; false when it is not found.
 
+      \lang{python}
       \doctest
       >>> has_nlpsol("ipopt"), has_nlpsol("no_such_plugin")
       (True, False)
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> has_nlpsol('ipopt'), has_nlpsol('no_such_plugin')
       1
       0
       \enddoctest
+      \endlang
 
       \identifier{2pb} */
   CASADI_EXPORT bool has_nlpsol(const std::string& name);
@@ -501,6 +557,7 @@ namespace casadi {
       Normally plugins are loaded on first use; this raises an error when the plugin cannot be
       found.
 
+      \lang{python}
       \doctest
       >>> try:
       ...     load_nlpsol("no_such_plugin")
@@ -508,12 +565,15 @@ namespace casadi {
       ...     print("no_such_plugin" in str(e))
       True
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> try, load_nlpsol('no_such_plugin'); catch e, msg = e.message; end
       >> contains(msg, 'no_such_plugin')
       1
       \enddoctest
+      \endlang
 
       \identifier{2pc} */
   CASADI_EXPORT void load_nlpsol(const std::string& name);
@@ -522,15 +582,19 @@ namespace casadi {
 
       The text includes the plugin-specific option table.
 
+      \lang{python}
       \doctest
       >>> "max_iter" in doc_nlpsol("sqpmethod")
       True
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> contains(doc_nlpsol('sqpmethod'), 'max_iter')
       1
       \enddoctest
+      \endlang
 
       \identifier{2pd} */
   CASADI_EXPORT std::string doc_nlpsol(const std::string& name);

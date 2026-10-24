@@ -4,12 +4,15 @@
 Usage: python docs/api/extra/doctest_headers.py [--verbose] [--lang python|matlab|julia|javascript|all] [header.hpp ...]
 With no headers all headers under casadi/ are scanned. Default language: python.
 Block syntax in a header comment:
-  \\doctest             Python, doctest format (>>> lines + expected output)
-  \\doctest{julia}      Documenter format (julia> lines + expected output), run by doctest_julia.jl
-  \\doctest{javascript} node REPL format (> lines + expected output), run by doctest_js.js
-  \\doctest{matlab}     command-window format (>> lines + expected output), run by doctest_matlab.m
-                       in MATLAB (install-matlab/matlab or CASADI_MATLAB_PATH; MATLAB_CMD=octave for Octave)
+  \\lang{julia}          everything up to \\endlang (prose, lists, examples) is for this language only
+  \\doctest              example in the format of the enclosing \\lang group, which it requires:
+                        python: doctest format (>>> lines + expected output)
+                        julia: Documenter format (julia> lines + expected output), run by doctest_julia.jl
+                        javascript: node REPL format (> lines + expected output), run by doctest_js.js
+                        matlab: command-window format (>> lines + expected output), run by doctest_matlab.m
+                        in MATLAB (install-matlab/matlab or CASADI_MATLAB_PATH; MATLAB_CMD=octave for Octave)
   \\enddoctest
+  \\endlang
 Needs an importable casadi on PYTHONPATH (python), build/swig/julia/CasADiNative or CASADI_JL (julia),
 build-wasm/swig/wasm-js/casadi.js or CASADI_WASM_JS (javascript).
 """
@@ -25,31 +28,55 @@ ROOT = os.path.normpath(os.path.join(HERE, "..", "..", ".."))
 JULIA = os.environ.get("JULIA", "julia")
 
 
-def collect(path):
-    """Yield (lineno, lang, text) for every \\doctest ... \\enddoctest block in a header."""
-    blocks = []
+def parse(path):
+    """Return the \\lang groups of a header: dicts with lang, line, comment and parts, a list of
+    ("text", lines), ("verbatim", text) and ("doctest", lineno, text) in source order."""
     with open(path) as f:
         lines = f.read().split("\n")
-    cur = None
+    groups, group, block, comment = [], None, None, 0
     for i, line in enumerate(lines, 1):
+        if "/**" in line or "/*!" in line:
+            comment += 1
         s = re.sub(r"^\s*\*?\s?", "", line)
-        m = re.match(r"\\doctest(?:\{(\w+)\})?\s*$", s.strip())
+        t = re.sub(r"\*/\s*$", "", s).strip()  # '\enddoctest */' closes the comment too
+        where = "%s:%d" % (path, i)
+        m = re.match(r"\\lang\{(\w+)\}$", t)
         if m:
-            if cur is not None:
-                raise ValueError("%s:%d: nested \\doctest" % (path, i))
-            cur = (i, m.group(1) or "python", [])
-        elif "\\enddoctest" in s:
-            if cur is None:
-                raise ValueError("%s:%d: \\enddoctest without \\doctest" % (path, i))
-            blocks.append((cur[0], cur[1], "\n".join(cur[2]) + "\n"))
-            cur = None
-        elif "\\doctestout" in s or "\\doctest" in s:
-            raise ValueError("%s:%d: malformed \\doctest line: %r" % (path, i, line))
-        elif cur is not None:
-            cur[2].append(s)
-    if cur is not None:
-        raise ValueError("%s:%d: unterminated \\doctest" % (path, cur[0]))
-    return blocks
+            if group is not None:
+                raise ValueError("%s: nested \\lang group" % where)
+            group = {"lang": m.group(1), "line": i, "comment": comment, "parts": []}
+        elif t == "\\endlang":
+            if group is None or block is not None:
+                raise ValueError("%s: \\endlang without \\lang" % where)
+            groups.append(group)
+            group = None
+        elif t == "\\doctest" or (t == "\\verbatim" and group is not None):
+            if group is None:
+                raise ValueError("%s: \\doctest outside a \\lang group" % where)
+            if block is not None:
+                raise ValueError("%s: nested %s" % (where, t))
+            block = (t[1:], i, [])
+        elif block is not None and t == "\\end" + block[0]:
+            text = "\n".join(block[2]) + "\n"
+            group["parts"].append(("doctest", block[1], text) if block[0] == "doctest" else ("verbatim", text))
+            block = None
+        elif "\\lang" in s or "\\endlang" in s or "\\doctest" in s:
+            raise ValueError("%s: malformed line: %r" % (where, line))
+        elif block is not None:
+            block[2].append(s)
+        elif group is not None:
+            if group["parts"] and group["parts"][-1][0] == "text":
+                group["parts"][-1][1].append(t)
+            else:
+                group["parts"].append(("text", [t]))
+        if "*/" in line and (group is not None or block is not None):
+            raise ValueError("%s: unterminated \\%s" % (where, "lang" if block is None else block[0]))
+    return groups
+
+
+def collect(path):
+    """Return (lineno, lang, text) for every \\doctest ... \\enddoctest block in a header."""
+    return [(p[1], g["lang"], p[2]) for g in parse(path) for p in g["parts"] if p[0] == "doctest"]
 
 
 def make_globs():

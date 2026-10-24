@@ -69,6 +69,7 @@ namespace casadi {
    *   (e.g. kinsol), ignored by newton.
    * - "expand", "print_time", "verbose", "common_options", "specific_options": as for nlpsol.
    *
+   * \lang{python}
    * \doctest
    * >>> x = SX.sym("x"); p = SX.sym("p")
    * >>> G = rootfinder("G", "newton", {"x": x, "p": p, "g": x**2 - p})
@@ -93,8 +94,10 @@ namespace casadi {
    * >>> G
    * Function(G:(p,x0)->(h,x) Newton)
    * \enddoctest
+   * \endlang
    *
-   * \doctest{matlab}
+   * \lang{matlab}
+   * \doctest
    * >> x = SX.sym('x'); p = SX.sym('p');
    * >> G = rootfinder('G', 'newton', struct('x', x, 'p', p, 'g', x^2 - p)); disp(G)
    * G:(x0,p)->(x) Newton
@@ -116,7 +119,9 @@ namespace casadi {
    * >> G = rootfinder('G', 'newton', f, struct('implicit_input', 1, 'implicit_output', 1)); disp(G)
    * G:(p,x0)->(h,x) Newton
    * \enddoctest
+   * \endlang
    *
+   * \lang{python}
    * \doctest
    * >>> x = SX.sym("x"); p = SX.sym("p")
    * >>> G = rootfinder("G", "newton", {"x": x, "p": p, "g": x**2 - p}, {"max_iter": 2})
@@ -141,8 +146,10 @@ namespace casadi {
    * ...     print("Dimension mismatch" in str(e))
    * True
    * \enddoctest
+   * \endlang
    *
-   * \doctest{matlab}
+   * \lang{matlab}
+   * \doctest
    * >> x = SX.sym('x'); p = SX.sym('p'); rfp = struct('x', x, 'p', p, 'g', x^2 - p);
    * >> G = rootfinder('G', 'newton', rfp, struct('max_iter', 2));
    * >> try, G('x0', 1, 'p', 2); catch e, msg = e.message; end
@@ -161,6 +168,7 @@ namespace casadi {
    * >> contains(msg, 'Dimension mismatch')
    * 1
    * \enddoctest
+   * \endlang
    *
    * \generalsection{Rootfinder}
    * \pluginssection{Rootfinder}
@@ -197,16 +205,20 @@ namespace casadi {
       dictionary, in order: x0, p. A Function created from a general Function keeps that
       Function's input names, with "0" appended to the unknown.
 
+      \lang{python}
       \doctest
       >>> rootfinder_in()
       ['x0', 'p']
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> rootfinder_in()
       x0
       p
       \enddoctest
+      \endlang
 
       \sa rootfinder_out, rootfinder_n_in
 
@@ -218,15 +230,19 @@ namespace casadi {
       Returns the name of the single output of a Function created by rootfinder from a
       dictionary: x.
 
+      \lang{python}
       \doctest
       >>> rootfinder_out()
       ['x']
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> rootfinder_out()
       x
       \enddoctest
+      \endlang
 
       \sa rootfinder_in, rootfinder_n_out
 
@@ -237,17 +253,21 @@ namespace casadi {
 
       \param ind Index in 0..rootfinder_n_in()-1; any other value gives an empty string
 
+      \lang{python}
       \doctest
       >>> rootfinder_in(0), rootfinder_in(1), repr(rootfinder_in(2))
       ('x0', 'p', "''")
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> rootfinder_in(0), rootfinder_in(1), isempty(rootfinder_in(2))
       x0
       p
       1
       \enddoctest
+      \endlang
 
       \identifier{1u0} */
   CASADI_EXPORT std::string rootfinder_in(casadi_int ind);
@@ -256,46 +276,58 @@ namespace casadi {
 
       \param ind Index in 0..rootfinder_n_out()-1; any other value gives an empty string
 
+      \lang{python}
       \doctest
       >>> rootfinder_out(0), repr(rootfinder_out(1))
       ('x', "''")
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> rootfinder_out(0), isempty(rootfinder_out(1))
       x
       1
       \enddoctest
+      \endlang
 
       \identifier{1u1} */
   CASADI_EXPORT std::string rootfinder_out(casadi_int ind);
 
   /** \brief Number of rootfinder inputs
 
+      \lang{python}
       \doctest
       >>> rootfinder_n_in()
       2
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> rootfinder_n_in()
       2
       \enddoctest
+      \endlang
 
       \identifier{1u2} */
   CASADI_EXPORT casadi_int rootfinder_n_in();
 
   /** \brief Number of rootfinder outputs
 
+      \lang{python}
       \doctest
       >>> rootfinder_n_out()
       1
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> rootfinder_n_out()
       1
       \enddoctest
+      \endlang
 
       \identifier{1u3} */
   CASADI_EXPORT casadi_int rootfinder_n_out();
@@ -306,17 +338,21 @@ namespace casadi {
       (e.g. "linear_solver", "error_on_fail") are not included. Raises an error for an unknown
       plugin.
 
+      \lang{python}
       \doctest
       >>> opts = rootfinder_options("newton")
       >>> "max_iter" in opts, "abstol" in opts, "linear_solver" in opts
       (True, True, False)
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> opts = cellstr(rootfinder_options('newton'));
       >> ismember({'max_iter', 'abstol', 'linear_solver'}, opts)
       1 1 0
       \enddoctest
+      \endlang
 
       \sa rootfinder_option_type, rootfinder_option_info
 
@@ -329,19 +365,23 @@ namespace casadi {
       \param op Option name; an unknown option raises an error
       \return Type name such as "OT_INT", "OT_DOUBLE", "OT_BOOL"
 
+      \lang{python}
       \doctest
       >>> rootfinder_option_type("newton", "max_iter")
       'OT_INT'
       >>> rootfinder_option_type("newton", "abstol")
       'OT_DOUBLE'
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> rootfinder_option_type('newton', 'max_iter')
       OT_INT
       >> rootfinder_option_type('newton', 'abstol')
       OT_DOUBLE
       \enddoctest
+      \endlang
 
       \identifier{1u5} */
   CASADI_EXPORT std::string rootfinder_option_type(const std::string& name, const std::string& op);
@@ -351,15 +391,19 @@ namespace casadi {
       \param name Plugin name
       \param op Option name; an unknown option raises an error
 
+      \lang{python}
       \doctest
       >>> rootfinder_option_info("newton", "abstol")
       'Stopping criterion tolerance on max(|F|)'
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> rootfinder_option_info('newton', 'abstol')
       Stopping criterion tolerance on max(|F|)
       \enddoctest
+      \endlang
 
       \identifier{1u6} */
   CASADI_EXPORT std::string rootfinder_option_info(const std::string& name, const std::string& op);
@@ -368,16 +412,20 @@ namespace casadi {
 
       Tries to load the plugin \p name if it is not loaded yet; false when it is not found.
 
+      \lang{python}
       \doctest
       >>> has_rootfinder("newton"), has_rootfinder("no_such_plugin")
       (True, False)
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> has_rootfinder('newton'), has_rootfinder('no_such_plugin')
       1
       0
       \enddoctest
+      \endlang
 
       \identifier{2ng} */
   CASADI_EXPORT bool has_rootfinder(const std::string& name);
@@ -387,6 +435,7 @@ namespace casadi {
       Normally plugins are loaded on first use; this raises an error when the plugin cannot be
       found.
 
+      \lang{python}
       \doctest
       >>> try:
       ...     load_rootfinder("no_such_plugin")
@@ -394,12 +443,15 @@ namespace casadi {
       ...     print("no_such_plugin" in str(e))
       True
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> try, load_rootfinder('no_such_plugin'); catch e, msg = e.message; end
       >> contains(msg, 'no_such_plugin')
       1
       \enddoctest
+      \endlang
 
       \identifier{2nh} */
   CASADI_EXPORT void load_rootfinder(const std::string& name);
@@ -408,15 +460,19 @@ namespace casadi {
 
       The text includes the plugin-specific option table.
 
+      \lang{python}
       \doctest
       >>> "newton iterations" in doc_rootfinder("newton")
       True
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> contains(doc_rootfinder('newton'), 'newton iterations')
       1
       \enddoctest
+      \endlang
 
       \identifier{2ni} */
   CASADI_EXPORT std::string doc_rootfinder(const std::string& name);

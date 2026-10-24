@@ -59,6 +59,7 @@ namespace casadi {
    is itself differentiated with finite differences only when it is a Callback with
    "enable_fd"; a Function built from SX/MX gives exact second derivatives.
 
+   \lang{python}
    \doctest
    >>> class MyCallback(Callback):
    ...   def __init__(self, name, d, opts={}):
@@ -87,8 +88,10 @@ namespace casadi {
    >>> round(float(J(2)), 4)
    0.2702
    \enddoctest
+   \endlang
 
-   \doctest{matlab}
+   \lang{matlab}
+   \doctest
    >> c = {'classdef MyCallback < casadi.Callback', 'properties', 'd', 'end', 'methods'};
    >> c = [c, {'function self = MyCallback(name, d, varargin)'}];
    >> c = [c, {'self@casadi.Callback(); self.d = d; construct(self, name, varargin{:});'}];
@@ -110,9 +113,11 @@ namespace casadi {
    0.2702
    >> rmpath(d); rmdir(d, 's');
    \enddoctest
+   \endlang
 
    The Python object must outlive every use of the Function:
 
+   \lang{python}
    \doctest
    >>> class Sq(Callback):
    ...   def __init__(self, name, opts={}):
@@ -132,8 +137,10 @@ namespace casadi {
    ...   print(str(e).splitlines()[-1])
    Callback object has been deleted
    \enddoctest
+   \endlang
 
-   \doctest{matlab}
+   \lang{matlab}
+   \doctest
    >> c = {'classdef SqCb < casadi.Callback', 'methods'};
    >> c = [c, {'function self = SqCb(name)', 'self@casadi.Callback(); construct(self, name);'}];
    >> c = [c, {'end'}];
@@ -148,9 +155,11 @@ namespace casadi {
    1
    >> rmpath(d); rmdir(d, 's');
    \enddoctest
+   \endlang
 
    Use in an NLP with finite differences:
 
+   \lang{python}
    \doctest
    >>> class Sq(Callback):
    ...   def __init__(self, name, opts={}):
@@ -166,8 +175,10 @@ namespace casadi {
    >>> round(opti.solve().value(v), 3)
    1.0
    \enddoctest
+   \endlang
 
-   \doctest{matlab}
+   \lang{matlab}
+   \doctest
    >> c = {'classdef SqFd < casadi.Callback', 'methods'};
    >> c = [c, {'function self = SqFd(name, opts)'}];
    >> c = [c, {'self@casadi.Callback(); construct(self, name, opts);', 'end'}];
@@ -181,6 +192,7 @@ namespace casadi {
    1
    >> rmpath(d); rmdir(d, 's');
    \enddoctest
+   \endlang
 
    \sa Function, external
 
@@ -206,6 +218,7 @@ namespace casadi {
 
         Callback objects cannot be copied; share the Function instead.
 
+        \lang{python}
         \doctest
         >>> class Sq(Callback):
         ...   def __init__(self, name, opts={}):
@@ -220,8 +233,10 @@ namespace casadi {
         ...   print("Callback objects cannot be copied" in str(e))
         True
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> c = {'classdef SqCopy < casadi.Callback', 'methods'};
         >> c = [c, {'function self = SqCopy(name)'}];
         >> c = [c, {'self@casadi.Callback(); construct(self, name);', 'end'}];
@@ -233,6 +248,7 @@ namespace casadi {
         1
         >> rmpath(d); rmdir(d, 's');
         \enddoctest
+        \endlang
 
         \identifier{o3} */
     Callback(const Callback& obj);
@@ -256,6 +272,7 @@ namespace casadi {
         \param opts Function options, e.g. "enable_fd", "fd_method", "fd_options",
                "enable_forward", "enable_reverse", "enable_jacobian"
 
+        \lang{python}
         \doctest
         >>> class Sq(Callback):
         ...   def __init__(self, name, opts={}):
@@ -272,8 +289,10 @@ namespace casadi {
         ...   print("Internal class already created" in str(e))
         True
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> c = {'classdef SqOpts < casadi.Callback', 'methods'};
         >> c = [c, {'function self = SqOpts(name, opts)'}];
         >> c = [c, {'self@casadi.Callback(); construct(self, name, opts);', 'end'}];
@@ -287,6 +306,7 @@ namespace casadi {
         1
         >> rmpath(d); rmdir(d, 's');
         \enddoctest
+        \endlang
 
         \identifier{o5} */
     void construct(const std::string& name, const Dict& opts=Dict());
@@ -296,6 +316,7 @@ namespace casadi {
         Called from construct() after the inputs and outputs are known and the options are
         processed, before finalize(). Override to allocate data; the default does nothing.
 
+        \lang{python}
         \doctest
         >>> class Sq(Callback):
         ...   def __init__(self, name, opts={}):
@@ -313,8 +334,10 @@ namespace casadi {
         finalize
         after construct
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> c = {'classdef SqInit < casadi.Callback', 'methods'};
         >> c = [c, {'function self = SqInit(name)'}];
         >> c = [c, {'self@casadi.Callback(); disp(''before construct'');'}];
@@ -331,6 +354,7 @@ namespace casadi {
         after construct
         >> rmpath(d); rmdir(d, 's');
         \enddoctest
+        \endlang
 
         \identifier{o6} */
     virtual void init() {}
@@ -356,6 +380,7 @@ namespace casadi {
         \param arg Input values
         \return Output values
 
+        \lang{python}
         \doctest
         >>> class Scale(Callback):
         ...   def __init__(self, name, opts={}):
@@ -379,8 +404,10 @@ namespace casadi {
         ...   print("Shape mismatch" in str(e))
         True
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> c = {'classdef Scale < casadi.Callback', 'methods'};
         >> c = [c, {'function self = Scale(name)'}];
         >> c = [c, {'self@casadi.Callback(); construct(self, name);', 'end'}];
@@ -404,6 +431,7 @@ namespace casadi {
         1
         >> rmpath(d); rmdir(d, 's');
         \enddoctest
+        \endlang
 
         \identifier{o8} */
     virtual std::vector<DM> eval(const std::vector<DM>& arg) const;
@@ -416,6 +444,7 @@ namespace casadi {
         the structural nonzeros of the corresponding input or output in column-major order;
         write the result into the output buffers and return 0.
 
+        \lang{python}
         \doctest
         >>> class Sq(Callback):
         ...   def __init__(self, name, opts={}):
@@ -433,6 +462,7 @@ namespace casadi {
         >>> f([1, 2, 3])
         DM([1, 4, 9])
         \enddoctest
+        \endlang
 
         \identifier{o9} */
     virtual int eval_buffer(const double **arg, const std::vector<casadi_int>& sizes_arg,
@@ -455,6 +485,7 @@ namespace casadi {
 
         Called during construct(). Default: 1.
 
+        \lang{python}
         \doctest
         >>> class Split(Callback):
         ...   def __init__(self, name, opts={}):
@@ -468,8 +499,10 @@ namespace casadi {
         >>> f(3)
         (DM(9), DM(-3))
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> c = {'classdef SplitCb < casadi.Callback', 'methods'};
         >> c = [c, {'function self = SplitCb(name)'}];
         >> c = [c, {'self@casadi.Callback(); construct(self, name);', 'end'}];
@@ -483,6 +516,7 @@ namespace casadi {
         -3
         >> rmpath(d); rmdir(d, 's');
         \enddoctest
+        \endlang
 
         \identifier{ob} */
     virtual casadi_int get_n_out();
@@ -492,6 +526,7 @@ namespace casadi {
         Called during construct() for i in 0..n_in-1. Default: scalar (1-by-1 dense).
         Inputs are padded or projected to this pattern when the Function is called.
 
+        \lang{python}
         \doctest
         >>> class Trace(Callback):
         ...   def __init__(self, name, n, opts={}):
@@ -505,8 +540,10 @@ namespace casadi {
         >>> f.sparsity_in(0), f(DM.ones(3, 3))
         (Sparsity(3x3,3nz), DM(3))
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> c = {'classdef TraceCb < casadi.Callback', 'properties', 'n', 'end', 'methods'};
         >> c = [c, {'function self = TraceCb(name, n)'}];
         >> c = [c, {'self@casadi.Callback(); self.n = n; construct(self, name);', 'end'}];
@@ -521,6 +558,7 @@ namespace casadi {
         3
         >> rmpath(d); rmdir(d, 's');
         \enddoctest
+        \endlang
 
         \identifier{oc} */
     virtual Sparsity get_sparsity_in(casadi_int i);
@@ -538,6 +576,7 @@ namespace casadi {
         Called during construct(). Default: "i0", "i1", ... Names allow calling the Function
         with keyword arguments.
 
+        \lang{python}
         \doctest
         >>> class Lin(Callback):
         ...   def __init__(self, name, opts={}):
@@ -554,8 +593,10 @@ namespace casadi {
         >>> f(x=2, a=3)
         {'y': DM(6)}
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> c = {'classdef Lin < casadi.Callback', 'methods'};
         >> c = [c, {'function self = Lin(name)'}];
         >> c = [c, {'self@casadi.Callback(); construct(self, name);', 'end'}];
@@ -573,6 +614,7 @@ namespace casadi {
         6
         >> rmpath(d); rmdir(d, 's');
         \enddoctest
+        \endlang
 
         \identifier{oe} */
     virtual std::string get_name_in(casadi_int i);
@@ -591,6 +633,7 @@ namespace casadi {
         passed as empty (all-zero sparsity) placeholders; return true to receive the actual
         output values, e.g. to reuse them in the derivative computation.
 
+        \lang{python}
         \doctest
         >>> class Sq(Callback):
         ...   def __init__(self, name, opts={}):
@@ -608,8 +651,10 @@ namespace casadi {
         >>> Sq("f").jacobian().sparsity_in(1), SqU("f").jacobian().sparsity_in(1)
         (Sparsity(1x1,0nz), Sparsity(1x1))
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> c = {'classdef SqJac < casadi.Callback', 'methods'};
         >> c = [c, {'function self = SqJac(name)'}];
         >> c = [c, {'self@casadi.Callback(); construct(self, name);', 'end'}];
@@ -632,6 +677,7 @@ namespace casadi {
         1x1
         >> rmpath(d); rmdir(d, 's');
         \enddoctest
+        \endlang
 
         \identifier{og} */
     virtual bool uses_output() const;
@@ -659,6 +705,7 @@ namespace casadi {
         Function may be an SX/MX Function (then higher derivatives are exact) or another
         Callback (keep a reference to it).
 
+        \lang{python}
         \doctest
         >>> class F43(Callback):
         ...   def __init__(self, name, opts={}):
@@ -687,8 +734,10 @@ namespace casadi {
          [2, 0, 1, 0],
          [0, 4, 5, 0]])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> c = {'classdef F43 < casadi.Callback', 'methods'};
         >> c = [c, {'function self = F43(name)'}];
         >> c = [c, {'self@casadi.Callback(); construct(self, name);', 'end'}];
@@ -720,6 +769,7 @@ namespace casadi {
          [0, 4, 5, 0]]
         >> rmpath(d); rmdir(d, 's');
         \enddoctest
+        \endlang
 
         \identifier{oh} */
     virtual bool has_jacobian() const;
@@ -738,6 +788,7 @@ namespace casadi {
         sensitivity per output. For nfwd>1 the seeds and sensitivities are horizontally
         stacked (n-by-nfwd*m). forward(nfwd) on the Function caches the result.
 
+        \lang{python}
         \doctest
         >>> class Sq(Callback):
         ...   def __init__(self, name, opts={}):
@@ -757,8 +808,10 @@ namespace casadi {
         >>> J(3)
         DM(6)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> c = {'classdef SqFwd < casadi.Callback', 'methods'};
         >> c = [c, {'function self = SqFwd(name)'}];
         >> c = [c, {'self@casadi.Callback(); construct(self, name);', 'end'}];
@@ -783,6 +836,7 @@ namespace casadi {
         6
         >> rmpath(d); rmdir(d, 's');
         \enddoctest
+        \endlang
 
         \identifier{oi} */
     virtual bool has_forward(casadi_int nfwd) const;
@@ -801,6 +855,7 @@ namespace casadi {
         seeds and sensitivities are horizontally stacked. Reverse mode is what gradient-based
         NLP solvers use for the objective gradient. reverse(nadj) caches the result.
 
+        \lang{python}
         \doctest
         >>> class Sq(Callback):
         ...   def __init__(self, name, opts={}):
@@ -820,8 +875,10 @@ namespace casadi {
         >>> G(3)
         DM(6)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> c = {'classdef SqAdj < casadi.Callback', 'methods'};
         >> c = [c, {'function self = SqAdj(name)'}];
         >> c = [c, {'self@casadi.Callback(); construct(self, name);', 'end'}];
@@ -846,6 +903,7 @@ namespace casadi {
         6
         >> rmpath(d); rmdir(d, 's');
         \enddoctest
+        \endlang
 
         \identifier{oj} */
     virtual bool has_reverse(casadi_int nadj) const;
@@ -864,6 +922,7 @@ namespace casadi {
         Finite differencing exploits the pattern (fewer evaluations) and the result of
         jacobian() carries it.
 
+        \lang{python}
         \doctest
         >>> class Diag(Callback):
         ...   def __init__(self, name, opts={}):
@@ -886,8 +945,10 @@ namespace casadi {
          [00, 4, 00],
          [00, 00, 6]])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> c = {'classdef DiagCb < casadi.Callback', 'methods'};
         >> c = [c, {'function self = DiagCb(name, opts)'}];
         >> c = [c, {'self@casadi.Callback(); construct(self, name, opts);', 'end'}];
@@ -910,6 +971,7 @@ namespace casadi {
          [00, 00, 6]]
         >> rmpath(d); rmdir(d, 's');
         \enddoctest
+        \endlang
 
         \identifier{ok} */
     virtual bool has_jac_sparsity(casadi_int oind, casadi_int iind) const { return false; }

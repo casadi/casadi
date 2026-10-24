@@ -442,6 +442,17 @@ def DM_from_csc(m, check_only=True):
 
 %feature("customdoc", "1");
 
+// Docstrings keep the \lang groups of the target language
+#if defined(SWIGMATLAB) || defined(SWIGOCTAVE)
+%feature("docstring:lang", "matlab");
+#elif defined(SWIGJULIA)
+%feature("docstring:lang", "julia");
+#elif defined(SWIGWASMJS)
+%feature("docstring:lang", "javascript");
+#else
+%feature("docstring:lang", "python");
+#endif
+
 %feature("customdoc:arg:self", "self");
 
 #if defined(SWIGMATLAB) || defined(SWIGOCTAVE)

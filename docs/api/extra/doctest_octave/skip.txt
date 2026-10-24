@@ -1,4 +1,4 @@
-# \doctest{matlab} blocks skipped under Octave (MATLAB-only behaviour or display).
+# \lang{matlab} \doctest blocks skipped under Octave (MATLAB-only behaviour or display).
 # <header>|<a statement of the block>  # reason. A block containing that exact statement is skipped.
 conic.hpp|delete(fn)  # delete() with an output request fails
 dae_builder.hpp|contains(msg, 'Could not open file')  # cell array display / error text differ

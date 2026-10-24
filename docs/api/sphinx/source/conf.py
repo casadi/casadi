@@ -209,6 +209,27 @@ except (OSError, ValueError):
     _SIDECAR = {}
 _LEXER = {'matlab': 'matlabsession', 'julia': 'jlcon', 'javascript': 'javascript'}
 
+def _tag_prose(out, prose, pad, cls):
+    """Wrap the paragraphs in prose that end out (up to blank lines) in a container tagged cls."""
+    end = len(out)
+    while end and not out[end - 1].strip():
+        end -= 1
+    start = end
+    while start:
+        k = start
+        while k and out[k - 1].strip():
+            k -= 1
+        if not k < start or ' '.join(l.strip() for l in out[k:start]) not in prose:
+            break
+        start = k
+        while start and not out[start - 1].strip():
+            start -= 1
+    while start < end and not out[start].strip():
+        start += 1
+    if start < end:
+        body = [pad + '   ' + l[len(pad):] if l.strip() else '' for l in out[start:end]]
+        out[start:] = [pad + '.. container:: ' + cls, ''] + body + ['']
+
 def _tag_examples(lines):
     """Turn '::' blocks of >>> examples into tagged pycon blocks; add their translations."""
     out, i = [], 0
@@ -226,16 +247,29 @@ def _tag_examples(lines):
             out += lines[i:j]; i = j; continue
         key = '\n'.join(l.strip() for l in content)
         extra = _SIDECAR.get(key, [])
+        prose = {' '.join(l.strip() for l in t.split('\n'))
+                 for lang, parts in extra if lang == 'python' for _, t in parts}
+        extra = [e for e in extra if e[0] != 'python']
         langs = {lang for lang, _ in extra}
         pad = ' ' * ind
         cls = 'doctest doctest-python' + ''.join(' has-' + l for l in sorted(langs))
+        if prose:
+            _tag_prose(out, prose, pad, cls)
         out += [pad + '.. code-block:: pycon', pad + '   :class: ' + cls, '']
         cind = min(len(l) - len(l.lstrip()) for l in content)
         out += [pad + '   ' + l[cind:] if l.strip() else '' for l in body]
-        for lang, text in extra:
-            out += ['', pad + '.. code-block:: ' + _LEXER.get(lang, 'text'),
-                    pad + '   :class: doctest doctest-' + lang, '']
-            out += [pad + '   ' + l if l.strip() else '' for l in text.split('\n')]
+        for lang, parts in extra:
+            sub = pad
+            if len(parts) > 1 or parts[0][0] != 'doctest':  # prose too: one tagged container
+                out += ['', pad + '.. container:: doctest doctest-' + lang]
+                sub = pad + '   '
+            for kind, text in parts:
+                if kind == 'text':
+                    out += [''] + [sub + l for l in text.split('\n')]
+                    continue
+                out += ['', sub + '.. code-block:: ' + (_LEXER.get(lang, 'text') if kind == 'doctest' else 'text'),
+                        sub + '   :class: doctest doctest-' + lang, '']
+                out += [sub + '   ' + l if l.strip() else '' for l in text.split('\n')]
         out.append('')
         i = j
     return out

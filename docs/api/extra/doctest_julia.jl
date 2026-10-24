@@ -2,7 +2,7 @@
 #
 # Usage: julia docs/api/extra/doctest_julia.jl <blocks.txt>
 # The file holds blocks separated by lines `#### <name>`; each block is the text between
-# \doctest{julia} and \enddoctest. Needs CASADI_JL pointing at a dir holding CasADiNative.jl
+# \doctest and \enddoctest of a \lang{julia} group. Needs CASADI_JL pointing at a dir holding CasADiNative.jl
 # (default: the worktree build dir swig/julia/CasADiNative). Exit code = number of failing blocks.
 
 const _jl_dir = get(ENV, "CASADI_JL", joinpath(@__DIR__, "..", "..", "..", "build", "swig", "julia", "CasADiNative"))

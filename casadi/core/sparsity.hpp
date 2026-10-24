@@ -110,6 +110,7 @@ namespace casadi {
    result of a coloring that exceeds its cutoff. Empty patterns are allowed: a 0-by-n or
    n-by-0 pattern has no nonzeros, is dense, and is_empty() is true for it.
 
+      \lang{python}
       \doctest
       >>> sp = Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3])
       >>> DM(sp, 1)
@@ -133,8 +134,10 @@ namespace casadi {
       >>> Sparsity.dense(0, 3), Sparsity().is_null()
       (Sparsity(0x3), True)
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> sp = Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3]);
       >> full(DM(sp, 1))
       1 0 0 1
@@ -157,6 +160,7 @@ namespace casadi {
       0x3
       1
       \enddoctest
+      \endlang
 
    * \see Matrix
    *
@@ -178,6 +182,7 @@ namespace casadi {
 
         \param dummy Must be 0 (any other value raises an error)
 
+        \lang{python}
         \doctest
         >>> sp = Sparsity()
         >>> sp.is_null(), sp
@@ -186,8 +191,10 @@ namespace casadi {
         ... except Exception as e: print("error")
         error
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> sp = Sparsity();
         >> sp.is_null(), sp
         1
@@ -195,6 +202,7 @@ namespace casadi {
         >> try, sp.nnz(); catch e, disp('error'); end
         error
         \enddoctest
+        \endlang
 
         \identifier{2nj} */
     explicit Sparsity(casadi_int dummy=0);
@@ -204,6 +212,7 @@ namespace casadi {
         \param nrow Number of rows, nonnegative
         \param ncol Number of columns, nonnegative
 
+        \lang{python}
         \doctest
         >>> sp = Sparsity(2, 3)
         >>> sp, sp.nnz(), sp.is_dense()
@@ -215,8 +224,10 @@ namespace casadi {
         [[00, 00],
          [00, 00]])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> sp = Sparsity(2, 3);
         >> sp, sp.nnz(), sp.is_dense()
         2x3,0nz
@@ -229,6 +240,7 @@ namespace casadi {
         0 0
         0 0
         \enddoctest
+        \endlang
 
         \sa dense, is_empty
 
@@ -248,6 +260,7 @@ namespace casadi {
         An invalid colind or an out-of-range row index raises an error. A pattern
         with colind[ncol] == nrow*ncol is the dense pattern.
 
+        \lang{python}
         \doctest
         >>> sp = Sparsity(3, 2, [0, 2, 3], [0, 2, 1])
         >>> DM(sp, 1)
@@ -263,8 +276,10 @@ namespace casadi {
         >>> Sparsity(3, 2, [0, 2, 3], [2, 0, 1], True).row()
         [0, 2, 1]
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> sp = Sparsity(3, 2, [0, 2, 3], [0, 2, 1]);
         >> full(DM(sp, 1))
         1 0
@@ -277,6 +292,7 @@ namespace casadi {
         >> Sparsity(3, 2, [0, 2, 3], [2, 0, 1], true).row()
         0 2 1
         \enddoctest
+        \endlang
 
         \sa compressed, triplet, get_ccs
 
@@ -317,6 +333,7 @@ namespace casadi {
         \param dense_scalar If true (default), the single entry is a nonzero; if false,
                the pattern is 1-by-1 with zero nonzeros (a structurally zero scalar)
 
+        \lang{python}
         \doctest
         >>> Sparsity.scalar(), Sparsity.scalar().nnz()
         (Sparsity(1x1), 1)
@@ -325,8 +342,10 @@ namespace casadi {
         >>> Sparsity.scalar() == Sparsity.dense(1, 1)
         True
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> Sparsity.scalar(), Sparsity.scalar().nnz()
         1x1
         1
@@ -336,6 +355,7 @@ namespace casadi {
         >> Sparsity.scalar() == Sparsity.dense(1, 1)
         1
         \enddoctest
+        \endlang
 
         \sa dense, is_scalar
 
@@ -355,6 +375,7 @@ namespace casadi {
 
         The shape can also be given as a single pair (nrow, ncol).
 
+        \lang{python}
         \doctest
         >>> sp = Sparsity.dense(2, 3)
         >>> sp, sp.nnz(), sp.is_dense()
@@ -366,8 +387,10 @@ namespace casadi {
         >>> Sparsity.dense(0, 3).nnz(), Sparsity.dense(0, 3).is_dense()
         (0, True)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> sp = Sparsity.dense(2, 3);
         >> sp, sp.nnz(), sp.is_dense()
         2x3
@@ -383,6 +406,7 @@ namespace casadi {
         0
         1
         \enddoctest
+        \endlang
 
         \sa Sparsity(nrow, ncol), scalar, is_dense
 
@@ -399,14 +423,17 @@ namespace casadi {
         \param n Length of the column vector
         \param el Row of the nonzero, in [0, n); an index outside this range raises an error
 
+        \lang{python}
         \doctest
         >>> DM(Sparsity.unit(4, 1), 1)
         DM([00, 1, 00, 00])
         >>> Sparsity.unit(4, 1).row()
         [1]
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> full(DM(Sparsity.unit(4, 1), 1))
         0
         1
@@ -415,6 +442,7 @@ namespace casadi {
         >> Sparsity.unit(4, 1).row()
         1
         \enddoctest
+        \endlang
 
         \sa nonzeros, triplet
 
@@ -430,6 +458,7 @@ namespace casadi {
 
         \param n Size of the square pattern, nonnegative
 
+        \lang{python}
         \doctest
         >>> DM(Sparsity.upper(3), 1)
         DM(
@@ -439,8 +468,10 @@ namespace casadi {
         >>> Sparsity.upper(3).nnz(), Sparsity.upper(3).is_triu()
         (6, True)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> full(DM(Sparsity.upper(3), 1))
         1 1 1
         0 1 1
@@ -449,6 +480,7 @@ namespace casadi {
         6
         1
         \enddoctest
+        \endlang
 
         \sa lower, triu, is_triu
 
@@ -462,6 +494,7 @@ namespace casadi {
 
         \param n Size of the square pattern, nonnegative
 
+        \lang{python}
         \doctest
         >>> DM(Sparsity.lower(3), 1)
         DM(
@@ -473,8 +506,10 @@ namespace casadi {
         [[x_0, 00],
          [x_1, x_2]])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> full(DM(Sparsity.lower(3), 1))
         1 0 0
         1 1 0
@@ -483,6 +518,7 @@ namespace casadi {
         [[x_0, 00],
          [x_1, x_2]]
         \enddoctest
+        \endlang
 
         \sa upper, tril, is_tril
 
@@ -495,6 +531,7 @@ namespace casadi {
         diagonal pattern is allowed. The shape can be given as one integer (square),
         as two integers or as a pair.
 
+        \lang{python}
         \doctest
         >>> DM(Sparsity.diag(3), 1)
         DM(
@@ -508,8 +545,10 @@ namespace casadi {
         >>> Sparsity.diag((4, 2)).nnz(), Sparsity.diag(0).nnz()
         (2, 0)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> full(DM(Sparsity.diag(3), 1))
         1 0 0
         0 1 0
@@ -521,6 +560,7 @@ namespace casadi {
         2
         0
         \enddoctest
+        \endlang
 
         \sa band, is_diag, get_diag
 
@@ -542,6 +582,7 @@ namespace casadi {
         \param p Offset of the band from the diagonal, positive below the diagonal and
                negative above it; |p| must be smaller than \p n, otherwise an error is raised
 
+        \lang{python}
         \doctest
         >>> DM(Sparsity.band(4, 1), 1)
         DM(
@@ -558,8 +599,10 @@ namespace casadi {
         >>> Sparsity.band(4, 0) == Sparsity.diag(4)
         True
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> full(DM(Sparsity.band(4, 1), 1))
         0 0 0 0
         1 0 0 0
@@ -573,6 +616,7 @@ namespace casadi {
         >> Sparsity.band(4, 0) == Sparsity.diag(4)
         1
         \enddoctest
+        \endlang
 
         \sa banded, diag
 
@@ -588,6 +632,7 @@ namespace casadi {
         \param p Half-bandwidth; \p p >= n gives a dense pattern and a negative \p p an
                all-zero pattern
 
+        \lang{python}
         \doctest
         >>> DM(Sparsity.banded(4, 1), 1)
         DM(
@@ -598,8 +643,10 @@ namespace casadi {
         >>> Sparsity.banded(4, 1).bw_upper(), Sparsity.banded(4, 1).bw_lower()
         (1, 1)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> full(DM(Sparsity.banded(4, 1), 1))
         1 1 0 0
         1 1 1 0
@@ -608,6 +655,7 @@ namespace casadi {
         >> [Sparsity.banded(4, 1).bw_upper(), Sparsity.banded(4, 1).bw_lower()]
         1 1
         \enddoctest
+        \endlang
 
         \sa band, bw_upper, bw_lower
 
@@ -624,6 +672,7 @@ namespace casadi {
         \param nrow Number of rows of the pattern
         \param ncol Number of columns of the pattern
 
+        \lang{python}
         \doctest
         >>> DM(Sparsity.rowcol([0, 2], [1, 2], 3, 4), 1)
         DM(
@@ -633,8 +682,10 @@ namespace casadi {
         >>> Sparsity.rowcol([], [1], 3, 4).nnz()
         0
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> full(DM(Sparsity.rowcol([0, 2], [1, 2], 3, 4), 1))
         0 1 1 0
         0 0 0 0
@@ -642,6 +693,7 @@ namespace casadi {
         >> Sparsity.rowcol([], [1], 3, 4).nnz()
         0
         \enddoctest
+        \endlang
 
         \sa triplet
 
@@ -668,6 +720,7 @@ namespace casadi {
         (length nnz(); for duplicates the first occurrence). With \p invert_mapping true,
         mapping[i] is the nonzero index of input entry i (length of the input).
 
+        \lang{python}
         \doctest
         >>> DM(Sparsity.triplet(3, 3, [0, 2, 1], [0, 0, 2]), 1)
         DM(
@@ -686,8 +739,10 @@ namespace casadi {
         ... except Exception as e: print("out of bounds")
         out of bounds
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> full(DM(Sparsity.triplet(3, 3, [0, 2, 1], [0, 0, 2]), 1))
         1 0 0
         0 0 1
@@ -701,6 +756,7 @@ namespace casadi {
         >> try, Sparsity.triplet(2, 2, [0, 2], [0, 0]); catch e, disp('out of bounds'); end
         out of bounds
         \enddoctest
+        \endlang
 
         \sa get_triplet, rowcol, nonzeros, Sparsity(nrow, ncol, colind, row)
 
@@ -722,6 +778,7 @@ namespace casadi {
         \param nz Flat indices, each in [0, nrow*ncol); an index out of range raises an error
         \param ind1 If true, the indices are one-based
 
+        \lang{python}
         \doctest
         >>> DM(Sparsity.nonzeros(3, 2, [0, 4]), 1)
         DM(
@@ -734,8 +791,10 @@ namespace casadi {
         >>> Sparsity.nonzeros(3, 2, [1, 5], True) == Sparsity.nonzeros(3, 2, [0, 4])
         True
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> full(DM(Sparsity.nonzeros(3, 2, [1, 5]), 1))
         1 0
         0 1
@@ -746,6 +805,7 @@ namespace casadi {
         >> Sparsity.nonzeros(3, 2, [0, 4], false) == Sparsity.nonzeros(3, 2, [1, 5])
         1
         \enddoctest
+        \endlang
 
         \sa find, triplet
 
@@ -764,6 +824,7 @@ namespace casadi {
         \param order_rows If true, unsorted row indices within a column are sorted instead
                of raising an error
 
+        \lang{python}
         \doctest
         >>> sp = Sparsity.compressed([3, 2, 0, 1, 2, 0, 2])
         >>> DM(sp, 1)
@@ -776,8 +837,10 @@ namespace casadi {
         >>> Sparsity.compressed([2, 2, 0, 2, 4])
         Sparsity(2x2)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> sp = Sparsity.compressed([3, 2, 0, 1, 2, 0, 2]);
         >> full(DM(sp, 1))
         1 0
@@ -788,6 +851,7 @@ namespace casadi {
         >> Sparsity.compressed([2, 2, 0, 2, 4])
         2x2
         \enddoctest
+        \endlang
 
         \sa compress, Sparsity(nrow, ncol, colind, row)
 
@@ -810,6 +874,7 @@ namespace casadi {
                anything else raises an error
         \param invert If true, build the inverse (transposed) permutation
 
+        \lang{python}
         \doctest
         >>> P = Sparsity.permutation([2, 0, 1])
         >>> DM(P, 1)
@@ -827,8 +892,10 @@ namespace casadi {
         ... except Exception as e: print("not a permutation")
         not a permutation
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> P = Sparsity.permutation([2, 0, 1]);
         >> full(DM(P, 1))
         0 0 1
@@ -843,6 +910,7 @@ namespace casadi {
         >> try, Sparsity.permutation([0, 0, 1]); catch e, disp('not a permutation'); end
         not a permutation
         \enddoctest
+        \endlang
 
         \sa permutation_vector, is_permutation, pmult
 
@@ -856,6 +924,7 @@ namespace casadi {
 
         \param invert If true, return the inverse permutation instead
 
+        \lang{python}
         \doctest
         >>> Sparsity.permutation([2, 0, 1]).permutation_vector()
         [2, 0, 1]
@@ -865,8 +934,10 @@ namespace casadi {
         ... except Exception as e: print("not a permutation matrix")
         not a permutation matrix
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> Sparsity.permutation([2, 0, 1]).permutation_vector()
         2 0 1
         >> Sparsity.permutation([2, 0, 1]).permutation_vector(true)
@@ -874,6 +945,7 @@ namespace casadi {
         >> try, Sparsity.dense(2, 2).permutation_vector(); catch e, disp('not a permutation'); end
         not a permutation
         \enddoctest
+        \endlang
 
         \sa permutation, is_permutation
 
@@ -890,6 +962,7 @@ namespace casadi {
         \return The pattern and a mapping: mapping[k] is the nonzero index in the original
                 pattern of nonzero k of the result
 
+        \lang{python}
         \doctest
         >>> sp, mapping = Sparsity.banded(3, 1).get_diag()
         >>> sp, mapping
@@ -904,8 +977,10 @@ namespace casadi {
         >>> sp, mapping
         (Sparsity(2x1,0nz), [])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> [sp, mapping] = Sparsity.banded(3, 1).get_diag(); disp(sp), disp(mapping)
         3x1
         0 3 6
@@ -918,6 +993,7 @@ namespace casadi {
         2x1,0nz
         1
         \enddoctest
+        \endlang
 
         \sa diag, nnz_diag
 
@@ -931,6 +1007,7 @@ namespace casadi {
         is abbreviated to [nrow, ncol, 1] (an abbreviation that compressed() given a
         vector does not accept).
 
+        \lang{python}
         \doctest
         >>> Sparsity.diag(2).compress()
         [2, 2, 0, 1, 2, 0, 1]
@@ -941,8 +1018,10 @@ namespace casadi {
         >>> Sparsity(0, 2).compress()
         [0, 2, 0, 0, 0]
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> Sparsity.diag(2).compress()
         2 2 0 1 2 0 1
         >> Sparsity.dense(2, 2).compress()
@@ -952,6 +1031,7 @@ namespace casadi {
         >> Sparsity(0, 2).compress()
         0 2 0 0 0
         \enddoctest
+        \endlang
 
         \sa compressed, get_ccs
 
@@ -972,6 +1052,7 @@ namespace casadi {
         otherwise colind and row are compared. The second overload compares against a
         pattern given in compressed column storage vectors.
 
+        \lang{python}
         \doctest
         >>> a = Sparsity.diag(2)
         >>> a.is_equal(Sparsity.diag(2)), a == Sparsity.diag(2), a != Sparsity.dense(2, 2)
@@ -983,8 +1064,10 @@ namespace casadi {
         >>> Sparsity(2, 2) == Sparsity.dense(2, 2)
         False
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> a = Sparsity.diag(2);
         >> a.is_equal(Sparsity.diag(2)), a == Sparsity.diag(2)
         1
@@ -998,6 +1081,7 @@ namespace casadi {
         >> Sparsity(2, 2) == Sparsity.dense(2, 2)
         0
         \enddoctest
+        \endlang
 
         \sa is_subset, is_transpose, is_reshape, hash
 
@@ -1023,6 +1107,7 @@ namespace casadi {
         pattern of repmat(y, 1, n). The patterns are compared structurally, so a dense
         pattern of the right shape does not count as a stack of a sparse one.
 
+        \lang{python}
         \doctest
         >>> sp = horzcat(Sparsity.diag(2), Sparsity.diag(2), Sparsity.diag(2))
         >>> sp.is_stacked(Sparsity.diag(2), 3), sp.is_stacked(Sparsity.diag(2), 2)
@@ -1030,8 +1115,10 @@ namespace casadi {
         >>> Sparsity.dense(2, 6).is_stacked(Sparsity.diag(2), 3)
         False
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> sp = [Sparsity.diag(2), Sparsity.diag(2), Sparsity.diag(2)];
         >> sp.is_stacked(Sparsity.diag(2), 3), sp.is_stacked(Sparsity.diag(2), 2)
         1
@@ -1039,6 +1126,7 @@ namespace casadi {
         >> Sparsity.dense(2, 6).is_stacked(Sparsity.diag(2), 3)
         0
         \enddoctest
+        \endlang
 
         \sa is_equal, horzcat
 
@@ -1070,17 +1158,21 @@ namespace casadi {
 
     /** \brief Number of rows
 
+        \lang{python}
         \doctest
         >>> sp = Sparsity.diag(2, 3)
         >>> sp.size1(), sp.rows(), sp.size2(), sp.columns()
         (2, 2, 3, 3)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> sp = Sparsity.diag(2, 3);
         >> fprintf('%d %d %d %d\n', sp.size1(), sp.rows(), sp.size2(), sp.columns())
         2 2 3 3
         \enddoctest
+        \endlang
 
         \sa size2, size, numel
 
@@ -1100,17 +1192,21 @@ namespace casadi {
 
         The product may overflow for very large shapes; nnz() never exceeds it.
 
+        \lang{python}
         \doctest
         >>> sp = Sparsity.diag(2, 3)
         >>> sp.numel(), sp.nnz(), Sparsity(0, 3).numel()
         (6, 2, 0)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> sp = Sparsity.diag(2, 3);
         >> fprintf('%d %d %d\n', sp.numel(), sp.nnz(), Sparsity(0, 3).numel())
         6 2 0
         \enddoctest
+        \endlang
 
         \sa nnz, size
 
@@ -1122,19 +1218,23 @@ namespace casadi {
         Computed in floating point, so it does not overflow for large shapes.
         An empty pattern (numel() == 0) is dense and gives 100.
 
+        \lang{python}
         \doctest
         >>> Sparsity.diag(4).density(), Sparsity.dense(2, 2).density()
         (25.0, 100.0)
         >>> Sparsity(0, 3).density()
         100.0
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> fprintf('%g %g\n', Sparsity.diag(4).density(), Sparsity.dense(2, 2).density())
         25 100
         >> Sparsity(0, 3).density()
         100
         \enddoctest
+        \endlang
 
         \sa nnz, numel, is_dense
 
@@ -1148,6 +1248,7 @@ namespace casadi {
 
         A pattern without nonzeros but with positive dimensions is not empty.
 
+        \lang{python}
         \doctest
         >>> Sparsity(0, 3).is_empty(), Sparsity(0, 3).is_empty(True)
         (True, False)
@@ -1156,8 +1257,10 @@ namespace casadi {
         >>> Sparsity(3, 3).is_empty(), Sparsity(3, 3).nnz()
         (False, 0)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> Sparsity(0, 3).is_empty(), Sparsity(0, 3).is_empty(true)
         1
         0
@@ -1167,6 +1270,7 @@ namespace casadi {
         0
         0
         \enddoctest
+        \endlang
 
         \sa numel, nnz
 
@@ -1189,6 +1293,7 @@ namespace casadi {
 
         Defined for any shape, not only square patterns.
 
+        \lang{python}
         \doctest
         >>> sp = Sparsity.dense(3, 3)
         >>> sp.nnz_upper(), sp.nnz_upper(True), sp.nnz_lower(), sp.nnz_lower(True)
@@ -1201,8 +1306,10 @@ namespace casadi {
         >>> Sparsity.lower(3).nnz_upper(), Sparsity.lower(3).nnz_upper(True)
         (3, 0)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> sp = Sparsity.dense(3, 3);
         >> [sp.nnz_upper(), sp.nnz_upper(true), sp.nnz_lower(), sp.nnz_lower(true)]
         6 3 6 3
@@ -1214,6 +1321,7 @@ namespace casadi {
         >> [Sparsity.lower(3).nnz_upper(), Sparsity.lower(3).nnz_upper(true)]
         3 0
         \enddoctest
+        \endlang
 
         \sa nnz_lower, nnz_diag, get_upper, is_triu
 
@@ -1240,6 +1348,7 @@ namespace casadi {
 
         Zero for a diagonal, lower triangular or all-zero pattern.
 
+        \lang{python}
         \doctest
         >>> Sparsity.banded(5, 2).bw_upper(), Sparsity.band(5, -2).bw_upper()
         (2, 2)
@@ -1248,8 +1357,10 @@ namespace casadi {
         >>> Sparsity(3, 3).bw_upper(), Sparsity.dense(2, 5).bw_upper()
         (0, 4)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> [Sparsity.banded(5, 2).bw_upper(), Sparsity.band(5, -2).bw_upper()]
         2 2
         >> [Sparsity.band(5, 2).bw_upper(), Sparsity.diag(3).bw_upper()]
@@ -1257,6 +1368,7 @@ namespace casadi {
         >> [Sparsity(3, 3).bw_upper(), Sparsity.dense(2, 5).bw_upper()]
         0 4
         \enddoctest
+        \endlang
 
         \sa bw_lower, banded
 
@@ -1267,6 +1379,7 @@ namespace casadi {
 
         Zero for a diagonal, upper triangular or all-zero pattern.
 
+        \lang{python}
         \doctest
         >>> Sparsity.banded(5, 2).bw_lower(), Sparsity.band(5, 2).bw_lower()
         (2, 2)
@@ -1275,8 +1388,10 @@ namespace casadi {
         >>> Sparsity.dense(5, 2).bw_lower()
         4
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> [Sparsity.banded(5, 2).bw_lower(), Sparsity.band(5, 2).bw_lower()]
         2 2
         >> Sparsity.band(5, -2).bw_lower()
@@ -1284,6 +1399,7 @@ namespace casadi {
         >> Sparsity.dense(5, 2).bw_lower()
         4
         \enddoctest
+        \endlang
 
         \sa bw_upper, banded
 
@@ -1292,13 +1408,16 @@ namespace casadi {
 
     /** \brief Shape as a pair (number of rows, number of columns)
 
+        \lang{python}
         \doctest
         >>> sp = Sparsity.diag(2, 3)
         >>> sp.size(), sp.size(1), sp.size(2), sp.shape
         ((2, 3), 2, 3, (2, 3))
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> sp = Sparsity.diag(2, 3);
         >> size(sp), sp.size(1), sp.size(2)
         2 3
@@ -1307,6 +1426,7 @@ namespace casadi {
         >> [m, n] = size(sp); fprintf('%d %d\n', m, n)
         2 3
         \enddoctest
+        \endlang
 
         \sa size1, size2, numel
 
@@ -1326,14 +1446,17 @@ namespace casadi {
 
         An empty dictionary for a null object.
 
+        \lang{python}
         \doctest
         >>> Sparsity.diag(2, 3).info()
         {'colind': [0, 1, 2, 2], 'ncol': 3, 'nrow': 2, 'row': [0, 1]}
         >>> Sparsity().info()
         {}
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> s = Sparsity.diag(2, 3).info(); disp(s)
         colind: [0 1 2 2]
         ncol: 3
@@ -1342,6 +1465,7 @@ namespace casadi {
         >> isempty(fieldnames(Sparsity().info()))
         1
         \enddoctest
+        \endlang
 
         \sa get_ccs, compress
 
@@ -1357,6 +1481,7 @@ namespace casadi {
         \param filename Path of the file to write
         \param format_hint Format name, e.g. "mtx", when the extension does not tell
 
+        \lang{python}
         \doctest
         >>> import os, tempfile
         >>> d = tempfile.mkdtemp()
@@ -1376,8 +1501,10 @@ namespace casadi {
         ... except Exception as e: print("unknown extension")
         unknown extension
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> f = [tempname '.mtx'];
         >> sp = Sparsity.triplet(3, 2, [0, 2, 1], [0, 0, 1]);
         >> sp.to_file(f);
@@ -1393,6 +1520,7 @@ namespace casadi {
         >> try, sp.to_file('pattern.txt'); catch e, disp('unknown extension'); end
         unknown extension
         \enddoctest
+        \endlang
 
         \sa from_file, DM::to_file
 
@@ -1422,6 +1550,7 @@ namespace casadi {
         A null object serializes and deserializes as a null object. Pickling in Python uses
         this mechanism.
 
+        \lang{python}
         \doctest
         >>> s = Sparsity.diag(2, 3).serialize()
         >>> type(s).__name__, Sparsity.deserialize(s) == Sparsity.diag(2, 3)
@@ -1432,8 +1561,10 @@ namespace casadi {
         >>> pickle.loads(pickle.dumps(Sparsity.diag(2, 3)))
         Sparsity(2x3,2nz)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> s = Sparsity.diag(2, 3).serialize();
         >> class(s), Sparsity.deserialize(s) == Sparsity.diag(2, 3)
         char
@@ -1441,6 +1572,7 @@ namespace casadi {
         >> Sparsity.deserialize(Sparsity().serialize()).is_null()
         1
         \enddoctest
+        \endlang
 
         \sa deserialize, compress
 
@@ -1489,6 +1621,7 @@ namespace casadi {
         the pattern; together with get_col() it is the triplet form. In the target languages
         this method is called row(), the same name as the single-element accessor.
 
+        \lang{python}
         \doctest
         >>> sp = Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3])
         >>> DM(sp, 1)
@@ -1503,8 +1636,10 @@ namespace casadi {
         >>> Sparsity(0, 2).colind(), Sparsity(2, 0).colind()
         ([0, 0, 0], [0])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> sp = Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3]);
         >> full(DM(sp, 1))
         1 0 0 1
@@ -1521,6 +1656,7 @@ namespace casadi {
         0 0 0
         0
         \enddoctest
+        \endlang
 
         \sa get_colind, get_col, get_ccs, get_triplet
 
@@ -1543,6 +1679,7 @@ namespace casadi {
         \param cc Column, in [0, size2()]; colind(size2()) equals nnz(). An index out of
                range raises an error.
 
+        \lang{python}
         \doctest
         >>> sp = Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3])
         >>> sp.row(1), sp.colind(1), sp.colind(4)
@@ -1551,14 +1688,17 @@ namespace casadi {
         ... except Exception as e: print("out of range")
         out of range
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> sp = Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3]);
         >> [sp.row(1), sp.colind(1), sp.colind(4)]
         2 2 4
         >> try, sp.row(4); catch e, disp('out of range'); end
         out of range
         \enddoctest
+        \endlang
 
         \sa row, get_colind
 
@@ -1594,6 +1734,7 @@ namespace casadi {
         \param nrow New number of rows, nonnegative
         \param ncol New number of columns, nonnegative
 
+        \lang{python}
         \doctest
         >>> sp = Sparsity.dense(3, 3); sp.resize(2, 2); print(sp)
         2x2
@@ -1605,8 +1746,10 @@ namespace casadi {
         >>> sp.resize(0, 2); print(sp)
         0x2
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> sp = Sparsity.dense(3, 3); sp.resize(2, 2); disp(sp)
         2x2
         >> sp.resize(4, 4); disp(full(DM(sp, 1)))
@@ -1617,6 +1760,7 @@ namespace casadi {
         >> sp.resize(0, 2); disp(sp)
         0x2
         \enddoctest
+        \endlang
 
         \sa enlarge, reshape
 
@@ -1630,6 +1774,7 @@ namespace casadi {
         shift by one). Negative indices count from the end. An index out of bounds raises
         an error.
 
+        \lang{python}
         \doctest
         >>> sp = Sparsity(3, 3)
         >>> sp.add_nz(1, 1), sp.add_nz(0, 0), sp.add_nz(1, 1), sp
@@ -1643,8 +1788,10 @@ namespace casadi {
         ... except Exception as e: print("out of bounds")
         out of bounds
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> sp = Sparsity(3, 3);
         >> [sp.add_nz(1, 1), sp.add_nz(0, 0), sp.add_nz(1, 1)], sp
         0 0 1
@@ -1656,6 +1803,7 @@ namespace casadi {
         >> try, sp.add_nz(3, 0); catch e, disp('out of bounds'); end
         out of bounds
         \enddoctest
+        \endlang
 
         \sa get_nz, has_nz
 
@@ -1668,6 +1816,7 @@ namespace casadi {
         For a dense pattern the result is rr + cc*size1(). The returned index addresses
         the nonzeros() vector of a matrix with this pattern.
 
+        \lang{python}
         \doctest
         >>> sp = Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3])
         >>> sp.get_nz(0, 0), sp.get_nz(2, 0), sp.get_nz(1, 0), sp.get_nz(-1, 0)
@@ -1676,14 +1825,17 @@ namespace casadi {
         ... except Exception as e: print("out of bounds")
         out of bounds
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> sp = Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3]);
         >> [sp.get_nz(0, 0), sp.get_nz(2, 0), sp.get_nz(1, 0), sp.get_nz(-1, 0)]
         0 1 -1 1
         >> try, sp.get_nz(3, 0); catch e, disp('out of bounds'); end
         out of bounds
         \enddoctest
+        \endlang
 
         \sa has_nz, add_nz, find
 
@@ -1694,17 +1846,21 @@ namespace casadi {
 
         Same index rules as get_nz.
 
+        \lang{python}
         \doctest
         >>> sp = Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3])
         >>> sp.has_nz(2, 0), sp.has_nz(1, 0)
         (True, False)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> sp = Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3]);
         >> [sp.has_nz(2, 0), sp.has_nz(1, 0)]
         1 0
         \enddoctest
+        \endlang
 
         \sa get_nz
 
@@ -1717,17 +1873,21 @@ namespace casadi {
         block (all rows of the first column first); -1 marks a structural zero. Indices must
         be in range (no negative indices); otherwise an error is raised.
 
+        \lang{python}
         \doctest
         >>> sp = Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3])
         >>> sp.get_nz([0, 2], [0, 3])
         [0, 1, 3, -1]
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> sp = Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3]);
         >> sp.get_nz([0, 2], [0, 3])
         0 1 3 -1
         \enddoctest
+        \endlang
 
         \sa get_nz(rr, cc), sub
 
@@ -1741,6 +1901,7 @@ namespace casadi {
         if the element is a structural zero. Entries that are already negative are left
         alone. The indices need not be sorted. An index of numel() or more raises an error.
 
+        \lang{python}
         \doctest
         >>> sp = Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3])
         >>> sp.get_nz([0, 2, 4, 9, 1])
@@ -1748,14 +1909,17 @@ namespace casadi {
         >>> Sparsity.dense(2, 2).get_nz([3, 0])
         [3, 0]
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> sp = Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3]);
         >> sp.get_nz([0, 2, 4, 9, 1])
         0 1 -1 3 -1
         >> Sparsity.dense(2, 2).get_nz([3, 0])
         3 0
         \enddoctest
+        \endlang
 
         \sa find, nonzeros
 
@@ -1764,6 +1928,7 @@ namespace casadi {
 
     /** \brief Nonzero indices of the entries in the lower triangular part (row >= col)
 
+        \lang{python}
         \doctest
         >>> sp = Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3])
         >>> sp.get_lower(), sp.get_upper()
@@ -1771,8 +1936,10 @@ namespace casadi {
         >>> Sparsity.dense(2, 2).get_lower(), Sparsity.dense(2, 2).get_upper()
         ([0, 1, 3], [0, 2, 3])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> sp = Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3]);
         >> sp.get_lower(), sp.get_upper()
         0 1
@@ -1781,6 +1948,7 @@ namespace casadi {
         0 1 3
         0 2 3
         \enddoctest
+        \endlang
 
         \sa get_upper, nnz_lower, tril
 
@@ -1796,19 +1964,23 @@ namespace casadi {
 
     /** \brief The pattern in compressed column storage: the colind and row vectors
 
+        \lang{python}
         \doctest
         >>> sp = Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3])
         >>> colind, row = sp.get_ccs()
         >>> colind, row
         ([0, 2, 2, 3, 4], [0, 2, 1, 0])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> sp = Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3]);
         >> [colind, row] = sp.get_ccs(); disp(colind), disp(row)
         0 2 2 3 4
         0 2 1 0
         \enddoctest
+        \endlang
 
         \sa get_crs, get_triplet, get_colind, get_row
 
@@ -1822,19 +1994,23 @@ namespace casadi {
         resulting order of the nonzeros (row-major) differs from the storage order of the
         pattern.
 
+        \lang{python}
         \doctest
         >>> sp = Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3])
         >>> rowind, col = sp.get_crs()
         >>> rowind, col
         ([0, 2, 3, 4], [0, 3, 2, 0])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> sp = Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3]);
         >> [rowind, col] = sp.get_crs(); disp(rowind), disp(col)
         0 2 3 4
         0 3 2 0
         \enddoctest
+        \endlang
 
         \sa get_ccs, T
 
@@ -1846,19 +2022,23 @@ namespace casadi {
 
         Inverse of triplet(): Sparsity.triplet(nrow, ncol, row, col) rebuilds the pattern.
 
+        \lang{python}
         \doctest
         >>> sp = Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3])
         >>> row, col = sp.get_triplet()
         >>> row, col
         ([0, 2, 1, 0], [0, 0, 2, 3])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> sp = Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3]);
         >> [row, col] = sp.get_triplet(); disp(row), disp(col)
         0 2 1 0
         0 0 2 3
         \enddoctest
+        \endlang
 
         \sa triplet, get_row, get_col
 
@@ -1879,6 +2059,7 @@ namespace casadi {
                 of the result: nonzero k of the submatrix is nonzero mapping[k] of this
                 pattern
 
+        \lang{python}
         \doctest
         >>> sp = Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3])
         >>> sub, mapping = sp.sub([0, 2], [0, 3])
@@ -1896,8 +2077,10 @@ namespace casadi {
         ... except Exception as e: print("out of range")
         out of range
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> sp = Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3]);
         >> [sub, mapping] = sp.sub([0, 2], [0, 3]); disp(full(DM(sub, 1))), disp(mapping)
         1 1
@@ -1912,6 +2095,7 @@ namespace casadi {
         >> try, sp.sub(3, 0); catch e, disp('out of range'); end
         out of range
         \enddoctest
+        \endlang
 
         \sa get_nz, erase, pmult
 
@@ -1934,6 +2118,7 @@ namespace casadi {
         \return The pattern and a mapping: nonzero k of the result is nonzero mapping[k]
                 of this pattern
 
+        \lang{python}
         \doctest
         >>> sp = Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3])
         >>> sub, mapping = sp.sub([0, 2, 9], Sparsity.dense(3, 1))
@@ -1948,8 +2133,10 @@ namespace casadi {
         ... except Exception as e: print("length mismatch")
         length mismatch
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> sp = Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3]);
         >> [sub, mapping] = sp.sub([0, 2, 9], Sparsity.dense(3, 1)); disp(sub), disp(mapping)
         3x1
@@ -1962,6 +2149,7 @@ namespace casadi {
         >> try, sp.sub([0, 2], Sparsity.dense(3, 1)); catch e, disp('length mismatch'); end
         length mismatch
         \enddoctest
+        \endlang
 
         \sa get_nz, find
 
@@ -1974,6 +2162,7 @@ namespace casadi {
         In Python, T is a property (sp.T); the method transpose() also returns the nonzero
         reordering.
 
+        \lang{python}
         \doctest
         >>> sp = Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3])
         >>> DM(sp.T, 1)
@@ -1987,8 +2176,10 @@ namespace casadi {
         >>> Sparsity.dense(2, 3).T, Sparsity(0, 3).T
         (Sparsity(3x2), Sparsity(3x0))
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> sp = Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3]);
         >> full(DM(sp.T, 1))
         1 0 1
@@ -2002,6 +2193,7 @@ namespace casadi {
         3x2
         3x0
         \enddoctest
+        \endlang
 
         \sa transpose, is_transpose, get_crs
 
@@ -2016,19 +2208,23 @@ namespace casadi {
                 of the transpose; with \p invert_mapping true, mapping[k] is the nonzero of
                 the transpose that original nonzero k becomes.
 
+        \lang{python}
         \doctest
         >>> sp = Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3])
         >>> spT, mapping = sp.transpose()
         >>> spT, mapping
         (Sparsity(4x3,4nz), [0, 3, 2, 1])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> sp = Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3]);
         >> [spT, mapping] = sp.transpose(); disp(spT), disp(mapping)
         4x3,4nz
         0 3 2 1
         \enddoctest
+        \endlang
 
         \sa T
 
@@ -2038,6 +2234,7 @@ namespace casadi {
 
     /** \brief Check whether \p y is the transpose of this pattern
 
+        \lang{python}
         \doctest
         >>> Sparsity.band(3, 1).is_transpose(Sparsity.band(3, -1))
         True
@@ -2046,8 +2243,10 @@ namespace casadi {
         >>> Sparsity.dense(2, 3).is_transpose(Sparsity.dense(3, 2))
         True
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> Sparsity.band(3, 1).is_transpose(Sparsity.band(3, -1))
         1
         >> Sparsity.band(3, 1).is_transpose(Sparsity.band(3, 1))
@@ -2055,6 +2254,7 @@ namespace casadi {
         >> Sparsity.dense(2, 3).is_transpose(Sparsity.dense(3, 2))
         1
         \enddoctest
+        \endlang
 
         \sa T, is_symmetric
 
@@ -2066,6 +2266,7 @@ namespace casadi {
         True when both have the same number of elements and the same flat (column-major)
         nonzero positions, i.e. reshape(A, y.size()) has pattern \p y.
 
+        \lang{python}
         \doctest
         >>> Sparsity.dense(2, 3).is_reshape(Sparsity.dense(6, 1))
         True
@@ -2074,8 +2275,10 @@ namespace casadi {
         >>> Sparsity.diag(2).is_reshape(Sparsity.nonzeros(4, 1, [0, 2]))
         False
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> Sparsity.dense(2, 3).is_reshape(Sparsity.dense(6, 1))
         1
         >> Sparsity.diag(2).is_reshape(Sparsity.nonzeros(4, 1, [1, 4]))
@@ -2083,6 +2286,7 @@ namespace casadi {
         >> Sparsity.diag(2).is_reshape(Sparsity.nonzeros(4, 1, [1, 3]))
         0
         \enddoctest
+        \endlang
 
         \sa reshape, find
 
@@ -2098,6 +2302,7 @@ namespace casadi {
         without gather/scatter. The index sets are returned in either case
         (the nonempty rows and columns); a pattern without nonzeros is compactible.
 
+        \lang{python}
         \doctest
         >>> ok, row, col = Sparsity.rowcol([0, 2], [0, 2], 3, 3).is_compactible()
         >>> ok, row, col
@@ -2106,8 +2311,10 @@ namespace casadi {
         >>> ok, row, col
         (False, [0, 1, 2], [0, 1, 2])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> [ok, row, col] = Sparsity.rowcol([0, 2], [0, 2], 3, 3).is_compactible();
         >> ok, row, col
         1
@@ -2118,6 +2325,7 @@ namespace casadi {
         0 1 2
         0 1 2
         \enddoctest
+        \endlang
 
         \sa rowcol
 
@@ -2144,6 +2352,7 @@ namespace casadi {
         \param function0_is_zero True if entries where only this pattern is nonzero are
                structural zeros
 
+        \lang{python}
         \doctest
         >>> a = Sparsity.diag(2)
         >>> b = Sparsity.triplet(2, 2, [0, 1], [1, 1])
@@ -2158,8 +2367,10 @@ namespace casadi {
         [[00, 1],
          [00, 1]])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> a = Sparsity.diag(2);
         >> b = Sparsity.triplet(2, 2, [0, 1], [1, 1]);
         >> a.combine(b, false, false) == a + b, a.combine(b, true, true) == a .* b
@@ -2172,6 +2383,7 @@ namespace casadi {
         0 1
         0 1
         \enddoctest
+        \endlang
 
         \sa unite, intersect
 
@@ -2189,6 +2401,7 @@ namespace casadi {
         The pattern of x + y for matrices with these patterns. A shape mismatch raises an
         error.
 
+        \lang{python}
         \doctest
         >>> a = Sparsity.diag(2)
         >>> b = Sparsity.triplet(2, 2, [0, 1], [1, 1])
@@ -2202,8 +2415,10 @@ namespace casadi {
         ... except Exception as e: print("dimension mismatch")
         dimension mismatch
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> a = Sparsity.diag(2);
         >> b = Sparsity.triplet(2, 2, [0, 1], [1, 1]);
         >> full(DM(a.unite(b), 1))
@@ -2215,6 +2430,7 @@ namespace casadi {
         >> try, a + Sparsity.dense(3, 3); catch e, disp('dimension mismatch'); end
         dimension mismatch
         \enddoctest
+        \endlang
 
         \sa intersect, combine, is_subset
 
@@ -2233,6 +2449,7 @@ namespace casadi {
         A shape mismatch raises an error. In MATLAB this is the .* operator; * and mtimes
         give the pattern of the matrix product.
 
+        \lang{python}
         \doctest
         >>> a = Sparsity.diag(2)
         >>> b = Sparsity.triplet(2, 2, [0, 1], [1, 1])
@@ -2241,14 +2458,17 @@ namespace casadi {
         [[00, 00],
          [00, 1]])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> a = Sparsity.diag(2);
         >> b = Sparsity.triplet(2, 2, [0, 1], [1, 1]);
         >> full(DM(a.intersect(b), 1))
         0 0
         0 1
         \enddoctest
+        \endlang
 
         \sa unite, combine
 
@@ -2266,6 +2486,7 @@ namespace casadi {
         Both patterns must have the same shape, otherwise an error is raised. A pattern is
         a subset of itself and an all-zero pattern is a subset of any pattern of its shape.
 
+        \lang{python}
         \doctest
         >>> Sparsity.diag(3).is_subset(Sparsity.dense(3, 3))
         True
@@ -2276,8 +2497,10 @@ namespace casadi {
         >>> Sparsity.diag(3).is_subset(Sparsity.diag(3))
         True
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> Sparsity.diag(3).is_subset(Sparsity.dense(3, 3))
         1
         >> Sparsity.dense(3, 3).is_subset(Sparsity.diag(3))
@@ -2287,6 +2510,7 @@ namespace casadi {
         >> Sparsity.diag(3).is_subset(Sparsity.diag(3))
         1
         \enddoctest
+        \endlang
 
         \sa unite, intersect, is_equal
 
@@ -2300,6 +2524,7 @@ namespace casadi {
         the subset of \p Y made of the nonzeros of \p Y whose counterpart in \p X is in this
         pattern.
 
+        \lang{python}
         \doctest
         >>> X = Sparsity.diag(4)
         >>> Y = Sparsity.dense(2, 2)
@@ -2309,8 +2534,10 @@ namespace casadi {
         [[1, 1],
          [00, 1]])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> X = Sparsity.diag(4);
         >> Y = Sparsity.dense(2, 2);
         >> x = Sparsity.nonzeros(4, 4, [1, 11, 16]);
@@ -2318,6 +2545,7 @@ namespace casadi {
         1 1
         0 1
         \enddoctest
+        \endlang
 
         \sa sparsity_cast, is_subset
 
@@ -2329,6 +2557,7 @@ namespace casadi {
         The result has the same shape; a dense pattern becomes all-zero and an all-zero
         pattern becomes dense.
 
+        \lang{python}
         \doctest
         >>> DM(Sparsity.diag(2).pattern_inverse(), 1)
         DM(
@@ -2337,8 +2566,10 @@ namespace casadi {
         >>> Sparsity.dense(2, 2).pattern_inverse(), Sparsity(2, 2).pattern_inverse()
         (Sparsity(2x2,0nz), Sparsity(2x2))
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> full(DM(Sparsity.diag(2).pattern_inverse(), 1))
         0 1
         1 0
@@ -2346,6 +2577,7 @@ namespace casadi {
         2x2,0nz
         2x2
         \enddoctest
+        \endlang
 
         \sa unite, intersect
 
@@ -2457,6 +2689,7 @@ namespace casadi {
 
         A wrong length or an index out of range raises an error.
 
+        \lang{python}
         \doctest
         >>> sp = Sparsity.dense(2, 2)
         >>> sp.enlarge(4, 3, [0, 3], [1, 2])
@@ -2470,8 +2703,10 @@ namespace casadi {
         ... except Exception as e: print("wrong length")
         wrong length
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> sp = Sparsity.dense(2, 2);
         >> sp.enlarge(4, 3, [0, 3], [1, 2]);
         >> full(DM(sp, 1))
@@ -2482,6 +2717,7 @@ namespace casadi {
         >> try, Sparsity.dense(2, 2).enlarge(4, 3, 0, [1, 2]); catch e, disp('wrong length'); end
         wrong length
         \enddoctest
+        \endlang
 
         \sa enlargeRows, enlargeColumns, resize, erase
 
@@ -2498,19 +2734,23 @@ namespace casadi {
         \param rr New row of every old row, length size1(), strictly increasing
         \param ind1 If true, indices are one-based
 
+        \lang{python}
         \doctest
         >>> sp = Sparsity.dense(2, 2); sp.enlargeRows(3, [0, 2]); print(DM(sp, 1))
         [[1, 1], 
          [00, 00], 
          [1, 1]]
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> sp = Sparsity.dense(2, 2); sp.enlargeRows(3, [0, 2]); disp(full(DM(sp, 1)))
         1 1
         0 0
         1 1
         \enddoctest
+        \endlang
 
         \sa enlarge, enlargeColumns
 
@@ -2525,17 +2765,21 @@ namespace casadi {
         \param cc New column of every old column, length size2(), strictly increasing
         \param ind1 If true, indices are one-based
 
+        \lang{python}
         \doctest
         >>> sp = Sparsity.dense(2, 2); sp.enlargeColumns(3, [0, 2]); print(DM(sp, 1))
         [[1, 00, 1], 
          [1, 00, 1]]
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> sp = Sparsity.dense(2, 2); sp.enlargeColumns(3, [0, 2]); disp(full(DM(sp, 1)))
         1 0 1
         1 0 1
         \enddoctest
+        \endlang
 
         \sa enlarge, enlargeRows
 
@@ -2547,19 +2791,23 @@ namespace casadi {
         \return The dense pattern and a mapping of length nnz(): mapping[k] is the flat
                 (column-major) element index of nonzero k, as returned by find()
 
+        \lang{python}
         \doctest
         >>> sp = Sparsity.triplet(3, 2, [0, 2], [0, 1])
         >>> dense, mapping = sp.makeDense()
         >>> dense, mapping
         (Sparsity(3x2), [0, 5])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> sp = Sparsity.triplet(3, 2, [0, 2], [0, 1]);
         >> [dense, mapping] = sp.makeDense(); disp(dense), disp(mapping)
         3x2
         0 5
         \enddoctest
+        \endlang
 
         \sa find, dense
 
@@ -2579,6 +2827,7 @@ namespace casadi {
         \return Mapping of length nnz() of the result: nonzero k of the result was nonzero
                 mapping[k] of the original pattern
 
+        \lang{python}
         \doctest
         >>> sp = Sparsity.dense(3, 3)
         >>> mapping = sp.erase([0, 2], [1])
@@ -2588,8 +2837,10 @@ namespace casadi {
          [1, 1, 1],
          [1, 00, 1]]), [0, 1, 2, 4, 6, 7, 8])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> sp = Sparsity.dense(3, 3);
         >> mapping = sp.erase([0, 2], 1);
         >> full(DM(sp, 1)), mapping
@@ -2598,6 +2849,7 @@ namespace casadi {
         1 0 1
         0 1 2 4 6 7 8
         \enddoctest
+        \endlang
 
         \sa erase(rr), sub, enlarge
 
@@ -2615,6 +2867,7 @@ namespace casadi {
         \return Mapping of length nnz() of the result: nonzero k of the result was nonzero
                 mapping[k] of the original pattern
 
+        \lang{python}
         \doctest
         >>> sp = Sparsity.dense(3, 3)
         >>> sp.erase([0, 4, 8]), sp
@@ -2628,8 +2881,10 @@ namespace casadi {
         ... except Exception as e: print("out of range")
         out of range
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> sp = Sparsity.dense(3, 3);
         >> sp.erase([0, 4, 8]), sp
         1 2 3 5 6 7
@@ -2641,6 +2896,7 @@ namespace casadi {
         >> try, Sparsity.dense(3, 3).erase(9); catch e, disp('out of range'); end
         out of range
         \enddoctest
+        \endlang
 
         \sa erase(rr, cc), find
 
@@ -2653,6 +2909,7 @@ namespace casadi {
         either side is ignored. Equivalent to rebinding to vertcat(self, sp); only cheap
         when both are column vectors.
 
+        \lang{python}
         \doctest
         >>> sp = Sparsity.dense(2, 2); sp.append(Sparsity.diag(2)); print(DM(sp, 1))
         [[1, 1], 
@@ -2665,8 +2922,10 @@ namespace casadi {
         ... except Exception as e: print("column mismatch")
         column mismatch
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> sp = Sparsity.dense(2, 2); sp.append(Sparsity.diag(2)); disp(full(DM(sp, 1)))
         1 1
         1 1
@@ -2677,6 +2936,7 @@ namespace casadi {
         >> try, sp.append(Sparsity.dense(2, 3)); catch e, disp('column mismatch'); end
         column mismatch
         \enddoctest
+        \endlang
 
         \sa appendColumns, vertcat
 
@@ -2688,6 +2948,7 @@ namespace casadi {
         The number of rows must match, otherwise an error is raised; a 0-by-0 pattern on
         either side is ignored. Equivalent to rebinding to horzcat(self, sp).
 
+        \lang{python}
         \doctest
         >>> sp = Sparsity.dense(2, 2); sp.appendColumns(Sparsity.diag(2)); print(DM(sp, 1))
         [[1, 1, 1, 00], 
@@ -2696,14 +2957,17 @@ namespace casadi {
         ... except Exception as e: print("row mismatch")
         row mismatch
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> sp = Sparsity.dense(2, 2); sp.appendColumns(Sparsity.diag(2)); disp(full(DM(sp, 1)))
         1 1 1 0
         1 1 0 1
         >> try, sp.appendColumns(Sparsity.dense(3, 2)); catch e, disp('row mismatch'); end
         row mismatch
         \enddoctest
+        \endlang
 
         \sa append, horzcat
 
@@ -2715,19 +2979,23 @@ namespace casadi {
         \param scalar_and_dense If true, additionally require the single entry to be a
                nonzero (a 1-by-1 pattern with zero nonzeros is a structural zero)
 
+        \lang{python}
         \doctest
         >>> Sparsity.dense(1, 1).is_scalar(), Sparsity(1, 1).is_scalar()
         (True, True)
         >>> Sparsity(1, 1).is_scalar(True), Sparsity.dense(2, 1).is_scalar()
         (False, False)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> [Sparsity.dense(1, 1).is_scalar(), Sparsity(1, 1).is_scalar()]
         1 1
         >> [Sparsity(1, 1).is_scalar(true), Sparsity.dense(2, 1).is_scalar()]
         0 0
         \enddoctest
+        \endlang
 
         \sa scalar, is_dense
 
@@ -2739,6 +3007,7 @@ namespace casadi {
         An empty pattern (a zero dimension) is dense. Note that a DM built from a nested
         list is dense even if it holds numerical zeros.
 
+        \lang{python}
         \doctest
         >>> Sparsity.dense(2, 3).is_dense(), Sparsity.diag(3).is_dense()
         (True, False)
@@ -2747,8 +3016,10 @@ namespace casadi {
         >>> DM([[1, 0], [0, 1]]).sparsity().is_dense()
         True
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> [Sparsity.dense(2, 3).is_dense(), Sparsity.diag(3).is_dense()]
         1 0
         >> [Sparsity(0, 3).is_dense(), Sparsity(1, 1).is_dense()]
@@ -2756,6 +3027,7 @@ namespace casadi {
         >> sparsity(DM([1, 0; 0, 1])).is_dense()
         1
         \enddoctest
+        \endlang
 
         \sa dense, density, makeDense
 
@@ -2766,19 +3038,23 @@ namespace casadi {
 
         The number of columns (including zero) and the nonzeros play no role.
 
+        \lang{python}
         \doctest
         >>> Sparsity.dense(1, 3).is_row(), Sparsity.dense(3, 1).is_row()
         (True, False)
         >>> Sparsity(1, 0).is_row()
         True
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> [Sparsity.dense(1, 3).is_row(), Sparsity.dense(3, 1).is_row()]
         1 0
         >> Sparsity(1, 0).is_row()
         1
         \enddoctest
+        \endlang
 
         \sa is_column, is_vector
 
@@ -2787,19 +3063,23 @@ namespace casadi {
 
     /** \brief Check whether the pattern is a column vector, i.e. size2() == 1
 
+        \lang{python}
         \doctest
         >>> Sparsity.dense(3, 1).is_column(), Sparsity.dense(1, 3).is_column()
         (True, False)
         >>> Sparsity(1, 1).is_column()
         True
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> [Sparsity.dense(3, 1).is_column(), Sparsity.dense(1, 3).is_column()]
         1 0
         >> Sparsity(1, 1).is_column()
         1
         \enddoctest
+        \endlang
 
         \sa is_row, is_vector
 
@@ -2810,6 +3090,7 @@ namespace casadi {
 
         A 1-by-1 pattern is a vector; a 0-by-3 pattern is not.
 
+        \lang{python}
         \doctest
         >>> Sparsity.dense(3, 1).is_vector(), Sparsity.dense(1, 3).is_vector()
         (True, True)
@@ -2818,8 +3099,10 @@ namespace casadi {
         >>> Sparsity(0, 3).is_vector()
         False
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> [Sparsity.dense(3, 1).is_vector(), Sparsity.dense(1, 3).is_vector()]
         1 1
         >> [Sparsity.dense(1, 1).is_vector(), Sparsity.dense(2, 2).is_vector()]
@@ -2827,6 +3110,7 @@ namespace casadi {
         >> Sparsity(0, 3).is_vector()
         0
         \enddoctest
+        \endlang
 
         \sa is_row, is_column
 
@@ -2838,6 +3122,7 @@ namespace casadi {
         True only for Sparsity.diag(n) (including n == 0); a rectangular diagonal pattern,
         an all-zero square pattern or a pattern with off-diagonal entries is not diagonal.
 
+        \lang{python}
         \doctest
         >>> Sparsity.diag(3).is_diag(), Sparsity.diag(2, 3).is_diag()
         (True, False)
@@ -2846,8 +3131,10 @@ namespace casadi {
         >>> Sparsity(0, 0).is_diag(), Sparsity.dense(2, 2).is_diag()
         (True, False)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> [Sparsity.diag(3).is_diag(), Sparsity.diag(2, 3).is_diag()]
         1 0
         >> [Sparsity.dense(1, 1).is_diag(), Sparsity(2, 2).is_diag()]
@@ -2855,6 +3142,7 @@ namespace casadi {
         >> [Sparsity(0, 0).is_diag(), Sparsity.dense(2, 2).is_diag()]
         1 0
         \enddoctest
+        \endlang
 
         \sa diag, nnz_diag
 
@@ -2863,19 +3151,23 @@ namespace casadi {
 
     /** \brief Check whether the number of rows equals the number of columns
 
+        \lang{python}
         \doctest
         >>> Sparsity.dense(2, 2).is_square(), Sparsity.dense(2, 3).is_square()
         (True, False)
         >>> Sparsity(0, 0).is_square()
         True
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> [Sparsity.dense(2, 2).is_square(), Sparsity.dense(2, 3).is_square()]
         1 0
         >> Sparsity(0, 0).is_square()
         1
         \enddoctest
+        \endlang
 
         \identifier{248} */
     bool is_square() const;
@@ -2885,19 +3177,23 @@ namespace casadi {
         Structural symmetry only: (i, j) is a nonzero if and only if (j, i) is. Required by
         amd, ldl and the star colorings. A rectangular pattern is never symmetric.
 
+        \lang{python}
         \doctest
         >>> Sparsity.banded(3, 1).is_symmetric(), Sparsity.upper(3).is_symmetric()
         (True, False)
         >>> Sparsity(3, 3).is_symmetric(), Sparsity.dense(2, 3).is_symmetric()
         (True, False)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> [Sparsity.banded(3, 1).is_symmetric(), Sparsity.upper(3).is_symmetric()]
         1 0
         >> [Sparsity(3, 3).is_symmetric(), Sparsity.dense(2, 3).is_symmetric()]
         1 0
         \enddoctest
+        \endlang
 
         \sa is_transpose, T
 
@@ -2910,6 +3206,7 @@ namespace casadi {
 
         Defined for any shape; a pattern without nonzeros is upper triangular.
 
+        \lang{python}
         \doctest
         >>> Sparsity.upper(3).is_triu(), Sparsity.upper(3).is_triu(True)
         (True, False)
@@ -2918,8 +3215,10 @@ namespace casadi {
         >>> Sparsity.dense(1, 3).is_triu(), Sparsity.dense(3, 1).is_triu()
         (True, False)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> [Sparsity.upper(3).is_triu(), Sparsity.upper(3).is_triu(true)]
         1 0
         >> [Sparsity.band(3, -1).is_triu(true), Sparsity(3, 3).is_triu()]
@@ -2927,6 +3226,7 @@ namespace casadi {
         >> [Sparsity.dense(1, 3).is_triu(), Sparsity.dense(3, 1).is_triu()]
         1 0
         \enddoctest
+        \endlang
 
         \sa is_tril, upper, triu, nnz_upper
 
@@ -2937,6 +3237,7 @@ namespace casadi {
 
         \param strictly If true, require row > col (no diagonal entries)
 
+        \lang{python}
         \doctest
         >>> Sparsity.lower(3).is_tril(), Sparsity.lower(3).is_tril(True)
         (True, False)
@@ -2945,8 +3246,10 @@ namespace casadi {
         >>> Sparsity.dense(3, 1).is_tril(), Sparsity.dense(1, 3).is_tril()
         (True, False)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> [Sparsity.lower(3).is_tril(), Sparsity.lower(3).is_tril(true)]
         1 0
         >> [Sparsity.band(3, 1).is_tril(true), Sparsity.diag(3).is_tril()]
@@ -2954,6 +3257,7 @@ namespace casadi {
         >> [Sparsity.dense(3, 1).is_tril(), Sparsity.dense(1, 3).is_tril()]
         1 0
         \enddoctest
+        \endlang
 
         \sa is_triu, lower, tril, nnz_lower
 
@@ -2966,6 +3270,7 @@ namespace casadi {
         of nonzero values can make a matrix with this pattern invertible. A non-square
         pattern raises an error.
 
+        \lang{python}
         \doctest
         >>> Sparsity.diag(3).is_singular(), Sparsity(3, 3).is_singular()
         (False, True)
@@ -2975,8 +3280,10 @@ namespace casadi {
         ... except Exception as e: print("not square")
         not square
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> [Sparsity.diag(3).is_singular(), Sparsity(3, 3).is_singular()]
         0 1
         >> [Sparsity.nonzeros(3, 3, [1, 2, 3]).is_singular(), Sparsity(0, 0).is_singular()]
@@ -2984,6 +3291,7 @@ namespace casadi {
         >> try, Sparsity.dense(2, 3).is_singular(); catch e, disp('not square'); end
         not square
         \enddoctest
+        \endlang
 
         \sa sprank, btf
 
@@ -2995,6 +3303,7 @@ namespace casadi {
         A square pattern with exactly one nonzero in every row and every column, so that
         multiplying a dense vector permutes its entries. Equivalent to is_orthonormal().
 
+        \lang{python}
         \doctest
         >>> Sparsity.permutation([1, 2, 0]).is_permutation()
         True
@@ -3003,8 +3312,10 @@ namespace casadi {
         >>> Sparsity.dense(2, 2).is_permutation(), Sparsity.diag(2, 3).is_permutation()
         (False, False)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> Sparsity.permutation([1, 2, 0]).is_permutation()
         1
         >> Sparsity.diag(3).is_permutation()
@@ -3012,6 +3323,7 @@ namespace casadi {
         >> [Sparsity.dense(2, 2).is_permutation(), Sparsity.diag(2, 3).is_permutation()]
         0 0
         \enddoctest
+        \endlang
 
         \sa permutation, permutation_vector, is_selection, is_orthonormal
 
@@ -3027,6 +3339,7 @@ namespace casadi {
         \param allow_empty If true, rows without nonzeros are allowed (the result may
                contain structural zeros)
 
+        \lang{python}
         \doctest
         >>> S = Sparsity.triplet(2, 3, [0, 1], [2, 0])
         >>> DM(S, 1) @ DM([10, 20, 30])
@@ -3038,8 +3351,10 @@ namespace casadi {
         >>> Sparsity.diag(3, 2).is_selection()
         False
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> S = Sparsity.triplet(2, 3, [0, 1], [2, 0]);
         >> DM(S, 1) * DM([10; 20; 30])
         [30, 10]
@@ -3050,6 +3365,7 @@ namespace casadi {
         >> Sparsity.diag(3, 2).is_selection()
         0
         \enddoctest
+        \endlang
 
         \sa is_permutation, is_orthonormal_rows
 
@@ -3064,6 +3380,7 @@ namespace casadi {
 
         \param allow_empty Disregard empty rows and columns in the analysis
 
+        \lang{python}
         \doctest
         >>> Sparsity.diag(3).is_orthonormal()
         True
@@ -3076,8 +3393,10 @@ namespace casadi {
         >>> Sparsity.diag(2, 3).is_orthonormal(), Sparsity.diag(2, 3).is_orthonormal(True)
         (False, True)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> Sparsity.diag(3).is_orthonormal()
         1
         >> Sparsity.triplet(3, 3, [0, 1], [0, 1]).is_orthonormal()
@@ -3089,6 +3408,7 @@ namespace casadi {
         >> [Sparsity.diag(2, 3).is_orthonormal(), Sparsity.diag(2, 3).is_orthonormal(true)]
         0 1
         \enddoctest
+        \endlang
 
         \sa is_orthonormal_rows, is_orthonormal_columns, is_permutation
 
@@ -3103,6 +3423,7 @@ namespace casadi {
 
         \param allow_empty Disregard empty rows in the analysis
 
+        \lang{python}
         \doctest
         >>> sp = Sparsity.diag(2, 3)
         >>> sp.is_orthonormal_rows(), sp.is_orthonormal_columns()
@@ -3110,14 +3431,17 @@ namespace casadi {
         >>> sp.T.is_orthonormal_rows(), sp.T.is_orthonormal_columns()
         (False, True)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> sp = Sparsity.diag(2, 3);
         >> [sp.is_orthonormal_rows(), sp.is_orthonormal_columns()]
         1 0
         >> [sp.T.is_orthonormal_rows(), sp.T.is_orthonormal_columns()]
         0 1
         \enddoctest
+        \endlang
 
         \sa is_orthonormal_columns, is_selection
 
@@ -3144,19 +3468,23 @@ namespace casadi {
 
         \param strictly If true (default), duplicate rows within a column are not allowed
 
+        \lang{python}
         \doctest
         >>> Sparsity.banded(3, 1).rowsSequential()
         True
         >>> Sparsity.dense(2, 2).rowsSequential(False)
         True
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> Sparsity.banded(3, 1).rowsSequential()
         1
         >> Sparsity.dense(2, 2).rowsSequential(false)
         1
         \enddoctest
+        \endlang
 
         \sa removeDuplicates
 
@@ -3171,20 +3499,24 @@ namespace casadi {
 
         \param mapping Vector of length nnz(), filtered in the same way as the nonzeros
 
+        \lang{python}
         \doctest
         >>> sp = Sparsity.banded(3, 1)
         >>> m = sp.removeDuplicates([0, 1, 2, 3, 4, 5, 6])
         >>> m, sp
         ([0, 1, 2, 3, 4, 5, 6], Sparsity(3x3,7nz))
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> sp = Sparsity.banded(3, 1);
         >> m = sp.removeDuplicates([0, 1, 2, 3, 4, 5, 6]);
         >> m, sp
         0 1 2 3 4 5 6
         3x3,7nz
         \enddoctest
+        \endlang
 
         \sa rowsSequential, triplet
 
@@ -3225,20 +3557,24 @@ namespace casadi {
         Copyright(c) Timothy A. Davis, 2006-2009
         Licensed as a derivative work under the GNU LGPL
 
+        \lang{python}
         \doctest
         >>> Sparsity.banded(4, 1).etree(), Sparsity.diag(4).etree()
         ([1, 2, 3, -1], [-1, -1, -1, -1])
         >>> Sparsity.dense(2, 3).etree(True)
         [1, 2, -1]
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> Sparsity.banded(4, 1).etree(), Sparsity.diag(4).etree()
         1 2 3 -1
         -1 -1 -1 -1
         >> Sparsity.dense(2, 3).etree(true)
         1 2 -1
         \enddoctest
+        \endlang
 
         \sa ldl, qr_sparse, amd
 
@@ -3256,6 +3592,7 @@ namespace casadi {
                in p; if false, p is the identity
         \return Pattern of L^T and the permutation vector p
 
+        \lang{python}
         \doctest
         >>> Lt, p = Sparsity.banded(4, 1).ldl(False)
         >>> DM(Lt, 1), p
@@ -3272,8 +3609,10 @@ namespace casadi {
         ... except Exception as e: print("not symmetric")
         not symmetric
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> [Lt, p] = Sparsity.banded(4, 1).ldl(false);
         >> full(DM(Lt, 1)), p
         0 1 0 0
@@ -3288,6 +3627,7 @@ namespace casadi {
         >> try, Sparsity.upper(3).ldl(); catch e, disp('not symmetric'); end
         not symmetric
         \enddoctest
+        \endlang
 
         The implementation is a modified version of LDL
         Copyright(c) Timothy A. Davis, 2005-2013
@@ -3310,6 +3650,7 @@ namespace casadi {
                A^T*A, returned in pc; if false, pc is the identity
         \return V, R, prinv, pc
 
+        \lang{python}
         \doctest
         >>> V, R, prinv, pc = Sparsity.dense(3, 2).qr_sparse()
         >>> V, R, prinv, pc
@@ -3318,8 +3659,10 @@ namespace casadi {
         >>> V, R, prinv, pc
         (Sparsity(4x4,7nz), Sparsity(4x4,9nz), [0, 1, 2, 3], [0, 1, 2, 3])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> [V, R, prinv, pc] = Sparsity.dense(3, 2).qr_sparse();
         >> V, R, prinv, pc
         3x2,5nz
@@ -3333,6 +3676,7 @@ namespace casadi {
         0 1 2 3
         0 1 2 3
         \enddoctest
+        \endlang
 
         The implementation is a modified version of CSparse
         Copyright(c) Timothy A. Davis, 2006-2009
@@ -3361,12 +3705,15 @@ namespace casadi {
         \param marked Visited flags per node, updated in place
         \return The new top of the stack, with the updated xi, pstack and marked vectors
 
+        \lang{python}
         \doctest
         >>> Sparsity.banded(3, 1).dfs(0, 3, [0, 0, 0], [0, 0, 0], [], [False] * 3)
         (0, [0, 1, 2], [1, 4, 5], [True, True, True])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> sp = Sparsity.banded(3, 1); xi = [0, 0, 0]; pstack = [0, 0, 0];
         >> [top, xi, pstack, marked] = sp.dfs(0, 3, xi, pstack, [], [false, false, false]);
         >> top, xi, pstack, marked
@@ -3375,6 +3722,7 @@ namespace casadi {
         1 4 5
         1 1 1
         \enddoctest
+        \endlang
 
         \sa scc
 
@@ -3400,6 +3748,7 @@ namespace casadi {
         Copyright(c) Timothy A. Davis, 2006-2009
         Licensed as a derivative work under the GNU LGPL
 
+        \lang{python}
         \doctest
         >>> A = Sparsity.nonzeros(4, 4, [0, 2, 5, 7, 10, 13, 15])
         >>> DM(A, 1)
@@ -3420,8 +3769,10 @@ namespace casadi {
         >>> Sparsity.diag(3).scc(), Sparsity.dense(3, 3).scc(), Sparsity(0, 0).scc()
         ((3, [0, 1, 2], [0, 1, 2, 3]), (1, [0, 1, 2], [0, 3]), (0, [], [0]))
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> A = Sparsity.nonzeros(4, 4, [1, 3, 6, 8, 11, 14, 16]);
         >> full(DM(A, 1))
         1 0 0 0
@@ -3450,6 +3801,7 @@ namespace casadi {
         1
         0
         \enddoctest
+        \endlang
 
         \sa btf, dfs
 
@@ -3483,6 +3835,7 @@ namespace casadi {
         Copyright(c) Timothy A. Davis, 2006-2009
         Licensed as a derivative work under the GNU LGPL
 
+        \lang{python}
         \doctest
         >>> B = Sparsity.triplet(3, 3, [0, 0, 1, 2], [0, 2, 1, 2])
         >>> DM(B, 1)
@@ -3503,8 +3856,10 @@ namespace casadi {
         >>> sprank(Sparsity.nonzeros(3, 3, [0, 1, 2])), sprank(Sparsity.diag(3))
         (1, 3)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> B = Sparsity.triplet(3, 3, [0, 0, 1, 2], [0, 2, 1, 2]);
         >> full(DM(B, 1))
         1 0 1
@@ -3527,6 +3882,7 @@ namespace casadi {
         >> [sprank(Sparsity.nonzeros(3, 3, [1, 2, 3])), sprank(Sparsity.diag(3))]
         1 3
         \enddoctest
+        \endlang
 
         \sa scc, sprank, is_singular
 
@@ -3549,6 +3905,7 @@ namespace casadi {
         Copyright(c) Timothy A. Davis, 2006-2009
         Licensed as a derivative work under the GNU LGPL
 
+        \lang{python}
         \doctest
         >>> Sparsity.banded(4, 1).amd(), Sparsity.dense(3, 3).amd(), Sparsity(0, 0).amd()
         ([3, 2, 0, 1], [0, 1, 2], [])
@@ -3556,8 +3913,10 @@ namespace casadi {
         ... except Exception as e: print("not symmetric")
         not symmetric
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> Sparsity.banded(4, 1).amd(), Sparsity.dense(3, 3).amd()
         3 2 0 1
         0 1 2
@@ -3566,6 +3925,7 @@ namespace casadi {
         >> try, Sparsity.upper(3).amd(); catch e, disp('not symmetric'); end
         not symmetric
         \enddoctest
+        \endlang
 
         \sa ldl, qr_sparse, etree, is_symmetric
 
@@ -3588,6 +3948,7 @@ namespace casadi {
 
         \param ind1 If true, the indices are one-based
 
+        \lang{python}
         \doctest
         >>> sp = Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3])
         >>> sp.find(), sp.find(True)
@@ -3595,8 +3956,10 @@ namespace casadi {
         >>> Sparsity.dense(2, 2).find(), Sparsity(2, 2).find(), Sparsity(0, 3).find()
         ([0, 1, 2, 3], [], [])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> sp = Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3]);
         >> sp.find(), sp.find(false)
         1 3 8 10
@@ -3606,6 +3969,7 @@ namespace casadi {
         >> [isempty(Sparsity(2, 2).find()), isempty(Sparsity(0, 3).find())]
         1 1
         \enddoctest
+        \endlang
 
         \sa nonzeros, get_nz, makeDense
 
@@ -3632,6 +3996,7 @@ namespace casadi {
         \return A size2()-by-ncolors pattern: column c lists the columns of this pattern
                 that received color c
 
+        \lang{python}
         \doctest
         >>> A = Sparsity.triplet(3, 4, [0, 1, 2, 0], [0, 1, 2, 3])
         >>> DM(A, 1)
@@ -3653,8 +4018,10 @@ namespace casadi {
         >>> Sparsity.dense(3, 3).uni_coloring(), Sparsity.diag(3).uni_coloring()
         (Sparsity(3x3,3nz), Sparsity(3x1))
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> A = Sparsity.triplet(3, 4, [0, 1, 2, 0], [0, 1, 2, 3]);
         >> full(DM(A, 1))
         1 0 0 1
@@ -3677,6 +4044,7 @@ namespace casadi {
         3x3,3nz
         3x1
         \enddoctest
+        \endlang
 
         \sa star_coloring, star_coloring_new
 
@@ -3698,6 +4066,7 @@ namespace casadi {
                 yields that nonzero, or -1 when the nonzero is obtained from its symmetric
                 counterpart instead (the lowest color index is preferred)
 
+        \lang{python}
         \doctest
         >>> H = Sparsity.banded(4, 1)
         >>> coloring, which_color = H.star_coloring_new()
@@ -3722,8 +4091,10 @@ namespace casadi {
         ... except Exception as e: print("not symmetric")
         not symmetric
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> H = Sparsity.banded(4, 1);
         >> [coloring, which_color] = H.star_coloring_new();
         >> full(DM(coloring, 1))
@@ -3745,6 +4116,7 @@ namespace casadi {
         >> try, Sparsity.upper(3).star_coloring_new(); catch e, disp('not symmetric'); end
         not symmetric
         \enddoctest
+        \endlang
 
         \sa star_coloring, star_coloring2, uni_coloring
 
@@ -3765,6 +4137,7 @@ namespace casadi {
                returned
         \return A size2()-by-ncolors pattern: column c lists the columns with color c
 
+        \lang{python}
         \doctest
         >>> H = Sparsity.banded(4, 1)
         >>> DM(H.star_coloring(), 1)
@@ -3778,8 +4151,10 @@ namespace casadi {
         >>> Sparsity.dense(4, 4).star_coloring(1, 2).is_null()
         True
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> H = Sparsity.banded(4, 1);
         >> full(DM(H.star_coloring(), 1))
         0 1 0
@@ -3791,6 +4166,7 @@ namespace casadi {
         >> Sparsity.dense(4, 4).star_coloring(1, 2).is_null()
         1
         \enddoctest
+        \endlang
 
         \sa star_coloring_new, star_coloring2, uni_coloring, largest_first
 
@@ -3804,6 +4180,7 @@ namespace casadi {
         Coloring Algorithms with Application to Computing Hessians, SIAM J. Sci. Comput.
         29(3), 2007. Same arguments and return value as star_coloring.
 
+        \lang{python}
         \doctest
         >>> H = Sparsity.banded(4, 1)
         >>> DM(H.star_coloring2(), 1)
@@ -3813,8 +4190,10 @@ namespace casadi {
          [00, 1, 00],
          [00, 00, 1]])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> H = Sparsity.banded(4, 1);
         >> full(DM(H.star_coloring2(), 1))
         0 1 0
@@ -3822,6 +4201,7 @@ namespace casadi {
         0 1 0
         0 0 1
         \enddoctest
+        \endlang
 
         \sa star_coloring, star_coloring_new
 
@@ -3834,18 +4214,22 @@ namespace casadi {
         Columns with the same number of nonzeros keep their relative order. Used as the
         ordering of the star colorings.
 
+        \lang{python}
         \doctest
         >>> sp = Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3])
         >>> sp.largest_first(), Sparsity.diag(3).largest_first()
         ([0, 2, 3, 1], [0, 1, 2])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> sp = Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3]);
         >> sp.largest_first(), Sparsity.diag(3).largest_first()
         0 2 3 1
         0 1 2
         \enddoctest
+        \endlang
 
         \sa star_coloring
 
@@ -3866,6 +4250,7 @@ namespace casadi {
         \param permute_columns Permute the columns
         \param invert_permutation Use the inverse permutation
 
+        \lang{python}
         \doctest
         >>> A = Sparsity.triplet(3, 3, [0, 1, 2, 0], [1, 2, 0, 0])
         >>> DM(A, 1)
@@ -3890,8 +4275,10 @@ namespace casadi {
          [1, 00, 00],
          [1, 1, 00]])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> A = Sparsity.triplet(3, 3, [0, 1, 2, 0], [1, 2, 0, 0]);
         >> full(DM(A, 1))
         1 1 0
@@ -3912,6 +4299,7 @@ namespace casadi {
         1 0 0
         1 1 0
         \enddoctest
+        \endlang
 
         \sa permutation, sub
 
@@ -3927,6 +4315,7 @@ namespace casadi {
         This is the string printed for a Sparsity: with the nonzero count when the pattern
         is not dense.
 
+        \lang{python}
         \doctest
         >>> sp = Sparsity.diag(2, 3)
         >>> sp.dim(), sp.dim(True)
@@ -3936,8 +4325,10 @@ namespace casadi {
         >>> sp
         Sparsity(2x3,2nz)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> sp = Sparsity.diag(2, 3);
         >> sp.dim(), sp.dim(true)
         2x3
@@ -3948,6 +4339,7 @@ namespace casadi {
         >> sp
         2x3,2nz
         \enddoctest
+        \endlang
 
         \sa postfix_dim, repr_el
 
@@ -3963,6 +4355,7 @@ namespace casadi {
         4. Other dense pattern: "[5x10]"
         5. Otherwise: "[5x10,3nz]"
 
+        \lang{python}
         \doctest
         >>> repr(Sparsity.dense(1, 1).postfix_dim()), repr(Sparsity(0, 0).postfix_dim())
         ("''", "'[]'")
@@ -3973,8 +4366,10 @@ namespace casadi {
         >>> Sparsity.dense(1, 5).postfix_dim(), Sparsity(0, 3).postfix_dim()
         ('[1x5]', '[0x3]')
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> fprintf('"%s" "%s"\n', Sparsity.dense(1, 1).postfix_dim(), Sparsity(0, 0).postfix_dim())
         "" "[]"
         >> Sparsity.dense(5).postfix_dim(), Sparsity.dense(5, 10).postfix_dim()
@@ -3987,6 +4382,7 @@ namespace casadi {
         [1x5]
         [0x3]
         \enddoctest
+        \endlang
 
         \sa dim
 
@@ -3999,6 +4395,7 @@ namespace casadi {
         dense. Indices follow the global start_index option (zero-based by default).
         \p k must be in [0, nnz()); it is not checked.
 
+        \lang{python}
         \doctest
         >>> sp = Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3])
         >>> sp.repr_el(1)
@@ -4006,14 +4403,17 @@ namespace casadi {
         >>> Sparsity.dense(2, 2).repr_el(3)
         '(row 1, col 1)'
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> sp = Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3]);
         >> sp.repr_el(1)
         nonzero index 2 (row 3, col 1)
         >> Sparsity.dense(2, 2).repr_el(3)
         (row 2, col 2)
         \enddoctest
+        \endlang
 
         \sa dim, get_nz
 
@@ -4038,6 +4438,7 @@ namespace casadi {
 
         \param mfile Path of the .m file to write
 
+        \lang{python}
         \doctest
         >>> import os, tempfile
         >>> d = tempfile.mkdtemp()
@@ -4054,8 +4455,10 @@ namespace casadi {
         spy(A);
         >>> os.remove(f); os.rmdir(d)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> f = [tempname '.m'];
         >> Sparsity.diag(2, 3).spy_matlab(f);
         >> fileread(f)
@@ -4069,6 +4472,7 @@ namespace casadi {
         spy(A);
         >> delete(f);
         \enddoctest
+        \endlang
 
         \sa spy, export_code
 
@@ -4091,6 +4495,7 @@ namespace casadi {
 
         An unknown option raises an error.
 
+        \lang{python}
         \doctest
         >>> Sparsity.diag(2, 3).export_code("matlab")
         sp_m = 2;
@@ -4110,8 +4515,10 @@ namespace casadi {
         ... except Exception as e: print("unsupported language")
         unsupported language
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> Sparsity.diag(2, 3).export_code('matlab');
         sp_m = 2;
         sp_n = 3;
@@ -4129,6 +4536,7 @@ namespace casadi {
         >> try, Sparsity.diag(2).export_code('python'); catch e, disp('unsupported language'); end
         unsupported language
         \enddoctest
+        \endlang
 
         \sa spy_matlab, compress
 
@@ -4145,19 +4553,23 @@ namespace casadi {
         In Python, Sparsity objects are not hashable with the built-in hash(); use this
         method.
 
+        \lang{python}
         \doctest
         >>> sp = Sparsity.diag(2, 3)
         >>> sp.hash() == Sparsity.diag(2, 3).hash(), sp.hash() == Sparsity.dense(2, 3).hash()
         (True, False)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> sp = Sparsity.diag(2, 3);
         >> class(sp.hash())
         uint64
         >> [sp.hash() == Sparsity.diag(2, 3).hash(), sp.hash() == Sparsity.dense(2, 3).hash()]
         1 0
         \enddoctest
+        \endlang
 
         \sa is_equal
 
@@ -4178,6 +4590,7 @@ namespace casadi {
         \param with_x_diag Add the diagonal to the H block
         \param with_lam_g_diag Make the lower right block diagonal instead of all-zero
 
+        \lang{python}
         \doctest
         >>> DM(Sparsity.kkt(Sparsity.diag(2), Sparsity.dense(1, 2)), 1)
         DM(
@@ -4193,8 +4606,10 @@ namespace casadi {
         ... except Exception as e: print("dimension mismatch")
         dimension mismatch
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> full(DM(Sparsity.kkt(Sparsity.diag(2), Sparsity.dense(1, 2)), 1))
         1 0 1
         0 1 1
@@ -4207,6 +4622,7 @@ namespace casadi {
         >> try, Sparsity.kkt(Sparsity.diag(2), J); catch e, disp('dimension mismatch'); end
         dimension mismatch
         \enddoctest
+        \endlang
 
         \sa blockcat
 
