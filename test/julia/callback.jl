@@ -91,6 +91,23 @@ CN.eval_(::CbNamed, a) = [sum(a[1]) * a[2]]
     @test C.name_in(C.Function(callback(CbSquare(), "sqn"))) == ["i0"]
 end
 
+# uses_output and buffer evaluation
+struct CbBuffer <: Callback end
+CN.get_n_in(::CbBuffer) = 2
+CN.get_sparsity_in(::CbBuffer, i) = C.dense(Sparsity, 2, 1)
+CN.get_sparsity_out(::CbBuffer, i) = C.dense(Sparsity, 2, 1)
+CN.has_eval_buffer(::CbBuffer) = true
+CN.eval_buffer(::CbBuffer, arg, res) = (res[1] .= arg[1] .* arg[2]; 0)
+CN.uses_output(::CbBuffer) = true
+
+@testset "Callback: positional options, eval_buffer, uses_output, no copies" begin
+    cb = callback(CbBuffer(), "buf", Dict("enable_fd" => true))
+    f = C.Function(cb)
+    @test GC.@preserve(cb, Vector(f([1, 2], [3, 4]))) == [3, 8]
+    @test C.uses_output(f)
+    @test_throws MethodError C.CallbackFunction(callback(CbSquare(), "nocopy"))
+end
+
 @testset "Callback: derivative hooks" begin
     J = C.Function(callback(CbSquareJac(), "sqj")).jacobian()
     @test Float64(J(3, 9)) == 6.0

@@ -6606,6 +6606,30 @@ namespace casadi {
 // users subtype the abstract Callback, as Python subclasses Callback; the proxy is CallbackFunction
 %rename(CallbackFunction) casadi::Callback;
 %feature("julia:director", "Callback") casadi::Callback;
+// a Callback cannot be copied (as in C++); CallbackFunction(obj) takes a Julia Callback
+%ignore casadi::Callback::Callback(const Callback&);
+// eval_buffer: arg and res reach Julia as vectors of Vector{Float64} views (nothing for a null)
+%{
+namespace casadi {
+  jl_value_t* julia_buffers(double** p, const std::vector<casadi_int>& sz) {
+    jl_value_t* vt = jl_apply_array_type((jl_value_t*)jl_float64_type, 1);
+    jl_array_t* a = jl_alloc_array_1d(jl_apply_array_type((jl_value_t*)jl_any_type, 1), sz.size());
+    JL_GC_PUSH2(&vt, &a);
+    for (size_t i = 0; i < sz.size(); ++i) {
+      jl_value_t* e = p[i] ? (jl_value_t*)jl_ptr_to_array_1d(vt, p[i], sz[i], 0) : jl_nothing;
+      jl_array_ptr_set(a, i, e);
+    }
+    JL_GC_POP();
+    return (jl_value_t*)a;
+  }
+} // namespace casadi
+%}
+%typemap(directorin, noblock=1) (const double** arg, const std::vector<casadi_int>& sizes_arg) {
+  $input = casadi::julia_buffers(const_cast<double**>($1), $2);
+}
+%typemap(directorin, noblock=1) (double** res, const std::vector<casadi_int>& sizes_res) {
+  $input = casadi::julia_buffers($1, $2);
+}
 #endif // SWIGJULIA
 %include <casadi/core/callback.hpp>
 
