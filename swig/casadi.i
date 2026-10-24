@@ -6603,7 +6603,6 @@ make_property(casadi::OptiSol, opti, Opti);
   make_property(casadi::Opti, name, type);
 %enddef
 
-make_property(casadi::OptiSol, debug, OptiAdvanced);
 make_property_opti(f, MX)
 make_property_opti(g, MX)
 make_property_opti(x, MX)
