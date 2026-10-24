@@ -649,6 +649,13 @@ class Sparsitytests(casadiTestCase):
         with self.assertRaisesRegex(Exception, "requires a symmetric pattern"):
           f()
 
+  def test_banded_wide(self):
+    self.assertTrue(ca.Sparsity.banded(4, 5) == ca.Sparsity.dense(4, 4))
+    self.assertTrue(ca.Sparsity.banded(4, 3) == ca.Sparsity.dense(4, 4))
+    self.assertEqual(ca.Sparsity.banded(0, 2).shape, (0, 0))
+    with self.assertRaisesRegex(Exception, "should be smaller than size"):
+      ca.Sparsity.band(4, 4)
+
   def test_eq_foreign_operand(self):
     # issue #4407: comparing against an unrelated type follows the Python data
     # model (NotImplemented -> False) instead of raising NotImplementedError.
