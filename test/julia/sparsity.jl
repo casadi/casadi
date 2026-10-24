@@ -61,7 +61,7 @@ end
     @test C.is_symmetric(C.diag(_S, 4))
     @test C.is_symmetric(C.lower(_S, 3)) == false
     t = C.dense(_S, 3, 5)
-    tT = C.transpose(t)
+    tT = C.T(t)
     @test (C.size1(tT), C.size2(tT)) == (5, 3)
 end
 
@@ -132,4 +132,13 @@ end
     @test !isempty(s) && isempty(Sparsity(2, 0))
     @test isempty(SX()) && isempty(DM(Sparsity(0, 3))) && isempty(MX())
     @test !isempty(sym(SX, "x")) && !isempty(DM([1, 2]))
+end
+
+@testset "output arguments are returned" begin
+    sp, mapping = C.triplet(_S, 3, 3, [2, 0, 1], [1, 0, 0], false)
+    @test C.nnz(sp) == 3 && mapping == [1, 2, 0]
+    n, index, offset = C.scc(C.banded(_S, 3, 1))
+    @test n == 1 && index == [0, 1, 2] && offset == [0, 3]
+    T, m = C.transpose(C.lower(_S, 2), false)
+    @test C.is_equal(T, C.T(C.lower(_S, 2))) && length(m) == 3
 end

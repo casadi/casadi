@@ -63,7 +63,7 @@ end
     @test t isa SX
     j = jacobian([x^2; y], z)
     @test Base.size(j) == (2, 2)
-    H = hessian(x^2 + y^2, z)
+    H, = hessian(x^2 + y^2, z)
     @test Base.size(H) == (2, 2)
 end
 

@@ -40,14 +40,15 @@ end
 @testset "hessian: 2nd derivatives" begin
     x = sym(SX, "x", 2)
     f = C.times(x[1], x[1]) + C.times(C.times(x[1], x[2]), x[2])  # x0^2 + x0*x1^2
-    H = hessian(f, x)
+    H, g = hessian(f, x)
+    @test Base.size(g) == (2, 1)
     @test Base.size(H) == (2, 2)
     hf = C.Function("H", [x], [H])
     # H = [[2, 2*x1], [2*x1, 2*x0]]; at x=[3,5] -> [[2,10],[10,6]]
     @test Matrix{Float64}(hf(DM([3.0, 5.0]))) == [2.0 10.0; 10.0 6.0]
     # x^4 -> d2/dx2 = 12 x^2 ; at 2 -> 48
     s = sym(SX, "s")
-    h2 = C.Function("h2", [s], [hessian(s^4, s)])
+    h2 = C.Function("h2", [s], [hessian(s^4, s)[1]])
     @test abs(Float64(h2(DM(2.0))) - 48.0) < 1e-9
 end
 
