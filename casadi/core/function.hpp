@@ -1372,6 +1372,33 @@ namespace casadi {
                                     const std::vector<std::string>& s_out,
                                     casadi_int order=1, bool tr=false) const;
 
+    /** \brief Find which entries of an input may make the outputs jump (discontinuously)
+
+        Returns one boolean per nonzero of input \p s_in: true when at least one of the
+        outputs \p s_out may jump in that entry. With \p tr true the relation is flipped:
+        one boolean per nonzero of the vertically concatenated outputs, true when it may jump
+        in any entry of \p s_in. False positives are possible, false negatives not.
+
+        \doctest
+        >>> x = SX.sym("x"); y = SX.sym("y")
+        >>> f = Function("f", [x, y], [floor(x)*y, if_else(y>0, x, 2*x)], ["x", "y"], ["a", "b"])
+        >>> f.which_jump("x", ["a", "b"]), f.which_jump("y", ["a", "b"], True)
+        ([True], [False, True])
+        \enddoctest
+
+        \doctest{matlab}
+        >> x = SX.sym('x'); y = SX.sym('y');
+        >> f = Function('f', {x, y}, {floor(x)*y, if_else(y>0, x, 2*x)}, {'x', 'y'}, {'a', 'b'});
+        >> f.which_jump('x', {'a', 'b'})
+        1
+        >> f.which_jump('y', {'a', 'b'}, true)
+        0 1
+        \enddoctest
+
+        \sa which_depends, jump_sparsity, jumps_in */
+    std::vector<bool> which_jump(const std::string& s_in,
+                                 const std::vector<std::string>& s_out, bool tr=false) const;
+
     /** \brief Print the name and shape of every input and output
 
         \doctest
@@ -2442,6 +2469,29 @@ namespace casadi {
 
         \identifier{1wt} */
     Sparsity jac_sparsity(casadi_int oind, casadi_int iind, bool compact = false) const;
+
+    /** \brief Get the sparsity pattern of the entries of input \p iind
+        that may make output \p oind jump (discontinuously)
+
+        Same layout as jac_sparsity. False positives are possible, false negatives not.
+
+        \doctest
+        >>> x = SX.sym("x", 2)
+        >>> f = Function("f", [x], [vertcat(floor(x[0]), x[0]*x[1])])
+        >>> f.jump_sparsity(0, 0), f.jac_sparsity(0, 0)
+        (Sparsity(2x2,1nz), Sparsity(2x2,3nz))
+        \enddoctest
+
+        \doctest{matlab}
+        >> x = SX.sym('x', 2);
+        >> f = Function('f', {x}, {vertcat(floor(x(1)), x(1)*x(2))});
+        >> f.jump_sparsity(0, 0), f.jac_sparsity(0, 0)
+        2x2,1nz
+        2x2,3nz
+        \enddoctest
+
+        \sa jac_sparsity, which_jump */
+    Sparsity jump_sparsity(casadi_int oind, casadi_int iind, bool compact = false) const;
 
     /** \brief Generate self-contained C code for the function
 

@@ -2352,6 +2352,17 @@ class NLPtests(casadiTestCase):
       solver = ca.nlpsol("solver","ipopt",nlp,{"detect_simple_bounds":True})
       self.checkfunction_light(solver,solver_ref,inputs=solver.convert_in(dict(lbg=-inf,ubg=-1.5)))
 
+  @requires_nlpsol("bonmin")
+  def test_bonmin_jump_constraint_not_linear(self):
+    x = ca.SX.sym("x")
+    y = ca.SX.sym("y")
+    nlp = {"x":ca.vertcat(x,y),"f":(x-3)**2+(y-2.6)**2,"g":ca.vertcat(ca.floor(x)+y,x-y)}
+    solver = ca.nlpsol("solver","bonmin",nlp,{"discrete":[False,True],"pass_nonlinear_constraints":True,
+                                              "bonmin.algorithm":"B-OA"})
+    res = solver(x0=0,lbx=-10,ubx=10,lbg=-inf,ubg=ca.vertcat(4,0.5))
+    self.assertTrue(solver.stats()["success"])
+    self.checkarray(res["x"],ca.DM([2.5,2]),digits=6)
+
   @memory_heavy()
   @requires_nlpsol("ipopt")
   def test_simple_bounds_equality(self):

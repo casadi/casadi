@@ -1061,9 +1061,12 @@ namespace casadi {
     /// Convert from compact Jacobian sparsity pattern
     Sparsity from_compact(casadi_int oind, casadi_int iind, const Sparsity& sp) const;
 
-    /// Get the sparsity pattern via sparsity seed propagation
-    template<bool fwd>
+    /// Get the sparsity pattern via sparsity seed propagation (jump: via jump propagation)
+    template<bool fwd, bool jump=false>
     Sparsity get_jac_sparsity_gen(casadi_int oind, casadi_int iind) const;
+
+    /// Compact pattern of the input nonzeros that may make an output nonzero jump
+    Sparsity jump_sparsity(casadi_int oind, casadi_int iind) const;
 
     /// A flavor of get_jac_sparsity_gen that does hierarchical block structure recognition
     Sparsity get_jac_sparsity_hierarchical(casadi_int oind, casadi_int iind) const;

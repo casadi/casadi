@@ -1334,14 +1334,34 @@ namespace casadi {
     }
   };
 
-  template<bool fwd>
+  template<bool fwd> struct JumpSparsityTraits {};
+  template<> struct JumpSparsityTraits<true> {
+    typedef const bvec_t* arg_t;
+    static inline void sp(const FunctionInternal *f,
+                          const bvec_t** arg, bvec_t** res,
+                          casadi_int* iw, bvec_t* w, void* mem) {
+      f->sp_forward_jump(arg, res, iw, w, mem);
+    }
+  };
+  template<> struct JumpSparsityTraits<false> {
+    typedef bvec_t* arg_t;
+    static inline void sp(const FunctionInternal *f,
+                          bvec_t** arg, bvec_t** res,
+                          casadi_int* iw, bvec_t* w, void* mem) {
+      f->sp_reverse_jump(arg, res, iw, w, mem);
+    }
+  };
+
+  template<bool fwd, bool jump>
   Sparsity FunctionInternal::get_jac_sparsity_gen(casadi_int oind, casadi_int iind) const {
+    typedef typename std::conditional<jump, JumpSparsityTraits<fwd>,
+                                      JacSparsityTraits<fwd>>::type Traits;
     // Number of nonzero inputs and outputs
     casadi_int nz_in = nnz_in(iind);
     casadi_int nz_out = nnz_out(oind);
 
     // Evaluation buffers
-    std::vector<typename JacSparsityTraits<fwd>::arg_t> arg(sz_arg(), nullptr);
+    std::vector<typename Traits::arg_t> arg(sz_arg(), nullptr);
     std::vector<bvec_t*> res(sz_res(), nullptr);
     std::vector<casadi_int> iw(sz_iw());
     std::vector<bvec_t> w(sz_w(), 0);
@@ -1394,8 +1414,7 @@ namespace casadi {
       }
 
       // Propagate the dependencies
-      JacSparsityTraits<fwd>::sp(this, get_ptr(arg), get_ptr(res),
-                                  get_ptr(iw), get_ptr(w), memory(0));
+      Traits::sp(this, get_ptr(arg), get_ptr(res), get_ptr(iw), get_ptr(w), memory(0));
 
       // Loop over the nonzeros of the output
       for (casadi_int el=0; el<sens.size(); ++el) {
@@ -1434,10 +1453,17 @@ namespace casadi {
     if (!fwd) swap(jrow, jcol);
     Sparsity ret = Sparsity::triplet(nz_out, nz_in, jcol, jrow);
     if (verbose_) {
-      casadi_message("Formed Jacobian sparsity pattern (dimension " + str(ret.size()) + ", "
+      casadi_message(std::string(jump ? "Formed jump" : "Formed Jacobian")
+          + " sparsity pattern (dimension " + str(ret.size()) + ", "
           + str(ret.nnz()) + " (" + str(ret.density()) + " %) nonzeros.");
     }
     return ret;
+  }
+
+  Sparsity FunctionInternal::jump_sparsity(casadi_int oind, casadi_int iind) const {
+    // Fewest sweeps
+    if (nnz_in(iind) <= nnz_out(oind)) return get_jac_sparsity_gen<true, true>(oind, iind);
+    return get_jac_sparsity_gen<false, true>(oind, iind);
   }
 
   Sparsity FunctionInternal::get_jac_sparsity_hierarchical_symm(casadi_int oind,

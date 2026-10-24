@@ -4445,7 +4445,28 @@ class Functiontests(casadiTestCase):
     if not args.run_slow: return
     cg = self.check_codegen(f,inputs=[ca.DM.rand(f.sparsity_in(i)) for i in range(f.n_in())],with_jac_sparsity=True,with_forward=True)
     mychecks(cg["F"],exempt=True)
-   
+
+  def test_which_jump(self):
+    for X in [ca.SX,ca.MX]:
+      x = X.sym("x",2)
+      y = X.sym("y")
+      g = ca.vertcat(ca.floor(x[0]), x[0]*x[1], ca.if_else(y>0, x[1], 2*x[1]))
+      f = ca.Function("f",[x,y],[g,ca.sign(y)*x],["x","y"],["g","h"])
+
+      self.checkarray(ca.DM(f.jump_sparsity(0,0),1),ca.DM([[1,0],[0,0],[0,0]]))
+      self.checkarray(ca.DM(f.jump_sparsity(0,1),1),ca.DM([0,0,1]))
+      self.checkarray(ca.DM(f.jump_sparsity(1,1),1),ca.DM([1,1]))
+      self.assertEqual(f.jump_sparsity(1,0).nnz(),0)
+
+      self.assertEqual(f.which_jump("x",["g"]),[True,False])
+      self.assertEqual(f.which_jump("x",["g"],True),[True,False,False])
+      self.assertEqual(f.which_jump("y",["g","h"]),[True])
+      self.assertEqual(f.which_jump("y",["g","h"],True),[False,False,True,True,True])
+
+      # Through a call node and a map
+      F = ca.Function("F",[x,y],[f.map(2)(ca.repmat(x,1,2),y)[0]],["x","y"],["g"])
+      self.assertEqual(F.which_jump("x",["g"],True),[True,False,False]*2)
+
    
   def test_cat_input(self):
 

@@ -1130,6 +1130,36 @@ namespace casadi {
     }
   }
 
+  Sparsity Function::jump_sparsity(casadi_int oind, casadi_int iind, bool compact) const {
+    try {
+      Sparsity sp = (*this)->jump_sparsity(oind, iind);
+      return compact ? sp : (*this)->from_compact(oind, iind, sp);
+    } catch(std::exception& e) {
+      THROW_ERROR("jump_sparsity", e.what());
+    }
+  }
+
+  std::vector<bool> Function::
+  which_jump(const std::string& s_in, const std::vector<std::string>& s_out, bool tr) const {
+    try {
+      casadi_int iind = index_in(s_in);
+      std::vector<bool> ret(tr ? 0 : nnz_in(iind), false);
+      for (auto&& s : s_out) {
+        Sparsity sp = jump_sparsity(index_out(s), iind, true);
+        if (tr) {
+          std::vector<bool> r(sp.size1(), false);
+          for (casadi_int k = 0; k < sp.nnz(); ++k) r[sp.row(k)] = true;
+          ret.insert(ret.end(), r.begin(), r.end());
+        } else {
+          for (casadi_int c : sp.get_col()) ret[c] = true;
+        }
+      }
+      return ret;
+    } catch(std::exception& e) {
+      THROW_ERROR("which_jump", e.what());
+    }
+  }
+
   const std::vector<std::string>& Function::name_in() const {
     return (*this)->name_in_;
   }

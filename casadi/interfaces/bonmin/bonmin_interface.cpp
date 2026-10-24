@@ -235,8 +235,11 @@ namespace casadi {
       if (pass_nonlinear_variables_)
         nl_ex_ = oracle_.which_depends("x", {"f", "g"}, 2, false);
     }
-    if (pass_nonlinear_constraints_)
+    if (pass_nonlinear_constraints_) {
       nl_g_ = oracle_.which_depends("x", {"g"}, 2, true);
+      std::vector<bool> jump_g = oracle_.which_jump("x", {"g"}, true);
+      for (casadi_int i=0;i<ng_;++i) nl_g_[i] = nl_g_[i] || jump_g[i];
+    }
 
     // Create sos info
 
