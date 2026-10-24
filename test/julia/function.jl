@@ -203,3 +203,11 @@ end
     opti = Opti(); opti.variable()
     @test C.initial(opti) isa Vector{MX}
 end
+
+@testset "convert_in / convert_out take a vector or a dict" begin
+    f = C.Function("f", [sym(SX, "x"), sym(SX, "y")], [SX(0)], ["x", "y"], ["r"])
+    d = C.convert_in(f, [1, 2])
+    @test d isa Dict{String,DM} && Float64(d["y"]) == 2
+    @test Float64(C.convert_in(f, Dict("y" => DM(3)))[2]) == 3
+    @test C.convert_out(f, [DM(5)]) isa Dict{String,DM}
+end
