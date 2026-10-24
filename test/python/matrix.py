@@ -1428,6 +1428,9 @@ class Matrixtests(casadiTestCase):
     with self.assertInException("outside the diagonal blocks is unsupported"):
       ca.diagsplit(ca.MX.sym("x", 2, 2), 1)
 
+  def test_triplet_empty(self):
+    self.assertEqual(ca.DM.triplet([], [], ca.DM(0, 1)).shape, (0, 0))
+
   def test_horzsplit_n(self):
     self.assertTrue(len(ca.horzsplit_n(ca.DM.rand(1,6),2))==2)
     self.assertTrue(len(ca.vertsplit_n(ca.DM.rand(6),2))==2)
