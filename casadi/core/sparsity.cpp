@@ -1674,7 +1674,8 @@ namespace casadi {
   Sparsity Sparsity::blockcat(const std::vector< std::vector< Sparsity > > &v) {
     std::vector< Sparsity > ret;
     for (casadi_int i=0; i<v.size(); ++i)
-      ret.push_back(horzcat(v[i]));
+      if (!v[i].empty()) ret.push_back(horzcat(v[i]));
+    if (ret.empty()) return Sparsity(0, 0);
     return vertcat(ret);
   }
 
@@ -1696,10 +1697,14 @@ namespace casadi {
     // Caveat: this is a very silly implementation
     IM x2 = IM::zeros(x);
 
+    casadi_int nnz = 0;
     for (casadi_int i=0; i<n; ++i) {
       ret.push_back(x2(Slice(offset1[i], offset1[i+1]),
                        Slice(offset2[i], offset2[i+1])).sparsity());
+      nnz += ret.back().nnz();
     }
+    casadi_assert(nnz==x.nnz(),
+      "diagsplit: the presence of nonzeros outside the diagonal blocks is unsupported.");
 
     return ret;
   }

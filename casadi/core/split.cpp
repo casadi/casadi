@@ -225,7 +225,7 @@ namespace casadi {
     }
 
     casadi_assert(offset_.back()==x.nnz(),
-      "DiagSplit:: the presence of nonzeros outside the diagonal blocks in unsupported.");
+      "DiagSplit:: the presence of nonzeros outside the diagonal blocks is unsupported.");
   }
 
   std::string Diagsplit::disp(const std::vector<std::string>& arg) const {
