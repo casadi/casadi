@@ -1343,6 +1343,10 @@ class Matrixtests(casadiTestCase):
     self.checkarray(res0,res1)
     
 
+  def test_logsumexp_empty(self):
+    with self.assertInException("Argument must be nonempty"):
+      ca.logsumexp(ca.DM(0, 1))
+
   def test_inplace(self):
     n = 10
     x = ca.MX.sym("x",n)
