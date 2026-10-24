@@ -1288,6 +1288,9 @@ namespace casadi {
     casadi_assert(f.nnz()==f.numel() && x.nnz()==x.numel(),
                           "mtaylor: not implemented for sparse matrices");
 
+    casadi_assert(a.sparsity()==x.sparsity(),
+                  "mtaylor: expected a of shape " + x.dim() + ", but got " + a.dim() + ".");
+
     casadi_assert(x.nnz()==order_contributions.size(),
                           "mtaylor: number of non-zero elements in x (" + str(x.nnz())
                           + ") must match size of order_contributions ("
