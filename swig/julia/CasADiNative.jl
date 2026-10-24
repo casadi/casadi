@@ -410,8 +410,15 @@ Base.size(x::Union{SX,MX,DM,Sparsity}, d::Integer) =
     d < 1 ? Base.throw(BoundsError(Base.size(x), d)) : d <= 2 ? Base.size(x)[d] : 1
 Base.length(x::Union{SX,MX,DM,Sparsity}) = C.numel(x)
 Base.isempty(x::Union{SX,MX,DM,Sparsity}) = C.numel(x) == 0
-Base.Float64(d::DM) = (n = C.nonzeros(d); Base.length(n) == 1 ? n[1] :
-    Base.error("DM is not scalar"))
+Base.Float64(d::DM) = C.numel(d) == 1 ? Base.Matrix{Float64}(d)[1] :
+    Base.throw(DimensionMismatch("Float64 of a $(_shape(d)) DM; only a 1×1 DM converts"))
+# scalar conversions follow the Float64 value, as for Julia numbers (Bool(2.0) throws)
+for T in (:Bool, :Int32, :Int64, :Float32)
+    @eval Base.$T(x::_Cat) = $T(Float64(x))
+end
+for f in (:round, :trunc, :floor, :ceil)
+    @eval Base.$f(::Type{T}, x::_Cat) where {T<:Integer} = Base.$f(T, Float64(x))
+end
 # P1-5: dense, shape-correct conversions (densify -> column-major nonzeros)
 Base.Matrix{Float64}(d::DM) =
     Base.reshape(C.nonzeros(C.densify(d)), (C.size1(d), C.size2(d)))
@@ -419,8 +426,10 @@ Base.Matrix(d::DM) = Base.Matrix{Float64}(d)
 Base.Array(d::DM) = Base.Matrix{Float64}(d)
 Base.collect(d::DM) = Base.Matrix{Float64}(d)
 Base.eltype(::Type{DM}) = Float64
-# kept for back-compat: structural nonzeros (column-major), ignores shape/sparsity
-Base.Vector{Float64}(d::DM) = C.nonzeros(d)
+# a row or column -> dense Vector, as Vector(x) for SX/MX
+Base.Vector{T}(d::DM) where {T} = C.size1(d) == 1 || C.size2(d) == 1 ? Base.Vector{T}(Base.vec(Base.Matrix{Float64}(d))) :
+    Base.throw(DimensionMismatch("Vector of a $(_shape(d)) matrix; use vec(Matrix(x))"))
+Base.Vector(d::DM) = Base.Vector{Float64}(d)
 
 # ---- zero/one: scalar for the type (so zeros(SX,m,n) works), shaped for a value ----
 for T in (:SX, :MX, :DM)

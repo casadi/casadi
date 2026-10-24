@@ -20,7 +20,7 @@ end
     @test Base.size(J) == (2, 2)
     # J = [[x1, x0], [1, 1]]; at x=[3,5] column-major nonzeros [5,1,3,1]
     f = C.Function("J", [x], [J])
-    @test Vector{Float64}(f(DM([3.0, 5.0]))) == [5.0, 1.0, 3.0, 1.0]
+    @test vec(Matrix(f(DM([3.0, 5.0])))) == [5.0, 1.0, 3.0, 1.0]
     # Diagonal Jacobian has a sparse pattern (3 nnz on a 3x3).
     y = sym(SX, "y", 3)
     Jd = jacobian(C.times(y, y), y)
@@ -99,7 +99,7 @@ end
     # jacobians agree too
     Js = C.Function("Js", [xs], [jacobian(build(xs), xs)])
     Jm = C.Function("Jm", [xm], [jacobian(build(xm), xm)])
-    @test maximum(abs.(Vector{Float64}(Js(inp)) .- Vector{Float64}(Jm(inp)))) < 1e-12
+    @test maximum(abs.(Matrix(Js(inp)) .- Matrix(Jm(inp)))) < 1e-12
 end
 
 @testset "substitute_inplace returns the updated expressions" begin

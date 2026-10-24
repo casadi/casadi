@@ -97,9 +97,9 @@ end
 @testset "DM copy is independent" begin
     x = C.ones(C.DM, 2, 3)
     y = C.DM(x)
-    @test Vector{Float64}(x) == Vector{Float64}(y)
+    @test Matrix(x) == Matrix(y)
     @test length(C.nonzeros(x)) == 6
-    @test all(Vector{Float64}(y) .== 1.0)
+    @test all(Matrix(y) .== 1.0)
 end
 
 # ---- invalid-Sparsity DM construction throws, doesn't segfault (test_sanity) ----
