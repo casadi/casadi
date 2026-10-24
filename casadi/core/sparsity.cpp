@@ -569,6 +569,9 @@ namespace casadi {
   }
 
   Sparsity Sparsity::diag(casadi_int nrow, casadi_int ncol) {
+    casadi_assert(nrow>=0 && ncol>=0,
+      "Dimensions must be non-negative, got " + str(nrow) + "-by-" + str(ncol));
+
     // Smallest dimension
     casadi_int n = std::min(nrow, ncol);
 
