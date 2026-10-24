@@ -664,6 +664,10 @@ class LinearSolverTests(casadiTestCase):
         self.assertTrue(C.is_subset(S1))
     
     
+  def test_empty_system(self):
+    L = ca.Linsol("L", "qr", ca.Sparsity(0, 0))
+    self.assertEqual(L.solve(ca.DM(0, 0), ca.DM(0, 2)).shape, (0, 2))
+
   def test_issue2734(self):
     example_input = ca.blockcat([[     8  ,  1  ,   6],[
          3 ,    5  ,   7],[
