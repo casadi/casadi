@@ -31,6 +31,8 @@
 #include <casadi/interfaces/qpoases/casadi_conic_qpoases_export.h>
 #include <qpOASES.hpp>
 
+namespace qpOASES = casadi_qpOASES; 
+
 /** \defgroup plugin_Conic_qpoases Title
     \par
 
