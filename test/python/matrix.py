@@ -1358,6 +1358,10 @@ class Matrixtests(casadiTestCase):
     with self.assertInException("must be a multiple of n"):
       ca.vertsplit_n(x.T, 0)
 
+  def test_diagsplit_offset_lengths(self):
+    with self.assertInException("offset1 and offset2 must have the same length"):
+      ca.diagsplit(ca.DM.ones(4, 4), 1, 2)
+
   def test_horzsplit_n(self):
     self.assertTrue(len(ca.horzsplit_n(ca.DM.rand(1,6),2))==2)
     self.assertTrue(len(ca.vertsplit_n(ca.DM.rand(6),2))==2)
