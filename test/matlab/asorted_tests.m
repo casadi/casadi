@@ -1015,6 +1015,11 @@ sp = Sparsity.lower(2);
 assert(sp' == Sparsity.upper(2));
 assert(sp.' == Sparsity.upper(2));
 
+% Sparsity intersection is .*, * is the matrix product pattern
+assert(Sparsity.diag(2) .* Sparsity.dense(2, 2) == Sparsity.diag(2));
+assert(mtimes(Sparsity.diag(2), Sparsity.dense(2, 1)) == Sparsity.dense(2, 1));
+assert(Sparsity.diag(2) * Sparsity.dense(2, 1) == Sparsity.dense(2, 1));
+
 disp('success')
 
 

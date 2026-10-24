@@ -4128,6 +4128,8 @@ def dcat(args):
 #ifdef SWIGMATLAB
 %rename(uminus) operator-;
 %rename(uplus) operator+;
+// Pattern intersection is elementwise; * and mtimes give the pattern of the matrix product
+%rename(times) casadi::Sparsity::operator*;
 %feature("varargin","1") casadi_vertcat;
 %feature("varargin","1") casadi_horzcat;
 %feature("varargin","1") casadi_diagcat;
