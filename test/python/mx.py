@@ -5418,6 +5418,12 @@ class MXtests(casadiTestCase):
     with self.assertInException("multiple of the number of dimensions"):
       ca.MX.bspline_dual([0.5, 0.5, 0.1], [[0, 0, 0, 0, 1, 1, 1, 1]]*2, [3, 3])
 
+  def test_unary_op_check(self):
+    y = ca.MX.sym("y")
+    for op in [ca.OP_ADD, 999]:
+      with self.assertInException("Not a unary operation"):
+        ca.MX.unary(op, y)
+
   def test_set_precision(self):
     # Issue #4326: numeric MX constants honor DM::set_precision
     # (the value lives in a DM-like node, so MX printing piggybacks

@@ -560,6 +560,7 @@ namespace casadi {
   }
 
   MX MX::unary(casadi_int op, const MX &x, bool unique) {
+    casadi_assert(casadi_math<double>::is_unary(op), "Not a unary operation: " + str(op));
     return x->get_unary(Operation(op), unique);
   }
 
