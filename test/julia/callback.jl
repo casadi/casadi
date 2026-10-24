@@ -70,6 +70,12 @@ const _ipopt_quiet = Dict("print_time" => false, "ipopt" => Dict{String,Any}("pr
     @test Float64(F(3)) == 10.0
 end
 
+@testset "Callback: base-class methods" begin
+    cb = callback(CbSquare(); name = "sqs")
+    @test occursin("sqs", C.str(cb))
+    @test !C.is_null(cb)
+end
+
 @testset "Callback: derivative hooks" begin
     J = C.Function(callback(CbSquareJac(); name = "sqj")).jacobian()
     @test Float64(J(3, 9)) == 6.0
