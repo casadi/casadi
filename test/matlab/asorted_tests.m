@@ -998,6 +998,12 @@ m = casadi.vvcat({DM([1; 2]), DM([3; 4])});
 assert(isa(m, 'casadi.DM') && isequal(full(m), [1; 2; 3; 4]));
 
 
+% Chained indexing acts on the result of the first subscript
+B = DM([1 2 3; 4 5 6]);
+assert(strcmp(B(1, :).dim(), '1x3'));
+assert(strcmp(B(2:1, :).dim(), '0x3'));
+v = SX.sym('v', 2);
+assert(strcmp(v(2).name(), 'v_1'));
 disp('success')
 
 

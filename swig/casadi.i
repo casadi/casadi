@@ -5869,12 +5869,19 @@ namespace casadi{
       [varargout{1:nargout}] = spy(sparse(casadi.DM(self.sparsity(),1)),varargin{:});
     end
     function varargout = subsref(self,s)
-      if numel(s)==1 && strcmp(s.type,'()')
-        [varargout{1}] = paren(self, s.subs{:});
-      elseif numel(s)==1 && strcmp(s.type,'{}')
-        [varargout{1}] = brace(self, s.subs{:});
+      if strcmp(s(1).type,'()')
+        ret = paren(self, s(1).subs{:});
+      elseif strcmp(s(1).type,'{}')
+        ret = brace(self, s(1).subs{:});
       else
         [varargout{1:nargout}] = builtin('subsref',self,s);
+        return
+      end
+      % Remaining subscripts act on the result, e.g. x(1,:).dim()
+      if numel(s)==1
+        varargout{1} = ret;
+      else
+        [varargout{1:nargout}] = subsref(ret, s(2:end));
       end
     end
     function self = subsasgn(self,s,v)
