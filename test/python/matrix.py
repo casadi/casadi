@@ -1431,6 +1431,11 @@ class Matrixtests(casadiTestCase):
   def test_triplet_empty(self):
     self.assertEqual(ca.DM.triplet([], [], ca.DM(0, 1)).shape, (0, 0))
 
+  def test_triplet_default_size(self):
+    A = ca.DM.triplet([0, 1], [1, 0], ca.DM([5, 6]))
+    self.assertEqual(A.shape, (2, 2))
+    self.checkarray(A, ca.DM([[0, 5], [6, 0]]))
+
   def test_horzsplit_n(self):
     self.assertTrue(len(ca.horzsplit_n(ca.DM.rand(1,6),2))==2)
     self.assertTrue(len(ca.vertsplit_n(ca.DM.rand(6),2))==2)
