@@ -1386,6 +1386,10 @@ class Matrixtests(casadiTestCase):
     with self.assertInException("sparsity_cast"):
       ca.sparsity_cast(ca.DM.eye(2), ca.Sparsity.dense(3, 1))
 
+  def test_repmat_negative(self):
+    with self.assertInException("must be non-negative"):
+      ca.repmat(ca.DM([1, 2]), -1)
+
   def test_horzsplit_n(self):
     self.assertTrue(len(ca.horzsplit_n(ca.DM.rand(1,6),2))==2)
     self.assertTrue(len(ca.vertsplit_n(ca.DM.rand(6),2))==2)
