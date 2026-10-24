@@ -656,6 +656,10 @@ class Sparsitytests(casadiTestCase):
     with self.assertRaisesRegex(Exception, "should be smaller than size"):
       ca.Sparsity.band(4, 4)
 
+  def test_density_empty(self):
+    for sp in [ca.Sparsity(0, 3), ca.Sparsity(0, 0), ca.Sparsity.dense(3, 0)]:
+      self.assertEqual(sp.density(), 100)
+
   def test_eq_foreign_operand(self):
     # issue #4407: comparing against an unrelated type follows the Python data
     # model (NotImplemented -> False) instead of raising NotImplementedError.
