@@ -232,3 +232,9 @@ end
     @test repr("text/plain", C.Slice(0, 3)) == "Slice(:3)"
     @test !occursin("Ptr", repr(C.Linsol("L", "ldl", C.dense(Sparsity, 2, 2))))
 end
+
+@testset "bound methods display their name" begin
+    @test repr("text/plain", C.Linsol.load_plugin) == "Linsol.load_plugin"
+    @test repr(sym(SX, "x").nnz) == "nnz bound to a SX"
+    @test Opti().variable isa Base.Function
+end
