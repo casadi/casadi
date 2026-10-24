@@ -32,7 +32,7 @@
       2
     ],
     "Conic": [
-      5
+      6
     ],
     "ConoptInterface": [
       1
@@ -155,7 +155,7 @@
       1
     ],
     "Nlpsol": [
-      5
+      6
     ],
     "OnnxFunction": [
       2
@@ -279,23 +279,31 @@
       "Conic::equality": [
         3,
         4,
-        5
+        5,
+        6
       ],
       "Conic::error_on_fail": [
         1
       ],
+      "Conic::sens_force_equality": [
+        6
+      ],
       "Conic::sens_linsol": [
-        5
+        5,
+        6
       ],
       "Conic::sens_linsol_options": [
-        5
+        5,
+        6
       ],
       "Conic::sens_min_lam": [
-        5
+        5,
+        6
       ],
       "Conic::solver_version_check": [
         4,
-        5
+        5,
+        6
       ]
     },
     "CvodesInterface": {
@@ -546,32 +554,41 @@
     "Nlpsol": {
       "Nlpsol::detect_simple_bounds_is_simple": [
         3,
-        5
+        5,
+        6
       ],
       "Nlpsol::detect_simple_bounds_parts": [
         3,
-        5
+        5,
+        6
       ],
       "Nlpsol::detect_simple_bounds_target_x": [
         3,
-        5
+        5,
+        6
       ],
       "Nlpsol::equality": [
-        5
+        5,
+        6
       ],
       "Nlpsol::error_on_fail": [
         1,
         2
       ],
+      "Nlpsol::sens_force_equality": [
+        6
+      ],
       "Nlpsol::sens_linsol": [
         2,
         3,
-        5
+        5,
+        6
       ],
       "Nlpsol::sens_linsol_options": [
         2,
         3,
-        5
+        5,
+        6
       ]
     },
     "OnnxFunction": {
@@ -904,7 +921,8 @@
       2,
       3,
       4,
-      5
+      5,
+      6
     ],
     "ConoptInterface": [
       1
@@ -1056,7 +1074,8 @@
       2,
       3,
       4,
-      5
+      5,
+      6
     ],
     "OnnxFunction": [
       1,
@@ -2285,7 +2304,7 @@
           "minimum": 1,
           "name": "Conic",
           "op": "version",
-          "value": 5
+          "value": 6
         },
         {
           "name": "Conic::discrete",
@@ -2372,6 +2391,27 @@
             [
               "literal",
               5
+            ]
+          ],
+          "op": "if"
+        },
+        {
+          "body": [
+            {
+              "name": "Conic::sens_force_equality",
+              "op": "field",
+              "type": "bool"
+            }
+          ],
+          "condition": [
+            "greater_equal",
+            [
+              "version",
+              "Conic"
+            ],
+            [
+              "literal",
+              6
             ]
           ],
           "op": "if"
@@ -7586,7 +7626,7 @@
           "minimum": 1,
           "name": "Nlpsol",
           "op": "version",
-          "value": 5
+          "value": 6
         },
         {
           "name": "Nlpsol::nx",
@@ -7748,6 +7788,27 @@
             [
               "literal",
               2
+            ]
+          ],
+          "op": "if"
+        },
+        {
+          "body": [
+            {
+              "name": "Nlpsol::sens_force_equality",
+              "op": "field",
+              "type": "bool"
+            }
+          ],
+          "condition": [
+            "greater_equal",
+            [
+              "version",
+              "Nlpsol"
+            ],
+            [
+              "literal",
+              6
             ]
           ],
           "op": "if"
