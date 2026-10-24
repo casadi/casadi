@@ -65,7 +65,7 @@ const Options RuntimeIntegrator::options_
       "Adaptive steps: minimum step size [1e-14]"}},
     {"quad_err_con",
       {OT_BOOL,
-      "Adaptive steps: include the quadratures in the error control [false]"}},
+      "Adaptive steps: include the quadratures in the error control [true]"}},
     {"max_tape_steps",
       {OT_INT,
       "Adaptive steps: capacity, in steps, of a tape in the work vector, for adjoint "
@@ -103,7 +103,7 @@ void RuntimeIntegrator::init(const Dict& opts) {
   step0_ = 0;
   max_step_size_ = 0;
   min_step_size_ = 1e-14;
-  quad_err_con_ = false;
+  quad_err_con_ = true;
   max_tape_steps_ = 0;
 
   // Read options

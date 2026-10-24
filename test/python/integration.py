@@ -1836,6 +1836,29 @@ class Integrationtests(casadiTestCase):
         J_sp, J_dense = J(numpy.concatenate([e.nonzeros() for e in inputs]))
         self.checkarray(J_dense, J_sp, plugin + " sparsity", digits=digits)
 
+  def test_runtime_integrator_quadrature_error_control(self):
+    # Constant states cannot reveal error in a time-varying quadrature.
+    t = ca.SX.sym("t")
+    x = ca.SX.sym("x")
+    dae = {"t": t, "x": x, "ode": 0*x, "quad": ca.exp(10*t)}
+    exact = numpy.expm1(10)/10
+    opts = {"abstol": 1e-9, "reltol": 1e-9, "step0": 1.0}
+    for plugin in ["erk", "rosenbrock"]:
+      if not ca.has_integrator(plugin):
+        continue
+      default = ca.integrator("default", plugin, dae, 0, 1, opts)
+      enabled = ca.integrator("enabled", plugin, dae, 0, 1,
+                              dict(opts, quad_err_con=True))
+      disabled = ca.integrator("disabled", plugin, dae, 0, 1,
+                               dict(opts, quad_err_con=False))
+      q_default = float(default(x0=0)["qf"])
+      q_enabled = float(enabled(x0=0)["qf"])
+      q_disabled = float(disabled(x0=0)["qf"])
+      self.assertEqual(q_default, q_enabled)
+      self.assertLess(abs(q_default-exact), 1e-4)
+      self.assertGreater(abs(q_disabled-exact), 1e-2)
+      self.assertGreater(default.stats()["n_steps"], disabled.stats()["n_steps"])
+
   @memory_heavy()
   def test_rosenbrock_order(self):
     self.message("rosenbrock: order 5 on fixed meshes, ODE and index-1 DAE")
