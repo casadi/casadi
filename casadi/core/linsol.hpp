@@ -103,6 +103,35 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> A = ca.DM([3 1; 1 2]); b = ca.DM([4, 3]);
+      julia> L = ca.Linsol("L", "qr", ca.sparsity(A));
+      julia> ca.plugin_name(L), ca.sparsity(L)
+      ("qr", 2x2)
+      julia> ca.solve(L, A, b)
+      DM([1, 1])
+      julia> ca.solve(L, ca.DM([1 2; 0 1]), ca.DM([1, 1]), true)
+      DM([1, -1])
+      julia> ca.solve(L, A, ca.DM([4 1; 3 0]))
+      DM(
+      [[1, 0.4],
+       [1, -0.2]])
+      julia> L.det(A)
+      5.0
+      julia> try
+                 ca.solve(L, ca.DM([1 1; 1 1]), b, false)
+             catch e
+                 println(occursin("'nfact' failed", sprint(showerror, e)))
+             end
+      true
+      julia> Am = ca.MX.sym("A", ca.sparsity(A)); bm = ca.MX.sym("b", 2);
+      julia> f = ca.Function("f", [Am, bm], [ca.solve(L, Am, bm), L.det(Am)]);
+      julia> f(A, b)
+      ([1, 1], 5)
+      \enddoctest
+      \endlang
+
       \generalsection{Linsol}
       \pluginssection{Linsol}
 
@@ -153,6 +182,20 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> L = ca.Linsol("L", "ldl", ca.Sparsity.dense(2, 2));
+        julia> ca.str(L)
+        "Linear solver LinsolLdl"
+        julia> try
+                   ca.Linsol("L", "qr", ca.Sparsity.dense(2, 2), Dict("no_such_option" => 1))
+               catch e
+                   println(occursin("Unknown option", sprint(showerror, e)))
+               end
+        true
+        \enddoctest
+        \endlang
+
         \identifier{2pe} */
     explicit Linsol(const std::string& name, const std::string& solver,
                     const Sparsity& sp, const Dict& opts=Dict());
@@ -194,6 +237,13 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> ca.Linsol.has_plugin("qr"), ca.Linsol.has_plugin("no_such_plugin")
+        (true, false)
+        \enddoctest
+        \endlang
+
         \identifier{2pf} */
     static bool has_plugin(const std::string& name);
 
@@ -219,6 +269,17 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> try
+                   ca.Linsol.load_plugin("no_such_plugin")
+               catch e
+                   println(occursin("no_such_plugin", sprint(showerror, e)))
+               end
+        true
+        \enddoctest
+        \endlang
+
         \identifier{2pg} */
     static void load_plugin(const std::string& name);
 
@@ -237,6 +298,13 @@ namespace casadi {
         \doctest
         >> contains(Linsol.doc('ldl'), 'LDL')
         1
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> occursin("LDL", ca.Linsol.doc("ldl"))
+        true
         \enddoctest
         \endlang
 
@@ -286,6 +354,19 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> A = ca.DM([3 1; 1 2]);
+        julia> L = ca.Linsol("L", "ldl", ca.sparsity(A));
+        julia> ca.nfact(L, A)
+        julia> ca.neig(L, A), ca.rank(L, A)
+        (0, 2)
+        julia> ca.nfact(L, ca.DM([-1 0; 0 1]))
+        julia> ca.neig(L, ca.DM([-1 0; 0 1]))
+        1
+        \enddoctest
+        \endlang
+
         \identifier{2pj} */
     void nfact(const DM& A) const;
 
@@ -326,6 +407,20 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> L = ca.Linsol("L", "qr", ca.Sparsity.dense(2, 2));
+        julia> ca.solve(L, ca.DM([3 1; 1 2]), ca.DM([4, 3]))
+        DM([1, 1])
+        julia> try
+                   ca.solve(L, ca.DM([3 1; 1 2]), ca.DM([1, 2, 3]))
+               catch e
+                   println(occursin("matching row count", sprint(showerror, e)))
+               end
+        true
+        \enddoctest
+        \endlang
+
         \identifier{2pk} */
     DM solve(const DM& A, const DM& B, bool tr=false) const;
     MX solve(const MX& A, const MX& B, bool tr=false) const;
@@ -362,6 +457,22 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> A = ca.DM([-2 0; 0 1]);
+        julia> L = ca.Linsol("L", "ldl", ca.sparsity(A));
+        julia> ca.nfact(L, A)
+        julia> ca.neig(L, A)
+        1
+        julia> try
+                   ca.neig(ca.Linsol("L", "qr", ca.sparsity(A)), A)
+               catch e
+                   println(occursin("'neig' not defined", sprint(showerror, e)))
+               end
+        true
+        \enddoctest
+        \endlang
+
         \identifier{1kk} */
     casadi_int neig(const DM& A) const;
 
@@ -386,6 +497,16 @@ namespace casadi {
         \doctest
         >> A = DM([2 1; 1 3]); L = Linsol('L', 'ldl', A.sparsity());
         >> L.nfact(A); disp(L.rank(A))
+        2
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> A = ca.DM([2 1; 1 3]);
+        julia> L = ca.Linsol("L", "ldl", ca.sparsity(A));
+        julia> ca.nfact(L, A)
+        julia> ca.rank(L, A)
         2
         \enddoctest
         \endlang
@@ -417,6 +538,20 @@ namespace casadi {
         >> L = Linsol('L', 'ldl', A.sparsity());
         >> try, L.det(A); catch e, disp(contains(e.message, '''det'' not defined')); end
         1
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> A = ca.DM([3 1; 1 2]);
+        julia> ca.Linsol("L", "qr", ca.sparsity(A)).det(A)
+        5.0
+        julia> try
+                   ca.Linsol("L", "ldl", ca.sparsity(A)).det(A)
+               catch e
+                   println(occursin("'det' not defined", sprint(showerror, e)))
+               end
+        true
         \enddoctest
         \endlang
 
@@ -456,6 +591,23 @@ namespace casadi {
         1
         >> L.solve(DM(2), DM(4)), isempty(fieldnames(L.stats()))
         2
+        1
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> L = ca.Linsol("L", "qr", ca.Sparsity.dense(1, 1));
+        julia> try
+                   ca.stats(L)
+               catch e
+                   println(occursin("did not solve a problem yet", sprint(showerror, e)))
+               end
+        true
+        julia> ca.solve(L, ca.DM(2), ca.DM(4)), ca.stats(L)
+        (2, Dict{String, Any}())
+        julia> L = ca.Linsol("L", "qr", ca.Sparsity.dense(1, 1), Dict("record_time" => true));
+        julia> ca.solve(L, ca.DM(2), ca.DM(4)); ca.stats(L)["n_call_solve"]
         1
         \enddoctest
         \endlang
@@ -512,6 +664,13 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> ca.has_linsol("qr"), ca.has_linsol("no_such_plugin")
+      (true, false)
+      \enddoctest
+      \endlang
+
       \identifier{2pm} */
   CASADI_EXPORT bool has_linsol(const std::string& name);
 
@@ -538,6 +697,17 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> try
+                 ca.load_linsol("no_such_plugin")
+             catch e
+                 println(occursin("no_such_plugin", sprint(showerror, e)))
+             end
+      true
+      \enddoctest
+      \endlang
+
       \identifier{2pn} */
   CASADI_EXPORT void load_linsol(const std::string& name);
 
@@ -556,6 +726,13 @@ namespace casadi {
       \doctest
       >> contains(doc_linsol('qr'), 'QR')
       1
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> occursin("QR", ca.doc_linsol("qr"))
+      true
       \enddoctest
       \endlang
 

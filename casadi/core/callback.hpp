@@ -115,6 +115,35 @@ namespace casadi {
    \enddoctest
    \endlang
 
+   \lang{julia}
+   \doctest
+   julia> struct MyCallback <: ca.Callback
+              d::Float64
+          end
+   julia> ca.get_n_in(::MyCallback) = 1
+   julia> ca.get_n_out(::MyCallback) = 1
+   julia> ca.eval_(cb::MyCallback, arg) = [sin(cb.d * arg[1])]
+   julia> f = ca.callback(MyCallback(0.5), "f");
+   julia> println(ca.Function(f))
+   f:(i0)->(o0) CallbackInternal
+   julia> f(2)
+   DM(0.8415)
+   julia> x = ca.MX.sym("x");
+   julia> println(f(x))
+   f(x){0}
+   julia> try
+              ca.jacobian(f(x), x)
+          catch e
+              println(occursin("Derivatives cannot be calculated for f", sprint(showerror, e)))
+          end
+   true
+   julia> f = ca.callback(MyCallback(0.5), "f", Dict("enable_fd" => true));
+   julia> J = ca.Function("J", [x], [ca.jacobian(f(x), x)]);
+   julia> J(2)
+   DM(0.2702)
+   \enddoctest
+   \endlang
+
    The callback object must outlive every use of the Function:
 
    \lang{python}
@@ -157,6 +186,25 @@ namespace casadi {
    \enddoctest
    \endlang
 
+   \lang{julia}
+   \doctest
+   julia> struct Sq <: ca.Callback end
+   julia> ca.eval_(::Sq, arg) = [arg[1]^2]
+   julia> x = ca.MX.sym("x");
+   julia> f = ca.callback(Sq(), "f");
+   julia> F = ca.Function("F", [x], [f(x)]);
+   julia> F(3)
+   DM(9)
+   julia> f = nothing; GC.gc()
+   julia> try
+              F(3)
+          catch e
+              println(last(split(sprint(showerror, e), "\n")))
+          end
+   Callback object has been deleted
+   \enddoctest
+   \endlang
+
    Use in an NLP with finite differences:
 
    \lang{python}
@@ -191,6 +239,21 @@ namespace casadi {
    >> sol = opti.solve(); disp(sol.value(v))
    1.0000
    >> rmpath(d); rmdir(d, 's');
+   \enddoctest
+   \endlang
+
+   \lang{julia}
+   \doctest
+   julia> struct Sq <: ca.Callback end
+   julia> ca.eval_(::Sq, arg) = [arg[1]^2]
+   julia> f = ca.callback(Sq(), "f", Dict("enable_fd" => true));
+   julia> opti = ca.Opti();
+   julia> v = ca.variable(opti);
+   julia> ca.minimize(opti, f(v - 1))
+   julia> ca.solver(opti, "ipopt", Dict("print_time" => false),
+                     Dict("print_level" => 0, "sb" => "yes"))
+   julia> ca.value(ca.solve(opti), v)
+   1.0
    \enddoctest
    \endlang
 
@@ -247,6 +310,20 @@ namespace casadi {
         >> try, Callback(f); catch e, disp(contains(e.message, 'cannot be copied')); end
         1
         >> rmpath(d); rmdir(d, 's');
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> struct Sq <: ca.Callback end
+        julia> ca.eval_(::Sq, arg) = [arg[1]^2]
+        julia> f = ca.callback(Sq(), "f");
+        julia> try
+                   ca.CallbackFunction(f)
+               catch e
+                   println(e isa MethodError)
+               end
+        true
         \enddoctest
         \endlang
 
@@ -308,6 +385,22 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> struct Sq <: ca.Callback end
+        julia> ca.eval_(::Sq, arg) = [arg[1]^2]
+        julia> f = ca.callback(Sq(), "f", Dict("enable_fd" => true, "fd_method" => "forward"));
+        julia> ca.name(f), ca.n_in(f), ca.n_out(f)
+        ("f", 1, 1)
+        julia> try
+                   ca.construct(f, "g")
+               catch e
+                   println(occursin("Internal class already created", sprint(showerror, e)))
+               end
+        true
+        \enddoctest
+        \endlang
+
         \identifier{o5} */
     void construct(const std::string& name, const Dict& opts=Dict());
 
@@ -353,6 +446,24 @@ namespace casadi {
         finalize
         after construct
         >> rmpath(d); rmdir(d, 's');
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> struct Sq <: ca.Callback end
+        julia> ca.init(::Sq) = println("init")
+        julia> ca.finalize(::Sq) = println("finalize")
+        julia> ca.eval_(::Sq, arg) = [arg[1]^2]
+        julia> begin
+                   println("before construct")
+                   f = ca.callback(Sq(), "f")
+                   println("after construct")
+               end
+        before construct
+        init
+        finalize
+        after construct
         \enddoctest
         \endlang
 
@@ -433,6 +544,28 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> abstract type AbstractScale <: ca.Callback end
+        julia> struct Scale <: AbstractScale end
+        julia> ca.get_n_in(::AbstractScale) = 2
+        julia> ca.get_sparsity_in(::AbstractScale, i) = ca.Sparsity.dense(i == 0 ? 2 : 1, 1)
+        julia> ca.get_sparsity_out(::AbstractScale, i) = ca.Sparsity.dense(2, 1)
+        julia> ca.eval_(::Scale, arg) = [arg[1] * arg[2]]
+        julia> f = ca.callback(Scale(), "f");
+        julia> f([1, 2], 3)
+        DM([3, 6])
+        julia> struct Bad <: AbstractScale end
+        julia> ca.eval_(::Bad, arg) = [arg[2]]
+        julia> try
+                   ca.callback(Bad(), "b")([1, 2], 3)
+               catch e
+                   println(occursin("Shape mismatch", sprint(showerror, e)))
+               end
+        true
+        \enddoctest
+        \endlang
+
         \identifier{o8} */
     virtual std::vector<DM> eval(const std::vector<DM>& arg) const;
 
@@ -460,6 +593,19 @@ namespace casadi {
         ...     return 0
         >>> f = Sq("f")
         >>> f([1, 2, 3])
+        DM([1, 4, 9])
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> struct Sq <: ca.Callback end
+        julia> ca.get_sparsity_in(::Sq, i) = ca.Sparsity.dense(3, 1)
+        julia> ca.get_sparsity_out(::Sq, i) = ca.Sparsity.dense(3, 1)
+        julia> ca.has_eval_buffer(::Sq) = true
+        julia> ca.eval_buffer(::Sq, arg, res) = (res[1] .= arg[1] .^ 2; 0)
+        julia> f = ca.callback(Sq(), "f");
+        julia> f([1, 2, 3])
         DM([1, 4, 9])
         \enddoctest
         \endlang
@@ -518,6 +664,18 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> struct Split <: ca.Callback end
+        julia> ca.get_n_in(::Split) = 1
+        julia> ca.get_n_out(::Split) = 2
+        julia> ca.eval_(::Split, arg) = [arg[1]^2, -arg[1]]
+        julia> f = ca.callback(Split(), "f");
+        julia> f(3)
+        (9, -3)
+        \enddoctest
+        \endlang
+
         \identifier{ob} */
     virtual casadi_int get_n_out();
 
@@ -557,6 +715,19 @@ namespace casadi {
         3x3,3nz
         3
         >> rmpath(d); rmdir(d, 's');
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> struct Trace <: ca.Callback
+                   n::Int
+               end
+        julia> ca.get_sparsity_in(cb::Trace, i) = ca.Sparsity.diag(cb.n)
+        julia> ca.eval_(::Trace, arg) = [ca.sum1(ca.diag(arg[1]))]
+        julia> f = ca.callback(Trace(3), "f");
+        julia> ca.sparsity_in(f, 0), f(ca.DM.ones(3, 3))
+        (3x3,3nz, 3)
         \enddoctest
         \endlang
 
@@ -613,6 +784,22 @@ namespace casadi {
         >> r = f('x', 2, 'a', 3); disp(r.y)
         6
         >> rmpath(d); rmdir(d, 's');
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> struct Lin <: ca.Callback end
+        julia> ca.get_n_in(::Lin) = 2
+        julia> ca.get_name_in(::Lin, i) = ["x", "a"][i + 1]
+        julia> ca.get_name_out(::Lin, i) = "y"
+        julia> ca.eval_(::Lin, arg) = [arg[2] * arg[1]]
+        julia> f = ca.callback(Lin(), "f");
+        julia> println(ca.Function(f))
+        f:(x,a)->(y) CallbackInternal
+        julia> f(x=2, a=3)
+        Dict{String, DM} with 1 entry:
+          "y" => 6
         \enddoctest
         \endlang
 
@@ -676,6 +863,20 @@ namespace casadi {
         >> g = SqJacU('g'); J = g.jacobian(); disp(J.sparsity_in(1))
         1x1
         >> rmpath(d); rmdir(d, 's');
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> struct Sq <: ca.Callback end
+        julia> ca.eval_(::Sq, arg) = [arg[1]^2]
+        julia> ca.has_jacobian(::Sq) = true
+        julia> function ca.get_jacobian(::Sq, name, inames, onames, opts)
+                   x = ca.SX.sym("x"); y = ca.SX.sym("y", ca.Sparsity(1, 1))
+                   ca.Function(name, [x, y], [2x], inames, onames, opts)
+               end
+        julia> ca.sparsity_in(ca.jacobian(ca.callback(Sq(), "f")), 1)
+        Sparsity(1x1,0nz)
         \enddoctest
         \endlang
 
@@ -771,6 +972,35 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> struct F43 <: ca.Callback end
+        julia> ca.get_sparsity_in(::F43, i) = ca.Sparsity.dense(4, 1)
+        julia> ca.get_sparsity_out(::F43, i) = ca.Sparsity.dense(3, 1)
+        julia> function ca.eval_(::F43, arg)
+                   a, b, c, d = arg[1][1], arg[1][2], arg[1][3], arg[1][4]
+                   [[sin(c)*d + d^2; 2a + c; b^2 + 5c]]
+               end
+        julia> ca.has_jacobian(::F43) = true
+        julia> function ca.get_jacobian(::F43, name, inames, onames, opts)
+                   println(name, " ", inames, " ", onames)
+                   x = ca.SX.sym("x", 4); y = ca.SX.sym("y", ca.Sparsity(3, 1))
+                   a, b, c, d = x[1], x[2], x[3], x[4]
+                   J = [0 0 d*cos(c) sin(c)+2d; 2 0 1 0; 0 2b 5 0]
+                   ca.Function(name, [x, y], [J], inames, onames, opts)
+               end
+        julia> f = ca.callback(F43(), "f");
+        julia> x = ca.MX.sym("x", 4);
+        julia> J = ca.Function("J", [x], [ca.jacobian(f(x), x)]);
+        jac_f ["i0", "out_o0"] ["jac_o0_i0"]
+        julia> J([1, 2, 0, 3])
+        DM(
+        [[0, 0, 3, 6],
+         [2, 0, 1, 0],
+         [0, 4, 5, 0]])
+        \enddoctest
+        \endlang
+
         \identifier{oh} */
     virtual bool has_jacobian() const;
     virtual Function get_jacobian(const std::string& name,
@@ -835,6 +1065,25 @@ namespace casadi {
         >> J(3)
         6
         >> rmpath(d); rmdir(d, 's');
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> struct Sq <: ca.Callback end
+        julia> ca.eval_(::Sq, arg) = [arg[1]^2]
+        julia> ca.has_forward(::Sq, nfwd) = nfwd == 1
+        julia> function ca.get_forward(::Sq, nfwd, name, inames, onames, opts)
+                   println(nfwd, " ", name, " ", inames, " ", onames)
+                   x = ca.SX.sym("x"); y = ca.SX.sym("y", ca.Sparsity(1, 1)); xd = ca.SX.sym("xd")
+                   ca.Function(name, [x, y, xd], [2x*xd], inames, onames, opts)
+               end
+        julia> f = ca.callback(Sq(), "f");
+        julia> x = ca.MX.sym("x");
+        julia> J = ca.Function("J", [x], [ca.jacobian(f(x), x)]);
+        1 fwd1_f ["i0", "out_o0", "fwd_i0"] ["fwd_o0"]
+        julia> J(3)
+        DM(6)
         \enddoctest
         \endlang
 
@@ -905,6 +1154,25 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> struct Sq <: ca.Callback end
+        julia> ca.eval_(::Sq, arg) = [arg[1]^2]
+        julia> ca.has_reverse(::Sq, nadj) = nadj == 1
+        julia> function ca.get_reverse(::Sq, nadj, name, inames, onames, opts)
+                   println(nadj, " ", name, " ", inames, " ", onames)
+                   x = ca.SX.sym("x"); y = ca.SX.sym("y", ca.Sparsity(1, 1)); yb = ca.SX.sym("yb")
+                   ca.Function(name, [x, y, yb], [2x*yb], inames, onames, opts)
+               end
+        julia> f = ca.callback(Sq(), "f");
+        julia> x = ca.MX.sym("x");
+        julia> G = ca.Function("G", [x], [ca.gradient(f(x), x)]);
+        1 adj1_f ["i0", "out_o0", "adj_o0"] ["adj_i0"]
+        julia> G(3)
+        DM(6)
+        \enddoctest
+        \endlang
+
         \identifier{oj} */
     virtual bool has_reverse(casadi_int nadj) const;
     virtual Function get_reverse(casadi_int nadj, const std::string& name,
@@ -970,6 +1238,26 @@ namespace casadi {
          [00, 4, 00],
          [00, 00, 6]]
         >> rmpath(d); rmdir(d, 's');
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> struct Diag <: ca.Callback end
+        julia> ca.get_sparsity_in(::Diag, i) = ca.Sparsity.dense(3, 1)
+        julia> ca.get_sparsity_out(::Diag, i) = ca.Sparsity.dense(3, 1)
+        julia> ca.eval_(::Diag, arg) = [arg[1] .^ 2]
+        julia> ca.has_jac_sparsity(::Diag, oind, iind) = true
+        julia> ca.get_jac_sparsity(::Diag, oind, iind, symmetric) = ca.Sparsity.diag(3)
+        julia> f = ca.callback(Diag(), "f", Dict("enable_fd" => true));
+        julia> x = ca.MX.sym("x", 3);
+        julia> J = ca.jacobian(f(x), x);
+        julia> ca.sparsity(J)
+        Sparsity(3x3,3nz)
+        julia> println(ca.Function("J", [x], [J])([1, 2, 3]))
+        [[2, 00, 00],
+         [00, 4, 00],
+         [00, 00, 6]]
         \enddoctest
         \endlang
 

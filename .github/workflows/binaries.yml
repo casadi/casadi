@@ -302,6 +302,12 @@ jobs:
             echo "== julia $f =="
             julia "$f"
           done
+      - name: Run Julia doctests of the C++ headers
+        run: |
+          export CASADI_JL=$PWD/build/swig/julia/CasADiNative
+          export CASADI_PLUGIN_SEARCH_PATH=$PWD/build/lib
+          export LD_LIBRARY_PATH=$PWD/build/lib
+          python3 docs/api/extra/doctest_headers.py --lang julia
       - name: Assemble CasADiNative artifact (Artifacts.toml-ready tarball)
         run: |
           cp LICENSE.txt build/swig/julia/CasADiNative/

@@ -162,6 +162,32 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> sp = ca.Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3]);
+      julia> ca.DM(sp, 1)
+      DM(
+      [[1, 00, 00, 1],
+       [00, 00, 1, 00],
+       [1, 00, 00, 00]])
+      julia> sp
+      Sparsity(3x4,4nz)
+      julia> ca.size1(sp), ca.size2(sp), ca.nnz(sp), ca.numel(sp)
+      (3, 4, 4, 12)
+      julia> ca.colind(sp), ca.row(sp)
+      ([0, 2, 2, 3, 4], [0, 2, 1, 0])
+      julia> ca.is_equal(sp, ca.Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3]))
+      true
+      julia> ca.SX.sym("x", sp)
+      SX(
+      [[x_0, 00, 00, x_3],
+       [00, 00, x_2, 00],
+       [x_1, 00, 00, 00]])
+      julia> ca.Sparsity.dense(0, 3), ca.is_null(ca.Sparsity())
+      (0x3, true)
+      \enddoctest
+      \endlang
+
    * \see Matrix
    *
    * \author Joel Andersson
@@ -204,6 +230,20 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> sp = ca.Sparsity();
+        julia> ca.is_null(sp), sp
+        (true, NULL)
+        julia> try
+                   ca.nnz(sp)
+               catch e
+                   println("error")
+               end
+        error
+        \enddoctest
+        \endlang
+
         \identifier{2nj} */
     explicit Sparsity(casadi_int dummy=0);
 
@@ -239,6 +279,21 @@ namespace casadi {
         >> DM(Sparsity(2, 2), 1)
         [[00, 00],
          [00, 00]]
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> sp = ca.Sparsity(2, 3)
+        Sparsity(2x3,0nz)
+        julia> ca.nnz(sp), ca.is_dense(sp)
+        (0, false)
+        julia> ca.Sparsity(0, 0), ca.is_dense(ca.Sparsity(0, 0))
+        (0x0, true)
+        julia> ca.DM(ca.Sparsity(2, 2), 1)
+        DM(
+        [[00, 00],
+         [00, 00]])
         \enddoctest
         \endlang
 
@@ -291,6 +346,30 @@ namespace casadi {
         not sorted
         >> Sparsity(3, 2, [0, 2, 3], [2, 0, 1], true).row()
         0 2 1
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> sp = ca.Sparsity(3, 2, [0, 2, 3], [0, 2, 1]);
+        julia> ca.DM(sp, 1)
+        DM(
+        [[1, 00],
+         [00, 1],
+         [1, 00]])
+        julia> ca.is_dense(ca.Sparsity(2, 2, [0, 2, 4], [0, 1, 0, 1]))
+        true
+        julia> try
+                   ca.Sparsity(3, 2, [0, 2, 3], [2, 0, 1])
+               catch e
+                   println("not sorted")
+               end
+        not sorted
+        julia> ca.row(ca.Sparsity(3, 2, [0, 2, 3], [2, 0, 1], true))
+        3-element Vector{Int64}:
+         0
+         2
+         1
         \enddoctest
         \endlang
 
@@ -357,6 +436,17 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> ca.Sparsity.scalar(), ca.nnz(ca.Sparsity.scalar())
+        (1x1, 1)
+        julia> ca.Sparsity.scalar(false), ca.nnz(ca.Sparsity.scalar(false))
+        (1x1,0nz, 0)
+        julia> ca.is_equal(ca.Sparsity.scalar(), ca.Sparsity.dense(1, 1))
+        true
+        \enddoctest
+        \endlang
+
         \sa dense, is_scalar
 
         \identifier{bd} */
@@ -408,6 +498,21 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> sp = ca.Sparsity.dense(2, 3)
+        Sparsity(2x3)
+        julia> ca.nnz(sp), ca.is_dense(sp)
+        (6, true)
+        julia> ca.colind(sp), ca.row(sp)
+        ([0, 2, 4, 6], [0, 1, 0, 1, 0, 1])
+        julia> ca.Sparsity.dense(3), ca.Sparsity.dense(2, 3)
+        (3x1, 2x3)
+        julia> ca.nnz(ca.Sparsity.dense(0, 3)), ca.is_dense(ca.Sparsity.dense(0, 3))
+        (0, true)
+        \enddoctest
+        \endlang
+
         \sa Sparsity(nrow, ncol), scalar, is_dense
 
         \identifier{be} */
@@ -438,6 +543,16 @@ namespace casadi {
         [00, 1, 00, 00]
         >> Sparsity.unit(4, 1).row()
         1
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> ca.DM(ca.Sparsity.unit(4, 1), 1)
+        DM([00, 1, 00, 00])
+        julia> ca.row(ca.Sparsity.unit(4, 1))
+        1-element Vector{Int64}:
+         1
         \enddoctest
         \endlang
 
@@ -479,6 +594,18 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> ca.DM(ca.Sparsity.upper(3), 1)
+        DM(
+        [[1, 1, 1],
+         [00, 1, 1],
+         [00, 00, 1]])
+        julia> ca.nnz(ca.Sparsity.upper(3)), ca.is_triu(ca.Sparsity.upper(3))
+        (6, true)
+        \enddoctest
+        \endlang
+
         \sa lower, triu, is_triu
 
         \identifier{bg} */
@@ -514,6 +641,20 @@ namespace casadi {
         >> SX.sym('x', Sparsity.lower(2))
         [[x_0, 00],
          [x_1, x_2]]
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> ca.DM(ca.Sparsity.lower(3), 1)
+        DM(
+        [[1, 00, 00],
+         [1, 1, 00],
+         [1, 1, 1]])
+        julia> ca.SX.sym("x", ca.Sparsity.lower(2))
+        SX(
+        [[x_0, 00],
+         [x_1, x_2]])
         \enddoctest
         \endlang
 
@@ -556,6 +697,22 @@ namespace casadi {
         >> Sparsity.diag([4, 2]).nnz(), Sparsity.diag(0).nnz()
         2
         0
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> ca.DM(ca.Sparsity.diag(3), 1)
+        DM(
+        [[1, 00, 00],
+         [00, 1, 00],
+         [00, 00, 1]])
+        julia> ca.DM(ca.Sparsity.diag(2, 4), 1)
+        DM(
+        [[1, 00, 00, 00],
+         [00, 1, 00, 00]])
+        julia> ca.nnz(ca.Sparsity.diag(4, 2)), ca.nnz(ca.Sparsity.diag(0))
+        (2, 0)
         \enddoctest
         \endlang
 
@@ -615,6 +772,25 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> ca.DM(ca.Sparsity.band(4, 1), 1)
+        DM(
+        [[00, 00, 00, 00],
+         [1, 00, 00, 00],
+         [00, 1, 00, 00],
+         [00, 00, 1, 00]])
+        julia> ca.DM(ca.Sparsity.band(4, -2), 1)
+        DM(
+        [[00, 00, 1, 00],
+         [00, 00, 00, 1],
+         [00, 00, 00, 00],
+         [00, 00, 00, 00]])
+        julia> ca.is_equal(ca.Sparsity.band(4, 0), ca.Sparsity.diag(4))
+        true
+        \enddoctest
+        \endlang
+
         \sa banded, diag
 
         \identifier{bj} */
@@ -654,6 +830,19 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> ca.DM(ca.Sparsity.banded(4, 1), 1)
+        DM(
+        [[1, 1, 00, 00],
+         [1, 1, 1, 00],
+         [00, 1, 1, 1],
+         [00, 00, 1, 1]])
+        julia> ca.bw_upper(ca.Sparsity.banded(4, 1)), ca.bw_lower(ca.Sparsity.banded(4, 1))
+        (1, 1)
+        \enddoctest
+        \endlang
+
         \sa band, bw_upper, bw_lower
 
         \identifier{bk} */
@@ -688,6 +877,18 @@ namespace casadi {
          [00, 00, 00, 00],
          [00, 1, 1, 00]]
         >> Sparsity.rowcol([], [1], 3, 4).nnz()
+        0
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> ca.DM(ca.Sparsity.rowcol([0, 2], [1, 2], 3, 4), 1)
+        DM(
+        [[00, 1, 1, 00],
+         [00, 00, 00, 00],
+         [00, 1, 1, 00]])
+        julia> ca.nnz(ca.Sparsity.rowcol([], [1], 3, 4))
         0
         \enddoctest
         \endlang
@@ -755,6 +956,36 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> ca.DM(ca.Sparsity.triplet(3, 3, [0, 2, 1], [0, 0, 2]), 1)
+        DM(
+        [[1, 00, 00],
+         [00, 00, 1],
+         [1, 00, 00]])
+        julia> ca.nnz(ca.Sparsity.triplet(2, 2, [0, 0, 1], [0, 0, 1]))
+        2
+        julia> sp, mapping = ca.Sparsity.triplet(3, 3, [2, 0, 1], [1, 0, 0], false);
+        julia> mapping
+        3-element Vector{Int64}:
+         1
+         2
+         0
+        julia> sp, mapping = ca.Sparsity.triplet(3, 3, [2, 0, 1], [1, 0, 0], true);
+        julia> mapping
+        3-element Vector{Int64}:
+         2
+         0
+         1
+        julia> try
+                   ca.Sparsity.triplet(2, 2, [0, 2], [0, 0])
+               catch e
+                   println("out of bounds")
+               end
+        out of bounds
+        \enddoctest
+        \endlang
+
         \sa get_triplet, rowcol, nonzeros, Sparsity(nrow, ncol, colind, row)
 
         \identifier{bm} */
@@ -804,6 +1035,22 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> ca.DM(ca.Sparsity.nonzeros(3, 2, [0, 4]), 1)
+        DM(
+        [[1, 00],
+         [00, 1],
+         [00, 00]])
+        julia> sp = ca.Sparsity.banded(3, 1);
+        julia> ca.is_equal(ca.Sparsity.nonzeros(3, 3, ca.find(sp)), sp)
+        true
+        julia> sp1 = ca.Sparsity.nonzeros(3, 2, [1, 5], true);
+        julia> ca.is_equal(sp1, ca.Sparsity.nonzeros(3, 2, [0, 4]))
+        true
+        \enddoctest
+        \endlang
+
         \sa find, triplet
 
         \identifier{23g} */
@@ -847,6 +1094,21 @@ namespace casadi {
         1
         >> Sparsity.compressed([2, 2, 0, 2, 4])
         2x2
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> sp = ca.Sparsity.compressed([3, 2, 0, 1, 2, 0, 2]);
+        julia> ca.DM(sp, 1)
+        DM(
+        [[1, 00],
+         [00, 00],
+         [00, 1]])
+        julia> ca.is_equal(ca.Sparsity.compressed(ca.compress(sp)), sp)
+        true
+        julia> ca.Sparsity.compressed([2, 2, 0, 2, 4])
+        Sparsity(2x2)
         \enddoctest
         \endlang
 
@@ -909,6 +1171,29 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> P = ca.Sparsity.permutation([2, 0, 1]);
+        julia> ca.DM(P, 1)
+        DM(
+        [[00, 00, 1],
+         [1, 00, 00],
+         [00, 1, 00]])
+        julia> ca.DM(P, 1) * ca.DM([10, 20, 30])
+        DM([30, 10, 20])
+        julia> ca.DM(ca.Sparsity.permutation([2, 0, 1], true), 1) * ca.DM([10, 20, 30])
+        DM([20, 30, 10])
+        julia> ca.is_equal(ca.Sparsity.permutation([2, 0, 1], true), ca.T(P))
+        true
+        julia> try
+                   ca.Sparsity.permutation([0, 0, 1])
+               catch e
+                   println("not a permutation")
+               end
+        not a permutation
+        \enddoctest
+        \endlang
+
         \sa permutation_vector, is_permutation, pmult
 
         \identifier{244} */
@@ -941,6 +1226,27 @@ namespace casadi {
         1 2 0
         >> try, Sparsity.dense(2, 2).permutation_vector(); catch e, disp('not a permutation'); end
         not a permutation
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> ca.permutation_vector(ca.Sparsity.permutation([2, 0, 1]))
+        3-element Vector{Int64}:
+         2
+         0
+         1
+        julia> ca.permutation_vector(ca.Sparsity.permutation([2, 0, 1]), true)
+        3-element Vector{Int64}:
+         1
+         2
+         0
+        julia> try
+                   ca.permutation_vector(ca.Sparsity.dense(2, 2))
+               catch e
+                   println("not a permutation matrix")
+               end
+        not a permutation matrix
         \enddoctest
         \endlang
 
@@ -992,6 +1298,17 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> ca.get_diag(ca.Sparsity.banded(3, 1))
+        (3x1, [0, 3, 6])
+        julia> ca.get_diag(ca.Sparsity.unit(3, 1))
+        (3x3,1nz, [0])
+        julia> ca.get_diag(ca.Sparsity(2, 3))
+        (2x1,0nz, Int64[])
+        \enddoctest
+        \endlang
+
         \sa diag, nnz_diag
 
         \identifier{2nm} */
@@ -1027,6 +1344,19 @@ namespace casadi {
         2 2 1
         >> Sparsity(0, 2).compress()
         0 2 0 0 0
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> println(ca.compress(ca.Sparsity.diag(2)))
+        [2, 2, 0, 1, 2, 0, 1]
+        julia> println(ca.compress(ca.Sparsity.dense(2, 2)))
+        [2, 2, 0, 2, 4, 0, 1, 0, 1]
+        julia> println(ca.compress(ca.Sparsity.dense(2, 2), false))
+        [2, 2, 1]
+        julia> println(ca.compress(ca.Sparsity(0, 2)))
+        [0, 2, 0, 0, 0]
         \enddoctest
         \endlang
 
@@ -1080,6 +1410,20 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> a = ca.Sparsity.diag(2);
+        julia> ca.is_equal(a, ca.Sparsity.diag(2)), !ca.is_equal(a, ca.Sparsity.dense(2, 2))
+        (true, true)
+        julia> ca.is_equal(a, 2, 2, [0, 1, 2], [0, 1])
+        true
+        julia> ca.is_equal(ca.Sparsity.dense(2, 2), ca.Sparsity.dense(2, 3))
+        false
+        julia> ca.is_equal(ca.Sparsity(2, 2), ca.Sparsity.dense(2, 2))
+        false
+        \enddoctest
+        \endlang
+
         \sa is_subset, is_transpose, is_reshape, hash
 
         \identifier{2no} */
@@ -1122,6 +1466,17 @@ namespace casadi {
         0
         >> Sparsity.dense(2, 6).is_stacked(Sparsity.diag(2), 3)
         0
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> sp = ca.repmat(ca.Sparsity.diag(2), 1, 3)
+        Sparsity(2x6,6nz)
+        julia> ca.is_stacked(sp, ca.Sparsity.diag(2), 3), ca.is_stacked(sp, ca.Sparsity.diag(2), 2)
+        (true, false)
+        julia> ca.is_stacked(ca.Sparsity.dense(2, 6), ca.Sparsity.diag(2), 3)
+        false
         \enddoctest
         \endlang
 
@@ -1171,6 +1526,14 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> sp = ca.Sparsity.diag(2, 3);
+        julia> ca.size1(sp), ca.rows(sp), ca.size2(sp), ca.columns(sp)
+        (2, 2, 3, 3)
+        \enddoctest
+        \endlang
+
         \sa size2, size, numel
 
         \identifier{2nq} */
@@ -1205,6 +1568,14 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> sp = ca.Sparsity.diag(2, 3);
+        julia> ca.numel(sp), ca.nnz(sp), ca.numel(ca.Sparsity(0, 3))
+        (6, 2, 0)
+        \enddoctest
+        \endlang
+
         \sa nnz, size
 
         \identifier{bq} */
@@ -1230,6 +1601,15 @@ namespace casadi {
         25 100
         >> Sparsity(0, 3).density()
         100
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> ca.density(ca.Sparsity.diag(4)), ca.density(ca.Sparsity.dense(2, 2))
+        (25.0, 100.0)
+        julia> ca.density(ca.Sparsity(0, 3))
+        100.0
         \enddoctest
         \endlang
 
@@ -1266,6 +1646,17 @@ namespace casadi {
         >> Sparsity(3, 3).is_empty(), Sparsity(3, 3).nnz()
         0
         0
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> ca.is_empty(ca.Sparsity(0, 3)), ca.is_empty(ca.Sparsity(0, 3), true)
+        (true, false)
+        julia> ca.is_empty(ca.Sparsity(0, 0), true)
+        true
+        julia> ca.is_empty(ca.Sparsity(3, 3)), ca.nnz(ca.Sparsity(3, 3))
+        (false, 0)
         \enddoctest
         \endlang
 
@@ -1320,6 +1711,21 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> sp = ca.Sparsity.dense(3, 3);
+        julia> ca.nnz_upper(sp), ca.nnz_upper(sp, true), ca.nnz_lower(sp), ca.nnz_lower(sp, true)
+        (6, 3, 6, 3)
+        julia> ca.nnz_diag(sp)
+        3
+        julia> sp = ca.Sparsity.dense(2, 4);
+        julia> ca.nnz_upper(sp), ca.nnz_lower(sp), ca.nnz_diag(sp)
+        (7, 3, 2)
+        julia> ca.nnz_upper(ca.Sparsity.lower(3)), ca.nnz_upper(ca.Sparsity.lower(3), true)
+        (3, 0)
+        \enddoctest
+        \endlang
+
         \sa nnz_lower, nnz_diag, get_upper, is_triu
 
         \identifier{bu} */
@@ -1367,6 +1773,17 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> ca.bw_upper(ca.Sparsity.banded(5, 2)), ca.bw_upper(ca.Sparsity.band(5, -2))
+        (2, 2)
+        julia> ca.bw_upper(ca.Sparsity.band(5, 2)), ca.bw_upper(ca.Sparsity.diag(3))
+        (0, 0)
+        julia> ca.bw_upper(ca.Sparsity(3, 3)), ca.bw_upper(ca.Sparsity.dense(2, 5))
+        (0, 4)
+        \enddoctest
+        \endlang
+
         \sa bw_lower, banded
 
         \identifier{bx} */
@@ -1398,6 +1815,17 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> ca.bw_lower(ca.Sparsity.banded(5, 2)), ca.bw_lower(ca.Sparsity.band(5, 2))
+        (2, 2)
+        julia> ca.bw_lower(ca.Sparsity.band(5, -2))
+        0
+        julia> ca.bw_lower(ca.Sparsity.dense(5, 2))
+        4
+        \enddoctest
+        \endlang
+
         \sa bw_upper, banded
 
         \identifier{by} */
@@ -1422,6 +1850,14 @@ namespace casadi {
         3
         >> [m, n] = size(sp); fprintf('%d %d\n', m, n)
         2 3
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> sp = ca.Sparsity.diag(2, 3);
+        julia> ca.size(sp), ca.size(sp, 1), ca.size(sp, 2)
+        ((2, 3), 2, 3)
         \enddoctest
         \endlang
 
@@ -1461,6 +1897,19 @@ namespace casadi {
         row: [0 1]
         >> isempty(fieldnames(Sparsity().info()))
         1
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> ca.info(ca.Sparsity.diag(2, 3))
+        Dict{String, Any} with 4 entries:
+          "nrow" => 2
+          "colind" => [0, 1, 2, 2]
+          "ncol" => 3
+          "row" => [0, 1]
+        julia> ca.info(ca.Sparsity())
+        Dict{String, Any}()
         \enddoctest
         \endlang
 
@@ -1519,6 +1968,30 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> d = mktempdir();
+        julia> f = joinpath(d, "pattern.mtx");
+        julia> sp = ca.Sparsity.triplet(3, 2, [0, 2, 1], [0, 0, 1]);
+        julia> ca.to_file(sp, f)
+        julia> print(read(f, String))
+        %%MatrixMarket matrix coordinate pattern general
+        3 2 3
+        1 1
+        3 1
+        2 2
+        julia> ca.is_equal(ca.Sparsity.from_file(f), sp)
+        true
+        julia> rm(d, recursive=true)
+        julia> try
+                   ca.to_file(sp, "pattern.txt")
+               catch e
+                   println("unknown extension")
+               end
+        unknown extension
+        \enddoctest
+        \endlang
+
         \sa from_file, DM::to_file
 
         \identifier{2ns} */
@@ -1568,6 +2041,16 @@ namespace casadi {
         1
         >> Sparsity.deserialize(Sparsity().serialize()).is_null()
         1
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> s = ca.serialize(ca.Sparsity.diag(2, 3));
+        julia> typeof(s), ca.is_equal(ca.Sparsity.deserialize(s), ca.Sparsity.diag(2, 3))
+        (String, true)
+        julia> ca.is_null(ca.Sparsity.deserialize(ca.serialize(ca.Sparsity())))
+        true
         \enddoctest
         \endlang
 
@@ -1655,6 +2138,18 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> sp = ca.Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3]);
+        julia> ca.row(sp), ca.colind(sp), ca.get_col(sp)
+        ([0, 2, 1, 0], [0, 2, 2, 3, 4], [0, 0, 2, 3])
+        julia> ca.row(ca.Sparsity.dense(2, 2)), ca.colind(ca.Sparsity(2, 2))
+        ([0, 1, 0, 1], [0, 0, 0])
+        julia> ca.colind(ca.Sparsity(0, 2)), ca.colind(ca.Sparsity(2, 0))
+        ([0, 0, 0], [0])
+        \enddoctest
+        \endlang
+
         \sa get_colind, get_col, get_ccs, get_triplet
 
         \identifier{c9} */
@@ -1693,6 +2188,20 @@ namespace casadi {
         >> [sp.row(1), sp.colind(1), sp.colind(4)]
         2 2 4
         >> try, sp.row(4); catch e, disp('out of range'); end
+        out of range
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> sp = ca.Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3]);
+        julia> ca.row(sp, 1), ca.colind(sp, 1), ca.colind(sp, 4)
+        (2, 2, 4)
+        julia> try
+                   ca.row(sp, 4)
+               catch e
+                   println("out of range")
+               end
         out of range
         \enddoctest
         \endlang
@@ -1759,6 +2268,21 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> sp = ca.Sparsity.dense(3, 3); ca.resize(sp, 2, 2); sp
+        Sparsity(2x2)
+        julia> ca.resize(sp, 4, 4); ca.DM(sp, 1)
+        DM(
+        [[1, 1, 00, 00],
+         [1, 1, 00, 00],
+         [00, 00, 00, 00],
+         [00, 00, 00, 00]])
+        julia> ca.resize(sp, 0, 2); sp
+        Sparsity(0x2)
+        \enddoctest
+        \endlang
+
         \sa enlarge, reshape
 
         \identifier{2nu} */
@@ -1802,6 +2326,25 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> sp = ca.Sparsity(3, 3);
+        julia> ca.add_nz(sp, 1, 1), ca.add_nz(sp, 0, 0), ca.add_nz(sp, 1, 1)
+        (0, 0, 1)
+        julia> ca.DM(sp, 1)
+        DM(
+        [[1, 00, 00],
+         [00, 1, 00],
+         [00, 00, 00]])
+        julia> try
+                   ca.add_nz(sp, 3, 0)
+               catch e
+                   println("out of bounds")
+               end
+        out of bounds
+        \enddoctest
+        \endlang
+
         \sa get_nz, has_nz
 
         \identifier{ce} */
@@ -1834,6 +2377,20 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> sp = ca.Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3]);
+        julia> ca.get_nz(sp, 0, 0), ca.get_nz(sp, 2, 0), ca.get_nz(sp, 1, 0), ca.get_nz(sp, -1, 0)
+        (0, 1, -1, 1)
+        julia> try
+                   ca.get_nz(sp, 3, 0)
+               catch e
+                   println("out of bounds")
+               end
+        out of bounds
+        \enddoctest
+        \endlang
+
         \sa has_nz, add_nz, find
 
         \identifier{cf} */
@@ -1856,6 +2413,14 @@ namespace casadi {
         >> sp = Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3]);
         >> [sp.has_nz(2, 0), sp.has_nz(1, 0)]
         1 0
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> sp = ca.Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3]);
+        julia> ca.has_nz(sp, 2, 0), ca.has_nz(sp, 1, 0)
+        (true, false)
         \enddoctest
         \endlang
 
@@ -1883,6 +2448,14 @@ namespace casadi {
         >> sp = Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3]);
         >> sp.get_nz([0, 2], [0, 3])
         0 1 3 -1
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> sp = ca.Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3]);
+        julia> println(ca.get_nz(sp, [0, 2], [0, 3]))
+        [0, 1, 3, -1]
         \enddoctest
         \endlang
 
@@ -1918,6 +2491,23 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> sp = ca.Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3]);
+        julia> ca.get_nz(sp, [0, 2, 4, 9, 1])
+        5-element Vector{Int64}:
+          0
+          1
+         -1
+          3
+         -1
+        julia> ca.get_nz(ca.Sparsity.dense(2, 2), [3, 0])
+        2-element Vector{Int64}:
+         3
+         0
+        \enddoctest
+        \endlang
+
         \sa find, nonzeros
 
         \identifier{ch} */
@@ -1944,6 +2534,16 @@ namespace casadi {
         >> Sparsity.dense(2, 2).get_lower(), Sparsity.dense(2, 2).get_upper()
         0 1 3
         0 2 3
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> sp = ca.Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3]);
+        julia> ca.get_lower(sp), ca.get_upper(sp)
+        ([0, 1], [0, 2, 3])
+        julia> ca.get_lower(ca.Sparsity.dense(2, 2)), ca.get_upper(ca.Sparsity.dense(2, 2))
+        ([0, 1, 3], [0, 2, 3])
         \enddoctest
         \endlang
 
@@ -1979,6 +2579,15 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> sp = ca.Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3]);
+        julia> colind, row = ca.get_ccs(sp);
+        julia> colind, row
+        ([0, 2, 2, 3, 4], [0, 2, 1, 0])
+        \enddoctest
+        \endlang
+
         \sa get_crs, get_triplet, get_colind, get_row
 
         \identifier{2ny} */
@@ -2009,6 +2618,15 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> sp = ca.Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3]);
+        julia> rowind, col = ca.get_crs(sp);
+        julia> rowind, col
+        ([0, 2, 3, 4], [0, 3, 2, 0])
+        \enddoctest
+        \endlang
+
         \sa get_ccs, T
 
         \identifier{2nz} */
@@ -2034,6 +2652,15 @@ namespace casadi {
         >> [row, col] = sp.get_triplet(); disp(row), disp(col)
         0 2 1 0
         0 0 2 3
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> sp = ca.Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3]);
+        julia> row, col = ca.get_triplet(sp);
+        julia> row, col
+        ([0, 2, 1, 0], [0, 0, 2, 3])
         \enddoctest
         \endlang
 
@@ -2094,6 +2721,24 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> sp = ca.Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3]);
+        julia> ca.sub(sp, [0, 2], [0, 3])
+        (2x2,3nz, [0, 1, 3])
+        julia> ca.sub(sp, [-1], [0])
+        (1x1, [1])
+        julia> ca.sub(sp, [0, 0], [0])
+        (2x1, [0, 0])
+        julia> try
+                   ca.sub(sp, [3], [0])
+               catch e
+                   println("out of range")
+               end
+        out of range
+        \enddoctest
+        \endlang
+
         \sa get_nz, erase, pmult
 
         \identifier{ci} */
@@ -2148,6 +2793,22 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> sp = ca.Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3]);
+        julia> ca.sub(sp, [0, 2, 9], ca.Sparsity.dense(3, 1))
+        (3x1, [0, 1, 3])
+        julia> ca.sub(sp, [0, 1, 2, 3], ca.Sparsity.dense(2, 2))
+        (2x2,2nz, [0, 1])
+        julia> try
+                   ca.sub(sp, [0, 2], ca.Sparsity.dense(3, 1))
+               catch e
+                   println("length mismatch")
+               end
+        length mismatch
+        \enddoctest
+        \endlang
+
         \sa get_nz, find
 
         \identifier{cj} */
@@ -2192,6 +2853,22 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> sp = ca.Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3]);
+        julia> ca.DM(ca.T(sp), 1)
+        DM(
+        [[1, 00, 1],
+         [00, 00, 00],
+         [00, 1, 00],
+         [1, 00, 00]])
+        julia> ca.colind(ca.T(sp)), ca.row(ca.T(sp))
+        ([0, 2, 3, 4], [0, 3, 2, 0])
+        julia> ca.T(ca.Sparsity.dense(2, 3)), ca.T(ca.Sparsity(0, 3))
+        (3x2, 3x0)
+        \enddoctest
+        \endlang
+
         \sa transpose, is_transpose, get_crs
 
         \identifier{2o1} */
@@ -2220,6 +2897,14 @@ namespace casadi {
         >> [spT, mapping] = sp.transpose(); disp(spT), disp(mapping)
         4x3,4nz
         0 3 2 1
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> sp = ca.Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3]);
+        julia> ca.transpose(sp, false)
+        (4x3,4nz, [0, 3, 2, 1])
         \enddoctest
         \endlang
 
@@ -2253,6 +2938,17 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> ca.is_transpose(ca.Sparsity.band(3, 1), ca.Sparsity.band(3, -1))
+        true
+        julia> ca.is_transpose(ca.Sparsity.band(3, 1), ca.Sparsity.band(3, 1))
+        false
+        julia> ca.is_transpose(ca.Sparsity.dense(2, 3), ca.Sparsity.dense(3, 2))
+        true
+        \enddoctest
+        \endlang
+
         \sa T, is_symmetric
 
         \identifier{2o2} */
@@ -2282,6 +2978,17 @@ namespace casadi {
         1
         >> Sparsity.diag(2).is_reshape(Sparsity.nonzeros(4, 1, [1, 3]))
         0
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> ca.is_reshape(ca.Sparsity.dense(2, 3), ca.Sparsity.dense(6, 1))
+        true
+        julia> ca.is_reshape(ca.Sparsity.diag(2), ca.Sparsity.nonzeros(4, 1, [0, 3]))
+        true
+        julia> ca.is_reshape(ca.Sparsity.diag(2), ca.Sparsity.nonzeros(4, 1, [0, 2]))
+        false
         \enddoctest
         \endlang
 
@@ -2321,6 +3028,15 @@ namespace casadi {
         0
         0 1 2
         0 1 2
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> ca.is_compactible(ca.Sparsity.rowcol([0, 2], [0, 2], 3, 3))
+        (true, [0, 2], [0, 2])
+        julia> ca.is_compactible(ca.Sparsity.diag(3))
+        (false, [0, 1, 2], [0, 1, 2])
         \enddoctest
         \endlang
 
@@ -2382,6 +3098,23 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> a = ca.Sparsity.diag(2);
+        julia> b = ca.Sparsity.triplet(2, 2, [0, 1], [1, 1]);
+        julia> ca.is_equal(ca.combine(a, b, false, false), ca.unite(a, b))
+        true
+        julia> ca.DM(ca.combine(a, b, true, false), 1)
+        DM(
+        [[1, 00],
+         [00, 1]])
+        julia> ca.DM(ca.combine(a, b, false, true), 1)
+        DM(
+        [[00, 1],
+         [00, 1]])
+        \enddoctest
+        \endlang
+
         \sa unite, intersect
 
         \identifier{cl} */
@@ -2429,6 +3162,23 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> a = ca.Sparsity.diag(2);
+        julia> b = ca.Sparsity.triplet(2, 2, [0, 1], [1, 1]);
+        julia> ca.DM(ca.unite(a, b), 1)
+        DM(
+        [[1, 1],
+         [00, 1]])
+        julia> try
+                   ca.unite(a, ca.Sparsity.dense(3, 3))
+               catch e
+                   println("dimension mismatch")
+               end
+        dimension mismatch
+        \enddoctest
+        \endlang
+
         \sa intersect, combine, is_subset
 
         \identifier{cm} */
@@ -2464,6 +3214,17 @@ namespace casadi {
         >> DM(a.intersect(b), 1)
         [[00, 00],
          [00, 1]]
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> a = ca.Sparsity.diag(2);
+        julia> b = ca.Sparsity.triplet(2, 2, [0, 1], [1, 1]);
+        julia> ca.DM(ca.intersect(a, b), 1)
+        DM(
+        [[00, 00],
+         [00, 1]])
         \enddoctest
         \endlang
 
@@ -2509,6 +3270,19 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> ca.is_subset(ca.Sparsity.diag(3), ca.Sparsity.dense(3, 3))
+        true
+        julia> ca.is_subset(ca.Sparsity.dense(3, 3), ca.Sparsity.diag(3))
+        false
+        julia> ca.is_subset(ca.Sparsity(3, 3), ca.Sparsity.diag(3))
+        true
+        julia> ca.is_subset(ca.Sparsity.diag(3), ca.Sparsity.diag(3))
+        true
+        \enddoctest
+        \endlang
+
         \sa unite, intersect, is_equal
 
         \identifier{2o4} */
@@ -2544,6 +3318,18 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> X = ca.Sparsity.diag(4);
+        julia> Y = ca.Sparsity.dense(2, 2);
+        julia> x = ca.Sparsity.nonzeros(4, 4, [0, 10, 15]);
+        julia> ca.DM(ca.sparsity_cast_mod(x, X, Y), 1)
+        DM(
+        [[1, 1],
+         [00, 1]])
+        \enddoctest
+        \endlang
+
         \sa sparsity_cast, is_subset
 
         \identifier{246} */
@@ -2573,6 +3359,17 @@ namespace casadi {
         >> Sparsity.dense(2, 2).pattern_inverse(), Sparsity(2, 2).pattern_inverse()
         2x2,0nz
         2x2
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> ca.DM(ca.pattern_inverse(ca.Sparsity.diag(2)), 1)
+        DM(
+        [[00, 1],
+         [1, 00]])
+        julia> ca.pattern_inverse(ca.Sparsity.dense(2, 2)), ca.pattern_inverse(ca.Sparsity(2, 2))
+        (2x2,0nz, 2x2)
         \enddoctest
         \endlang
 
@@ -2716,6 +3513,25 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> sp = ca.Sparsity.dense(2, 2);
+        julia> ca.enlarge(sp, 4, 3, [0, 3], [1, 2])
+        julia> ca.DM(sp, 1)
+        DM(
+        [[00, 1, 1],
+         [00, 00, 00],
+         [00, 00, 00],
+         [00, 1, 1]])
+        julia> try
+                   ca.enlarge(ca.Sparsity.dense(2, 2), 4, 3, [0], [1, 2])
+               catch e
+                   println("wrong length")
+               end
+        wrong length
+        \enddoctest
+        \endlang
+
         \sa enlargeRows, enlargeColumns, resize, erase
 
         \identifier{cr} */
@@ -2749,6 +3565,16 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> sp = ca.Sparsity.dense(2, 2); ca.enlargeRows(sp, 3, [0, 2]); ca.DM(sp, 1)
+        DM(
+        [[1, 1],
+         [00, 00],
+         [1, 1]])
+        \enddoctest
+        \endlang
+
         \sa enlarge, enlargeColumns
 
         \identifier{cs} */
@@ -2778,6 +3604,15 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> sp = ca.Sparsity.dense(2, 2); ca.enlargeColumns(sp, 3, [0, 2]); ca.DM(sp, 1)
+        DM(
+        [[1, 00, 1],
+         [1, 00, 1]])
+        \enddoctest
+        \endlang
+
         \sa enlarge, enlargeRows
 
         \identifier{ct} */
@@ -2803,6 +3638,14 @@ namespace casadi {
         >> [dense, mapping] = sp.makeDense(); disp(dense), disp(mapping)
         3x2
         0 5
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> sp = ca.Sparsity.triplet(3, 2, [0, 2], [0, 1]);
+        julia> ca.makeDense(sp)
+        (3x2, [0, 5])
         \enddoctest
         \endlang
 
@@ -2845,6 +3688,20 @@ namespace casadi {
          [1, 1, 1],
          [1, 00, 1]]
         0 1 2 4 6 7 8
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> sp = ca.Sparsity.dense(3, 3);
+        julia> mapping = ca.erase(sp, [0, 2], [1]);
+        julia> println(mapping)
+        [0, 1, 2, 4, 6, 7, 8]
+        julia> ca.DM(sp, 1)
+        DM(
+        [[1, 00, 1],
+         [1, 1, 1],
+         [1, 00, 1]])
         \enddoctest
         \endlang
 
@@ -2895,6 +3752,25 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> sp = ca.Sparsity.dense(3, 3);
+        julia> println(ca.erase(sp, [0, 4, 8]))
+        [1, 2, 3, 5, 6, 7]
+        julia> ca.DM(sp, 1)
+        DM(
+        [[00, 1, 1],
+         [1, 00, 1],
+         [1, 1, 00]])
+        julia> try
+                   ca.erase(ca.Sparsity.dense(3, 3), [9])
+               catch e
+                   println("out of range")
+               end
+        out of range
+        \enddoctest
+        \endlang
+
         \sa erase(rr, cc), find
 
         \identifier{cw} */
@@ -2935,6 +3811,25 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> sp = ca.Sparsity.dense(2, 2); ca.append(sp, ca.Sparsity.diag(2)); ca.DM(sp, 1)
+        DM(
+        [[1, 1],
+         [1, 1],
+         [1, 00],
+         [00, 1]])
+        julia> sp = ca.Sparsity(0, 0); ca.append(sp, ca.Sparsity.diag(2)); print(sp)
+        2x2,2nz
+        julia> try
+                   ca.append(ca.Sparsity.dense(2, 2), ca.Sparsity.dense(2, 3))
+               catch e
+                   println("column mismatch")
+               end
+        column mismatch
+        \enddoctest
+        \endlang
+
         \sa appendColumns, vertcat
 
         \identifier{2o6} */
@@ -2966,6 +3861,21 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> sp = ca.Sparsity.dense(2, 2); ca.appendColumns(sp, ca.Sparsity.diag(2)); ca.DM(sp, 1)
+        DM(
+        [[1, 1, 1, 00],
+         [1, 1, 00, 1]])
+        julia> try
+                   ca.appendColumns(ca.Sparsity.dense(2, 2), ca.Sparsity.dense(3, 2))
+               catch e
+                   println("row mismatch")
+               end
+        row mismatch
+        \enddoctest
+        \endlang
+
         \sa append, horzcat
 
         \identifier{2o7} */
@@ -2991,6 +3901,15 @@ namespace casadi {
         1 1
         >> [Sparsity(1, 1).is_scalar(true), Sparsity.dense(2, 1).is_scalar()]
         0 0
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> ca.is_scalar(ca.Sparsity.dense(1, 1)), ca.is_scalar(ca.Sparsity(1, 1))
+        (true, true)
+        julia> ca.is_scalar(ca.Sparsity(1, 1), true), ca.is_scalar(ca.Sparsity.dense(2, 1))
+        (false, false)
         \enddoctest
         \endlang
 
@@ -3026,6 +3945,17 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> ca.is_dense(ca.Sparsity.dense(2, 3)), ca.is_dense(ca.Sparsity.diag(3))
+        (true, false)
+        julia> ca.is_dense(ca.Sparsity(0, 3)), ca.is_dense(ca.Sparsity(1, 1))
+        (true, false)
+        julia> ca.is_dense(ca.sparsity(ca.DM([1 0; 0 1])))
+        true
+        \enddoctest
+        \endlang
+
         \sa dense, density, makeDense
 
         \identifier{2o9} */
@@ -3053,6 +3983,15 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> ca.is_row(ca.Sparsity.dense(1, 3)), ca.is_row(ca.Sparsity.dense(3, 1))
+        (true, false)
+        julia> ca.is_row(ca.Sparsity(1, 0))
+        true
+        \enddoctest
+        \endlang
+
         \sa is_column, is_vector
 
         \identifier{cx} */
@@ -3075,6 +4014,15 @@ namespace casadi {
         1 0
         >> Sparsity(1, 1).is_column()
         1
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> ca.is_column(ca.Sparsity.dense(3, 1)), ca.is_column(ca.Sparsity.dense(1, 3))
+        (true, false)
+        julia> ca.is_column(ca.Sparsity(1, 1))
+        true
         \enddoctest
         \endlang
 
@@ -3106,6 +4054,17 @@ namespace casadi {
         1 0
         >> Sparsity(0, 3).is_vector()
         0
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> ca.is_vector(ca.Sparsity.dense(3, 1)), ca.is_vector(ca.Sparsity.dense(1, 3))
+        (true, true)
+        julia> ca.is_vector(ca.Sparsity.dense(1, 1)), ca.is_vector(ca.Sparsity.dense(2, 2))
+        (true, false)
+        julia> ca.is_vector(ca.Sparsity(0, 3))
+        false
         \enddoctest
         \endlang
 
@@ -3141,6 +4100,17 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> ca.is_diag(ca.Sparsity.diag(3)), ca.is_diag(ca.Sparsity.diag(2, 3))
+        (true, false)
+        julia> ca.is_diag(ca.Sparsity.dense(1, 1)), ca.is_diag(ca.Sparsity(2, 2))
+        (true, false)
+        julia> ca.is_diag(ca.Sparsity(0, 0)), ca.is_diag(ca.Sparsity.dense(2, 2))
+        (true, false)
+        \enddoctest
+        \endlang
+
         \sa diag, nnz_diag
 
         \identifier{247} */
@@ -3163,6 +4133,15 @@ namespace casadi {
         1 0
         >> Sparsity(0, 0).is_square()
         1
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> ca.is_square(ca.Sparsity.dense(2, 2)), ca.is_square(ca.Sparsity.dense(2, 3))
+        (true, false)
+        julia> ca.is_square(ca.Sparsity(0, 0))
+        true
         \enddoctest
         \endlang
 
@@ -3189,6 +4168,15 @@ namespace casadi {
         1 0
         >> [Sparsity(3, 3).is_symmetric(), Sparsity.dense(2, 3).is_symmetric()]
         1 0
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> ca.is_symmetric(ca.Sparsity.banded(3, 1)), ca.is_symmetric(ca.Sparsity.upper(3))
+        (true, false)
+        julia> ca.is_symmetric(ca.Sparsity(3, 3)), ca.is_symmetric(ca.Sparsity.dense(2, 3))
+        (true, false)
         \enddoctest
         \endlang
 
@@ -3225,6 +4213,17 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> ca.is_triu(ca.Sparsity.upper(3)), ca.is_triu(ca.Sparsity.upper(3), true)
+        (true, false)
+        julia> ca.is_triu(ca.Sparsity.band(3, -1), true), ca.is_triu(ca.Sparsity(3, 3))
+        (true, true)
+        julia> ca.is_triu(ca.Sparsity.dense(1, 3)), ca.is_triu(ca.Sparsity.dense(3, 1))
+        (true, false)
+        \enddoctest
+        \endlang
+
         \sa is_tril, upper, triu, nnz_upper
 
         \identifier{24a} */
@@ -3253,6 +4252,17 @@ namespace casadi {
         1 1
         >> [Sparsity.dense(3, 1).is_tril(), Sparsity.dense(1, 3).is_tril()]
         1 0
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> ca.is_tril(ca.Sparsity.lower(3)), ca.is_tril(ca.Sparsity.lower(3), true)
+        (true, false)
+        julia> ca.is_tril(ca.Sparsity.band(3, 1), true), ca.is_tril(ca.Sparsity.diag(3))
+        (true, true)
+        julia> ca.is_tril(ca.Sparsity.dense(3, 1)), ca.is_tril(ca.Sparsity.dense(1, 3))
+        (true, false)
         \enddoctest
         \endlang
 
@@ -3290,6 +4300,23 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> ca.is_singular(ca.Sparsity.diag(3)), ca.is_singular(ca.Sparsity(3, 3))
+        (false, true)
+        julia> ca.is_singular(ca.Sparsity.nonzeros(3, 3, [0, 1, 2]))
+        true
+        julia> ca.is_singular(ca.Sparsity(0, 0))
+        false
+        julia> try
+                   ca.is_singular(ca.Sparsity.dense(2, 3))
+               catch e
+                   println("not square")
+               end
+        not square
+        \enddoctest
+        \endlang
+
         \sa sprank, btf
 
         \identifier{24c} */
@@ -3319,6 +4346,17 @@ namespace casadi {
         1
         >> [Sparsity.dense(2, 2).is_permutation(), Sparsity.diag(2, 3).is_permutation()]
         0 0
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> ca.is_permutation(ca.Sparsity.permutation([1, 2, 0]))
+        true
+        julia> ca.is_permutation(ca.Sparsity.diag(3))
+        true
+        julia> ca.is_permutation(ca.Sparsity.dense(2, 2)), ca.is_permutation(ca.Sparsity.diag(2, 3))
+        (false, false)
         \enddoctest
         \endlang
 
@@ -3361,6 +4399,20 @@ namespace casadi {
         1
         >> Sparsity.diag(3, 2).is_selection()
         0
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> S = ca.Sparsity.triplet(2, 3, [0, 1], [2, 0]);
+        julia> ca.DM(S, 1) * ca.DM([10, 20, 30])
+        DM([30, 10])
+        julia> ca.is_selection(S), ca.is_selection(ca.Sparsity.triplet(2, 3, [0], [2]))
+        (true, false)
+        julia> ca.is_selection(ca.Sparsity.triplet(2, 3, [0], [2]), true)
+        true
+        julia> ca.is_selection(ca.Sparsity.diag(3, 2))
+        false
         \enddoctest
         \endlang
 
@@ -3407,6 +4459,22 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> ca.is_orthonormal(ca.Sparsity.diag(3))
+        true
+        julia> ca.is_orthonormal(ca.Sparsity.triplet(3, 3, [0, 1], [0, 1]))
+        false
+        julia> ca.is_orthonormal(ca.Sparsity.triplet(3, 3, [0, 1], [0, 1]), true)
+        true
+        julia> ca.is_orthonormal(ca.Sparsity.triplet(3, 3, [0, 0], [0, 1]), true)
+        false
+        julia> sp = ca.Sparsity.diag(2, 3);
+        julia> ca.is_orthonormal(sp), ca.is_orthonormal(sp, true)
+        (false, true)
+        \enddoctest
+        \endlang
+
         \sa is_orthonormal_rows, is_orthonormal_columns, is_permutation
 
         \identifier{24f} */
@@ -3437,6 +4505,16 @@ namespace casadi {
         1 0
         >> [sp.T.is_orthonormal_rows(), sp.T.is_orthonormal_columns()]
         0 1
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> sp = ca.Sparsity.diag(2, 3);
+        julia> ca.is_orthonormal_rows(sp), ca.is_orthonormal_columns(sp)
+        (true, false)
+        julia> ca.is_orthonormal_rows(ca.T(sp)), ca.is_orthonormal_columns(ca.T(sp))
+        (false, true)
         \enddoctest
         \endlang
 
@@ -3483,6 +4561,15 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> ca.rowsSequential(ca.Sparsity.banded(3, 1))
+        true
+        julia> ca.rowsSequential(ca.Sparsity.dense(2, 2), false)
+        true
+        \enddoctest
+        \endlang
+
         \sa removeDuplicates
 
         \identifier{d0} */
@@ -3512,6 +4599,15 @@ namespace casadi {
         >> m, sp
         0 1 2 3 4 5 6
         3x3,7nz
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> sp = ca.Sparsity.banded(3, 1);
+        julia> m = ca.removeDuplicates(sp, [0, 1, 2, 3, 4, 5, 6]);
+        julia> m, sp
+        ([0, 1, 2, 3, 4, 5, 6], 3x3,7nz)
         \enddoctest
         \endlang
 
@@ -3573,6 +4669,15 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> ca.etree(ca.Sparsity.banded(4, 1)), ca.etree(ca.Sparsity.diag(4))
+        ([1, 2, 3, -1], [-1, -1, -1, -1])
+        julia> println(ca.etree(ca.Sparsity.dense(2, 3), true))
+        [1, 2, -1]
+        \enddoctest
+        \endlang
+
         \sa ldl, qr_sparse, amd
 
         \identifier{d2} */
@@ -3626,6 +4731,22 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> ca.ldl(ca.Sparsity.banded(4, 1), false)
+        (4x4,3nz, [0, 1, 2, 3])
+        julia> A = ca.Sparsity.nonzeros(4, 4, [0, 3, 5, 10, 12, 15]);
+        julia> ca.nnz(first(ca.ldl(A)))
+        1
+        julia> try
+                   ca.ldl(ca.Sparsity.upper(3))
+               catch e
+                   println("not symmetric")
+               end
+        not symmetric
+        \enddoctest
+        \endlang
+
         The implementation is a modified version of LDL
         Copyright(c) Timothy A. Davis, 2005-2013
         Licensed as a derivative work under the GNU LGPL
@@ -3675,6 +4796,17 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> V, R, prinv, pc = ca.qr_sparse(ca.Sparsity.dense(3, 2));
+        julia> V, R, prinv, pc
+        (3x2,5nz, 3x2,3nz, [0, 1, 2], [0, 1])
+        julia> V, R, prinv, pc = ca.qr_sparse(ca.Sparsity.banded(4, 1), false);
+        julia> V, R, prinv, pc
+        (4x4,7nz, 4x4,9nz, [0, 1, 2, 3], [0, 1, 2, 3])
+        \enddoctest
+        \endlang
+
         The implementation is a modified version of CSparse
         Copyright(c) Timothy A. Davis, 2006-2009
         Licensed as a derivative work under the GNU LGPL
@@ -3718,6 +4850,13 @@ namespace casadi {
         0 1 2
         1 4 5
         1 1 1
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> ca.dfs(ca.Sparsity.banded(3, 1), 0, 3, [0, 0, 0], [0, 0, 0], [], [false, false, false])
+        (0, [0, 1, 2], [1, 4, 5], Bool[1, 1, 1])
         \enddoctest
         \endlang
 
@@ -3797,6 +4936,24 @@ namespace casadi {
         0
         1
         0
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> A = ca.Sparsity.nonzeros(4, 4, [0, 2, 5, 7, 10, 13, 15]);
+        julia> ca.DM(A, 1)
+        DM(
+        [[1, 00, 00, 00],
+         [00, 1, 00, 1],
+         [1, 00, 1, 00],
+         [00, 1, 00, 1]])
+        julia> ca.scc(A)
+        (3, [2, 0, 1, 3], [0, 1, 2, 4])
+        julia> ca.scc(ca.Sparsity.diag(3)), ca.scc(ca.Sparsity.dense(3, 3))
+        ((3, [0, 1, 2], [0, 1, 2, 3]), (1, [0, 1, 2], [0, 3]))
+        julia> ca.scc(ca.Sparsity(0, 0))
+        (0, Int64[], [0])
         \enddoctest
         \endlang
 
@@ -3881,6 +5038,21 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> B = ca.Sparsity.triplet(3, 3, [0, 0, 1, 2], [0, 2, 1, 2]);
+        julia> ca.DM(B, 1)
+        DM(
+        [[1, 00, 1],
+         [00, 1, 00],
+         [00, 00, 1]])
+        julia> ca.btf(B)
+        (3, [2, 0, 1], [2, 0, 1], [0, 1, 2, 3], [0, 1, 2, 3], [0, 0, 0, 3, 3], [0, 0, 3, 3, 3])
+        julia> ca.sprank(ca.Sparsity.nonzeros(3, 3, [0, 1, 2])), ca.sprank(ca.Sparsity.diag(3))
+        (1, 3)
+        \enddoctest
+        \endlang
+
         \sa scc, sprank, is_singular
 
         \identifier{d7} */
@@ -3920,6 +5092,21 @@ namespace casadi {
         >> isempty(Sparsity(0, 0).amd())
         1
         >> try, Sparsity.upper(3).amd(); catch e, disp('not symmetric'); end
+        not symmetric
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> ca.amd(ca.Sparsity.banded(4, 1)), ca.amd(ca.Sparsity.dense(3, 3))
+        ([3, 2, 0, 1], [0, 1, 2])
+        julia> ca.amd(ca.Sparsity(0, 0))
+        Int64[]
+        julia> try
+                   ca.amd(ca.Sparsity.upper(3))
+               catch e
+                   println("not symmetric")
+               end
         not symmetric
         \enddoctest
         \endlang
@@ -3965,6 +5152,18 @@ namespace casadi {
         1 2 3 4
         >> [isempty(Sparsity(2, 2).find()), isempty(Sparsity(0, 3).find())]
         1 1
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> sp = ca.Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3]);
+        julia> ca.find(sp), ca.find(sp, true)
+        ([0, 2, 7, 9], [1, 3, 8, 10])
+        julia> println(ca.find(ca.Sparsity.dense(2, 2)))
+        [0, 1, 2, 3]
+        julia> ca.find(ca.Sparsity(2, 2)), ca.find(ca.Sparsity(0, 3))
+        (Int64[], Int64[])
         \enddoctest
         \endlang
 
@@ -4043,6 +5242,32 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> A = ca.Sparsity.triplet(3, 4, [0, 1, 2, 0], [0, 1, 2, 3]);
+        julia> ca.DM(A, 1)
+        DM(
+        [[1, 00, 00, 1],
+         [00, 1, 00, 00],
+         [00, 00, 1, 00]])
+        julia> c = ca.uni_coloring(A, ca.Sparsity(), 1000);
+        julia> ca.DM(c, 1)
+        DM(
+        [[1, 00],
+         [1, 00],
+         [1, 00],
+         [00, 1]])
+        julia> ca.size2(c), [ca.row(c)[ca.colind(c)[j]+1:ca.colind(c)[j+1]] for j in 1:ca.size2(c)]
+        (2, [[0, 1, 2], [3]])
+        julia> ca.is_null(ca.uni_coloring(A, ca.Sparsity(), 1))
+        true
+        julia> ca.uni_coloring(ca.Sparsity.dense(3, 3), ca.Sparsity(), 1000)
+        Sparsity(3x3,3nz)
+        julia> ca.uni_coloring(ca.Sparsity.diag(3), ca.Sparsity(), 1000)
+        Sparsity(3x1)
+        \enddoctest
+        \endlang
+
         \sa star_coloring, star_coloring_new
 
         \identifier{db} */
@@ -4115,6 +5340,20 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> H = ca.Sparsity.banded(4, 1);
+        julia> ca.star_coloring_new(H)
+        (4x3,4nz, [1, -1, 0, 0, 0, -1, 1, 1, -1, 2])
+        julia> try
+                   ca.star_coloring_new(ca.Sparsity.upper(3))
+               catch e
+                   println("not symmetric")
+               end
+        not symmetric
+        \enddoctest
+        \endlang
+
         \sa star_coloring, star_coloring2, uni_coloring
 
         \identifier{2jz} */
@@ -4165,6 +5404,22 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> H = ca.Sparsity.banded(4, 1);
+        julia> ca.DM(ca.star_coloring(H, 1, 1000), 1)
+        DM(
+        [[00, 1, 00],
+         [1, 00, 00],
+         [00, 1, 00],
+         [00, 00, 1]])
+        julia> ca.star_coloring(ca.Sparsity.diag(5), 1, 1000)
+        Sparsity(5x1)
+        julia> ca.is_null(ca.star_coloring(ca.Sparsity.dense(4, 4), 0, 2))
+        true
+        \enddoctest
+        \endlang
+
         \sa star_coloring_new, star_coloring2, uni_coloring, largest_first
 
         \identifier{dc} */
@@ -4200,6 +5455,18 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> H = ca.Sparsity.banded(4, 1);
+        julia> ca.DM(ca.star_coloring2(H, 1, 1000), 1)
+        DM(
+        [[00, 1, 00],
+         [1, 00, 00],
+         [00, 1, 00],
+         [00, 00, 1]])
+        \enddoctest
+        \endlang
+
         \sa star_coloring, star_coloring_new
 
         \identifier{dd} */
@@ -4225,6 +5492,14 @@ namespace casadi {
         >> sp.largest_first(), Sparsity.diag(3).largest_first()
         0 2 3 1
         0 1 2
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> sp = ca.Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3]);
+        julia> ca.largest_first(sp), ca.largest_first(ca.Sparsity.diag(3))
+        ([0, 2, 3, 1], [0, 1, 2])
         \enddoctest
         \endlang
 
@@ -4298,6 +5573,33 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> A = ca.Sparsity.triplet(3, 3, [0, 1, 2, 0], [1, 2, 0, 0]);
+        julia> ca.DM(A, 1)
+        DM(
+        [[1, 1, 00],
+         [00, 00, 1],
+         [1, 00, 00]])
+        julia> p = [2, 0, 1];
+        julia> ca.DM(ca.pmult(A, p), 1)
+        DM(
+        [[00, 1, 00],
+         [00, 00, 1],
+         [1, 00, 1]])
+        julia> P = ca.DM(ca.Sparsity.permutation(p), 1);
+        julia> ca.is_equal(ca.pmult(A, p), ca.sparsity(P' * ca.DM(A, 1) * P))
+        true
+        julia> ca.is_equal(ca.pmult(A, p, true, true, true), first(ca.sub(A, p, p)))
+        true
+        julia> ca.DM(ca.pmult(A, p, true, false), 1)
+        DM(
+        [[00, 00, 1],
+         [1, 00, 00],
+         [1, 1, 00]])
+        \enddoctest
+        \endlang
+
         \sa permutation, sub
 
         \identifier{df} */
@@ -4334,6 +5636,18 @@ namespace casadi {
         2x2
         2x2,4nz
         >> sp
+        2x3,2nz
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> sp = ca.Sparsity.diag(2, 3);
+        julia> ca.dim(sp), ca.dim(sp, true)
+        ("2x3", "2x3,2nz")
+        julia> ca.dim(ca.Sparsity.dense(2, 2)), ca.dim(ca.Sparsity.dense(2, 2), true)
+        ("2x2", "2x2,4nz")
+        julia> print(sp)
         2x3,2nz
         \enddoctest
         \endlang
@@ -4381,6 +5695,19 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> ca.postfix_dim(ca.Sparsity.dense(1, 1)), ca.postfix_dim(ca.Sparsity(0, 0))
+        ("", "[]")
+        julia> ca.postfix_dim(ca.Sparsity.dense(5)), ca.postfix_dim(ca.Sparsity.dense(5, 10))
+        ("[5]", "[5x10]")
+        julia> ca.postfix_dim(ca.Sparsity.diag(5, 10)), ca.postfix_dim(ca.Sparsity(1, 1))
+        ("[5x10,5nz]", "[1x1,0nz]")
+        julia> ca.postfix_dim(ca.Sparsity.dense(1, 5)), ca.postfix_dim(ca.Sparsity(0, 3))
+        ("[1x5]", "[0x3]")
+        \enddoctest
+        \endlang
+
         \sa dim
 
         \identifier{dg} */
@@ -4409,6 +5736,16 @@ namespace casadi {
         nonzero index 2 (row 3, col 1)
         >> Sparsity.dense(2, 2).repr_el(3)
         (row 2, col 2)
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> sp = ca.Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3]);
+        julia> ca.repr_el(sp, 1)
+        "nonzero index 1 (row 2, col 0)"
+        julia> ca.repr_el(ca.Sparsity.dense(2, 2), 3)
+        "(row 1, col 1)"
         \enddoctest
         \endlang
 
@@ -4468,6 +5805,24 @@ namespace casadi {
         A = sparse(A_i, A_j, A_v, A_m, A_n);
         spy(A);
         >> delete(f);
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> d = mktempdir();
+        julia> f = joinpath(d, "show_pattern.m");
+        julia> ca.spy_matlab(ca.Sparsity.diag(2, 3), f)
+        julia> print(read(f, String))
+        % This function was automatically generated by CasADi
+        A_m = 2;
+        A_n = 3;
+        A_j = [1, 2];
+        A_i = [1, 2];
+        A_v = ones(size(A_i));
+        A = sparse(A_i, A_j, A_v, A_m, A_n);
+        spy(A);
+        julia> rm(d, recursive=true)
         \enddoctest
         \endlang
 
@@ -4535,6 +5890,31 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> ca.export_code(ca.Sparsity.diag(2, 3), "matlab")
+        sp_m = 2;
+        sp_n = 3;
+        sp_j = [1, 2];
+        sp_i = [1, 2];
+        sp_v = ones(size(sp_i));
+        sp = sparse(sp_i, sp_j, sp_v, sp_m, sp_n);
+        julia> opts = Dict("name" => "A", "as_matrix" => false, "nonzeros" => ["1.5", "2"]);
+        julia> ca.export_code(ca.Sparsity.diag(2), "matlab", opts)
+        A_m = 2;
+        A_n = 2;
+        A_j = [1, 2];
+        A_i = [1, 2];
+        A_v = [1.5, 2];
+        julia> try
+                   ca.export_code(ca.Sparsity.diag(2), "python")
+               catch e
+                   println("unsupported language")
+               end
+        unsupported language
+        \enddoctest
+        \endlang
+
         \sa spy_matlab, compress
 
         \identifier{dj} */
@@ -4565,6 +5945,16 @@ namespace casadi {
         uint64
         >> [sp.hash() == Sparsity.diag(2, 3).hash(), sp.hash() == Sparsity.dense(2, 3).hash()]
         1 0
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> sp = ca.Sparsity.diag(2, 3);
+        julia> ca.hash(sp) == ca.hash(ca.Sparsity.diag(2, 3)), ca.hash(sp) == ca.hash(ca.Sparsity.dense(2, 3))
+        (true, false)
+        julia> sp == ca.Sparsity.diag(2, 3), hash(sp) == hash(ca.Sparsity.diag(2, 3))
+        (true, true)
         \enddoctest
         \endlang
 
@@ -4617,6 +6007,27 @@ namespace casadi {
          [1, 1, 00]]
         >> J = Sparsity.dense(1, 3);
         >> try, Sparsity.kkt(Sparsity.diag(2), J); catch e, disp('dimension mismatch'); end
+        dimension mismatch
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> ca.DM(ca.Sparsity.kkt(ca.Sparsity.diag(2), ca.Sparsity.dense(1, 2)), 1)
+        DM(
+        [[1, 00, 1],
+         [00, 1, 1],
+         [1, 1, 1]])
+        julia> ca.DM(ca.Sparsity.kkt(ca.Sparsity(2, 2), ca.Sparsity.dense(1, 2), false, false), 1)
+        DM(
+        [[00, 00, 1],
+         [00, 00, 1],
+         [1, 1, 00]])
+        julia> try
+                   ca.Sparsity.kkt(ca.Sparsity.diag(2), ca.Sparsity.dense(1, 3))
+               catch e
+                   println("dimension mismatch")
+               end
         dimension mismatch
         \enddoctest
         \endlang

@@ -146,6 +146,25 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> x = ca.SX.sym("x"); p = ca.SX.sym("p");
+      julia> dae = Dict("x" => x, "p" => p, "ode" => -p*x, "quad" => x);
+      julia> F = ca.integrator("F", "cvodes", dae);
+      julia> ca.n_in(F), ca.n_out(F), ca.size_in(F, 4)
+      (7, 7, (0, 0))
+      julia> r = F(x0=1, p=1);
+      julia> r["xf"], r["qf"]
+      (0.3679, 0.6321)
+      julia> F = ca.integrator("F", "rk", dae, 0, [1, 2, 3]);
+      julia> F(x0=1, p=1)["xf"]
+      DM([[0.3679, 0.1353, 0.0498]])
+      julia> xf, zf, qf, adj_x0, adj_z0, adj_p, adj_u = F(1, 0, 1, 0, 0, 0, 0);
+      julia> size(xf), size(zf), size(adj_x0)
+      ((1, 3), (0, 3), (0, 0))
+      \enddoctest
+      \endlang
+
       \lang{python}
       \doctest
       >>> x = SX.sym("x"); z = SX.sym("z"); u = SX.sym("u")
@@ -196,6 +215,36 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> x = ca.SX.sym("x"); z = ca.SX.sym("z"); u = ca.SX.sym("u");
+      julia> dae = Dict("x" => x, "z" => z, "ode" => -z, "alg" => z^2 - x);
+      julia> F = ca.integrator("F", "idas", dae);
+      julia> r = F(x0=1, z0=1);
+      julia> r["xf"], r["zf"]
+      (0.25, 0.5)
+      julia> F(x0=1, z0=-1)["zf"]
+      DM(-1.5)
+      julia> F = ca.integrator("F", "rk", Dict("x" => x, "u" => u, "ode" => u), 0, [1, 2, 3]);
+      julia> F(x0=0, u=[1 2 3])["xf"]
+      DM([[1, 3, 6]])
+      julia> F(x0=0, u=1)["xf"]
+      DM([[1, 2, 3]])
+      julia> try
+                 ca.integrator("F", "cvodes", Dict("x" => x, "z" => z, "ode" => -z, "alg" => z - x))
+             catch e
+                 println(occursin("does not support algebraic variables", sprint(showerror, e)))
+             end
+      true
+      julia> try
+                 ca.integrator("F", "cvodes", Dict("x" => x, "ode" => [x; x]))
+             catch e
+                 println(occursin("Dimension mismatch for 'ode'", sprint(showerror, e)))
+             end
+      true
+      \enddoctest
+      \endlang
+
       \lang{python}
       \doctest
       >>> x = SX.sym("x"); p = SX.sym("p")
@@ -226,6 +275,24 @@ namespace casadi {
       >> F = integrator('F', 'cvodes', dae); pm = MX.sym('p'); r = F('x0', 1, 'p', pm);
       >> J = Function('J', {pm}, {jacobian(r.xf, pm)}); J(1)
       -0.3679
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> x = ca.SX.sym("x"); p = ca.SX.sym("p");
+      julia> dae = Dict("x" => x, "p" => p, "ode" => -p*x, "quad" => x);
+      julia> F = ca.integrator("F", "cvodes", dae, Dict("nadj" => 1));
+      julia> ca.size_in(F, 4), ca.size_out(F, 5)
+      ((1, 1), (1, 1))
+      julia> r = F(x0=1, p=1, adj_xf=1);
+      julia> r["adj_x0"], r["adj_p"]
+      (0.3679, -0.3679)
+      julia> F = ca.integrator("F", "cvodes", dae);
+      julia> pm = ca.MX.sym("p");
+      julia> J = ca.Function("J", [pm], [ca.jacobian(F(x0=1, p=pm)["xf"], pm)]);
+      julia> J(1)
+      DM(-0.3679)
       \enddoctest
       \endlang
 
@@ -287,6 +354,13 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> ca.has_integrator("rk"), ca.has_integrator("no_such_plugin")
+      (true, false)
+      \enddoctest
+      \endlang
+
       \identifier{2oi} */
   CASADI_EXPORT bool has_integrator(const std::string& name);
 
@@ -313,6 +387,17 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> try
+                 ca.load_integrator("no_such_plugin")
+             catch e
+                 println(occursin("no_such_plugin", sprint(showerror, e)))
+             end
+      true
+      \enddoctest
+      \endlang
+
       \identifier{2oj} */
   CASADI_EXPORT void load_integrator(const std::string& name);
 
@@ -331,6 +416,13 @@ namespace casadi {
       \doctest
       >> contains(doc_integrator('rk'), 'Runge-Kutta')
       1
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> occursin("Runge-Kutta", ca.doc_integrator("rk"))
+      true
       \enddoctest
       \endlang
 
@@ -359,6 +451,20 @@ namespace casadi {
       adj_xf
       adj_zf
       adj_qf
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> ca.integrator_in()
+      7-element Vector{String}:
+       "x0"
+       "z0"
+       "p"
+       "u"
+       "adj_xf"
+       "adj_zf"
+       "adj_qf"
       \enddoctest
       \endlang
 
@@ -392,6 +498,20 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> ca.integrator_out()
+      7-element Vector{String}:
+       "xf"
+       "zf"
+       "qf"
+       "adj_x0"
+       "adj_z0"
+       "adj_p"
+       "adj_u"
+      \enddoctest
+      \endlang
+
       \sa integrator_in, integrator_n_out
 
       \identifier{7c} */
@@ -414,6 +534,13 @@ namespace casadi {
       x0
       adj_qf
       1
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> ca.integrator_in(0), ca.integrator_in(6), ca.integrator_in(7)
+      ("x0", "adj_qf", "")
       \enddoctest
       \endlang
 
@@ -440,6 +567,13 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> ca.integrator_out(0), ca.integrator_out(6), ca.integrator_out(7)
+      ("xf", "adj_u", "")
+      \enddoctest
+      \endlang
+
       \identifier{7e} */
   CASADI_EXPORT std::string integrator_out(casadi_int ind);
 
@@ -459,6 +593,13 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> ca.integrator_n_in()
+      7
+      \enddoctest
+      \endlang
+
       \identifier{7f} */
   CASADI_EXPORT casadi_int integrator_n_in();
 
@@ -474,6 +615,13 @@ namespace casadi {
       \lang{matlab}
       \doctest
       >> integrator_n_out()
+      7
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> ca.integrator_n_out()
       7
       \enddoctest
       \endlang
@@ -501,6 +649,18 @@ namespace casadi {
       z
       p
       u
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> ca.dyn_in()
+      5-element Vector{String}:
+       "t"
+       "x"
+       "z"
+       "p"
+       "u"
       \enddoctest
       \endlang
 
@@ -539,6 +699,21 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> ca.dyn_out()
+      4-element Vector{String}:
+       "ode"
+       "alg"
+       "quad"
+       "zero"
+      julia> x = ca.SX.sym("x"); t = ca.SX.sym("t"); e = ca.SX(0, 1);
+      julia> dae = ca.Function("dae", [t, x, e, e, e], [-x, e, x, e], ca.dyn_in(), ca.dyn_out());
+      julia> ca.integrator("F", "rk", dae)(x0=1)["xf"]
+      DM(0.3679)
+      \enddoctest
+      \endlang
+
       \sa dyn_in, integrator
 
       \identifier{25q} */
@@ -560,6 +735,13 @@ namespace casadi {
       >> dyn_in(1), isempty(dyn_in(5))
       x
       1
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> ca.dyn_in(1), ca.dyn_in(5)
+      ("x", "")
       \enddoctest
       \endlang
 
@@ -585,6 +767,13 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> ca.dyn_out(0), ca.dyn_out(4)
+      ("ode", "")
+      \enddoctest
+      \endlang
+
       \identifier{25s} */
   CASADI_EXPORT std::string dyn_out(casadi_int ind);
 
@@ -604,6 +793,13 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> ca.dyn_n_in()
+      5
+      \enddoctest
+      \endlang
+
       \identifier{25t} */
   CASADI_EXPORT casadi_int dyn_n_in();
 
@@ -619,6 +815,13 @@ namespace casadi {
       \lang{matlab}
       \doctest
       >> dyn_n_out()
+      4
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> ca.dyn_n_out()
       4
       \enddoctest
       \endlang
@@ -650,6 +853,19 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> ca.event_in()
+      6-element Vector{String}:
+       "index"
+       "t"
+       "x"
+       "z"
+       "p"
+       "u"
+      \enddoctest
+      \endlang
+
       \sa event_out
 
       \identifier{2b4} */
@@ -672,6 +888,15 @@ namespace casadi {
       >> event_out()
       post_x
       post_z
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> ca.event_out()
+      2-element Vector{String}:
+       "post_x"
+       "post_z"
       \enddoctest
       \endlang
 

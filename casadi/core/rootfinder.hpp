@@ -122,6 +122,33 @@ namespace casadi {
    * \enddoctest
    * \endlang
    *
+   * \lang{julia}
+   * \doctest
+   * julia> x = ca.SX.sym("x"); p = ca.SX.sym("p");
+   * julia> G = ca.rootfinder("G", "newton", Dict("x" => x, "p" => p, "g" => x^2 - p))
+   * Function(G:(x0,p)->(x) Newton)
+   * julia> G(x0=1, p=2)["x"], G(1, 2)
+   * (1.4142, 1.4142)
+   * julia> ca.stats(G)["success"], ca.stats(G)["return_status"]
+   * (true, "success")
+   * julia> pm = ca.MX.sym("p");
+   * julia> dxdp = ca.Function("dxdp", [pm], [ca.jacobian(G(x0=1, p=pm)["x"], pm)]);
+   * julia> dxdp(4)
+   * DM(0.25)
+   * julia> f = ca.Function("f", [x, p], [x^2 - p, 3*x], ["x", "p"], ["g", "h"]);
+   * julia> G = ca.rootfinder("G", "newton", f)
+   * Function(G:(x0,p)->(x,h) Newton)
+   * julia> G(x0=1, p=4)
+   * Dict{String, DM} with 2 entries:
+   *   "h" => 6
+   *   "x" => 2
+   * julia> f = ca.Function("f", [p, x], [3*x, x^2 - p], ["p", "x"], ["h", "g"]);
+   * julia> opts = Dict("implicit_input" => 1, "implicit_output" => 1);
+   * julia> G = ca.rootfinder("G", "newton", f, opts)
+   * Function(G:(p,x0)->(h,x) Newton)
+   * \enddoctest
+   * \endlang
+   *
    * \lang{python}
    * \doctest
    * >>> x = SX.sym("x"); p = SX.sym("p")
@@ -169,6 +196,37 @@ namespace casadi {
    * >> try, rootfinder('G', 'newton', struct('x', X, 'g', X(1))); catch e, msg = e.message; end
    * >> contains(msg, 'Dimension mismatch')
    * 1
+   * \enddoctest
+   * \endlang
+   *
+   * \lang{julia}
+   * \doctest
+   * julia> x = ca.SX.sym("x"); p = ca.SX.sym("p");
+   * julia> rfp = Dict("x" => x, "p" => p, "g" => x^2 - p);
+   * julia> G = ca.rootfinder("G", "newton", rfp, Dict("max_iter" => 2));
+   * julia> try
+   *            G(x0=1, p=2)
+   *        catch e
+   *            println(occursin("rootfinder process failed", sprint(showerror, e)))
+   *        end
+   * true
+   * julia> opts = Dict("max_iter" => 2, "error_on_fail" => false, "print_iteration" => false);
+   * julia> G = ca.rootfinder("G", "newton", rfp, opts);
+   * julia> G(x0=1, p=2)["x"], ca.stats(G)["return_status"]
+   * (1.4167, "max_iteration_reached")
+   * julia> X = ca.SX.sym("x", 2);
+   * julia> try
+   *            ca.rootfinder("G", "newton", Dict("x" => X, "g" => [X[1] - 1; 1]))
+   *        catch e
+   *            println(occursin("structurally rank-deficient", sprint(showerror, e)))
+   *        end
+   * true
+   * julia> try
+   *            ca.rootfinder("G", "newton", Dict("x" => X, "g" => X[1]))
+   *        catch e
+   *            println(occursin("Dimension mismatch", sprint(showerror, e)))
+   *        end
+   * true
    * \enddoctest
    * \endlang
    *
@@ -222,6 +280,15 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> ca.rootfinder_in()
+      2-element Vector{String}:
+       "x0"
+       "p"
+      \enddoctest
+      \endlang
+
       \sa rootfinder_out, rootfinder_n_in
 
       \identifier{1ty} */
@@ -243,6 +310,14 @@ namespace casadi {
       \doctest
       >> rootfinder_out()
       x
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> ca.rootfinder_out()
+      1-element Vector{String}:
+       "x"
       \enddoctest
       \endlang
 
@@ -271,6 +346,13 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> ca.rootfinder_in(0), ca.rootfinder_in(1), ca.rootfinder_in(2)
+      ("x0", "p", "")
+      \enddoctest
+      \endlang
+
       \identifier{1u0} */
   CASADI_EXPORT std::string rootfinder_in(casadi_int ind);
 
@@ -293,6 +375,13 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> ca.rootfinder_out(0), ca.rootfinder_out(1)
+      ("x", "")
+      \enddoctest
+      \endlang
+
       \identifier{1u1} */
   CASADI_EXPORT std::string rootfinder_out(casadi_int ind);
 
@@ -312,6 +401,13 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> ca.rootfinder_n_in()
+      2
+      \enddoctest
+      \endlang
+
       \identifier{1u2} */
   CASADI_EXPORT casadi_int rootfinder_n_in();
 
@@ -327,6 +423,13 @@ namespace casadi {
       \lang{matlab}
       \doctest
       >> rootfinder_n_out()
+      1
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> ca.rootfinder_n_out()
       1
       \enddoctest
       \endlang
@@ -353,6 +456,14 @@ namespace casadi {
       >> opts = cellstr(rootfinder_options('newton'));
       >> ismember({'max_iter', 'abstol', 'linear_solver'}, opts)
       1 1 0
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> opts = ca.rootfinder_options("newton");
+      julia> "max_iter" in opts, "abstol" in opts, "linear_solver" in opts
+      (true, true, false)
       \enddoctest
       \endlang
 
@@ -385,6 +496,15 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> ca.rootfinder_option_type("newton", "max_iter")
+      "OT_INT"
+      julia> ca.rootfinder_option_type("newton", "abstol")
+      "OT_DOUBLE"
+      \enddoctest
+      \endlang
+
       \identifier{1u5} */
   CASADI_EXPORT std::string rootfinder_option_type(const std::string& name, const std::string& op);
 
@@ -407,6 +527,13 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> ca.rootfinder_option_info("newton", "abstol")
+      "Stopping criterion tolerance on max(|F|)"
+      \enddoctest
+      \endlang
+
       \identifier{1u6} */
   CASADI_EXPORT std::string rootfinder_option_info(const std::string& name, const std::string& op);
 
@@ -426,6 +553,13 @@ namespace casadi {
       >> has_rootfinder('newton'), has_rootfinder('no_such_plugin')
       1
       0
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> ca.has_rootfinder("newton"), ca.has_rootfinder("no_such_plugin")
+      (true, false)
       \enddoctest
       \endlang
 
@@ -455,6 +589,17 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> try
+                 ca.load_rootfinder("no_such_plugin")
+             catch e
+                 println(occursin("no_such_plugin", sprint(showerror, e)))
+             end
+      true
+      \enddoctest
+      \endlang
+
       \identifier{2nh} */
   CASADI_EXPORT void load_rootfinder(const std::string& name);
 
@@ -473,6 +618,13 @@ namespace casadi {
       \doctest
       >> contains(doc_rootfinder('newton'), 'newton iterations')
       1
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> occursin("newton iterations", ca.doc_rootfinder("newton"))
+      true
       \enddoctest
       \endlang
 

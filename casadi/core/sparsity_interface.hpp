@@ -142,6 +142,29 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> [ca.DM([1, 2]) ca.DM([3, 4]) ca.DM([5, 6])]
+        DM(
+        [[1, 3, 5],
+         [2, 4, 6]])
+        julia> [ca.SX.sym("x", 2) ca.DM.ones(2, 1)]
+        SX(@1=1,
+        [[x_0, @1],
+         [x_1, @1]])
+        julia> [ca.MX.sym("x", 2, 2) ca.MX.sym("y", 2, 0)]
+        MX(x)
+        julia> size([ca.DM(2, 3) ca.DM(0, 0)])
+        (2, 3)
+        julia> try
+                   [ca.DM.ones(2, 2) ca.DM.ones(3, 1)]
+               catch err
+                   println(occursin("dimension mismatch", sprint(showerror, err)))
+               end
+        false
+        \enddoctest
+        \endlang
+
         \sa vertcat, diagcat, veccat, horzsplit
 
         \identifier{3e} */
@@ -200,6 +223,26 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> [ca.SX.sym("x", 2); 3]
+        SX([x_0, x_1, 3])
+        julia> [ca.DM([1 2]); ca.DM.eye(2)]
+        DM(
+        [[1, 2],
+         [1, 00],
+         [00, 1]])
+        julia> print([ca.MX.sym("a", 2, 3); ca.MX.sym("b", 1, 3)])
+        horzcat(a', b')'
+        julia> try
+                   [ca.MX.sym("a", 2, 2); ca.MX.sym("b", 2, 3)]
+               catch err
+                   println(occursin("vertcat dimension mismatch", sprint(showerror, err)))
+               end
+        false
+        \enddoctest
+        \endlang
+
         \sa horzcat, diagcat, veccat, vertsplit
 
         \identifier{3f} */
@@ -250,6 +293,31 @@ namespace casadi {
         2 0
         >> try, horzsplit(x, [0, 2]); catch e, disp(e.message); end
         ...must start at 0, be nondecreasing and end at 5...
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> x = ca.DM([1 2 3 4 5; 6 7 8 9 10]);
+        julia> v = ca.horzsplit(x, [0, 2, 5]);
+        julia> length(v)
+        2
+        julia> v[1]
+        DM(
+        [[1, 2],
+         [6, 7]])
+        julia> v[2]
+        DM(
+        [[3, 4, 5],
+         [8, 9, 10]])
+        julia> size(ca.horzsplit(x, [0, 0, 5])[1])
+        (2, 0)
+        julia> try
+                   ca.horzsplit(x, [0, 2])
+               catch err
+                   println(occursin("end at 5", sprint(showerror, err)))
+               end
+        true
         \enddoctest
         \endlang
 
@@ -309,6 +377,31 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> ca.horzsplit(ca.SX.sym("x", 1, 3))
+        3-element Vector{SX}:
+         SX(x_0)
+         SX(x_1)
+         SX(x_2)
+        julia> ca.horzsplit(ca.DM([1 2 3 4 5]), 2)
+        3-element Vector{DM}:
+         DM([[1, 2]])
+         DM([[3, 4]])
+         DM(5)
+        julia> ca.horzsplit(ca.MX.sym("x", 2, 4), 2)
+        2-element Vector{MX}:
+         MX(horzsplit(x){0})
+         MX(horzsplit(x){1})
+        julia> ca.horzsplit(ca.Sparsity.diag(3), 2)
+        2-element Vector{Sparsity}:
+         Sparsity(3x2,2nz)
+         Sparsity(3x1,1nz)
+        julia> ca.horzsplit(ca.MX.sym("x", 2, 0))
+        MX[]
+        \enddoctest
+        \endlang
+
         \sa horzsplit_n, vertsplit
 
         \identifier{3h} */
@@ -350,6 +443,26 @@ namespace casadi {
         2 0
         >> try, horzsplit_n(DM([1 2 3]), 2); catch e, disp(e.message); end
         ...must be a multiple of n...
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> ca.horzsplit_n(ca.DM([1 2 3 4]), 2)
+        2-element Vector{DM}:
+         DM([[1, 2]])
+         DM([[3, 4]])
+        julia> ca.horzsplit_n(ca.DM(2, 0), 3)
+        3-element Vector{DM}:
+         DM(2x0)
+         DM(2x0)
+         DM(2x0)
+        julia> try
+                   ca.horzsplit_n(ca.DM([1 2 3]), 2)
+               catch err
+                   println(occursin("must be a multiple of n", sprint(showerror, err)))
+               end
+        true
         \enddoctest
         \endlang
 
@@ -398,6 +511,25 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> x = ca.SX.sym("x", 5);
+        julia> ca.vertsplit(x, [0, 2, 5])
+        2-element Vector{SX}:
+         SX([x_0, x_1])
+         SX([x_2, x_3, x_4])
+        julia> parts = [ca.DM.ones(2, 1), ca.DM.ones(3, 1)];
+        julia> ca.vertsplit(x, ca.offset(parts))
+        2-element Vector{SX}:
+         SX([x_0, x_1])
+         SX([x_2, x_3, x_4])
+        julia> ca.vertsplit(ca.DM([1 2; 3 4]), [0, 1, 2])
+        2-element Vector{DM}:
+         DM([[1, 2]])
+         DM([[3, 4]])
+        \enddoctest
+        \endlang
+
         \sa vertsplit_n, horzsplit, offset
 
         \identifier{3i} */
@@ -424,6 +556,24 @@ namespace casadi {
         [0, 3, 7]
         >>> offset([])
         [0]
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> ca.offset([ca.DM(2, 3), ca.DM(4, 3)])
+        3-element Vector{Int64}:
+         0
+         2
+         6
+        julia> ca.offset([ca.DM(2, 3), ca.DM(2, 4)], false)
+        3-element Vector{Int64}:
+         0
+         3
+         7
+        julia> ca.offset(ca.DM[])
+        1-element Vector{Int64}:
+         0
         \enddoctest
         \endlang
 
@@ -481,6 +631,32 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> ca.vertsplit(ca.SX.sym("a", 4))
+        4-element Vector{SX}:
+         SX(a_0)
+         SX(a_1)
+         SX(a_2)
+         SX(a_3)
+        julia> ca.vertsplit(ca.SX.sym("a", 4), 2)
+        2-element Vector{SX}:
+         SX([a_0, a_1])
+         SX([a_2, a_3])
+        julia> ca.vertsplit(ca.DM([0, 1, 2, 3, 4]), 2)
+        3-element Vector{DM}:
+         DM([0, 1])
+         DM([2, 3])
+         DM(4)
+        julia> ca.vertsplit(ca.MX.sym("x", 4), 2)
+        2-element Vector{MX}:
+         MX(vertsplit(x){0})
+         MX(vertsplit(x){1})
+        julia> ca.vertsplit(ca.MX.sym("x", 0, 2))
+        MX[]
+        \enddoctest
+        \endlang
+
         \sa vertsplit_n, horzsplit
 
         \identifier{3k} */
@@ -517,6 +693,21 @@ namespace casadi {
         [3, 4]
         >> try, vertsplit_n(DM([1; 2; 3]), 2); catch e, disp(e.message); end
         ...must be a multiple of n...
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> ca.vertsplit_n(ca.DM([1, 2, 3, 4]), 2)
+        2-element Vector{DM}:
+         DM([1, 2])
+         DM([3, 4])
+        julia> try
+                   ca.vertsplit_n(ca.DM([1, 2, 3]), 2)
+               catch err
+                   println(occursin("must be a multiple of n", sprint(showerror, err)))
+               end
+        true
         \enddoctest
         \endlang
 
@@ -565,6 +756,22 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> ca.blockcat([[ca.DM(1), ca.DM([2 3])], [ca.DM([4, 5]), ca.DM.eye(2)]])
+        DM(
+        [[1, 2, 3],
+         [4, 1, 00],
+         [5, 00, 1]])
+        julia> a, b = ca.MX.sym("a", 2, 2), ca.MX.sym("b", 2, 1);
+        julia> c, d = ca.MX.sym("c", 1, 2), ca.MX.sym("d");
+        julia> print(ca.blockcat([[a, b], [c, d]]))
+        horzcat(horzcat(a, b)', horzcat(c, d)')'
+        julia> print([a b; c d])
+        horzcat(horzcat(a, b)', horzcat(c, d)')'
+        \enddoctest
+        \endlang
+
         \sa horzcat, vertcat, blocksplit
 
         \identifier{3l} */
@@ -590,6 +797,15 @@ namespace casadi {
         >> [DM(1), 2; 3, 4]
         [[1, 2],
          [3, 4]]
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> ca.blockcat(ca.DM(1), ca.DM(2), ca.DM(3), ca.DM(4))
+        DM(
+        [[1, 2],
+         [3, 4]])
         \enddoctest
         \endlang
 
@@ -632,6 +848,18 @@ namespace casadi {
         >> b{1}{2}, b{2}{2}
         3
         [6, 9]
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> x = ca.DM([1 2 3; 4 5 6; 7 8 9]);
+        julia> ca.blocksplit(x, [0, 1, 3], [0, 2, 3])
+        2-element Vector{Vector{DM}}:
+         DM[[[1, 2]], 3]
+         DM[
+        [[4, 5],
+         [7, 8]], [6, 9]]
         \enddoctest
         \endlang
 
@@ -687,6 +915,23 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> x = ca.DM([1 2 3; 4 5 6; 7 8 9]);
+        julia> ca.blocksplit(x, 2, 2)
+        2-element Vector{Vector{DM}}:
+         DM[
+        [[1, 2],
+         [4, 5]], [3, 6]]
+         DM[[[7, 8]], 9]
+        julia> ca.blockcat(ca.blocksplit(x, 2, 2))
+        DM(
+        [[1, 2, 3],
+         [4, 5, 6],
+         [7, 8, 9]])
+        \enddoctest
+        \endlang
+
         \sa blockcat
 
         \identifier{3o} */
@@ -738,6 +983,22 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> ca.diagcat(ca.DM.ones(1, 2), 3)
+        DM(
+        [[1, 1, 00],
+         [00, 00, 3]])
+        julia> ca.diagcat(ca.SX.sym("x"), ca.SX.sym("y", 2))
+        SX(
+        [[x, 00],
+         [00, y_0],
+         [00, y_1]])
+        julia> print(ca.diagcat(ca.MX.sym("x"), ca.MX.sym("y", 2, 2)))
+        diagcat(x, y)
+        \enddoctest
+        \endlang
+
         \sa horzcat, vertcat, diagsplit
 
         \identifier{3p} */
@@ -773,6 +1034,16 @@ namespace casadi {
         >> v = diagsplit(x, [0, 1, 2], [0, 2, 3]); disp(v{1}), disp(v{2})
         [[1, 2]]
         6
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> x = ca.DM([1 2 0; 0 0 6]);
+        julia> ca.diagsplit(x, [0, 1, 2], [0, 2, 3])
+        2-element Vector{DM}:
+         DM([[1, 2]])
+         DM(6)
         \enddoctest
         \endlang
 
@@ -817,6 +1088,25 @@ namespace casadi {
         5
         >> try, diagsplit(DM.ones(2, 3), [0, 2]); catch e, disp(e.message); end
         ...must be square...
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> x = ca.DM([1 2 0; 3 4 0; 0 0 5]);
+        julia> v = ca.diagsplit(x, [0, 2, 3]);
+        julia> v[1]
+        DM(
+        [[1, 2],
+         [3, 4]])
+        julia> v[2]
+        DM(5)
+        julia> try
+                   ca.diagsplit(ca.DM.ones(2, 3), [0, 2])
+               catch err
+                   println(occursin("must be square", sprint(showerror, err)))
+               end
+        true
         \enddoctest
         \endlang
 
@@ -876,6 +1166,34 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> ca.diagsplit(ca.DM([1 0; 0 4]))
+        2-element Vector{DM}:
+         DM(1)
+         DM(4)
+        julia> v = ca.diagsplit(ca.diagcat(ca.SX.sym("a", 2, 2), ca.SX.sym("b", 2, 2)), 2);
+        julia> v[1]
+        SX(
+        [[a_0, a_2],
+         [a_1, a_3]])
+        julia> v[2]
+        SX(
+        [[b_0, b_2],
+         [b_1, b_3]])
+        julia> ca.diagsplit(ca.MX.sym("x", ca.Sparsity.diag(4)), 2)
+        2-element Vector{MX}:
+         MX(diagsplit(x){0})
+         MX(diagsplit(x){1})
+        julia> try
+                   ca.diagsplit(ca.MX.sym("x", 4, 4), 2)
+               catch err
+                   println(occursin("nonzeros outside the diagonal blocks", sprint(showerror, err)))
+               end
+        true
+        \enddoctest
+        \endlang
+
         \sa diagcat
 
         \identifier{3s} */
@@ -905,6 +1223,15 @@ namespace casadi {
         >> v = diagsplit(DM([1 2 0 0; 0 0 7 8]), 1, 2); disp(v{1}), disp(v{2})
         [[1, 2]]
         [[7, 8]]
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> ca.diagsplit(ca.DM([1 2 0 0; 0 0 7 8]), 1, 2)
+        2-element Vector{DM}:
+         DM([[1, 2]])
+         DM([[7, 8]])
         \enddoctest
         \endlang
 
@@ -942,6 +1269,15 @@ namespace casadi {
         [1, 3, 2, 4, 5]
         >> veccat(MX.sym('x', 2, 2), MX.sym('y', 1, 3))
         vertcat(vec(x), y')
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> print(ca.veccat([ca.MX.sym("x", 2, 2), ca.MX.sym("y", 1, 3)]))
+        vertcat(vec(x), y')
+        julia> [vec(ca.DM([1 2; 3 4])); 5]
+        DM([1, 3, 2, 4, 5])
         \enddoctest
         \endlang
 
@@ -1015,6 +1351,30 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> A = ca.DM([1 2; 3 4]);
+        julia> A * A
+        DM(
+        [[7, 10],
+         [15, 22]])
+        julia> A * 2
+        DM(
+        [[2, 4],
+         [6, 8]])
+        julia> ca.mtimes(ca.Sparsity.diag(2), ca.Sparsity.dense(2, 1))
+        Sparsity(2x1)
+        julia> print(ca.MX.sym("x", 2, 3) * ca.MX.sym("y", 3, 1))
+        mac(x,y,zeros(2x1))
+        julia> try
+                   A * ca.DM.ones(3, 1)
+               catch err
+                   println(occursin("incompatible dimensions", sprint(showerror, err)))
+               end
+        true
+        \enddoctest
+        \endlang
+
         \sa mac, times, norm_0_mul
 
         \identifier{3v} */
@@ -1037,6 +1397,19 @@ namespace casadi {
         Traceback (most recent call last):
           ...
         RuntimeError: ...must not be empty...
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> ca.DM([1 2]) * ca.DM([1 0; 0 2]) * ca.DM([1, 1])
+        DM(5)
+        julia> try
+                   ca.mtimes(ca.DM[])
+               catch err
+                   println(occursin("must not be empty", sprint(showerror, err)))
+               end
+        true
         \enddoctest
         \endlang
 
@@ -1092,6 +1465,23 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> A = ca.DM([1 2; 3 4]);
+        julia> ca.mac(A, A, ca.DM.eye(2))
+        DM(
+        [[8, 00],
+         [00, 23]])
+        julia> ca.mac(A, A, ca.DM.ones(2, 2))
+        DM(
+        [[8, 11],
+         [16, 23]])
+        julia> x, y = ca.MX.sym("x", 2, 3), ca.MX.sym("y", 3, 2);
+        julia> print(ca.mac(x, y, ca.MX.sym("z", ca.Sparsity.diag(2))))
+        mac(x,y,z)
+        \enddoctest
+        \endlang
+
         \sa mtimes
 
         \identifier{3x} */
@@ -1124,6 +1514,17 @@ namespace casadi {
         x'
         >> transpose(Sparsity.lower(2)) == Sparsity.upper(2)
         1
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> ca.DM([1 2 3])'
+        DM([1, 2, 3])
+        julia> print(ca.MX.sym("x", 2, 3)')
+        x'
+        julia> ca.is_equal(ca.transpose(ca.Sparsity.lower(2)), ca.Sparsity.upper(2))
+        true
         \enddoctest
         \endlang
 
@@ -1166,6 +1567,17 @@ namespace casadi {
         >> vec(DM.eye(2))
         [1, 00, 00, 1]
         >> vec(MX.sym('x', 1, 3))
+        x'
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> vec(ca.DM([1 2; 3 4]))
+        DM([1, 3, 2, 4])
+        julia> vec(ca.DM.eye(2))
+        DM([1, 00, 00, 1])
+        julia> print(vec(ca.MX.sym("x", 1, 3)))
         x'
         \enddoctest
         \endlang
@@ -1228,6 +1640,29 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> x = ca.DM([1 2 3; 4 5 6]);
+        julia> reshape(x, 3, 2)
+        DM(
+        [[1, 5],
+         [4, 3],
+         [2, 6]])
+        julia> reshape(x, :, 1)
+        DM([1, 4, 2, 5, 3, 6])
+        julia> reshape(ca.DM.eye(2), 1, 4)
+        DM([[1, 00, 00, 1]])
+        julia> print(reshape(ca.MX.sym("x", 2, 3), 3, 2))
+        reshape(x)
+        julia> try
+                   reshape(x, 4, 2)
+               catch err
+                   println(occursin("number of elements must remain", sprint(showerror, err)))
+               end
+        true
+        \enddoctest
+        \endlang
+
         \sa vec, sparsity_cast, transpose
 
         \identifier{40} */
@@ -1253,6 +1688,15 @@ namespace casadi {
         >> reshape(DM([1; 2; 3; 4]), [2, 2])
         [[1, 3],
          [2, 4]]
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> reshape(ca.DM([1, 2, 3, 4]), (2, 2))
+        DM(
+        [[1, 3],
+         [2, 4]])
         \enddoctest
         \endlang
 
@@ -1285,6 +1729,19 @@ namespace casadi {
         >> x = MX.sym('x', Sparsity.diag(2));
         >> try, reshape(x, Sparsity.dense(4, 1)); catch e, disp(e.message); end
         ...Reshape mismatch...
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> ca.reshape(ca.SX.sym("x", 2, 2), ca.Sparsity.dense(4, 1))
+        SX([x_0, x_1, x_2, x_3])
+        julia> try
+                   ca.reshape(ca.MX.sym("x", ca.Sparsity.diag(2)), ca.Sparsity.dense(4, 1))
+               catch err
+                   println(occursin("Reshape mismatch", sprint(showerror, err)))
+               end
+        true
         \enddoctest
         \endlang
 
@@ -1335,6 +1792,23 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> ca.sparsity_cast(ca.DM([1 2; 3 4]), ca.Sparsity.dense(1, 4))
+        DM([[1, 3, 2, 4]])
+        julia> ca.sparsity_cast(ca.DM.eye(3), ca.Sparsity.dense(3, 1))
+        DM([1, 1, 1])
+        julia> print(ca.sparsity_cast(ca.MX.sym("x", ca.Sparsity.diag(3)), ca.Sparsity.dense(3, 1)))
+        nonzeros(x)
+        julia> try
+                   ca.sparsity_cast(ca.MX.sym("x", 2, 2), ca.Sparsity.dense(3, 1))
+               catch err
+                   println(occursin("Mismatching nonzero count", sprint(showerror, err)))
+               end
+        true
+        \enddoctest
+        \endlang
+
         \sa reshape
 
         \identifier{24z} */
@@ -1378,6 +1852,19 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> ca.sprank(ca.Sparsity.diag(3))
+        3
+        julia> ca.sprank(ca.Sparsity.triplet(3, 3, [0, 1, 2], [0, 0, 0]))
+        1
+        julia> ca.sprank(ca.DM([1 2; 2 4]))
+        2
+        julia> ca.sprank(ca.DM(2, 3))
+        0
+        \enddoctest
+        \endlang
+
         \identifier{43} */
     inline friend casadi_int sprank(const MatType& x) {
       return MatType::sprank(x);
@@ -1410,6 +1897,21 @@ namespace casadi {
         3
         >> try, norm_0_mul(DM.ones(2, 3), DM.ones(2, 3)); catch e, disp(e.message); end
         ...Dimension error...
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> ca.norm_0_mul(ca.DM.eye(3), ca.DM.ones(3, 2))
+        6
+        julia> ca.norm_0_mul(ca.Sparsity.diag(3), ca.Sparsity.diag(3))
+        3
+        julia> try
+                   ca.norm_0_mul(ca.DM.ones(2, 3), ca.DM.ones(2, 3))
+               catch err
+                   println(occursin("Dimension error", sprint(showerror, err)))
+               end
+        true
         \enddoctest
         \endlang
 
@@ -1458,6 +1960,22 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> x = ca.DM([1 2 3; 4 5 6]);
+        julia> ca.triu(x)
+        DM(
+        [[1, 2, 3],
+         [00, 5, 6]])
+        julia> ca.triu(x, false)
+        DM(
+        [[00, 2, 3],
+         [00, 00, 6]])
+        julia> print(ca.triu(ca.MX.sym("x", 2, 2)))
+        project(x)
+        \enddoctest
+        \endlang
+
         \sa tril
 
         \identifier{45} */
@@ -1495,6 +2013,20 @@ namespace casadi {
         >> tril(x, false)
         [[00, 00, 00],
          [4, 00, 00]]
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> x = ca.DM([1 2 3; 4 5 6]);
+        julia> ca.tril(x)
+        DM(
+        [[1, 00, 00],
+         [4, 5, 00]])
+        julia> ca.tril(x, false)
+        DM(
+        [[00, 00, 00],
+         [4, 00, 00]])
         \enddoctest
         \endlang
 
@@ -1540,6 +2072,23 @@ namespace casadi {
          [00, 00, 3, 4]]
         >> size(kron(MX.sym('a', 2, 2), MX.sym('b', 1, 2)))
         2 4
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> kron(ca.DM([1 2]), ca.DM([1; 10]))
+        DM(
+        [[1, 2],
+         [10, 20]])
+        julia> kron(ca.DM.eye(2), ca.DM([1 2; 3 4]))
+        DM(
+        [[1, 2, 00, 00],
+         [3, 4, 00, 00],
+         [00, 00, 1, 2],
+         [00, 00, 3, 4]])
+        julia> size(kron(ca.MX.sym("a", 2, 2), ca.MX.sym("b", 1, 2)))
+        (2, 4)
         \enddoctest
         \endlang
 
@@ -1594,6 +2143,25 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> repeat(ca.DM([1 2]), 2, 2)
+        DM(
+        [[1, 2, 1, 2],
+         [1, 2, 1, 2]])
+        julia> repeat(ca.DM.eye(2), 1, 2)
+        DM(
+        [[1, 00, 1, 00],
+         [00, 1, 00, 1]])
+        julia> print(repeat(ca.MX.sym("x", 2), 1, 3))
+        repmat(x, 3)
+        julia> print(repeat(ca.MX.sym("x", 2), 3, 1))
+        vertcat(x, x, x)
+        julia> size(repeat(ca.DM.ones(2, 3), 0, 2))
+        (0, 6)
+        \enddoctest
+        \endlang
+
         \identifier{48} */
     inline friend MatType repmat(const MatType &A, casadi_int n, casadi_int m=1) {
       return MatType::repmat(A, n, m);
@@ -1614,6 +2182,13 @@ namespace casadi {
         \doctest
         >> repmat(DM(7), [1, 3])
         [[7, 7, 7]]
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> ca.repmat(ca.DM(7), 1, 3)
+        DM([[7, 7, 7]])
         \enddoctest
         \endlang
 
@@ -1800,6 +2375,19 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> ca.sum1(ca.DM([1 2 3; 4 5 6]))
+        DM([[5, 7, 9]])
+        julia> ca.sum1(ca.SX.sym("x", 2, 2))
+        SX([[(x_0+x_1), (x_2+x_3)]])
+        julia> print(ca.sum1(ca.MX.sym("x", 2, 3)))
+        mac(ones(1x2),x,zeros(1x3))
+        julia> ca.sum1(ca.DM(0, 3))
+        DM([[00, 00, 00]])
+        \enddoctest
+        \endlang
+
         \sa sum2, sum
 
         \identifier{4p} */
@@ -1831,6 +2419,17 @@ namespace casadi {
         [(x_0+x_2), (x_1+x_3)]
         >> sum2(DM(3, 3))
         [00, 00, 00]
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> ca.sum2(ca.DM([1 2 3; 4 5 6]))
+        DM([6, 15])
+        julia> ca.sum2(ca.SX.sym("x", 2, 2))
+        SX([(x_0+x_2), (x_1+x_3)])
+        julia> ca.sum2(ca.DM(3, 3))
+        DM([00, 00, 00])
         \enddoctest
         \endlang
 
@@ -1869,6 +2468,19 @@ namespace casadi {
         ((x_0+x_1)+x_2)
         >> sum(DM(3, 0), 'all')
         00
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> sum(ca.DM([1 2 3; 4 5 6]))
+        DM(21)
+        julia> sum(ca.DM([1 2 3; 4 5 6]), dims=1)
+        DM([[5, 7, 9]])
+        julia> sum(ca.SX.sym("x", 3))
+        SX(((x_0+x_1)+x_2))
+        julia> sum(ca.DM(3, 0))
+        DM(00)
         \enddoctest
         \endlang
 

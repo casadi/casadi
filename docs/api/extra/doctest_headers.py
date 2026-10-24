@@ -60,6 +60,7 @@ def parse(path):
             if block is not None:
                 raise ValueError("%s: nested %s" % (where, t))
             block = (t[1:], i, [])
+            indent = line[:line.index(t)]  # julia continuation lines keep their 7 spaces
         elif block is not None and t == "\\end" + block[0]:
             text = "\n".join(block[2]) + "\n"
             group["parts"].append(("doctest", block[1], text) if block[0] == "doctest" else ("verbatim", text))
@@ -67,7 +68,7 @@ def parse(path):
         elif "\\lang" in s or "\\endlang" in s or "\\doctest" in s:
             raise ValueError("%s: malformed line: %r" % (where, line))
         elif block is not None:
-            block[2].append(s)
+            block[2].append(line[len(indent):] if group["lang"] == "julia" and line.startswith(indent) else s)
         elif group is not None:
             if group["parts"] and group["parts"][-1][0] == "text":
                 group["parts"][-1][1].append(t)

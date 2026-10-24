@@ -121,6 +121,20 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> A = ca.DM([1 2; 3 4]);
+      julia> ca.dim(ca.sparsity(A)), ca.nonzeros(A)
+      ("2x2", [1.0, 3.0, 2.0, 4.0])
+      julia> S = ca.DM(ca.Sparsity.diag(2))
+      DM(
+      [[1, 00],
+       [00, 1]])
+      julia> ca.nnz(S), ca.numel(S)
+      (2, 4)
+      \enddoctest
+      \endlang
+
       \author Joel Andersson
       \date 2010-2014
 
@@ -146,6 +160,13 @@ namespace casadi {
         \doctest
         >> fprintf('%s %d\n', DM().dim(), SX().is_empty())
         0x0 1
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> ca.dim(ca.DM()), ca.is_empty(ca.SX())
+        ("0x0", true)
         \enddoctest
         \endlang
 
@@ -193,6 +214,19 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> ca.DM(2, 3)
+        DM(
+        [[00, 00, 00],
+         [00, 00, 00]])
+        julia> ca.nnz(ca.DM(2, 3)), ca.nnz(ca.DM.zeros(2, 3))
+        (0, 6)
+        julia> ca.dim(ca.SX(2, 0))
+        "2x0"
+        \enddoctest
+        \endlang
+
         \sa zeros, ones
 
         \identifier{18g} */
@@ -233,6 +267,15 @@ namespace casadi {
         >> DM(Sparsity.diag(2))
         [[1, 00],
          [00, 1]]
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> ca.DM(ca.Sparsity.diag(2))
+        DM(
+        [[1, 00],
+         [00, 1]])
         \enddoctest
         \endlang
 
@@ -282,6 +325,25 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> ca.DM(ca.Sparsity.diag(2), [5, 6])
+        DM(
+        [[5, 00],
+         [00, 6]])
+        julia> ca.DM(ca.Sparsity.diag(2), 5)
+        DM(
+        [[5, 00],
+         [00, 5]])
+        julia> ca.SX(ca.Sparsity.lower(2), ca.SX.sym("v", 3))
+        SX(
+        [[v_0, 00],
+         [v_1, v_2]])
+        julia> try ca.DM(ca.Sparsity.diag(3), [1, 2]); catch; println("error") end
+        error
+        \enddoctest
+        \endlang
+
         \identifier{18l} */
     Matrix(const Sparsity& sp, const Matrix<Scalar>& d);
 
@@ -310,6 +372,17 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> ca.DM([1 2; 3 4])
+        DM(
+        [[1, 2],
+         [3, 4]])
+        julia> try ca.DM([[1, 2], [3]]); catch; println("error") end
+        error
+        \enddoctest
+        \endlang
+
         \identifier{2oo} */
     explicit Matrix(const std::vector< std::vector<double> >& m);
 
@@ -321,6 +394,13 @@ namespace casadi {
         \doctest
         >>> DM([1, 2, 3]).dim(), DM(np.array([1, 2, 3])).dim(), DM([]).dim()
         ('3x1', '3x1', '0x1')
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> ca.dim(ca.DM([1, 2, 3])), ca.dim(ca.DM(Float64[]))
+        ("3x1", "0x1")
         \enddoctest
         \endlang
 
@@ -358,6 +438,17 @@ namespace casadi {
         [1, 2]
         >> DM(SX.sym('x'))
         nan
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> ca.dim(ca.SX(ca.DM(ca.Sparsity.diag(2))))
+        "2x2"
+        julia> ca.DM(ca.SX([1, 2]))
+        DM([1, 2])
+        julia> ca.DM(ca.SX.sym("x"))
+        DM(nan)
         \enddoctest
         \endlang
 
@@ -437,6 +528,14 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> S = ca.DM(ca.Sparsity.diag(2));
+        julia> ca.has_nz(S, 0, 0), ca.has_nz(S, 0, 1), ca.has_nz(ca.DM([0, 1]), 0, 0)
+        (true, false, true)
+        \enddoctest
+        \endlang
+
         \sa has_zeros, Sparsity::has_nz
 
         \identifier{2op} */
@@ -457,6 +556,18 @@ namespace casadi {
         True
         >>> try: bool(x > 0)
         ... except Exception as e: print("error")
+        error
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> Bool(ca.DM(1)), Bool(ca.DM(0)), Bool(ca.DM(1, 1))
+        (true, false, false)
+        julia> x = ca.SX.sym("x");
+        julia> Bool(x == x)
+        true
+        julia> try Bool(x > 0); catch; println("error") end
         error
         \enddoctest
         \endlang
@@ -531,6 +642,21 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> A = ca.DM([1 2 3; 4 5 6]);
+        julia> A[2], A[3], A[end]
+        (4, 2, 6)
+        julia> A[[1, 6]]
+        DM([1, 6])
+        julia> S = ca.DM(ca.Sparsity.diag(2));
+        julia> S[2]
+        DM(00)
+        julia> try A[7]; catch; println("error") end
+        error
+        \enddoctest
+        \endlang
+
         \sa set, get_nz, Sparsity::sub
 
         \identifier{2or} */
@@ -596,6 +722,29 @@ namespace casadi {
         >> S(2, 1)
         00
         >> try, A(3, 1); catch e, disp('error'); end
+        error
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> A = ca.DM([1 2 3; 4 5 6]);
+        julia> A[1, 2], A[2, end]
+        (2, 6)
+        julia> A[:, 2]
+        DM([2, 5])
+        julia> A[[2, 1], [1, 3]]
+        DM(
+        [[4, 6],
+         [1, 3]])
+        julia> ca.dim(A[2:1, :])
+        "0x3"
+        julia> x = ca.SX.sym("x", 2, 2);
+        julia> x[1, :]
+        SX([[x_0, x_2]])
+        julia> ca.DM(ca.Sparsity.diag(2))[2, 1]
+        DM(00)
+        julia> try A[3, 1]; catch; println("error") end
         error
         \enddoctest
         \endlang
@@ -676,6 +825,23 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> A = ca.DM([1 2; 3 4]);
+        julia> A[2] = 10; A[[1, 4]] = [7, 8];
+        julia> A
+        DM(
+        [[7, 2],
+         [10, 8]])
+        julia> S = ca.DM(ca.Sparsity.diag(2));
+        julia> S[2] = 5;
+        julia> ca.nnz(S), S[1, 2]
+        (3, 00)
+        julia> try A[[1, 2]] = [1, 2, 3]; catch; println("error") end
+        error
+        \enddoctest
+        \endlang
+
         \sa get, set_nz, erase
 
         \identifier{2ot} */
@@ -747,6 +913,31 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> A = ca.DM([1 2 3; 4 5 6]);
+        julia> A[1, 2] = 9; A[2, :] = 0;
+        julia> A
+        DM(
+        [[1, 9, 3],
+         [0, 0, 0]])
+        julia> A[1, :] = ca.DM([7, 8, 9]);
+        julia> A[1, :]
+        DM([[7, 8, 9]])
+        julia> A[:, 1] = ca.DM(2, 1);
+        julia> ca.nnz(A)
+        4
+        julia> x = ca.SX.sym("x", 2, 2);
+        julia> x[1, 1] = 0;
+        julia> x
+        SX(
+        [[0, x_2],
+         [x_1, x_3]])
+        julia> try A[1, :] = [1, 2]; catch; println("error") end
+        error
+        \enddoctest
+        \endlang
+
         \sa get
 
         \identifier{2ou} */
@@ -806,6 +997,23 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> S = ca.DM(ca.Sparsity.diag(3)); S[1, 3] = 7;
+        julia> S.nz[:]
+        DM([1, 1, 7, 1])
+        julia> S.nz[3], S.nz[end], length(S.nz)
+        (7, 1, 4)
+        julia> x = ca.SX.sym("x", ca.Sparsity.lower(2));
+        julia> x.nz[[1, 3]]
+        SX([x_0, x_2])
+        julia> ca.dim(ca.SX.sym("e", 2, 0).nz[:])
+        "0x1"
+        julia> try S.nz[5]; catch e; println(typeof(e)) end
+        BoundsError
+        \enddoctest
+        \endlang
+
         \sa set_nz, get, nonzeros
 
         \identifier{2ov} */
@@ -853,6 +1061,22 @@ namespace casadi {
         >> S.nnz()
         3
         >> try, S.set_nz([1 2 3], true, [1 2]); catch e, disp('error'); end
+        error
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> S = ca.DM(ca.Sparsity.diag(3));
+        julia> S.nz[:] = [4, 5, 6]; S.nz[1] = 0;
+        julia> S
+        DM(
+        [[0, 00, 00],
+         [00, 5, 00],
+         [00, 00, 6]])
+        julia> ca.nnz(S)
+        3
+        julia> try S.nz[[1, 2]] = [1, 2, 3]; catch; println("error") end
         error
         \enddoctest
         \endlang
@@ -1177,6 +1401,22 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> ca.adj(ca.DM([1 2; 3 4]))
+        DM(
+        [[4, -2],
+         [-3, 1]])
+        julia> X = ca.SX.sym("X", 2, 2);
+        julia> ca.adj(X)
+        SX(
+        [[X_3, (-X_2)],
+         [(-X_1), X_0]])
+        julia> ca.adj(ca.DM(5)), ca.nnz(ca.adj(ca.DM(ca.Sparsity.diag(3))))
+        (1, 3)
+        \enddoctest
+        \endlang
+
         \sa inv_minor, cofactor, det
 
         \identifier{18p} */
@@ -1215,6 +1455,17 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> A = ca.DM([1 2 3; 0 1 4; 5 6 0]);
+        julia> ca.minor(A, 0, 1)
+        DM(-18)
+        julia> X = ca.SX.sym("X", 2, 2);
+        julia> ca.minor(X, 0, 1)
+        SX(X_2)
+        \enddoctest
+        \endlang
+
         \sa cofactor, adj, det
 
         \identifier{18q} */
@@ -1240,6 +1491,14 @@ namespace casadi {
         >> cofactor(A, 0, 1), cofactor(A, 0, 0)
         18
         -24
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> A = ca.DM([1 2 3; 0 1 4; 5 6 0]);
+        julia> ca.cofactor(A, 0, 1), ca.cofactor(A, 0, 0)
+        (18, -24)
         \enddoctest
         \endlang
 
@@ -1297,6 +1556,26 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> Q, R = ca.qr(ca.DM([3 1; 4 2]));
+        julia> Q
+        DM(
+        [[0.6, -0.8],
+         [0.8, 0.6]])
+        julia> R
+        DM(
+        [[5, 2.2],
+         [00, 0.4]])
+        julia> Q * R
+        DM(
+        [[3, 1],
+         [4, 2]])
+        julia> try ca.qr(ca.DM([1 2 3])); catch; println("error") end
+        error
+        \enddoctest
+        \endlang
+
         \sa qr_sparse, chol, ldl
 
         \identifier{18s} */
@@ -1340,6 +1619,19 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> A = ca.DM([3 1; 4 2]);
+        julia> V, R, beta, prinv, pc = ca.qr_sparse(A);
+        julia> R
+        DM(
+        [[5, 2.2],
+         [00, 0.4]])
+        julia> ca.qr_solve(ca.DM([1, 2]), V, R, beta, prinv, pc)
+        DM([0, 1])
+        \enddoctest
+        \endlang
+
         \sa qr_solve, Sparsity::qr_sparse, qr
 
         \identifier{18t} */
@@ -1375,6 +1667,17 @@ namespace casadi {
         [-3, 2.5]
         >> solve(A', DM([1; 2]))
         [-3, 2.5]
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> A = ca.DM([3 1; 4 2]);
+        julia> V, R, beta, prinv, pc = ca.qr_sparse(A);
+        julia> print(ca.qr_solve(ca.DM([1, 2]), V, R, beta, prinv, pc, true))
+        [-3, 2.5]
+        julia> A' \ [1, 2]
+        DM([-3, 2.5])
         \enddoctest
         \endlang
 
@@ -1422,6 +1725,20 @@ namespace casadi {
         [[4, 2],
          [2, 3]]
         >> chol(DM(Sparsity.diag(3)) * 4).nnz()
+        3
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> R = ca.chol(ca.DM([4 2; 2 3]))
+        DM(
+        [[2, 1],
+         [00, 1.41421]])
+        julia> print(R' * R)
+        [[4, 2],
+         [2, 3]]
+        julia> ca.nnz(ca.chol(ca.DM(ca.Sparsity.diag(3)) * 4))
         3
         \enddoctest
         \endlang
@@ -1478,6 +1795,27 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> D, LT, p = ca.ldl(ca.DM([4 2; 2 3]));
+        julia> D
+        DM([4, 2])
+        julia> p
+        2-element Vector{Int64}:
+         0
+         1
+        julia> LT
+        DM(
+        [[00, 0.5],
+         [00, 00]])
+        julia> L = ca.DM.eye(2) + LT';
+        julia> L * ca.diag(D) * L'
+        DM(
+        [[4, 2],
+         [2, 3]])
+        \enddoctest
+        \endlang
+
         \sa ldl_solve, chol, Sparsity::ldl
 
         \identifier{18w} */
@@ -1511,6 +1849,17 @@ namespace casadi {
         [-0.125, 0.75]
         >> solve(A, DM([1; 2]))
         [-0.125, 0.75]
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> A = ca.DM([4 2; 2 3]);
+        julia> D, LT, p = ca.ldl(A);
+        julia> ca.ldl_solve(ca.DM([1, 2]), D, LT, p)
+        DM([-0.125, 0.75])
+        julia> A \ [1, 2]
+        DM([-0.125, 0.75])
         \enddoctest
         \endlang
 
@@ -1589,6 +1938,14 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> A = ca.DM([1 2; 3 4]);
+        julia> ca.norm_inf_mul(A, A), ca.norm_inf(A * A)
+        (22, 22)
+        \enddoctest
+        \endlang
+
         \sa norm_inf, mtimes
 
         \identifier{190} */
@@ -1636,6 +1993,21 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> ca.sparsify(ca.DM([1 0; 0 2]))
+        DM(
+        [[1, 00],
+         [00, 2]])
+        julia> A = ca.DM([1 0; 1e-9 2]);
+        julia> ca.nnz(ca.sparsify(A)), ca.nnz(ca.sparsify(A, 1e-6))
+        (3, 2)
+        julia> x = ca.SX.sym("x");
+        julia> ca.sparsify([x; 0; x * 0])
+        SX([x, 00, 00])
+        \enddoctest
+        \endlang
+
         \sa densify, has_zeros
 
         \identifier{191} */
@@ -1675,6 +2047,20 @@ namespace casadi {
         >> [w, t] = expand(3*(x + y) + 1);
         >> t
         [x, y, 1]
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> x = ca.SX.sym("x"); y = ca.SX.sym("y");
+        julia> w, t = ca.expand(3*x - x + 5*y);
+        julia> w
+        SX([2, 5])
+        julia> t
+        SX([x, y])
+        julia> w, t = ca.expand(3*(x + y) + 1);
+        julia> t
+        SX([x, y, 1])
         \enddoctest
         \endlang
 
@@ -1723,6 +2109,23 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> t = ca.SX.sym("t");
+        julia> e = ca.pw_const(t, [0, 2], [7, 1, 3]);
+        julia> f = ca.Function("f", [t], [e]);
+        julia> [Float64(f(v)) for v in [-1, 0, 1, 2, 5]]
+        5-element Vector{Float64}:
+         7.0
+         1.0
+         1.0
+         3.0
+         3.0
+        julia> try ca.pw_const(t, [0], [7, 1, 3]); catch; println("error") end
+        error
+        \enddoctest
+        \endlang
+
         \sa pw_lin, if_else, interpolant
 
         \identifier{193} */
@@ -1765,6 +2168,24 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> t = ca.SX.sym("t");
+        julia> f = ca.Function("f", [t], [ca.pw_lin(t, [0, 1, 3], [0, 2, 1])]);
+        julia> [Float64(f(v)) for v in [-1, 0, 0.5, 1, 2, 3, 4]]
+        7-element Vector{Float64}:
+         -2.0
+          0.0
+          1.0
+          2.0
+          1.5
+          1.0
+          0.5
+        julia> try ca.pw_lin(t, [0], [7]); catch; println("error") end
+        error
+        \enddoctest
+        \endlang
+
         \sa pw_const, interpolant
 
         \identifier{194} */
@@ -1797,6 +2218,15 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> ca.heaviside(ca.DM([-1, 0, 1]))
+        DM([0, 0.5, 1])
+        julia> ca.heaviside(ca.SX.sym("x"))
+        SX(((1+sign(x))/2))
+        \enddoctest
+        \endlang
+
         \sa ramp, rectangle, sign
 
         \identifier{195} */
@@ -1823,6 +2253,13 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> ca.rectangle(ca.DM([-1, -0.5, 0, 0.5, 1]))
+        DM([0, 0.5, 1, 0.5, 0])
+        \enddoctest
+        \endlang
+
         \sa triangle, heaviside
 
         \identifier{23n} */
@@ -1845,6 +2282,13 @@ namespace casadi {
         \doctest
         >> triangle(DM([-1; -0.5; 0; 0.5; 1]))
         [0, 0.5, 1, 0.5, 0]
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> ca.triangle(ca.DM([-1, -0.5, 0, 0.5, 1]))
+        DM([0, 0.5, 1, 0.5, 0])
         \enddoctest
         \endlang
 
@@ -1875,6 +2319,15 @@ namespace casadi {
         [0, 0.5, 3]
         >> ramp(SX.sym('x'))
         (x*((1+sign(x))/2))
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> ca.ramp(ca.DM([0, 0.5, 3]))
+        DM([0, 0.5, 3])
+        julia> ca.ramp(ca.SX.sym("x"))
+        SX((x*((1+sign(x))/2)))
         \enddoctest
         \endlang
 
@@ -1911,6 +2364,14 @@ namespace casadi {
         \doctest
         >> x = SX.sym('x');
         >> try, gauss_quadrature(x^2, x, 0, 1, 3); catch e, disp('error'); end
+        error
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> x = ca.SX.sym("x");
+        julia> try ca.gauss_quadrature(x^2, x, 0, 1, 3); catch; println("error") end
         error
         \enddoctest
         \endlang
@@ -1975,6 +2436,20 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> x = ca.SX.sym("x"); a = ca.SX.sym("a");
+        julia> ca.taylor(sin(x), x)
+        SX(x)
+        julia> ca.taylor(sin(x), x, a, 1)
+        SX((sin(a)+(cos(a)*(x-a))))
+        julia> ca.taylor(exp(x), x, 0, 3)
+        SX(@1=sq(x), (((1+x)+(0.5*@1))+(0.166667*(@1*x))))
+        julia> ca.taylor([sin(x); cos(x)], x, 0, 2)
+        SX([x, (1+(-0.5*sq(x)))])
+        \enddoctest
+        \endlang
+
         \sa mtaylor, linearize, linear_coeff
 
         \identifier{23q} */
@@ -2019,6 +2494,16 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> x = ca.SX.sym("x"); y = ca.SX.sym("y"); a = ca.SX.sym("a"); b = ca.SX.sym("b");
+        julia> ca.mtaylor(sin(x + y), [x; y], [a; b], 1)
+        SX(((sin((a+b))+(cos((a+b))*(x-a)))+(cos((a+b))*(y-b))))
+        julia> ca.mtaylor(exp(x * y), [x; y], ca.DM([0, 0]), 2)
+        SX(@1=2, ((1+((x*y)/@1))+((y*x)/@1)))
+        \enddoctest
+        \endlang
+
         \sa taylor
 
         \identifier{23r} */
@@ -2046,6 +2531,14 @@ namespace casadi {
         >> x = SX.sym('x'); y = SX.sym('y');
         >> mtaylor(sin(x + y), [x; y], [0; 0], 3, [1 2])
         ((x-((sq(x)*x)/6))+y)
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> x = ca.SX.sym("x"); y = ca.SX.sym("y");
+        julia> ca.mtaylor(sin(x + y), [x; y], [0; 0], 3, [1, 2])
+        SX(((x-((sq(x)*x)/6))+y))
         \enddoctest
         \endlang
 
@@ -2089,6 +2582,18 @@ namespace casadi {
         >> poly_coeff((x - a)*(x + a), x)
         [1, 0, (-sq(a))]
         >> try, poly_coeff(sin(x), x); catch e, disp('error'); end
+        error
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> x = ca.SX.sym("x"); a = ca.SX.sym("a");
+        julia> ca.poly_coeff(3*x^2 + 2*x + 1, x)
+        SX([3, 2, 1])
+        julia> ca.poly_coeff((x - a)*(x + a), x)
+        SX([1, 0, (-sq(a))])
+        julia> try ca.poly_coeff(sin(x), x); catch; println("error") end
         error
         \enddoctest
         \endlang
@@ -2138,6 +2643,20 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> ca.poly_roots(ca.SX([1, -3, 2]))
+        SX([1, 2])
+        julia> print(ca.evalf(ca.poly_roots(ca.SX([1, -6, 11, -6]))))
+        [3, 1, 2]
+        julia> a = ca.SX.sym("a");
+        julia> ca.poly_roots([a; 2])
+        SX((-2/a))
+        julia> try ca.poly_roots(ca.SX([1, 1, 1, 1, 1, 1])); catch; println("error") end
+        error
+        \enddoctest
+        \endlang
+
         \sa poly_coeff, eig_symbolic
 
         \identifier{198} */
@@ -2178,6 +2697,22 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> ca.evalf(ca.eig_symbolic(ca.SX([2 1; 1 2])))
+        DM([1, 3])
+        julia> M = ca.SX.sym("M", 2, 2);
+        julia> l = ca.eig_symbolic(M); size(l)
+        (2, 1)
+        julia> l[1]
+        SX(@1=(M_3+M_0), ((@1-sqrt((sq(@1)-(4*((M_0*M_3)-(M_2*M_1))))))/2))
+        julia> l[2]
+        SX(@1=(M_3+M_0), ((@1+sqrt((sq(@1)-(4*((M_0*M_3)-(M_2*M_1))))))/2))
+        julia> ca.evalf(ca.eig_symbolic(ca.SX.eye(5) * 3))'
+        DM([[3, 3, 3, 3, 3]])
+        \enddoctest
+        \endlang
+
         \sa poly_roots, Sparsity::scc
 
         \identifier{199} */
@@ -2214,6 +2749,19 @@ namespace casadi {
         >> evalf(MX(DM([1; 2])) + 1)
         [2, 3]
         >> try, evalf(SX.sym('x')); catch e, disp('error'); end
+        error
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> ca.evalf(ca.SX([1 2; 3 4]) * 2)
+        DM(
+        [[2, 4],
+         [6, 8]])
+        julia> ca.evalf(ca.MX(ca.DM([1, 2])) + 1)
+        DM([2, 3])
+        julia> try ca.evalf(ca.SX.sym("x")); catch; println("error") end
         error
         \enddoctest
         \endlang
@@ -2265,6 +2813,20 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> x = ca.SX.sym("x"); y = ca.SX.sym("y");
+        julia> sin(x + y) - sin(x + y)
+        SX((sin((x+y))-sin((x+y))))
+        julia> ca.SX.set_max_depth(2)
+        julia> sin(x + y) - sin(x + y)
+        SX(0)
+        julia> ca.SX.set_max_depth()
+        julia> ca.SX.get_max_depth()
+        1
+        \enddoctest
+        \endlang
+
         \sa get_max_depth, is_equal
 
         \identifier{19b} */
@@ -2299,6 +2861,15 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> x = ca.SX.sym("x");
+        julia> ca.SX.get_input(ca.Function("f", [x], [x + 1]))
+        1-element Vector{SX}:
+         SX(x)
+        \enddoctest
+        \endlang
+
         \sa Function::sx_in, get_free
 
         \identifier{19d} */
@@ -2325,6 +2896,15 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> x = ca.SX.sym("x"); y = ca.SX.sym("y");
+        julia> ca.SX.get_free(ca.Function("f", [x], [x + y], Dict("allow_free" => true)))
+        1-element Vector{SX}:
+         SX(y)
+        \enddoctest
+        \endlang
+
         \sa Function::free_sx, get_input
 
         \identifier{19e} */
@@ -2343,6 +2923,13 @@ namespace casadi {
         \doctest
         >> fprintf('%s %s\n', DM.type_name(), SX.type_name())
         DM SX
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> ca.DM.type_name(), ca.SX.type_name()
+        ("DM", "SX")
         \enddoctest
         \endlang
 
@@ -2381,6 +2968,17 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> ca.print_split(ca.DM([1 2; 3 4]))
+        (["1", "3", "2", "4"], String[])
+        julia> x = ca.SX.sym("x"); y = ca.SX.sym("y");
+        julia> e = x * y;
+        julia> ca.print_split([e + 1; e - 1])
+        (["(@1+@2)", "(@1-@2)"], ["(x*y)", "1"])
+        \enddoctest
+        \endlang
+
         \identifier{2oy} */
     void print_split(std::vector<std::string>& SWIG_OUTPUT(nz),
                     std::vector<std::string>& SWIG_OUTPUT(inter)) const;
@@ -2410,6 +3008,15 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> ca.print_scalar(ca.DM(3))
+        3
+        julia> ca.print_scalar(ca.DM(1, 1))
+        00
+        \enddoctest
+        \endlang
+
         \identifier{2p0} */
     void print_scalar(std::ostream &stream) const;
 
@@ -2422,6 +3029,13 @@ namespace casadi {
         \lang{python}
         \doctest
         >>> DM(Sparsity.unit(3, 1)).print_vector()
+        [00, 1, 00]
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> ca.print_vector(ca.DM(ca.Sparsity.unit(3, 1)))
         [00, 1, 00]
         \enddoctest
         \endlang
@@ -2444,6 +3058,14 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> ca.print_dense(ca.DM(ca.Sparsity.diag(2)))
+        [[1, 00],
+         [00, 1]]
+        \enddoctest
+        \endlang
+
         \sa print_sparse
 
         \identifier{2p2} */
@@ -2460,6 +3082,17 @@ namespace casadi {
          (0, 0) -> 1
          (1, 1) -> 1
         >>> DM(2, 2).print_sparse()
+        all zero sparse: 2-by-2
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> ca.print_sparse(ca.DM(ca.Sparsity.diag(2)))
+        sparse: 2-by-2, 2 nnz
+         (0, 0) -> 1
+         (1, 1) -> 1
+        julia> ca.print_sparse(ca.DM(2, 2))
         all zero sparse: 2-by-2
         \enddoctest
         \endlang
@@ -2534,6 +3167,21 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> A = ca.DM([1 2; 3 4]);
+        julia> ca.resize(A, 3, 3)
+        julia> A
+        DM(
+        [[1, 2, 00],
+         [3, 4, 00],
+         [00, 00, 00]])
+        julia> ca.resize(A, 1, 1)
+        julia> print(A)
+        1
+        \enddoctest
+        \endlang
+
         \sa enlarge, reshape
 
         \identifier{2p4} */
@@ -2578,6 +3226,19 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> A = ca.DM([1 2 3; 4 5 6]);
+        julia> ca.erase(A, [0], [1])
+        julia> A
+        DM(
+        [[1, 00, 3],
+         [4, 5, 6]])
+        julia> ca.dim(A), ca.nnz(A)
+        ("2x3", 5)
+        \enddoctest
+        \endlang
+
         \sa remove, sparsify
 
         \identifier{19f} */
@@ -2609,6 +3270,17 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> A = ca.DM([1 2 3; 4 5 6]);
+        julia> ca.erase(A, [0, 5])
+        julia> A
+        DM(
+        [[00, 2, 3],
+         [4, 5, 00]])
+        \enddoctest
+        \endlang
+
         \identifier{19g} */
     void erase(const std::vector<casadi_int>& rr, bool ind1=false);
 
@@ -2631,6 +3303,15 @@ namespace casadi {
         >> A.remove(0, 1);
         >> A
         [[4, 6]]
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> A = ca.DM([1 2 3; 4 5 6]);
+        julia> ca.remove(A, [0], [1])
+        julia> A
+        DM([[4, 6]])
         \enddoctest
         \endlang
 
@@ -2679,6 +3360,20 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> A = ca.DM([1 2; 3 4]);
+        julia> ca.enlarge(A, 3, 4, [0, 2], [0, 1])
+        julia> A
+        DM(
+        [[1, 2, 00, 00],
+         [00, 00, 00, 00],
+         [3, 4, 00, 00]])
+        julia> try ca.enlarge(A, 4, 4, [0, 1], [0, 1]); catch; println("error") end
+        error
+        \enddoctest
+        \endlang
+
         \sa resize, Sparsity::enlarge
 
         \identifier{19i} */
@@ -2721,6 +3416,13 @@ namespace casadi {
         \doctest
         >> DM(Sparsity.diag(2)).sparsity()
         2x2,2nz
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> ca.sparsity(ca.DM(ca.Sparsity.diag(2)))
+        Sparsity(2x2,2nz)
         \enddoctest
         \endlang
 
@@ -2786,6 +3488,24 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> ca.DM.triplet([0, 1], [1, 0], [5, 6], 3, 3)
+        DM(
+        [[00, 5, 00],
+         [6, 00, 00],
+         [00, 00, 00]])
+        julia> ca.SX.triplet([0, 1], [0, 1], ca.SX.sym("v", 2), 2, 2)
+        SX(
+        [[v_0, 00],
+         [00, v_1]])
+        julia> ca.nnz(ca.DM.triplet([], [], [], 2, 2))
+        0
+        julia> try ca.DM.triplet([0, 1], [1, 0], [5], 3, 3); catch; println("error") end
+        error
+        \enddoctest
+        \endlang
+
         \sa Sparsity::triplet
 
         \identifier{23t} */
@@ -2829,6 +3549,17 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> ca.DM.inf(), ca.is_inf(ca.DM.inf(2, 1))
+        (inf, true)
+        julia> ca.DM.inf(ca.Sparsity.diag(2))
+        DM(
+        [[inf, 00],
+         [00, inf]])
+        \enddoctest
+        \endlang
+
         \sa nan, is_inf
 
         \identifier{19k} */
@@ -2859,6 +3590,15 @@ namespace casadi {
         2x1
         >> DM.nan(2, 2).is_regular()
         0
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> ca.DM.nan(), ca.dim(ca.DM.nan(2, 1))
+        (nan, "2x1")
+        julia> ca.is_regular(ca.DM.nan(2, 2))
+        false
         \enddoctest
         \endlang
 
@@ -2895,6 +3635,17 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> ca.DM.eye(2)
+        DM(
+        [[1, 00],
+         [00, 1]])
+        julia> ca.nnz(ca.DM.eye(3)), ca.dim(ca.DM.eye(0))
+        (3, "0x0")
+        \enddoctest
+        \endlang
+
         \sa is_eye, Sparsity::diag
 
         \identifier{19m} */
@@ -2919,6 +3670,14 @@ namespace casadi {
         >> h = x.element_hash();
         >> fprintf('%d %d\n', h == x.element_hash(), h == y.element_hash())
         1 0
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> x = ca.SX.sym("x"); y = ca.SX.sym("y");
+        julia> ca.element_hash(x) == ca.element_hash(x), ca.element_hash(x) == ca.element_hash(y)
+        (true, false)
         \enddoctest
         \endlang
 
@@ -2956,6 +3715,19 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> ca.is_regular(ca.DM([1, 2])), ca.is_regular(ca.DM([1, Inf]))
+        (true, false)
+        julia> ca.is_regular(ca.DM.nan(2, 2))
+        false
+        julia> ca.is_regular(ca.DM(2, 2)), ca.is_regular(ca.SX([1, 2]))
+        (true, true)
+        julia> try ca.is_regular(ca.SX.sym("x")); catch; println("error") end
+        error
+        \enddoctest
+        \endlang
+
         \sa nan, inf
 
         \identifier{2p5} */
@@ -2984,6 +3756,16 @@ namespace casadi {
         >> c = x > 0; b = if_else(c, x, 0);
         >> fprintf('%d %d %d\n', b.is_smooth(), c.is_smooth(), DM(1).is_smooth())
         0 0 1
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> x = ca.SX.sym("x");
+        julia> ca.is_smooth(sin(x)), ca.is_smooth(abs(x)), ca.is_smooth(floor(x))
+        (true, true, false)
+        julia> ca.is_smooth(ifelse(x > 0, x, 0)), ca.is_smooth(x > 0), ca.is_smooth(ca.DM(1))
+        (false, false, true)
         \enddoctest
         \endlang
 
@@ -3066,6 +3848,18 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> x = ca.SX.sym("x"); y = ca.SX.sym("y");
+        julia> v = [x; y];
+        julia> ca.has_duplicates(v)
+        false
+        julia> ca.reset_input(v)
+        julia> ca.has_duplicates([x; x])
+        true
+        \enddoctest
+        \endlang
+
         \sa reset_input, is_valid_input
 
         \identifier{19t} */
@@ -3100,6 +3894,16 @@ namespace casadi {
         1 0 1
         >> fprintf('%d %d\n', vertcat(x, 1).is_constant(), SX.sym('e', 2, 0).is_constant())
         0 1
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> x = ca.SX.sym("x");
+        julia> ca.is_constant(ca.SX([1, 2])), ca.is_constant(x), ca.is_constant(x * 0)
+        (true, false, true)
+        julia> ca.is_constant([x; 1]), ca.is_constant(ca.SX.sym("e", 2, 0))
+        (false, true)
         \enddoctest
         \endlang
 
@@ -3221,6 +4025,16 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> ca.has_zeros(ca.DM([1, 0])), ca.has_zeros(ca.DM([1, 2])), ca.has_zeros(ca.DM(2, 2))
+        (true, false, false)
+        julia> x = ca.SX.sym("x");
+        julia> ca.has_zeros([x; 0]), ca.has_zeros([x; x * 0])
+        (true, true)
+        \enddoctest
+        \endlang
+
         \sa sparsify, has_nz
 
         \identifier{1a1} */
@@ -3255,6 +4069,19 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> ca.nonzeros(ca.DM([1 2; 3 4]))
+        4-element Vector{Float64}:
+         1.0
+         3.0
+         2.0
+         4.0
+        julia> ca.nonzeros(ca.DM(ca.Sparsity.diag(2))), ca.nonzeros(ca.DM(2, 0))
+        ([1.0, 1.0], Float64[])
+        \enddoctest
+        \endlang
+
         \sa elements, get_nz
 
         \identifier{1a2} */
@@ -3275,6 +4102,17 @@ namespace casadi {
         \doctest
         >> DM(Sparsity.diag(2)).elements()
         1 0 0 1
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> ca.elements(ca.DM(ca.Sparsity.diag(2)))
+        4-element Vector{Float64}:
+         1.0
+         0.0
+         0.0
+         1.0
         \enddoctest
         \endlang
 
@@ -3314,6 +4152,15 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> Float64(ca.DM(2.5)), Float64(ca.SX(3))
+        (2.5, 3.0)
+        julia> try Float64(ca.DM([1, 2])); catch; println("error") end
+        error
+        \enddoctest
+        \endlang
+
         \identifier{1a5} */
     explicit operator double() const;
 
@@ -3329,6 +4176,13 @@ namespace casadi {
         \lang{matlab}
         \doctest
         >> DM(3.7).to_int()
+        3
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> ca.to_int(ca.DM(3.7))
         3
         \enddoctest
         \endlang
@@ -3363,6 +4217,13 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> ca.name(ca.SX.sym("x")), ca.name(ca.SX.sym("v", 2)[2])
+        ("x", "v_1")
+        \enddoctest
+        \endlang
+
         \sa is_symbolic
 
         \identifier{1a8} */
@@ -3392,6 +4253,15 @@ namespace casadi {
         x
         y
         2
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> x = ca.SX.sym("x"); y = ca.SX.sym("y");
+        julia> e = x * y;
+        julia> ca.dep(e, 0), ca.dep(e, 1), ca.n_dep(e)
+        (x, y, 2)
         \enddoctest
         \endlang
 
@@ -3435,6 +4305,17 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> ca.DM.set_precision(3)
+        julia> print(ca.DM(1/3))
+        0.333
+        julia> ca.DM.set_precision(6)
+        julia> print(ca.DM(1/3))
+        0.333333
+        \enddoctest
+        \endlang
+
         \sa get_precision
 
         \identifier{2p6} */
@@ -3473,6 +4354,15 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> ca.DM.rng(1); a = ca.DM.rand(2, 2);
+        julia> ca.DM.rng(1); b = ca.DM.rand(2, 2);
+        julia> ca.norm_inf(a - b)
+        DM(0)
+        \enddoctest
+        \endlang
+
         \sa rand
 
         \identifier{2p7} */
@@ -3501,6 +4391,17 @@ namespace casadi {
         >> DM.rand(Sparsity.diag(3)).nnz()
         3
         >> try, SX.rand(2); catch e, disp('error'); end
+        error
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> ca.dim(ca.DM.rand(2, 3)), ca.dim(ca.DM.rand())
+        ("2x3", "1x1")
+        julia> ca.nnz(ca.DM.rand(ca.Sparsity.diag(3)))
+        3
+        julia> try ca.SX.rand(2); catch; println("error") end
         error
         \enddoctest
         \endlang
@@ -3550,6 +4451,15 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> sort(collect(keys(ca.info(ca.DM([1, 2])))))
+        2-element Vector{String}:
+         "data"
+         "sparsity"
+        \enddoctest
+        \endlang
+
         \identifier{2p8} */
     Dict info() const;
     #ifndef SWIG
@@ -3586,6 +4496,19 @@ namespace casadi {
         >> x = SX.sym('x'); e = sin(x) + x;
         >> SX.deserialize(e.serialize())
         (sin(x)+x)
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> s = ca.serialize(ca.DM([1 2; 3 4]));
+        julia> ca.DM.deserialize(s)
+        DM(
+        [[1, 2],
+         [3, 4]])
+        julia> x = ca.SX.sym("x");
+        julia> ca.SX.deserialize(ca.serialize(sin(x) + x))
+        SX((sin(x)+x))
         \enddoctest
         \endlang
 
@@ -3654,6 +4577,19 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> fn = joinpath(mktempdir(), "a.txt");
+        julia> A = ca.DM(ca.Sparsity.diag(2)) * 2.5;
+        julia> ca.to_file(A, fn)
+        julia> ca.DM.from_file(fn)
+        DM(
+        [[2.5, 00],
+         [00, 2.5]])
+        julia> rm(dirname(fn), recursive=true)
+        \enddoctest
+        \endlang
+
         \sa from_file, Sparsity::to_file
 
         \identifier{2p9} */
@@ -3700,6 +4636,20 @@ namespace casadi {
         >> A.nnz()
         3
         >> delete(fn);
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> fn = joinpath(mktempdir(), "a.txt");
+        julia> write(fn, "# comment\n1 00\n0 2\n");
+        julia> A = ca.DM.from_file(fn)
+        DM(
+        [[1, 00],
+         [0, 2]])
+        julia> ca.nnz(A)
+        3
+        julia> rm(dirname(fn), recursive=true)
         \enddoctest
         \endlang
 
