@@ -1571,24 +1571,56 @@ namespace std {
 #endif
 
 #ifdef SWIGJULIA
-    // Element type of the Julia array a std::vector<M> becomes (boxed types only)
-    template<typename M> jl_value_t* julia_vector_eltype() { return (jl_value_t*)jl_any_type; }
-    template<> jl_value_t* julia_vector_eltype<std::string>() { return (jl_value_t*)jl_string_type; }
+    // Julia type a C++ M becomes: element type of vectors and value type of dicts
+    template<typename M> struct julia_eltype {
+      static jl_value_t* get() { return (jl_value_t*)jl_any_type; }
+    };
+    inline jl_value_t* julia_proxy_type(const char* name) {
+      std::map<std::string, jl_value_t*>::iterator it = swig_jl_proxy_types().find(name);
+      return it == swig_jl_proxy_types().end() ? (jl_value_t*)jl_any_type : it->second;
+    }
+#define JULIA_ELTYPE(M, E) \
+    template<> struct julia_eltype< M > { static jl_value_t* get() { return E; } };
+    JULIA_ELTYPE(std::string, (jl_value_t*)jl_string_type)
+    JULIA_ELTYPE(casadi_int, (jl_value_t*)jl_int64_type)
+    JULIA_ELTYPE(double, (jl_value_t*)jl_float64_type)
+    JULIA_ELTYPE(bool, (jl_value_t*)jl_bool_type)
+    JULIA_ELTYPE(Sparsity, julia_proxy_type("Sparsity"))
+    JULIA_ELTYPE(DM, julia_proxy_type("DM"))
+    JULIA_ELTYPE(SX, julia_proxy_type("SX"))
+    JULIA_ELTYPE(MX, julia_proxy_type("MX"))
+    JULIA_ELTYPE(Function, julia_proxy_type("Function"))
+    JULIA_ELTYPE(Linsol, julia_proxy_type("Linsol"))
+#undef JULIA_ELTYPE
+    template<typename M> struct julia_eltype<std::vector<M> > {
+      static jl_value_t* get() { return jl_apply_array_type(julia_eltype<M>::get(), 1); }
+    };
+    template<typename M> struct julia_eltype<std::map<std::string, M> > {
+      static jl_value_t* get() {
+        return jl_apply_type2(jl_get_global(jl_base_module, jl_symbol("Dict")),
+                              (jl_value_t*)jl_string_type, julia_eltype<M>::get());
+      }
+    };
 #endif
     template<typename M> GUESTOBJECT* from_ptr(const std::vector<M> *a) {
 #ifdef SWIGJULIA
       {
-        jl_value_t* atype = jl_apply_array_type(julia_vector_eltype<M>(), 1);
+        jl_value_t* atype = jl_apply_array_type((jl_value_t*)jl_any_type, 1);
         jl_array_t* arr = jl_alloc_array_1d(atype, a->size());
-        JL_GC_PUSH1(&arr);
+        jl_value_t* r = 0;
+        JL_GC_PUSH2(&arr, &r);
         for (size_t i = 0; i < a->size(); ++i) {
           M tmpv = (*a)[i];
           GUESTOBJECT* e = casadi::from_ptr(&tmpv);
           if (!e) { JL_GC_POP(); return 0; }
           jl_array_ptr_set(arr, i, e);
         }
+        // narrow Vector{Any} to the element type
+        r = jl_call2(jl_get_function(jl_base_module, "convert"),
+                     julia_eltype<std::vector<M> >::get(), (jl_value_t*)arr);
+        if (!r) { jl_exception_clear(); r = (jl_value_t*)arr; }
         JL_GC_POP();
-        return (GUESTOBJECT*)arr;
+        return (GUESTOBJECT*)r;
       }
 #endif
 #ifdef SWIGWASMJS
@@ -2083,10 +2115,9 @@ namespace std {
     template<typename M> GUESTOBJECT* from_ptr(const std::map<std::string, M> *a) {
 #ifdef SWIGJULIA
       {
-        jl_value_t* dict_f = jl_get_function(jl_base_module, "Dict");
         jl_value_t* set_f = jl_get_function(jl_base_module, "setindex!");
         jl_value_t* d = 0; JL_GC_PUSH1(&d);
-        d = jl_call0(dict_f);
+        d = jl_call0(julia_eltype<std::map<std::string, M> >::get());
         if (!d) { JL_GC_POP(); return 0; }
         for (typename std::map<std::string, M>::const_iterator it = a->begin(); it != a->end(); ++it) {
           GUESTOBJECT* e = 0; jl_value_t* k = 0;
