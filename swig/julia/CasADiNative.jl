@@ -764,7 +764,7 @@ end
 
 # Let a Callback be used wherever a casadi Function is expected (nlpsol, graphs).
 # The Function copy-ctor accepts the Callback proxy via the SWIG cast chain.
-CasadiFunction(cb::C.Callback) = C.Function(C._check(ccall((:_swig_Function_new_Function__SWIG_8,
+CasadiFunction(cb::C.Callback) = C.Function(C._check(ccall((:_swig_Function_new_Function__SWIG_7,
         C._lib), Ptr{Cvoid}, (Any,), cb)))
 Base.convert(::Type{CasadiFunction}, cb::C.Callback) = CasadiFunction(cb)
 # A constructed Callback proxy is a casadi Function; call it like one (numeric or symbolic).
