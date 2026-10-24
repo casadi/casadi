@@ -104,6 +104,13 @@ namespace casadi {
     return true;
   }
 
+  void check_offset(const std::vector<casadi_int>& offset, casadi_int n,
+      const std::string& fname) {
+    casadi_assert(!offset.empty() && offset.front()==0 && offset.back()==n
+      && is_monotone(offset), fname + ": offset " + str(offset) + " must start at 0, "
+      "be nondecreasing and end at " + str(n));
+  }
+
 
   std::vector<casadi_int> range(casadi_int start, casadi_int stop,
       casadi_int step, casadi_int len) {

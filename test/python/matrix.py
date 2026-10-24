@@ -1369,6 +1369,23 @@ class Matrixtests(casadiTestCase):
       ca.blockcat([[ca.DM(1), ca.DM(2)], [ca.DM(3)]])
     self.assertEqual(ca.blockcat([[ca.DM(1), ca.DM(2)], [ca.DM.ones(1, 2)]]).shape, (2, 2))
 
+  def test_split_user_errors(self):
+    x = ca.DM.ones(2, 4)
+    for offset in [[1, 4], [0, 3, 2, 4]]:
+      with self.assertInException("must start at 0, be nondecreasing and end at 4"):
+        ca.horzsplit(x, offset)
+    for incr in [0, -1]:
+      with self.assertInException("must be positive"):
+        ca.horzsplit(x, incr)
+    with self.assertInException("must be positive"):
+      ca.blocksplit(ca.DM.ones(4, 4), 0, 2)
+    with self.assertInException("must start at 0, be nondecreasing and end at 4"):
+      ca.diagsplit(ca.DM.ones(4, 4), [0, 1, 3], [0, 2, 4])
+    with self.assertInException("Reshape mismatch"):
+      ca.reshape(ca.DM.eye(2), ca.Sparsity.dense(4, 2))
+    with self.assertInException("sparsity_cast"):
+      ca.sparsity_cast(ca.DM.eye(2), ca.Sparsity.dense(3, 1))
+
   def test_horzsplit_n(self):
     self.assertTrue(len(ca.horzsplit_n(ca.DM.rand(1,6),2))==2)
     self.assertTrue(len(ca.vertsplit_n(ca.DM.rand(6),2))==2)
