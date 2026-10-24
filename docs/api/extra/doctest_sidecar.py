@@ -1,15 +1,18 @@
 #!/usr/bin/env python
-"""Pair non-Python \\doctest blocks of the C++ headers with the Python block they translate.
+"""Pair the non-Python \\lang groups of the C++ headers with the Python example they translate.
 
-Writes JSON {normalized python block: [[lang, block text], ...]} for the Sphinx hook, which inserts
-those blocks after the matching Python example on the API page. A block in another language belongs
-to the closest preceding Python block of the same Doxygen comment.
+Writes JSON {normalized python block: [[lang, parts], ...]} for the Sphinx hook, which inserts
+those groups after the matching Python example on the API page. parts is a list of
+["text", paragraph text], ["verbatim", text] and ["doctest", text]. A group in another language
+belongs to the closest preceding Python group of the same Doxygen comment and follows its last
+\\doctest; groups without such an anchor are left out.
 Usage: python doctest_sidecar.py <casadi source dir> <output.json>
 """
 import json
 import os
-import re
 import sys
+
+from doctest_headers import parse
 
 
 def norm(text):
@@ -18,26 +21,23 @@ def norm(text):
 
 def pairs(path):
     out = {}
-    lines = open(path).read().split("\n")
-    in_comment, cur, last_py = False, None, None
-    for line in lines:
-        if "/**" in line:
-            in_comment, last_py = True, None
-        s = re.sub(r"^\s*\*?\s?", "", line)
-        m = re.match(r"\\doctest(?:\{(\w+)\})?\s*$", s.strip())
-        if in_comment and m:
-            cur = (m.group(1) or "python", [])
-        elif cur is not None and re.sub(r"\*/\s*$", "", s).strip() == "\\enddoctest":
-            lang, body = cur[0], "\n".join(cur[1]).strip("\n")
-            if lang == "python":
-                last_py = norm(body)
-            elif last_py is not None:
-                out.setdefault(last_py, []).append([lang, body])
-            cur = None
-        elif cur is not None:
-            cur[1].append(s)
-        if "*/" in line:
-            in_comment, cur = False, None
+    comment, last_py = None, None
+    for g in parse(path):
+        if g["comment"] != comment:
+            comment, last_py = g["comment"], None
+        if g["lang"] == "python":
+            last_py = None
+            for p in g["parts"]:
+                if p[0] == "doctest":
+                    last_py = norm(p[2])
+        elif last_py is not None:
+            parts = []
+            for p in g["parts"]:
+                if p[0] == "text":
+                    parts += [["text", t] for t in "\n".join(p[1]).strip().split("\n\n") if t.strip()]
+                else:
+                    parts.append([p[0], p[-1].strip("\n")])
+            out.setdefault(last_py, []).append([g["lang"], parts])
     return out
 
 

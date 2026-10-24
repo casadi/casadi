@@ -84,6 +84,7 @@ namespace casadi {
         numerically zero still count; structural zeros (not stored) do not.
         For a dense matrix this equals numel().
 
+        \lang{python}
         \doctest
         >>> DM.eye(3).nnz(), DM.ones(3, 3).nnz(), DM(3, 3).nnz()
         (3, 9, 0)
@@ -92,8 +93,10 @@ namespace casadi {
         >>> MX.sym("x", 2, 0).nnz()
         0
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> fprintf('%d %d %d\n', DM.eye(3).nnz(), DM.ones(3, 3).nnz(), DM(3, 3).nnz())
         3 9 0
         >> DM([1 0; 0 2]).nnz()
@@ -101,6 +104,7 @@ namespace casadi {
         >> MX.sym('x', 2, 0).nnz()
         0
         \enddoctest
+        \endlang
 
         \sa numel, nnz_lower, nnz_upper, nnz_diag, sparsity
 
@@ -109,16 +113,20 @@ namespace casadi {
 
     /** \brief Get the number of structural nonzeros on or below the diagonal
 
+        \lang{python}
         \doctest
         >>> DM.ones(3, 3).nnz_lower(), DM.eye(3).nnz_lower(), DM.ones(2, 3).nnz_lower()
         (6, 3, 3)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> A = DM.ones(3, 3); I = DM.eye(3); B = DM.ones(2, 3);
         >> fprintf('%d %d %d\n', A.nnz_lower(), I.nnz_lower(), B.nnz_lower())
         6 3 3
         \enddoctest
+        \endlang
 
         \sa nnz, nnz_upper, nnz_diag
 
@@ -127,16 +135,20 @@ namespace casadi {
 
     /** \brief Get the number of structural nonzeros on or above the diagonal
 
+        \lang{python}
         \doctest
         >>> DM.ones(3, 3).nnz_upper(), DM.eye(3).nnz_upper(), DM.ones(2, 3).nnz_upper()
         (6, 3, 5)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> A = DM.ones(3, 3); I = DM.eye(3); B = DM.ones(2, 3);
         >> fprintf('%d %d %d\n', A.nnz_upper(), I.nnz_upper(), B.nnz_upper())
         6 3 5
         \enddoctest
+        \endlang
 
         \sa nnz, nnz_lower, nnz_diag
 
@@ -147,16 +159,20 @@ namespace casadi {
 
         Also defined for non-square matrices.
 
+        \lang{python}
         \doctest
         >>> DM.ones(3, 3).nnz_diag(), DM.eye(3).nnz_diag(), DM.ones(2, 3).nnz_diag()
         (3, 3, 2)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> A = DM.ones(3, 3); I = DM.eye(3); B = DM.ones(2, 3);
         >> fprintf('%d %d %d\n', A.nnz_diag(), I.nnz_diag(), B.nnz_diag())
         3 3 2
         \enddoctest
+        \endlang
 
         \sa nnz, nnz_lower, nnz_upper
 
@@ -167,15 +183,19 @@ namespace casadi {
 
         Counts all entries, structural zeros included.
 
+        \lang{python}
         \doctest
         >>> DM.eye(3).numel(), MX.sym("x", 2, 0).numel(), SX.sym("x").numel()
         (9, 0, 1)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> fprintf('%d %d %d\n', DM.eye(3).numel(), MX.sym('x', 2, 0).numel(), SX.sym('x').numel())
         9 0 1
         \enddoctest
+        \endlang
 
         \sa nnz, size
 
@@ -184,17 +204,21 @@ namespace casadi {
 
     /** \brief Get the first dimension (i.e. number of rows)
 
+        \lang{python}
         \doctest
         >>> x = MX.sym("x", 2, 3)
         >>> x.size1(), x.size2()
         (2, 3)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = MX.sym('x', 2, 3);
         >> fprintf('%d %d\n', x.size1(), x.size2())
         2 3
         \enddoctest
+        \endlang
 
         \sa size2, size, rows
 
@@ -222,15 +246,19 @@ namespace casadi {
 
         The representation is e.g. "4x5" or, with \p with_nz true, "4x5,10nz".
 
+        \lang{python}
         \doctest
         >>> DM.eye(3).dim(), DM.eye(3).dim(True), DM.ones(3, 3).dim(True)
         ('3x3', '3x3,3nz', '3x3,9nz')
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> fprintf('%s %s %s\n', DM.eye(3).dim(), DM.eye(3).dim(true), DM.ones(3, 3).dim(true))
         3x3 3x3,3nz 3x3,9nz
         \enddoctest
+        \endlang
 
         \sa size, nnz
 
@@ -239,19 +267,23 @@ namespace casadi {
 
     /** \brief  Get the shape as a pair (number of rows, number of columns)
 
+        \lang{python}
         \doctest
         >>> x = MX.sym("x", 2, 3)
         >>> x.size(), x.size(1), x.size(2)
         ((2, 3), 2, 3)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = MX.sym('x', 2, 3);
         >> size(x)
         2 3
         >> fprintf('%d %d\n', size(x, 1), size(x, 2))
         2 3
         \enddoctest
+        \endlang
 
         \sa size1, size2, numel, dim
 
@@ -270,20 +302,24 @@ namespace casadi {
 
         With \p both true, only a 0-by-0 matrix counts as empty.
 
+        \lang{python}
         \doctest
         >>> DM(0, 3).is_empty(), DM(0, 3).is_empty(True), DM(0, 0).is_empty(True)
         (True, False, True)
         >>> DM(1, 1).is_empty()
         False
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> E = DM(0, 3);
         >> fprintf('%d %d %d\n', E.is_empty(), E.is_empty(true), DM(0, 0).is_empty(true))
         1 0 1
         >> DM(1, 1).is_empty()
         0
         \enddoctest
+        \endlang
 
         \identifier{1az} */
     bool is_empty(bool both=false) const { return sparsity().is_empty(both);}
@@ -293,16 +329,20 @@ namespace casadi {
         Based on the sparsity pattern only: stored numerical zeros still count as nonzeros.
         Empty matrices are dense.
 
+        \lang{python}
         \doctest
         >>> DM.zeros(2, 2).is_dense(), DM(2, 2).is_dense(), DM(0, 3).is_dense()
         (True, False, True)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> Z = DM.zeros(2, 2);
         >> fprintf('%d %d %d\n', Z.is_dense(), DM(2, 2).is_dense(), DM(0, 3).is_dense())
         1 0 1
         \enddoctest
+        \endlang
 
         \sa nnz, numel, densify
 
@@ -313,17 +353,21 @@ namespace casadi {
 
         \param scalar_and_dense When true, a 1-by-1 matrix with a structural zero does not count
 
+        \lang{python}
         \doctest
         >>> x = SX.sym("x", Sparsity(1, 1))
         >>> x.is_scalar(), x.is_scalar(True), SX.sym("y").is_scalar(True)
         (True, False, True)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x', Sparsity(1, 1));
         >> fprintf('%d %d %d\n', x.is_scalar(), x.is_scalar(true), SX.sym('y').is_scalar(true))
         1 0 1
         \enddoctest
+        \endlang
 
         \identifier{1b1} */
     bool is_scalar(bool scalar_and_dense=false) const;
@@ -338,19 +382,23 @@ namespace casadi {
         True when size1() or size2() is one, so scalars and n-by-1 or 1-by-n empties count.
         A 0-by-0 matrix does not.
 
+        \lang{python}
         \doctest
         >>> DM(3, 1).is_vector(), DM(1, 3).is_vector(), DM(1, 1).is_vector()
         (True, True, True)
         >>> DM(3, 3).is_vector(), DM(0, 1).is_vector(), DM(0, 0).is_vector()
         (False, True, False)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> fprintf('%d %d %d\n', DM(3, 1).is_vector(), DM(1, 3).is_vector(), DM(1, 1).is_vector())
         1 1 1
         >> fprintf('%d %d %d\n', DM(3, 3).is_vector(), DM(0, 1).is_vector(), DM(0, 0).is_vector())
         0 1 0
         \enddoctest
+        \endlang
 
         \sa is_row, is_column
 
@@ -373,16 +421,20 @@ namespace casadi {
         the diagonal. A dense matrix with numerical zeros below the diagonal is not upper
         triangular. Also defined for non-square matrices.
 
+        \lang{python}
         \doctest
         >>> DM(Sparsity.upper(3), 1).is_triu(), DM.zeros(2, 2).is_triu(), DM(2, 2).is_triu()
         (True, False, True)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> U = DM(Sparsity.upper(3), 1);
         >> fprintf('%d %d %d\n', U.is_triu(), DM.zeros(2, 2).is_triu(), DM(2, 2).is_triu())
         1 0 1
         \enddoctest
+        \endlang
 
         \sa is_tril, triu, triu2symm
 
@@ -406,6 +458,7 @@ namespace casadi {
         and row(el) is the row index of nonzero \p el. Without argument, the full vectors
         are returned. Out-of-range indices raise an error.
 
+        \lang{python}
         \doctest
         >>> x = DM(Sparsity.diag(2), [5, 6])
         >>> x.row(), x.colind()
@@ -413,8 +466,10 @@ namespace casadi {
         >>> x.row(1), x.colind(2)
         (1, 2)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = DM(Sparsity.diag(2), [5; 6]);
         >> x.row(), x.colind()
         0 1
@@ -422,6 +477,7 @@ namespace casadi {
         >> fprintf('%d %d\n', x.row(1), x.colind(2))
         1 2
         \enddoctest
+        \endlang
 
         \identifier{1b8} */
     std::vector<casadi_int> get_row() const { return sparsity().get_row(); }
@@ -436,19 +492,23 @@ namespace casadi {
 
     /** \brief Get the sparsity pattern
 
+        \lang{python}
         \doctest
         >>> DM.eye(2).sparsity()
         Sparsity(2x2,2nz)
         >>> DM.eye(2).sparsity() == Sparsity.diag(2)
         True
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> DM.eye(2).sparsity()
         2x2,2nz
         >> DM.eye(2).sparsity() == Sparsity.diag(2)
         1
         \enddoctest
+        \endlang
 
         \identifier{1b9} */
     SWIG_CONSTREF(Sparsity) sparsity() const;
@@ -568,6 +628,7 @@ namespace casadi {
          located arithmetically from x[0] and x[1] instead of by search
          \return Matrix of size xq.size()-by-m
 
+         \lang{python}
          \doctest
          >>> interp1d([0, 1, 2], DM([0, 10, 20]), [0.5, 1.5])
          DM([5, 15])
@@ -582,8 +643,10 @@ namespace casadi {
          >>> interp1d([0, 1, 2], SX.sym("v", 3), [0.5])
          SX(@1=0.5, ((@1*v_0)+(@1*v_1)))
          \enddoctest
+         \endlang
 
-         \doctest{matlab}
+         \lang{matlab}
+         \doctest
          >> interp1d([0, 1, 2], DM([0; 10; 20]), [0.5, 1.5])
          [5, 15]
          >> interp1d([0, 1, 2], DM([0; 10; 20]), [0.5, 1.5], 'floor')
@@ -596,6 +659,7 @@ namespace casadi {
          >> interp1d([0, 1, 2], SX.sym('v', 3), 0.5)
          @1=0.5, ((@1*v_0)+(@1*v_1))
          \enddoctest
+         \endlang
 
          \sa interpolant
 
@@ -612,6 +676,7 @@ namespace casadi {
         the inverse of the positive power (via inv). If both arguments are scalar, this is
         the elementwise pow. A non-integer or symbolic \p n for a matrix raises an error.
 
+        \lang{python}
         \doctest
         >>> A = DM([[1, 2], [3, 4]])
         >>> mpower(A, 2)
@@ -632,8 +697,10 @@ namespace casadi {
         ... except Exception as e: print("error")
         error
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> A = DM([1 2; 3 4]);
         >> A^2
         [[7, 10],
@@ -649,6 +716,7 @@ namespace casadi {
         >> try, A^0.5; catch e, disp('error'); end
         error
         \enddoctest
+        \endlang
 
         \sa mtimes, inv, expm
 
@@ -666,6 +734,7 @@ namespace casadi {
         \param x Vector expression of size n (row or column; sparse entries are densified)
         \param y Scalar expression
 
+        \lang{python}
         \doctest
         >>> soc(DM([1, 2]), 3)
         DM(
@@ -673,13 +742,16 @@ namespace casadi {
          [00, 3, 2],
          [1, 2, 3]])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> soc(DM([1; 2]), 3)
         [[3, 00, 1],
          [00, 3, 2],
          [1, 2, 3]]
         \enddoctest
+        \endlang
 
         \sa norm_2
 
@@ -704,6 +776,7 @@ namespace casadi {
 
         In the overload with an explicit \p C argument, the contraction is added to \p C.
 
+        \lang{python}
         \doctest
         >>> A = DM([1, 2, 3, 4])
         >>> einstein(A, A, [2, 2], [2, 2], [2, 2], [-1, -2], [-2, -3], [-1, -3])
@@ -715,8 +788,10 @@ namespace casadi {
         >>> einstein(DM([1, 2, 3]), DM([4, 5, 6]), [3], [3], [], [-1], [-1], [])
         DM(32)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> A = DM([1; 2; 3; 4]);
         >> einstein(A, A, [2, 2], [2, 2], [2, 2], [-1, -2], [-2, -3], [-1, -3])
         [7, 10, 15, 22]
@@ -726,6 +801,7 @@ namespace casadi {
         >> einstein(DM([1; 2; 3]), DM([4; 5; 6]), 3, 3, [], -1, -1, [])
         32
         \enddoctest
+        \endlang
 
         \sa mtimes, dot
 
@@ -755,17 +831,21 @@ namespace casadi {
         Computes x*inv(A) as solve(A', x')'. If either argument is scalar, the
         elementwise division x/A is returned instead.
 
+        \lang{python}
         \doctest
         >>> A = DM([[1, 2], [3, 4]])
         >>> mrdivide(DM([[1, 2]]), A)
         DM([[1, 0]])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> A = DM([1 2; 3 4]);
         >> DM([1 2])/A
         [[1, 0]]
         \enddoctest
+        \endlang
 
         \sa mldivide, solve, inv
 
@@ -779,17 +859,21 @@ namespace casadi {
         Computes inv(A)*b as solve(A, b). If either argument is scalar, the
         elementwise division b/A is returned instead.
 
+        \lang{python}
         \doctest
         >>> A = DM([[1, 2], [3, 4]])
         >>> mldivide(A, DM([1, 2]))
         DM([0, 0.5])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> A = DM([1 2; 3 4]);
         >> A\DM([1; 2])
         [0, 0.5]
         \enddoctest
+        \endlang
 
         \sa mrdivide, solve, inv
 
@@ -806,6 +890,7 @@ namespace casadi {
         is used. Presence in the graph is a structural notion; an expression like 0*x
         still lists x. Use depends_on for mathematical dependency. Not defined for DM.
 
+        \lang{python}
         \doctest
         >>> x = SX.sym("x"); y = SX.sym("y"); z = SX.sym("z")
         >>> symvar(vertcat(z*x, y))
@@ -818,8 +903,10 @@ namespace casadi {
         >>> symvar(SX(3))
         []
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x'); y = SX.sym('y'); z = SX.sym('z');
         >> v = symvar(vertcat(z*x, y));
         >> numel(v), vertcat(v{:})
@@ -834,6 +921,7 @@ namespace casadi {
         >> numel(symvar(SX(3)))
         0
         \enddoctest
+        \endlang
 
         \sa depends_on, contains
 
@@ -849,6 +937,7 @@ namespace casadi {
         with x.numel() == A.size1() and y.numel() == A.size2(); otherwise an error is raised.
         The result is scalar. When \p y is omitted, the quadratic form x^T A x is calculated.
 
+        \lang{python}
         \doctest
         >>> A = DM([[1, 2], [3, 4]])
         >>> bilin(A, DM([1, 1]), DM([1, 2]))
@@ -858,8 +947,10 @@ namespace casadi {
         >>> bilin(MX.sym("A", 2, 2), MX.sym("x", 2), MX.sym("y", 2))
         MX(bilin(A, x, y))
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> A = DM([1 2; 3 4]);
         >> bilin(A, DM([1; 1]), DM([1; 2]))
         16
@@ -868,6 +959,7 @@ namespace casadi {
         >> bilin(MX.sym('A', 2, 2), MX.sym('x', 2), MX.sym('y', 2))
         bilin(A, x, y)
         \enddoctest
+        \endlang
 
         \sa rank1, dot, mtimes
 
@@ -890,6 +982,7 @@ namespace casadi {
         \param x Vector with x.numel() == A.size1() (row vectors are transposed)
         \param y Vector with y.numel() == A.size2()
 
+        \lang{python}
         \doctest
         >>> A = DM([[1, 2], [3, 4]])
         >>> rank1(A, 2, DM([1, 0]), DM([0, 1]))
@@ -899,8 +992,10 @@ namespace casadi {
         >>> rank1(MX.sym("A", 2, 2), MX.sym("a"), MX.sym("x", 2), MX.sym("y", 2))
         MX(rank1(A, a, x, y))
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> A = DM([1 2; 3 4]);
         >> rank1(A, 2, DM([1; 0]), DM([0; 1]))
         [[1, 4],
@@ -908,6 +1003,7 @@ namespace casadi {
         >> rank1(MX.sym('A', 2, 2), MX.sym('a'), MX.sym('x', 2), MX.sym('y', 2))
         rank1(A, a, x, y)
         \enddoctest
+        \endlang
 
         \sa bilin, mtimes
 
@@ -925,6 +1021,7 @@ namespace casadi {
         Defined as dot(x, x) for a matrix of any shape; structural zeros contribute nothing.
         Prefer this over norm_2(x)**2 in objectives: it is smooth everywhere.
 
+        \lang{python}
         \doctest
         >>> sumsqr(DM([[1, 2], [3, 4]]))
         DM(30)
@@ -933,8 +1030,10 @@ namespace casadi {
         >>> sumsqr(MX.sym("x", 2))
         MX(dot(x, x))
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> sumsqr(DM([1 2; 3 4]))
         30
         >> sumsqr(SX.sym('x', 2))
@@ -942,6 +1041,7 @@ namespace casadi {
         >> sumsqr(MX.sym('x', 2))
         dot(x, x)
         \enddoctest
+        \endlang
 
         \sa dot, norm_2, norm_fro
 
@@ -960,6 +1060,7 @@ namespace casadi {
 
         (*) https://nhigham.com/2021/01/05/what-is-the-log-sum-exp-function/
 
+        \lang{python}
         \doctest
         >>> logsumexp(DM([1, 2, 3]))
         DM(3.40761)
@@ -971,8 +1072,10 @@ namespace casadi {
         ... except Exception as e: print("error")
         error
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> logsumexp(DM([1; 2; 3]))
         3.40761
         >> logsumexp(DM([1000; 1000]))
@@ -982,6 +1085,7 @@ namespace casadi {
         >> try, logsumexp(DM([1; 2; 3])'); catch e, disp('error'); end
         error
         \enddoctest
+        \endlang
 
         \sa mmax
 
@@ -995,15 +1099,19 @@ namespace casadi {
         computed as logsumexp(alpha*x)/alpha with alpha = log(n)/margin for n = x.size1().
         \p margin must be of the same type as \p x (MX for MX).
 
+        \lang{python}
         \doctest
         >>> logsumexp(DM([1, 2, 3]), 0.1)
         DM(3)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> logsumexp(DM([1; 2; 3]), 0.1)
         3
         \enddoctest
+        \endlang
 
         \identifier{1bs} */
     inline friend MatType logsumexp(const MatType& x, const MatType& margin) {
@@ -1019,6 +1127,7 @@ namespace casadi {
         matrices, the \p nsteps intermediate matrices are stacked vertically (vertcat).
         \p nsteps must be at least 1.
 
+        \lang{python}
         \doctest
         >>> linspace(0, 1, 5)
         DM([0, 0.25, 0.5, 0.75, 1])
@@ -1027,8 +1136,10 @@ namespace casadi {
         >>> linspace(DM([0, 0]), DM([1, 2]), 3)
         DM([0, 0, 0.5, 1, 1, 2])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> linspace(DM(0), DM(1), 5)
         [0, 0.25, 0.5, 0.75, 1]
         >> linspace(SX.sym('a'), SX.sym('b'), 3)
@@ -1036,6 +1147,7 @@ namespace casadi {
         >> linspace(DM([0; 0]), DM([1; 2]), 3)
         [0, 0, 0.5, 1, 1, 2]
         \enddoctest
+        \endlang
 
         \identifier{1bt} */
     inline friend MatType linspace(const MatType &a, const MatType &b, casadi_int nsteps) {
@@ -1051,6 +1163,7 @@ namespace casadi {
         \param dim 1 to take the products along the rows (3-by-n input), 2 along the columns,
         -1 (default) to pick the dimension of length 3 (rows first)
 
+        \lang{python}
         \doctest
         >>> cross(DM([1, 0, 0]), DM([0, 1, 0]))
         DM([0, 0, 1])
@@ -1061,8 +1174,10 @@ namespace casadi {
         >>> cross(SX.sym("a", 3), SX.sym("b", 3))
         SX([((a_1*b_2)-(a_2*b_1)), ((a_2*b_0)-(a_0*b_2)), ((a_0*b_1)-(a_1*b_0))])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> cross(DM([1; 0; 0]), DM([0; 1; 0]))
         [0, 0, 1]
         >> cross(DM([1 0 0; 0 1 0]), DM([0 1 0; 0 0 1]))
@@ -1071,6 +1186,7 @@ namespace casadi {
         >> cross(SX.sym('a', 3), SX.sym('b', 3))
         [((a_1*b_2)-(a_2*b_1)), ((a_2*b_0)-(a_0*b_2)), ((a_0*b_1)-(a_1*b_0))]
         \enddoctest
+        \endlang
 
         \sa skew, dot
 
@@ -1083,6 +1199,7 @@ namespace casadi {
 
         skew(a) is the 3-by-3 matrix S with S*b == cross(a, b).
 
+        \lang{python}
         \doctest
         >>> skew(DM([1, 2, 3]))
         DM(
@@ -1092,8 +1209,10 @@ namespace casadi {
         >>> inv_skew(skew(DM([1, 2, 3])))
         DM([1, 2, 3])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> skew(DM([1; 2; 3]))
         [[0, -3, 2],
          [3, 0, -1],
@@ -1101,6 +1220,7 @@ namespace casadi {
         >> inv_skew(skew(DM([1; 2; 3])))
         [1, 2, 3]
         \enddoctest
+        \endlang
 
         \sa inv_skew, cross
 
@@ -1129,6 +1249,7 @@ namespace casadi {
         quickly with the matrix size. For MX a determinant node is created that is
         evaluated through the 'qr' linear solver. A non-square argument raises an error.
 
+        \lang{python}
         \doctest
         >>> det(DM([[1, 2], [3, 4]]))
         DM(-2)
@@ -1137,8 +1258,10 @@ namespace casadi {
         >>> det(MX.sym("A", 2, 2))
         MX(det(A))
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> det(DM([1 2; 3 4]))
         -2
         >> det(SX.sym('A', 2, 2))
@@ -1146,6 +1269,7 @@ namespace casadi {
         >> det(MX.sym('A', 2, 2))
         det(A)
         \enddoctest
+        \endlang
 
         \sa inv, inv_minor
 
@@ -1158,15 +1282,19 @@ namespace casadi {
         with a symbolic determinant, such as "symbolicqr", are accepted)
         \param dict Options passed to the linear solver
 
+        \lang{python}
         \doctest
         >>> det(DM([[1, 2], [3, 4]]), "qr")
         DM(-2)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> det(DM([1 2; 3 4]), 'qr')
         -2
         \enddoctest
+        \endlang
 
         \sa Linsol
 
@@ -1181,18 +1309,22 @@ namespace casadi {
         Computes adj(A)/det(A) by minor expansion. Available for DM and SX; MX raises
         "Not implemented". Use inv for the general case.
 
+        \lang{python}
         \doctest
         >>> inv_minor(DM([[1, 2], [3, 4]]))
         DM(
         [[-2, 1],
          [1.5, -0.5]])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> inv_minor(DM([1 2; 3 4]))
         [[-2, 1],
          [1.5, -0.5]]
         \enddoctest
+        \endlang
 
         \sa inv, det
 
@@ -1205,6 +1337,7 @@ namespace casadi {
         raises an error. A numerically singular DM does not raise; the result contains
         inf or nan. For MX the result is a solve node.
 
+        \lang{python}
         \doctest
         >>> inv(DM([[1, 2], [3, 4]]))
         DM(
@@ -1219,8 +1352,10 @@ namespace casadi {
         [[0.5, 00],
          [00, 0.25]])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> inv(DM([1 2; 3 4]))
         [[-2, 1],
          [1.5, -0.5]]
@@ -1232,6 +1367,7 @@ namespace casadi {
         [[0.5, 00],
          [00, 0.25]]
         \enddoctest
+        \endlang
 
         \sa solve, pinv, det, mldivide
 
@@ -1247,18 +1383,22 @@ namespace casadi {
         \param lsolver Name of a Linsol plugin, e.g. "qr", "csparse", "lapacklu"
         \param options Options passed to the linear solver
 
+        \lang{python}
         \doctest
         >>> inv(DM([[1, 2], [3, 4]]), "qr")
         DM(
         [[-2, 1],
          [1.5, -0.5]])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> inv(DM([1 2; 3 4]), 'qr')
         [[-2, 1],
          [1.5, -0.5]]
         \enddoctest
+        \endlang
 
         \sa solve, Linsol
 
@@ -1274,19 +1414,23 @@ namespace casadi {
         Sum of the diagonal entries of a square matrix (structural zeros contribute nothing).
         A non-square argument raises an error.
 
+        \lang{python}
         \doctest
         >>> trace(DM([[1, 2], [3, 4]]))
         DM(5)
         >>> trace(SX.sym("A", 2, 2))
         SX((A_0+A_3))
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> trace(DM([1 2; 3 4]))
         5
         >> trace(SX.sym('A', 2, 2))
         (A_0+A_3)
         \enddoctest
+        \endlang
 
         \sa diag
 
@@ -1299,6 +1443,7 @@ namespace casadi {
         part. The argument must be square and have no structural nonzeros above the diagonal
         (a dense matrix is rejected even if numerically lower triangular).
 
+        \lang{python}
         \doctest
         >>> L = DM(Sparsity.lower(3), [1, 2, 3, 4, 5, 6])
         >>> tril2symm(L)
@@ -1311,8 +1456,10 @@ namespace casadi {
         [[L_0, L_1],
          [L_1, L_2]])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> L = DM(Sparsity.lower(3), [1; 2; 3; 4; 5; 6]);
         >> tril2symm(L)
         [[1, 2, 3],
@@ -1322,6 +1469,7 @@ namespace casadi {
         [[L_0, L_1],
          [L_1, L_2]]
         \enddoctest
+        \endlang
 
         \sa triu2symm, tril, is_tril
 
@@ -1333,6 +1481,7 @@ namespace casadi {
         Mirror image of tril2symm: the argument must be square without structural nonzeros
         below the diagonal.
 
+        \lang{python}
         \doctest
         >>> U = DM(Sparsity.upper(2), [1, 2, 3])
         >>> triu2symm(U)
@@ -1340,13 +1489,16 @@ namespace casadi {
         [[1, 2],
          [2, 3]])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> U = DM(Sparsity.upper(2), [1; 2; 3]);
         >> triu2symm(U)
         [[1, 2],
          [2, 3]]
         \enddoctest
+        \endlang
 
         \sa tril2symm, triu, is_triu
 
@@ -1359,19 +1511,23 @@ namespace casadi {
         Not differentiable at x == 0 (the derivative evaluates to nan there); use sumsqr
         in objectives where possible.
 
+        \lang{python}
         \doctest
         >>> norm_fro(DM([[1, -2], [3, 4]]))
         DM(5.47723)
         >>> norm_fro(SX.sym("x", 2))
         SX(sqrt((sq(x_0)+sq(x_1))))
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> norm_fro(DM([1 -2; 3 4]))
         5.47723
         >> norm_fro(SX.sym('x', 2))
         sqrt((sq(x_0)+sq(x_1)))
         \enddoctest
+        \endlang
 
         \sa norm_2, norm_1, norm_inf, sumsqr
 
@@ -1385,6 +1541,7 @@ namespace casadi {
         meant); MX creates a spectral-norm node that cannot be evaluated.
         Not differentiable at x == 0; use sumsqr in objectives where possible.
 
+        \lang{python}
         \doctest
         >>> norm_2(DM([3, 4]))
         DM(5)
@@ -1394,8 +1551,10 @@ namespace casadi {
         ... except Exception as e: print("error")
         error
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> norm_2(DM([3; 4]))
         5
         >> norm_2(MX.sym('x', 2))
@@ -1403,6 +1562,7 @@ namespace casadi {
         >> try, norm_2(DM([1 2; 3 4])); catch e, disp('error'); end
         error
         \enddoctest
+        \endlang
 
         \sa norm_fro, norm_1, norm_inf, sumsqr
 
@@ -1414,19 +1574,23 @@ namespace casadi {
         Sum of the absolute values of all entries. For a matrix this is the entrywise norm,
         not the induced (maximum column sum) matrix norm. Nonsmooth at zero entries.
 
+        \lang{python}
         \doctest
         >>> norm_1(DM([[1, -2], [3, 4]]))
         DM(10)
         >>> norm_1(SX.sym("x", 2))
         SX((fabs(x_0)+fabs(x_1)))
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> norm_1(DM([1 -2; 3 4]))
         10
         >> norm_1(SX.sym('x', 2))
         (fabs(x_0)+fabs(x_1))
         \enddoctest
+        \endlang
 
         \sa norm_inf, norm_2, norm_fro
 
@@ -1438,19 +1602,23 @@ namespace casadi {
         Largest absolute value among all entries. For a matrix this is the entrywise norm,
         not the induced (maximum row sum) matrix norm. Nonsmooth.
 
+        \lang{python}
         \doctest
         >>> norm_inf(DM([[1, -2], [3, 4]]))
         DM(4)
         >>> norm_inf(SX.sym("x", 2))
         SX(fmax(fmax(0,fabs(x_0)),fabs(x_1)))
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> norm_inf(DM([1 -2; 3 4]))
         4
         >> norm_inf(SX.sym('x', 2))
         fmax(fmax(0,fabs(x_0)),fabs(x_1))
         \enddoctest
+        \endlang
 
         \sa norm_1, norm_2, norm_fro, mmax
 
@@ -1467,6 +1635,7 @@ namespace casadi {
         \param n Order, at least 1
         \param axis 0 (rows), 1 (columns) or -1 (automatic); 1 and 2 in MATLAB
 
+        \lang{python}
         \doctest
         >>> diff(DM([1, 4, 9, 16]))
         DM([3, 5, 7])
@@ -1479,8 +1648,10 @@ namespace casadi {
         >>> diff(DM(3)).dim()
         '0x0'
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> diff(DM([1; 4; 9; 16]))
         [3, 5, 7]
         >> diff(DM([1; 4; 9; 16]), 2)
@@ -1492,6 +1663,7 @@ namespace casadi {
         >> d = diff(DM(3)); disp(d.dim())
         0x0
         \enddoctest
+        \endlang
 
         \sa cumsum
 
@@ -1506,6 +1678,7 @@ namespace casadi {
         preserved. With axis -1, the columns are summed for a row vector and the rows
         otherwise. MATLAB numbers the axes 1 (rows) and 2 (columns).
 
+        \lang{python}
         \doctest
         >>> cumsum(DM([1, 2, 3]))
         DM([1, 3, 6])
@@ -1520,8 +1693,10 @@ namespace casadi {
         >>> cumsum(SX.sym("x", 3))
         SX(@1=(x_1+x_0), [x_0, @1, (x_2+@1)])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> cumsum(DM([1; 2; 3]))
         [1, 3, 6]
         >> cumsum(DM([1 2; 3 4]))
@@ -1533,6 +1708,7 @@ namespace casadi {
         >> cumsum(SX.sym('x', 3))
         @1=(x_1+x_0), [x_0, @1, (x_2+@1)]
         \enddoctest
+        \endlang
 
         \sa diff, sum1, sum2
 
@@ -1547,6 +1723,7 @@ namespace casadi {
         shape (a matrix is treated as the vector of its entries). Only entries that are
         structurally nonzero in both arguments contribute. A shape mismatch raises an error.
 
+        \lang{python}
         \doctest
         >>> dot(DM([1, 2]), DM([3, 4]))
         DM(11)
@@ -1557,8 +1734,10 @@ namespace casadi {
         >>> dot(SX.sym("x", 2), SX.sym("y", 2))
         SX(((x_0*y_0)+(x_1*y_1)))
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> dot(DM([1; 2]), DM([3; 4]))
         11
         >> dot(DM([1 2; 3 4]), DM([1 1; 1 1]))
@@ -1568,6 +1747,7 @@ namespace casadi {
         >> dot(SX.sym('x', 2), SX.sym('y', 2))
         ((x_0*y_0)+(x_1*y_1))
         \enddoctest
+        \endlang
 
         \sa mtimes, sumsqr, bilin
 
@@ -1586,19 +1766,23 @@ namespace casadi {
 
         Inspired by Numerical Methods in Scientific Computing by Ake Bjorck
 
+        \lang{python}
         \doctest
         >>> A = DM([[1, 2, 3], [4, 5, 6]])
         >>> Z = nullspace(A)
         >>> Z.dim(), float(norm_1(mtimes(A, Z))) < 1e-12
         ('3x1', True)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> A = DM([1 2 3; 4 5 6]);
         >> Z = nullspace(A);
         >> fprintf('%s %d\n', Z.dim(), full(norm_1(A*Z)) < 1e-12)
         3x1 1
         \enddoctest
+        \endlang
 
         \sa qr, pinv
 
@@ -1617,6 +1801,7 @@ namespace casadi {
         \param p Dense column vector of coefficients, at least one entry
         \param x Point(s) of evaluation, any shape
 
+        \lang{python}
         \doctest
         >>> polyval(DM([1, 2, 3]), 2)
         DM(11)
@@ -1625,8 +1810,10 @@ namespace casadi {
         >>> polyval(SX.sym("p", 3), SX.sym("x"))
         SX(((((p_0*x)+p_1)*x)+p_2))
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> polyval(DM([1; 2; 3]), 2)
         11
         >> polyval(DM([1; 0; -1]), DM([0; 1; 2]))
@@ -1634,6 +1821,7 @@ namespace casadi {
         >> polyval(SX.sym('p', 3), SX.sym('x'))
         ((((p_0*x)+p_1)*x)+p_2)
         \enddoctest
+        \endlang
 
         \identifier{1cc} */
     inline friend MatType polyval(const MatType& p, const MatType& x) {
@@ -1647,6 +1835,7 @@ namespace casadi {
         entries are returned as a column vector of length min(size1(), size2()); only
         structurally nonzero entries are kept.
 
+        \lang{python}
         \doctest
         >>> diag(DM([1, 2]))
         DM(
@@ -1659,8 +1848,10 @@ namespace casadi {
         >>> diag(DM.ones(2, 3))
         DM([1, 1])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> diag(DM([1; 2]))
         [[1, 00],
          [00, 2]]
@@ -1671,6 +1862,7 @@ namespace casadi {
         >> diag(DM.ones(2, 3))
         [1, 1]
         \enddoctest
+        \endlang
 
         \sa trace, diagcat, Sparsity::diag
 
@@ -1685,6 +1877,7 @@ namespace casadi {
         positions. Both must have the same shape; a shared structural nonzero raises
         "Pattern intersection not empty".
 
+        \lang{python}
         \doctest
         >>> A = DM(Sparsity.upper(2), [1, 2, 3])
         >>> B = DM(Sparsity.triplet(2, 2, [1], [0]), [4])
@@ -1696,8 +1889,10 @@ namespace casadi {
         ... except Exception as e: print("error")
         error
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> A = DM(Sparsity.upper(2), [1; 2; 3]);
         >> B = DM(Sparsity.triplet(2, 2, 1, 0), 4);
         >> unite(A, B)
@@ -1706,6 +1901,7 @@ namespace casadi {
         >> try, unite(DM.eye(2), DM.eye(2)); catch e, disp('error'); end
         error
         \enddoctest
+        \endlang
 
         \sa project, Sparsity::unite
 
@@ -1719,6 +1915,7 @@ namespace casadi {
         Structural zeros become stored numerical zeros; the shape and the values of the
         existing nonzeros are unchanged. A dense input is returned as is.
 
+        \lang{python}
         \doctest
         >>> densify(DM.eye(2))
         DM(
@@ -1731,8 +1928,10 @@ namespace casadi {
         >>> densify(MX.sym("x", Sparsity.diag(2)))
         MX(dense(x))
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> densify(DM.eye(2))
         [[1, 0],
          [0, 1]]
@@ -1743,6 +1942,7 @@ namespace casadi {
         >> densify(MX.sym('x', Sparsity.diag(2)))
         dense(x)
         \enddoctest
+        \endlang
 
         \sa project, sparsify, is_dense
 
@@ -1769,6 +1969,7 @@ namespace casadi {
         true, the target pattern is the intersection of \p sp and the pattern of \p A, so the
         result only ever loses entries.
 
+        \lang{python}
         \doctest
         >>> project(DM([[1, 2], [3, 4]]), Sparsity.diag(2))
         DM(
@@ -1783,8 +1984,10 @@ namespace casadi {
         [[1, 00],
          [00, 2]])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> project(DM([1 2; 3 4]), Sparsity.diag(2))
         [[1, 00],
          [00, 4]]
@@ -1795,6 +1998,7 @@ namespace casadi {
         [[1, 00],
          [00, 2]]
         \enddoctest
+        \endlang
 
         \sa densify, sparsify, unite
 
@@ -1816,6 +2020,7 @@ namespace casadi {
         does not propagate. With \p short_circuit true (MX only; ignored for SX and DM) the
         branches are wrapped in functions and only the selected one is evaluated.
 
+        \lang{python}
         \doctest
         >>> if_else(DM(1), DM(10), DM(20)), if_else(DM(0), DM(10), DM(20))
         (DM(10), DM(20))
@@ -1831,8 +2036,10 @@ namespace casadi {
         >>> if_else(X > 0, X, -X, True)
         MX(switch((0<X), X){0})
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> if_else(DM(1), DM(10), DM(20)), if_else(DM(0), DM(10), DM(20))
         10
         20
@@ -1848,6 +2055,7 @@ namespace casadi {
         >> if_else(X > 0, X, -X, true)
         switch((0<X), X){0}
         \enddoctest
+        \endlang
 
         \sa conditional, if_else_zero, Function::if_else
 
@@ -1865,6 +2073,7 @@ namespace casadi {
         are evaluated. With \p short_circuit true (MX only; SX raises an error) a Switch
         function evaluates only the selected case.
 
+        \lang{python}
         \doctest
         >>> conditional(DM(1), [DM(10), DM(20)], DM(-1))
         DM(20)
@@ -1877,8 +2086,10 @@ namespace casadi {
         >>> conditional(X, [Y, 2*Y], 0, True)
         MX(switch(X, Y){0})
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> conditional(DM(1), {DM(10), DM(20)}, DM(-1))
         20
         >> conditional(DM(5), {DM(10), DM(20)}, DM(-1))
@@ -1890,6 +2101,7 @@ namespace casadi {
         >> conditional(X, {Y, 2*Y}, 0, true)
         switch(X, Y){0}
         \enddoctest
+        \endlang
 
         \sa if_else, Function::conditional
 
@@ -1914,6 +2126,7 @@ namespace casadi {
 
         To check that kind of dependency, use contains(symvar(f),arg)
 
+        \lang{python}
         \doctest
         >>> x = SX.sym("x"); y = SX.sym("y")
         >>> depends_on(x*y, x), depends_on(x*y, SX.sym("z"))
@@ -1926,8 +2139,10 @@ namespace casadi {
         >>> depends_on(v[0], v)
         True
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x'); y = SX.sym('y');
         >> fprintf('%d %d\n', depends_on(x*y, x), depends_on(x*y, SX.sym('z')))
         1 0
@@ -1939,6 +2154,7 @@ namespace casadi {
         >> depends_on(v(1), v)
         1
         \enddoctest
+        \endlang
 
         \sa which_depends, symvar, contains, jacobian_sparsity
 
@@ -1958,6 +2174,7 @@ namespace casadi {
     * For mathematical dependency, see depends_on
     * \sa depends_on
     *
+    * \lang{python}
     * \doctest
     * >>> x = SX.sym("x"); y = SX.sym("y"); z = SX.sym("z")
     * >>> e = x + y
@@ -1973,8 +2190,10 @@ namespace casadi {
     * >>> contains([X, Y], Y), contains([X + Y], Y)
     * (True, False)
     * \enddoctest
+    * \endlang
     *
-    * \doctest{matlab}
+    * \lang{matlab}
+    * \doctest
     * >> x = SX.sym('x'); y = SX.sym('y');
     * >> e = x + y;
     * >> fprintf('%d %d %d\n', contains({x, y}, y), contains({e}, y), contains({e}, e))
@@ -1985,6 +2204,7 @@ namespace casadi {
     * >> fprintf('%d %d\n', contains({X, Y}, Y), contains({X + Y}, Y))
     * 1 0
     * \enddoctest
+    * \endlang
 
         \identifier{2c8} */
     /// @{
@@ -2008,6 +2228,7 @@ namespace casadi {
         of such a primitive is rejected. Substituting a symbol that does not occur in \p ex
         is a no-op. Not defined for DM.
 
+        \lang{python}
         \doctest
         >>> x = SX.sym("x"); y = SX.sym("y"); z = SX.sym("z")
         >>> substitute(x*y + x, x, 2)
@@ -2021,8 +2242,10 @@ namespace casadi {
         >>> substitute(X*Y + X, X, Y)
         MX((sq(Y)+Y))
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x'); y = SX.sym('y'); z = SX.sym('z');
         >> substitute(x*y + x, x, 2)
         ((2.*y)+2)
@@ -2035,6 +2258,7 @@ namespace casadi {
         >> substitute(X*Y + X, X, Y)
         (sq(Y)+Y)
         \enddoctest
+        \endlang
 
         \sa substitute_inplace, graph_substitute, Function
 
@@ -2049,6 +2273,7 @@ namespace casadi {
         All substitutions happen simultaneously: vdef[k] is not itself subject to the
         other substitutions, so swapping two variables works as expected.
 
+        \lang{python}
         \doctest
         >>> x = SX.sym("x"); y = SX.sym("y")
         >>> substitute([x*y, x + y], [x, y], [1, 2])
@@ -2056,8 +2281,10 @@ namespace casadi {
         >>> substitute([x + y], [x, y], [y, x])
         [SX((x+y))]
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x'); y = SX.sym('y');
         >> r = substitute({x*y, x + y}, {x, y}, {1, 2});
         >> r{1}, r{2}
@@ -2067,6 +2294,7 @@ namespace casadi {
         >> r{1}
         (x+y)
         \enddoctest
+        \endlang
 
         \identifier{1cm} */
     friend inline std::vector<MatType>
@@ -2086,6 +2314,7 @@ namespace casadi {
         \p v must consist of symbolic primitives with the shapes of \p vdef.
         \p reverse is only accepted for SX; MX raises "Not implemented".
 
+        \lang{python}
         \doctest
         >>> x = SX.sym("x"); y = SX.sym("y")
         >>> substitute_inplace([x, y], [y + 1, 3], [x*y])
@@ -2094,8 +2323,10 @@ namespace casadi {
         >>> substitute_inplace([X, Y], [Y + 1, 3], [X*Y])
         ([MX(1), MX(3)], [MX(00)])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x'); y = SX.sym('y');
         >> [vdef, ex] = substitute_inplace({x, y}, {y + 1, 3}, {x*y});
         >> vdef{1}, vdef{2}, ex{1}
@@ -2109,6 +2340,7 @@ namespace casadi {
         3
         00
         \enddoctest
+        \endlang
 
         \sa substitute
 
@@ -2126,6 +2358,7 @@ namespace casadi {
         separately share a single node, reducing the number of nodes and the evaluation
         cost. The shape is preserved. DM is returned unchanged.
 
+        \lang{python}
         \doctest
         >>> x = SX.sym("x"); y = SX.sym("y")
         >>> e = sin(x + y)*cos(x + y)
@@ -2134,8 +2367,10 @@ namespace casadi {
         >>> n_nodes(e), n_nodes(cse(e))
         (7, 6)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x'); y = SX.sym('y');
         >> e = sin(x + y)*cos(x + y);
         >> cse(e)
@@ -2143,6 +2378,7 @@ namespace casadi {
         >> fprintf('%d %d\n', n_nodes(e), n_nodes(cse(e)))
         7 6
         \enddoctest
+        \endlang
 
         \sa n_nodes, shared, extract
 
@@ -2156,6 +2392,7 @@ namespace casadi {
 
         Subexpressions are shared across all entries of the list.
 
+        \lang{python}
         \doctest
         >>> X = MX.sym("X"); Y = MX.sym("Y")
         >>> vertcat(sin(X + Y), cos(X + Y))
@@ -2163,8 +2400,10 @@ namespace casadi {
         >>> vertcat(*cse([sin(X + Y), cos(X + Y)]))
         MX(@1=(X+Y), vertcat(sin(@1), cos(@1)))
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> X = MX.sym('X'); Y = MX.sym('Y');
         >> [sin(X + Y); cos(X + Y)]
         vertcat(sin((X+Y)), cos((X+Y)))
@@ -2172,6 +2411,7 @@ namespace casadi {
         >> vertcat(r{:})
         @1=(X+Y), vertcat(sin(@1), cos(@1))
         \enddoctest
+        \endlang
 
         \identifier{1cp} */
     inline friend std::vector<MatType> cse(const std::vector<MatType>& e) {
@@ -2201,6 +2441,7 @@ namespace casadi {
         \p b may have several columns (one right-hand side each). A non-square \p A or a row
         count mismatch raises an error; a numerically singular DM returns nan or inf.
 
+        \lang{python}
         \doctest
         >>> A = DM([[1, 2], [3, 4]])
         >>> solve(A, DM([1, 2]))
@@ -2217,8 +2458,10 @@ namespace casadi {
         >>> solve(DM(2), DM([1, 2]))
         DM([0.5, 1])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> A = DM([1 2; 3 4]);
         >> solve(A, DM([1; 2]))
         [0, 0.5]
@@ -2232,6 +2475,7 @@ namespace casadi {
         >> solve(DM(2), DM([1; 2]))
         [0.5, 1]
         \enddoctest
+        \endlang
 
         \sa inv, mldivide, Linsol, qr
 
@@ -2251,6 +2495,7 @@ namespace casadi {
         "symbolicqr", "ldl", "ma27"; which ones are available depends on the build
         \param dict Options passed to the linear solver
 
+        \lang{python}
         \doctest
         >>> A = DM([[1, 2], [3, 4]])
         >>> solve(A, DM([1, 2]), "qr")
@@ -2258,14 +2503,17 @@ namespace casadi {
         >>> solve(MX.sym("A", 2, 2), MX.sym("b", 2), "qr")
         MX((A\b))
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> A = DM([1 2; 3 4]);
         >> solve(A, DM([1; 2]), 'qr')
         [0, 0.5]
         >> solve(MX.sym('A', 2, 2), MX.sym('b', 2), 'qr')
         (A\b)
         \enddoctest
+        \endlang
 
         \sa Linsol, has_linsol
 
@@ -2291,17 +2539,21 @@ namespace casadi {
     * \p x0 must have the shape of \p x or be a scalar (broadcast).
     * For a variant that returns sin(x0)+cos(x0)*(x-x0), see taylor.
     *
+    * \lang{python}
     * \doctest
     * >>> x = SX.sym("x"); y = SX.sym("y")
     * >>> linearize(sin(x), x, y)
     * SX((sin(y)+(cos(y)*x)))
     * \enddoctest
+    * \endlang
     *
-    * \doctest{matlab}
+    * \lang{matlab}
+    * \doctest
     * >> x = SX.sym('x'); y = SX.sym('y');
     * >> linearize(sin(x), x, y)
     * (sin(y)+(cos(y)*x))
     * \enddoctest
+    * \endlang
     *
     * \sa taylor, linear_coeff
 
@@ -2325,6 +2577,7 @@ namespace casadi {
         The normal equations are solved with solve, so \p A is assumed to have full rank.
         For a square matrix this is the inverse.
 
+        \lang{python}
         \doctest
         >>> A = DM([[1, 0, 0], [0, 2, 0]])
         >>> pinv(A)
@@ -2339,8 +2592,10 @@ namespace casadi {
         >>> pinv(SX.sym("A", 1, 2))
         SX(@1=(sq(A_0)+sq(A_1)), [(A_0/@1), (A_1/@1)])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> A = DM([1 0 0; 0 2 0]);
         >> pinv(A)
         [[1, 0],
@@ -2352,6 +2607,7 @@ namespace casadi {
         >> pinv(SX.sym('A', 1, 2))
         @1=(sq(A_0)+sq(A_1)), [(A_0/@1), (A_1/@1)]
         \enddoctest
+        \endlang
 
         \sa inv, solve, nullspace
 
@@ -2368,6 +2624,7 @@ namespace casadi {
         \param lsolver Name of a Linsol plugin, e.g. "qr"
         \param dict Options passed to the linear solver
 
+        \lang{python}
         \doctest
         >>> pinv(DM([[1, 0, 0], [0, 2, 0]]), "qr")
         DM(
@@ -2375,13 +2632,16 @@ namespace casadi {
          [0, 0.5],
          [0, 0]])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> pinv(DM([1 0 0; 0 2 0]), 'qr')
         [[1, 0],
          [0, 0.5],
          [0, 0]]
         \enddoctest
+        \endlang
 
         \identifier{1cu} */
     friend inline MatType pinv(const MatType& A, const std::string& lsolver,
@@ -2432,6 +2692,7 @@ namespace casadi {
         "verbose"
         \return Sparse matrix
 
+        \lang{python}
         \doctest
         >>> x = SX.sym("x"); y = SX.sym("y")
         >>> J = jacobian(vertcat(x*y, x**2), vertcat(x, y))
@@ -2447,8 +2708,10 @@ namespace casadi {
         >>> jacobian(SX(0, 1), vertcat(x, y)).dim()
         '0x2'
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x'); y = SX.sym('y');
         >> J = jacobian(vertcat(x*y, x^2), vertcat(x, y));
         >> J
@@ -2462,6 +2725,7 @@ namespace casadi {
         >> J = jacobian(SX(0, 1), vertcat(x, y)); disp(J.dim())
         0x2
         \enddoctest
+        \endlang
 
         \sa gradient, hessian, jtimes, jacobian_sparsity, Function::jacobian
 
@@ -2481,6 +2745,7 @@ namespace casadi {
         \param opts Options, see jacobian
         \return Matrix with the sparsity of \p arg
 
+        \lang{python}
         \doctest
         >>> x = SX.sym("x"); y = SX.sym("y")
         >>> gradient(x*y + x**2, vertcat(x, y))
@@ -2493,8 +2758,10 @@ namespace casadi {
         [[(2.*A_0), (2.*A_2)],
          [(2.*A_1), (2.*A_3)]])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x'); y = SX.sym('y');
         >> gradient(x*y + x^2, vertcat(x, y))
         [((2.*x)+y), x]
@@ -2505,6 +2772,7 @@ namespace casadi {
         [[(2.*A_0), (2.*A_2)],
          [(2.*A_1), (2.*A_3)]]
         \enddoctest
+        \endlang
 
         \sa jacobian, hessian, jtimes
 
@@ -2518,17 +2786,21 @@ namespace casadi {
         sweep and projected onto the sparsity of \p ex: the result has the shape and pattern
         of \p ex. A non-scalar \p arg raises an error (use jacobian).
 
+        \lang{python}
         \doctest
         >>> x = SX.sym("x")
         >>> tangent(vertcat(x**2, 3*x), x)
         SX([(2.*x), 3])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x');
         >> tangent(vertcat(x^2, 3*x), x)
         [(2.*x), 3]
         \enddoctest
+        \endlang
 
         \sa gradient, jacobian, jtimes
 
@@ -2551,6 +2823,7 @@ namespace casadi {
         is ex.size1()-by-ex.size2()*n_dir (arg.size1()-by-arg.size2()*n_dir when \p tr is
         true). An inconsistent shape of \p v raises an error.
 
+        \lang{python}
         \doctest
         >>> x = SX.sym("x"); y = SX.sym("y")
         >>> ex = vertcat(x*y, x**2); arg = vertcat(x, y)
@@ -2565,8 +2838,10 @@ namespace casadi {
         >>> jtimes(ex, arg, SX.sym("v", 2))
         SX([((y*v_0)+(x*v_1)), ((2.*x)*v_0)])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x'); y = SX.sym('y');
         >> ex = vertcat(x*y, x^2); arg = vertcat(x, y);
         >> jtimes(ex, arg, DM([1; 0]))
@@ -2579,6 +2854,7 @@ namespace casadi {
         >> jtimes(ex, arg, SX.sym('v', 2))
         [((y*v_0)+(x*v_1)), ((2.*x)*v_0)]
         \enddoctest
+        \endlang
 
         \sa jacobian, forward, reverse
 
@@ -2600,6 +2876,7 @@ namespace casadi {
         \param v List of directions, each a list of seeds matching \p arg
         \param opts Options, see jacobian
 
+        \lang{python}
         \doctest
         >>> x = SX.sym("x"); y = SX.sym("y")
         >>> forward([x*y, x**2], [x, y], [[1, 0]])
@@ -2607,8 +2884,10 @@ namespace casadi {
         >>> forward([x*y, x**2], [x, y], [[1, 0], [0, 1]])
         [[SX(y), SX((2.*x))], [SX(x), SX(0)]]
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x'); y = SX.sym('y');
         >> r = forward({x*y, x^2}, {x, y}, {{1, 0}});
         >> r{1}{1}, r{1}{2}
@@ -2619,6 +2898,7 @@ namespace casadi {
         x
         0
         \enddoctest
+        \endlang
 
         \sa reverse, jtimes, Function::forward
 
@@ -2641,6 +2921,7 @@ namespace casadi {
         \param v List of directions, each a list of seeds matching \p ex
         \param opts Options, see jacobian
 
+        \lang{python}
         \doctest
         >>> x = SX.sym("x"); y = SX.sym("y")
         >>> reverse([x*y, x**2], [x, y], [[1, 0]])
@@ -2648,8 +2929,10 @@ namespace casadi {
         >>> reverse([x*y, x**2], [x, y], [[1, 1]])
         [[SX(((2.*x)+y)), SX(x)]]
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x'); y = SX.sym('y');
         >> r = reverse({x*y, x^2}, {x, y}, {{1, 0}});
         >> r{1}{1}, r{1}{2}
@@ -2660,6 +2943,7 @@ namespace casadi {
         ((2.*x)+y)
         x
         \enddoctest
+        \endlang
 
         \sa forward, jtimes, gradient, Function::reverse
 
@@ -2682,6 +2966,7 @@ namespace casadi {
 
         \param opts Options, see jacobian
 
+        \lang{python}
         \doctest
         >>> x = SX.sym("x"); y = SX.sym("y")
         >>> H, g = hessian(x**2*y, vertcat(x, y))
@@ -2692,8 +2977,10 @@ namespace casadi {
         >>> g
         SX([((2.*x)*y), sq(x)])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x'); y = SX.sym('y');
         >> [H, g] = hessian(x^2*y, vertcat(x, y));
         >> H
@@ -2703,6 +2990,7 @@ namespace casadi {
         >> g
         [((2.*x)*y), sq(x)]
         \enddoctest
+        \endlang
 
         \sa gradient, jacobian, Function::hessian
 
@@ -2733,6 +3021,7 @@ namespace casadi {
         it depend on any element of \p var.
         \return List of booleans
 
+        \lang{python}
         \doctest
         >>> x = SX.sym("x"); y = SX.sym("y")
         >>> e = vertcat(x*y, x**2, 3*x)
@@ -2743,8 +3032,10 @@ namespace casadi {
         >>> which_depends(e, vertcat(x, y), 2, True)
         [True, True, False]
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x'); y = SX.sym('y');
         >> e = vertcat(x*y, x^2, 3*x);
         >> which_depends(e, vertcat(x, y), 1, false)
@@ -2754,6 +3045,7 @@ namespace casadi {
         >> which_depends(e, vertcat(x, y), 2, true)
         1 1 0
         \enddoctest
+        \endlang
 
         \sa depends_on, is_linear, jacobian_sparsity
 
@@ -2767,17 +3059,21 @@ namespace casadi {
 
         Equivalent to, but cheaper to compute than, jacobian(f,x).sparsity()
 
+        \lang{python}
         \doctest
         >>> x = SX.sym("x"); y = SX.sym("y")
         >>> jacobian_sparsity(vertcat(x*y, x**2, 3), vertcat(x, y))
         Sparsity(3x2,3nz)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x'); y = SX.sym('y');
         >> jacobian_sparsity(vertcat(x*y, x^2, 3), vertcat(x, y))
         3x2,3nz
         \enddoctest
+        \endlang
 
         \sa jacobian, which_depends
 
@@ -2796,6 +3092,7 @@ namespace casadi {
     * are treated as linear.
     * A constant expression counts as linear.
     *
+    * \lang{python}
     * \doctest
     * >>> x = SX.sym("x"); y = SX.sym("y")
     * >>> is_linear(2*x + y, vertcat(x, y)), is_linear(x*y, vertcat(x, y))
@@ -2803,14 +3100,17 @@ namespace casadi {
     * >>> is_linear(sin(y)*x, x), is_linear(x*x/x, x)
     * (True, False)
     * \enddoctest
+    * \endlang
     *
-    * \doctest{matlab}
+    * \lang{matlab}
+    * \doctest
     * >> x = SX.sym('x'); y = SX.sym('y');
     * >> fprintf('%d %d\n', is_linear(2*x + y, vertcat(x, y)), is_linear(x*y, vertcat(x, y)))
     * 1 0
     * >> fprintf('%d %d\n', is_linear(sin(y)*x, x), is_linear(x*x/x, x))
     * 1 0
     * \enddoctest
+    * \endlang
     *
     * \sa is_quadratic, linear_coeff, which_depends
 
@@ -2827,6 +3127,7 @@ namespace casadi {
     * see is_linear for the structural nature of the check.
     * Linear and constant expressions count as quadratic.
     *
+    * \lang{python}
     * \doctest
     * >>> x = SX.sym("x"); y = SX.sym("y")
     * >>> is_quadratic(x*y + x**2, vertcat(x, y)), is_quadratic(x**3, x)
@@ -2834,14 +3135,17 @@ namespace casadi {
     * >>> is_quadratic(x, x)
     * True
     * \enddoctest
+    * \endlang
     *
-    * \doctest{matlab}
+    * \lang{matlab}
+    * \doctest
     * >> x = SX.sym('x'); y = SX.sym('y');
     * >> fprintf('%d %d\n', is_quadratic(x*y + x^2, vertcat(x, y)), is_quadratic(x^3, x))
     * 1 0
     * >> is_quadratic(x, x)
     * 1
     * \enddoctest
+    * \endlang
     *
     * \sa is_linear, quadratic_coeff
 
@@ -2863,6 +3167,7 @@ namespace casadi {
     *                  error is raised otherwise ("called on non-quadratic expression").
     *                  Provided to deal with false positive dependency checks.
     *
+    * \lang{python}
     * \doctest
     * >>> x = SX.sym("x"); y = SX.sym("y")
     * >>> A, b, c = quadratic_coeff(x**2 + 2*x*y + 3*x + 4, vertcat(x, y))
@@ -2876,8 +3181,10 @@ namespace casadi {
     * ... except Exception as e: print("error")
     * error
     * \enddoctest
+    * \endlang
     *
-    * \doctest{matlab}
+    * \lang{matlab}
+    * \doctest
     * >> x = SX.sym('x'); y = SX.sym('y');
     * >> [A, b, c] = quadratic_coeff(x^2 + 2*x*y + 3*x + 4, vertcat(x, y));
     * >> A
@@ -2890,6 +3197,7 @@ namespace casadi {
     * >> try, [A, b, c] = quadratic_coeff(x^3, x); catch e, disp('error'); end
     * error
     * \enddoctest
+    * \endlang
     *
     * \sa linear_coeff, is_quadratic, hessian
 
@@ -2910,6 +3218,7 @@ namespace casadi {
     *                  (is_linear) and an error is raised otherwise.
     *                  Provided to deal with false positive dependency checks.
     *
+    * \lang{python}
     * \doctest
     * >>> x = SX.sym("x"); y = SX.sym("y")
     * >>> A, b = linear_coeff(vertcat(2*x + y + 1, 3*y), vertcat(x, y))
@@ -2920,8 +3229,10 @@ namespace casadi {
     * >>> b
     * SX([1, 0])
     * \enddoctest
+    * \endlang
     *
-    * \doctest{matlab}
+    * \lang{matlab}
+    * \doctest
     * >> x = SX.sym('x'); y = SX.sym('y');
     * >> [A, b] = linear_coeff(vertcat(2*x + y + 1, 3*y), vertcat(x, y));
     * >> A
@@ -2930,6 +3241,7 @@ namespace casadi {
     * >> b
     * [1, 0]
     * \enddoctest
+    * \endlang
     *
     * \sa quadratic_coeff, is_linear, jacobian
 
@@ -2971,6 +3283,7 @@ namespace casadi {
      * \p expr may also be a list of expressions and \p par a list of parameter symbols
      * (concatenated internally). An unknown option raises an error. Not defined for DM.
      *
+     * \lang{python}
      * \doctest
      * >>> x = SX.sym("x"); y = SX.sym("y"); p = SX.sym("p")
      * >>> expr_ret, symbols, parametric = extract_parametric((x - sqrt(p))*y + cos(p)**2, p)
@@ -2983,8 +3296,10 @@ namespace casadi {
      * >>> extract_parametric(x*p, p, {"extract_trivial": True})
      * (SX((x*e_0)), [SX(e_0)], [SX(p)])
      * \enddoctest
+     * \endlang
      *
-     * \doctest{matlab}
+     * \lang{matlab}
+     * \doctest
      * >> x = SX.sym('x'); y = SX.sym('y'); p = SX.sym('p');
      * >> [expr_ret, symbols, parametric] = extract_parametric((x - sqrt(p))*y + cos(p)^2, p);
      * >> expr_ret
@@ -3003,6 +3318,7 @@ namespace casadi {
      * e_0
      * p
      * \enddoctest
+     * \endlang
      *
      * \sa separate_linear, substitute
 
@@ -3088,6 +3404,7 @@ namespace casadi {
     *
     * \p sym_lin and \p sym_const may also be lists of symbols. Not defined for DM.
     *
+    * \lang{python}
     * \doctest
     * >>> x = SX.sym("x"); y = SX.sym("y"); p = SX.sym("p")
     * >>> separate_linear(cos(p) + 7*x + x*y, vertcat(x, y), p)
@@ -3095,8 +3412,10 @@ namespace casadi {
     * >>> separate_linear(p*x, x, p)
     * (SX(0), SX((p*x)), SX(0))
     * \enddoctest
+    * \endlang
     *
-    * \doctest{matlab}
+    * \lang{matlab}
+    * \doctest
     * >> x = SX.sym('x'); y = SX.sym('y'); p = SX.sym('p');
     * >> [c, l, n] = separate_linear(cos(p) + 7*x + x*y, vertcat(x, y), p);
     * >> c, l, n
@@ -3109,6 +3428,7 @@ namespace casadi {
     * (p*x)
     * 0
     * \enddoctest
+    * \endlang
     *
     * \sa extract_parametric, linear_coeff
 
@@ -3133,6 +3453,7 @@ namespace casadi {
         are counted once; identical subexpressions built separately are counted separately
         (use cse to merge them). Not defined for DM.
 
+        \lang{python}
         \doctest
         >>> x = SX.sym("x"); y = SX.sym("y")
         >>> n_nodes(x), n_nodes(x + y), n_nodes(vertcat(x + y, x + y))
@@ -3140,14 +3461,17 @@ namespace casadi {
         >>> n_nodes(SX(0, 1))
         0
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x'); y = SX.sym('y');
         >> fprintf('%d %d %d\n', n_nodes(x), n_nodes(x + y), n_nodes(vertcat(x + y, x + y)))
         1 3 4
         >> n_nodes(SX(0, 1))
         0
         \enddoctest
+        \endlang
 
         \sa cse, Function::n_nodes
 
@@ -3161,18 +3485,22 @@ namespace casadi {
         For SX, applies simplification passes such as constant folding and removal of
         trivial operations. For MX and DM the expression is returned unchanged.
 
+        \lang{python}
         \doctest
         >>> x = SX.sym("x"); y = SX.sym("y")
         >>> simplify(x*2*3), simplify(x*0 + y*1)
         (SX((6*x)), SX(y))
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x'); y = SX.sym('y');
         >> simplify(x*2*3), simplify(x*0 + y*1)
         (6*x)
         y
         \enddoctest
+        \endlang
 
         \sa transform, cse
 
@@ -3188,17 +3516,21 @@ namespace casadi {
         verb: "simplify" (followed by task names), "expand" or "external"; an unknown verb
         raises an error. Without \p passes a default set of simplification passes is applied.
 
+        \lang{python}
         \doctest
         >>> x = SX.sym("x")
         >>> transform(x*2*3)
         SX((6*x))
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x');
         >> transform(x*2*3)
         (6*x)
         \enddoctest
+        \endlang
 
         \sa simplify, Function::transform
 
@@ -3227,6 +3559,7 @@ namespace casadi {
         place of its operands. \p xb must be a unary or binary operation (a symbol or
         constant raises an error for SX) and \p args must have one entry per operand.
 
+        \lang{python}
         \doctest
         >>> x = SX.sym("x"); y = SX.sym("y")
         >>> print_operator(x + y, ["a", "b"]), print_operator(sin(x), ["a"])
@@ -3235,8 +3568,10 @@ namespace casadi {
         >>> print_operator(vertcat(X, Y), ["a", "b"])
         'vertcat(a, b)'
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x'); y = SX.sym('y');
         >> print_operator(x + y, {'a', 'b'}), print_operator(sin(x), {'a'})
         (a+b)
@@ -3245,6 +3580,7 @@ namespace casadi {
         >> print_operator(vertcat(X, Y), {'a', 'b'})
         vertcat(a, b)
         \enddoctest
+        \endlang
 
         \identifier{1d4} */
     inline friend std::string
@@ -3268,6 +3604,7 @@ namespace casadi {
           - prefix (str), default 'v_', suffix (str), default '', offset (int), default 0:
             naming of the new symbols
 
+        \lang{python}
         \doctest
         >>> x = SX.sym("x"); y = SX.sym("y")
         >>> e = x + y
@@ -3282,8 +3619,10 @@ namespace casadi {
         >>> extract([f(E)*f(E)], {"lift_shared": False, "lift_calls": True})
         ([MX((v_1*v_2))], [MX(v_0), MX(v_1), MX(v_2)], [MX((X+Y)), MX(f(v_0){0}), MX(f(v_0){0})])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x'); y = SX.sym('y');
         >> e = x + y;
         >> [ex, v, vdef] = extract({sin(e), cos(e)});
@@ -3309,6 +3648,7 @@ namespace casadi {
         3
         f(v_0){0}
         \enddoctest
+        \endlang
 
         \sa shared, cse, substitute
 
@@ -3326,6 +3666,7 @@ namespace casadi {
         that is used more than once is replaced by a new symbol named \p v_prefix + counter
         + \p v_suffix. In Python the call is shared(ex, v_prefix, v_suffix) -> (ex, v, vdef).
 
+        \lang{python}
         \doctest
         >>> x = SX.sym("x"); y = SX.sym("y")
         >>> e = x + y
@@ -3334,8 +3675,10 @@ namespace casadi {
         >>> shared([sin(e), cos(e)], "w_", "_s")
         ([SX(sin(w_0_s)), SX(cos(w_0_s))], [SX(w_0_s)], [SX((x+y))])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x'); y = SX.sym('y');
         >> e = x + y;
         >> [ex, v, vdef] = shared({sin(e)*cos(e) + e});
@@ -3349,6 +3692,7 @@ namespace casadi {
         cos(w_0_s)
         w_0_s
         \enddoctest
+        \endlang
 
         \sa extract, cse
 
@@ -3368,6 +3712,7 @@ namespace casadi {
         sense that repsum(repmat(x, n, m), n, m) == n*m*x. The dimensions of \p A must be
         multiples of \p n and \p m.
 
+        \lang{python}
         \doctest
         >>> repsum(DM([[1, 2, 3, 4], [5, 6, 7, 8]]), 1, 2)
         DM(
@@ -3376,14 +3721,17 @@ namespace casadi {
         >>> repsum(SX.sym("x", 4), 2)
         SX([(x_0+x_2), (x_1+x_3)])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> repsum(DM([1 2 3 4; 5 6 7 8]), 1, 2)
         [[4, 6],
          [12, 14]]
         >> repsum(SX.sym('x', 4), 2)
         [(x_0+x_2), (x_1+x_3)]
         \enddoctest
+        \endlang
 
         \sa repmat, blocksplit
 
@@ -3399,6 +3747,7 @@ namespace casadi {
         nonzeros has minimum 0). An empty matrix gives an empty 0-by-0 result. For SX a
         chain of fmin operations is built; for MX a single node.
 
+        \lang{python}
         \doctest
         >>> mmin(DM([[3, -1], [2, 5]])), mmax(DM([[3, -1], [2, 5]]))
         (DM(-1), DM(5))
@@ -3407,8 +3756,10 @@ namespace casadi {
         >>> mmin(SX.sym("x", 3))
         SX(fmin(fmin(x_0,x_1),x_2))
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> mmin(DM([3 -1; 2 5])), mmax(DM([3 -1; 2 5]))
         -1
         5
@@ -3417,6 +3768,7 @@ namespace casadi {
         >> mmin(SX.sym('x', 3))
         fmin(fmin(x_0,x_1),x_2)
         \enddoctest
+        \endlang
 
         \sa mmax, fmin, norm_inf
 
@@ -3431,19 +3783,23 @@ namespace casadi {
 
         Over all entries, structural zeros included. See mmin.
 
+        \lang{python}
         \doctest
         >>> mmax(DM(Sparsity.diag(2), [-3, -4]))
         DM(0)
         >>> mmax(MX.sym("x", 3))
         MX(max(x))
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> mmax(DM(Sparsity.diag(2), [-3; -4]))
         0
         >> mmax(MX.sym('x', 3))
         max(x)
         \enddoctest
+        \endlang
 
         \sa mmin, fmax, logsumexp
 
@@ -3487,6 +3843,7 @@ namespace casadi {
         \param nrow Number of rows, default 1
         \param ncol Number of columns, default 1
 
+        \lang{python}
         \doctest
         >>> SX.sym("x"), MX.sym("x", 2, 3).dim()
         (SX(x), '2x3')
@@ -3499,8 +3856,10 @@ namespace casadi {
         >>> is_equal(SX.sym("x"), SX.sym("x"))
         False
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> SX.sym('x'), MX.sym('x', 2, 3).dim()
         x
         2x3
@@ -3512,6 +3871,7 @@ namespace casadi {
         >> is_equal(SX.sym('x'), SX.sym('x'))
         0
         \enddoctest
+        \endlang
 
         \sa symvar, zeros, ones
 
@@ -3532,6 +3892,7 @@ namespace casadi {
         Only the structural nonzeros of \p sp become symbolic entries; for SX they are
         numbered by nonzero index.
 
+        \lang{python}
         \doctest
         >>> SX.sym("p", Sparsity.diag(2))
         SX(
@@ -3540,14 +3901,17 @@ namespace casadi {
         >>> MX.sym("p", Sparsity.diag(2)).dim(True)
         '2x2,2nz'
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> SX.sym('p', Sparsity.diag(2))
         [[p_0, 00],
          [00, p_1]]
         >> MX.sym('p', Sparsity.diag(2)).dim(true)
         2x2,2nz
         \enddoctest
+        \endlang
 
         \identifier{1dc} */
     static MatType sym(const std::string& name, const Sparsity& sp) {
@@ -3558,35 +3922,43 @@ namespace casadi {
 
         The k-th symbol is named name followed by k (no separator).
 
+        \lang{python}
         \doctest
         >>> MX.sym("x", Sparsity.dense(2, 1), 3)
         [MX(x0), MX(x1), MX(x2)]
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> v = MX.sym('x', Sparsity.dense(2, 1), 3);
         >> numel(v), v{1}, v{3}
         3
         x0
         x2
         \enddoctest
+        \endlang
 
         \identifier{1dd} */
     static std::vector<MatType > sym(const std::string& name, const Sparsity& sp, casadi_int p);
 
     /** \brief Create a list of length p of nrow-by-ncol symbolic primitives
 
+        \lang{python}
         \doctest
         >>> SX.sym("x", 1, 1, 2)
         [SX(x0), SX(x1)]
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> v = SX.sym('x', 1, 1, 2);
         >> v{1}, v{2}
         x0
         x1
         \enddoctest
+        \endlang
 
         \identifier{1de} */
     static std::vector<MatType > sym(const std::string& name, casadi_int nrow,
@@ -3605,18 +3977,22 @@ namespace casadi {
 
     /** \brief Create a list of length r of lists of length p of nrow-by-ncol symbolic primitives
 
+        \lang{python}
         \doctest
         >>> MX.sym("x", 1, 1, 2, 2)
         [[MX(x_00), MX(x_01)], [MX(x_10), MX(x_11)]]
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> v = MX.sym('x', 1, 1, 2, 2);
         >> numel(v), v{1}{2}, v{2}{1}
         2
         x_01
         x_10
         \enddoctest
+        \endlang
 
         \identifier{1dg} */
     static std::vector<std::vector<MatType> >
@@ -3632,20 +4008,24 @@ namespace casadi {
         structural nonzero of \p sp. To get structural zeros instead, construct from a shape,
         e.g. DM(2, 2).
 
+        \lang{python}
         \doctest
         >>> DM.zeros(2, 2).nnz(), DM.zeros(Sparsity.diag(2)).nnz(), DM(2, 2).nnz()
         (4, 2, 0)
         >>> MX.zeros(2, 3)
         MX(zeros(2x3))
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> Z = DM.zeros(Sparsity.diag(2));
         >> fprintf('%d %d %d\n', DM.zeros(2, 2).nnz(), Z.nnz(), DM(2, 2).nnz())
         4 2 0
         >> MX.zeros(2, 3)
         zeros(2x3)
         \enddoctest
+        \endlang
 
         \sa ones, Sparsity
 
@@ -3665,6 +4045,7 @@ namespace casadi {
         ones(sp) sets every structural nonzero of \p sp to one; other entries stay
         structurally zero.
 
+        \lang{python}
         \doctest
         >>> DM.ones(2, 3)
         DM(
@@ -3675,8 +4056,10 @@ namespace casadi {
         [[1, 00],
          [00, 1]])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> DM.ones(2, 3)
         [[1, 1, 1],
          [1, 1, 1]]
@@ -3684,6 +4067,7 @@ namespace casadi {
         [[1, 00],
          [00, 1]]
         \enddoctest
+        \endlang
 
         \sa zeros, Sparsity
 

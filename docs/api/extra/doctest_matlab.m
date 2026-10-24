@@ -1,16 +1,18 @@
 function nfail = doctest_matlab(varargin)
-% Run the \doctest{matlab} blocks of CasADi C++ headers (MATLAB and Octave).
+% Run the \doctest blocks of the \lang{matlab} groups of CasADi C++ headers (MATLAB and Octave).
 %
 %   doctest_matlab()                      all headers under casadi/
 %   doctest_matlab(file1, file2, ...)     selected headers (or directories)
 %   doctest_matlab(..., '-verbose')       print every example
 %
 % Block syntax inside a header comment:
-%   \doctest{matlab}
+%   \lang{matlab}
+%   \doctest
 %   >> x = MX.sym('x', 2);
 %   >> disp(size(x))
 %        2     1
 %   \enddoctest
+%   \endlang
 % Each '>> ' line is one statement (several separated by ';' or ',' are fine). A piece without
 % semicolon shows its value like disp() does (no 'ans =' / 'x =' header, strings unquoted). The lines up to the
 % next '>> ' are its expected output; blank lines and runs of blanks are ignored and a line '...'
@@ -107,10 +109,16 @@ function blocks = doctest__collect(fname)
   lines = regexp(txt, '\r?\n', 'split');
   blocks = {};
   inblock = false;
+  lang = '';
   for n = 1:numel(lines)
     s = regexprep(lines{n}, '^\s*\*?\s?', '');
     t = strtrim(regexprep(s, '\*/\s*$', ''));  % '\enddoctest */' closes the comment too
-    if ~inblock && strcmp(t, '\doctest{matlab}')
+    l = regexp(t, '^\\lang\{(\w+)\}$', 'tokens', 'once');
+    if ~inblock && ~isempty(l)
+      lang = l{1};
+    elseif ~inblock && strcmp(t, '\endlang')
+      lang = '';
+    elseif ~inblock && strcmp(t, '\doctest') && strcmp(lang, 'matlab')
       inblock = true; start = n; body = {}; bodyline = [];
     elseif inblock && strcmp(t, '\enddoctest')
       inblock = false;
@@ -122,7 +130,7 @@ function blocks = doctest__collect(fname)
     end
   end
   if inblock
-    error('doctest_matlab:syntax', '%s:%d: unterminated \\doctest{matlab}', fname, start);
+    error('doctest_matlab:syntax', '%s:%d: unterminated \\doctest', fname, start);
   end
 end
 

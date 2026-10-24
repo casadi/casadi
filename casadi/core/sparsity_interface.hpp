@@ -103,6 +103,7 @@ namespace casadi {
         \param v List of matrices with matching row count
         \return Matrix with the blocks of \p v side by side
 
+        \lang{python}
         \doctest
         >>> horzcat(DM([1, 2]), DM([3, 4]), DM([5, 6]))
         DM(
@@ -121,8 +122,10 @@ namespace casadi {
           ...
         RuntimeError: ...Mismatching number of rows...
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> [DM([1; 2]), DM([3; 4]), DM([5; 6])]
         [[1, 3, 5],
          [2, 4, 6]]
@@ -137,6 +140,7 @@ namespace casadi {
         >> try, [DM.ones(2, 2), DM.ones(3, 1)]; catch e, disp(e.message); end
         ...Mismatching number of rows
         \enddoctest
+        \endlang
 
         \sa vertcat, diagcat, veccat, horzsplit
 
@@ -161,6 +165,7 @@ namespace casadi {
         \param v List of matrices with matching column count
         \return Matrix with the blocks of \p v stacked vertically
 
+        \lang{python}
         \doctest
         >>> vertcat(SX.sym("x", 2), 3)
         SX([x_0, x_1, 3])
@@ -178,8 +183,10 @@ namespace casadi {
           ...
         RuntimeError: ...vertcat dimension mismatch...
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> [SX.sym('x', 2); 3]
         [x_0, x_1, 3]
         >> vertcat(DM([1 2]), DM.eye(2))
@@ -191,6 +198,7 @@ namespace casadi {
         >> try, [MX.sym('a', 2, 2); MX.sym('b', 2, 3)]; catch e, disp(e.message); end
         ...vertcat dimension mismatch...
         \enddoctest
+        \endlang
 
         \sa horzcat, diagcat, veccat, vertsplit
 
@@ -211,6 +219,7 @@ namespace casadi {
         \param offset Start column of every block followed by the column count of \p x
         \return List of matrices of the same type as \p x, one per block
 
+        \lang{python}
         \doctest
         >>> x = DM([[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]])
         >>> horzsplit(x, [0, 2, 5])
@@ -226,8 +235,10 @@ namespace casadi {
           ...
         RuntimeError: ...must start at 0, be nondecreasing and end at 5...
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = DM([1 2 3 4 5; 6 7 8 9 10]);
         >> v = horzsplit(x, [0, 2, 5]); disp(numel(v)), disp(v{1}), disp(v{2})
         2
@@ -240,6 +251,7 @@ namespace casadi {
         >> try, horzsplit(x, [0, 2]); catch e, disp(e.message); end
         ...must start at 0, be nondecreasing and end at 5...
         \enddoctest
+        \endlang
 
         \sa horzsplit_n, vertsplit, offset
 
@@ -261,6 +273,7 @@ namespace casadi {
         \param incr Number of columns per block, must be positive
         \return List of matrices of the same type as \p x
 
+        \lang{python}
         \doctest
         >>> horzsplit(SX.sym("x", 1, 3))
         [SX(x_0), SX(x_1), SX(x_2)]
@@ -273,8 +286,10 @@ namespace casadi {
         >>> horzsplit(MX.sym("x", 2, 0))
         []
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> v = horzsplit(SX.sym('x', 1, 3)); disp(numel(v)), disp(v{1}), disp(v{3})
         3
         x_0
@@ -292,6 +307,7 @@ namespace casadi {
         >> v = horzsplit(MX.sym('x', 2, 0)); disp(numel(v))
         0
         \enddoctest
+        \endlang
 
         \sa horzsplit_n, vertsplit
 
@@ -311,6 +327,7 @@ namespace casadi {
         \param n Number of blocks
         \return List of \p n matrices of the same type as \p x
 
+        \lang{python}
         \doctest
         >>> horzsplit_n(DM([[1, 2, 3, 4]]), 2)
         [DM([[1, 2]]), DM([[3, 4]])]
@@ -321,8 +338,10 @@ namespace casadi {
           ...
         RuntimeError: ...must be a multiple of n...
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> v = horzsplit_n(DM([1 2 3 4]), 2); disp(v{1}), disp(v{2})
         [[1, 2]]
         [[3, 4]]
@@ -332,6 +351,7 @@ namespace casadi {
         >> try, horzsplit_n(DM([1 2 3]), 2); catch e, disp(e.message); end
         ...must be a multiple of n...
         \enddoctest
+        \endlang
 
         \sa horzsplit, vertsplit_n
 
@@ -352,6 +372,7 @@ namespace casadi {
         \param offset Start row of every block followed by the row count of \p x
         \return List of matrices of the same type as \p x, one per block
 
+        \lang{python}
         \doctest
         >>> x = SX.sym("x", 5)
         >>> vertsplit(x, [0, 2, 5])
@@ -362,8 +383,10 @@ namespace casadi {
         >>> vertsplit(DM([[1, 2], [3, 4]]), [0, 1, 2])
         [DM([[1, 2]]), DM([[3, 4]])]
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x', 5);
         >> v = vertsplit(x, [0, 2, 5]); disp(numel(v)), disp(v{1}), disp(v{2})
         2
@@ -373,6 +396,7 @@ namespace casadi {
         [[1, 2]]
         [[3, 4]]
         \enddoctest
+        \endlang
 
         \sa vertsplit_n, horzsplit, offset
 
@@ -392,6 +416,7 @@ namespace casadi {
         \param vert True for row offsets, false for column offsets
         \return List of offsets of length len(v)+1
 
+        \lang{python}
         \doctest
         >>> offset([DM(2, 3), DM(4, 3)])
         [0, 2, 6]
@@ -400,6 +425,7 @@ namespace casadi {
         >>> offset([])
         [0]
         \enddoctest
+        \endlang
 
         \sa vertsplit, horzsplit
 
@@ -420,6 +446,7 @@ namespace casadi {
         \param incr Number of rows per block, must be positive
         \return List of matrices of the same type as \p x
 
+        \lang{python}
         \doctest
         >>> vertsplit(SX.sym("a", 4))
         [SX(a_0), SX(a_1), SX(a_2), SX(a_3)]
@@ -432,8 +459,10 @@ namespace casadi {
         >>> vertsplit(MX.sym("x", 0, 2))
         []
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> v = vertsplit(SX.sym('a', 4)); disp(numel(v)), disp(v{1}), disp(v{4})
         4
         a_0
@@ -450,6 +479,7 @@ namespace casadi {
         >> v = vertsplit(MX.sym('x', 0, 2)); disp(numel(v))
         0
         \enddoctest
+        \endlang
 
         \sa vertsplit_n, horzsplit
 
@@ -469,6 +499,7 @@ namespace casadi {
         \param n Number of blocks
         \return List of \p n matrices of the same type as \p x
 
+        \lang{python}
         \doctest
         >>> vertsplit_n(DM([1, 2, 3, 4]), 2)
         [DM([1, 2]), DM([3, 4])]
@@ -477,14 +508,17 @@ namespace casadi {
           ...
         RuntimeError: ...must be a multiple of n...
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> v = vertsplit_n(DM([1; 2; 3; 4]), 2); disp(v{1}), disp(v{2})
         [1, 2]
         [3, 4]
         >> try, vertsplit_n(DM([1; 2; 3]), 2); catch e, disp(e.message); end
         ...must be a multiple of n...
         \enddoctest
+        \endlang
 
         \sa vertsplit, horzsplit_n
 
@@ -504,6 +538,7 @@ namespace casadi {
         \param v List of block rows, each a list of matrices
         \return Matrix of the same type as the blocks
 
+        \lang{python}
         \doctest
         >>> blockcat([[DM(1), DM([[2, 3]])], [DM([4, 5]), DM.eye(2)]])
         DM(
@@ -514,8 +549,10 @@ namespace casadi {
         >>> blockcat([[a, b], [c, d]])
         MX(horzcat(horzcat(a, b)', horzcat(c, d)')')
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> blockcat({{DM(1), DM([2 3])}, {DM([4; 5]), DM.eye(2)}})
         [[1, 2, 3],
          [4, 1, 00],
@@ -526,6 +563,7 @@ namespace casadi {
         >> [a, b; c, d]
         horzcat(horzcat(a, b)', horzcat(c, d)')'
         \enddoctest
+        \endlang
 
         \sa horzcat, vertcat, blocksplit
 
@@ -538,18 +576,22 @@ namespace casadi {
 
         Shorthand for the two-by-two block layout [[A, B], [C, D]].
 
+        \lang{python}
         \doctest
         >>> blockcat(1, 2, 3, 4)
         DM(
         [[1, 2],
          [3, 4]])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> [DM(1), 2; 3, 4]
         [[1, 2],
          [3, 4]]
         \enddoctest
+        \endlang
 
         \identifier{3m} */
     inline friend MatType
@@ -569,6 +611,7 @@ namespace casadi {
         \param horz_offset Column boundaries of the block columns
         \return List of block rows, each a list of matrices of the same type as \p x
 
+        \lang{python}
         \doctest
         >>> x = DM([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
         >>> blocksplit(x, [0, 1, 3], [0, 2, 3])
@@ -576,8 +619,10 @@ namespace casadi {
         [[4, 5],
          [7, 8]]), DM([6, 9])]]
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = DM([1 2 3; 4 5 6; 7 8 9]);
         >> b = blocksplit(x, [0, 1, 3], [0, 2, 3]); disp(size(b)), disp(b{1}{1}), disp(b{2}{1})
         1 2
@@ -588,6 +633,7 @@ namespace casadi {
         3
         [6, 9]
         \enddoctest
+        \endlang
 
         \sa blockcat, vertsplit, horzsplit
 
@@ -610,6 +656,7 @@ namespace casadi {
         \param horz_incr Columns per block, must be positive
         \return List of block rows, each a list of matrices of the same type as \p x
 
+        \lang{python}
         \doctest
         >>> x = DM([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
         >>> blocksplit(x, 2, 2)
@@ -622,8 +669,10 @@ namespace casadi {
          [4, 5, 6],
          [7, 8, 9]])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = DM([1 2 3; 4 5 6; 7 8 9]);
         >> b = blocksplit(x, 2, 2); disp(b{1}{1}), disp(b{1}{2}), disp(b{2}{1}), disp(b{2}{2})
         [[1, 2],
@@ -636,6 +685,7 @@ namespace casadi {
          [4, 5, 6],
          [7, 8, 9]]
         \enddoctest
+        \endlang
 
         \sa blockcat
 
@@ -656,6 +706,7 @@ namespace casadi {
         \param A List of matrices of any shape
         \return Block-diagonal matrix of the same type as the blocks
 
+        \lang{python}
         \doctest
         >>> diagcat(DM.ones(1, 2), 3)
         DM(
@@ -671,8 +722,10 @@ namespace casadi {
         >>> diagcat().shape
         (0, 0)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> diagcat(DM.ones(1, 2), 3)
         [[1, 1, 00],
          [00, 00, 3]]
@@ -683,6 +736,7 @@ namespace casadi {
         >> diagcat(MX.sym('x'), MX.sym('y', 2, 2))
         diagcat(x, y)
         \enddoctest
+        \endlang
 
         \sa horzcat, vertcat, diagsplit
 
@@ -705,18 +759,22 @@ namespace casadi {
         \param output_offset2 Column boundaries of the blocks
         \return List of matrices of the same type as \p x, one per block
 
+        \lang{python}
         \doctest
         >>> x = DM([[1, 2, 0], [0, 0, 6]])
         >>> diagsplit(x, [0, 1, 2], [0, 2, 3])
         [DM([[1, 2]]), DM(6)]
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = DM([1 2 0; 0 0 6]);
         >> v = diagsplit(x, [0, 1, 2], [0, 2, 3]); disp(v{1}), disp(v{2})
         [[1, 2]]
         6
         \enddoctest
+        \endlang
 
         \sa diagcat
 
@@ -736,6 +794,7 @@ namespace casadi {
         \param x Square matrix (or Sparsity) to split
         \param output_offset Boundaries of the blocks
 
+        \lang{python}
         \doctest
         >>> x = DM([[1, 2, 0], [3, 4, 0], [0, 0, 5]])
         >>> diagsplit(x, [0, 2, 3])
@@ -747,8 +806,10 @@ namespace casadi {
           ...
         RuntimeError: ...must be square...
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = DM([1 2 0; 3 4 0; 0 0 5]);
         >> v = diagsplit(x, [0, 2, 3]); disp(v{1}), disp(v{2})
         [[1, 2],
@@ -757,6 +818,7 @@ namespace casadi {
         >> try, diagsplit(DM.ones(2, 3), [0, 2]); catch e, disp(e.message); end
         ...must be square...
         \enddoctest
+        \endlang
 
         \sa diagcat
 
@@ -777,6 +839,7 @@ namespace casadi {
         \param x Square matrix (or Sparsity) to split
         \param incr Size of each block, must be positive
 
+        \lang{python}
         \doctest
         >>> diagsplit(DM([[1, 0], [0, 4]]))
         [DM(1), DM(4)]
@@ -793,8 +856,10 @@ namespace casadi {
           ...
         RuntimeError: ...nonzeros outside the diagonal blocks...
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> v = diagsplit(DM([1 0; 0 4])); disp(v{1}), disp(v{2})
         1
         4
@@ -809,6 +874,7 @@ namespace casadi {
         >> try, diagsplit(MX.sym('x', 4, 4), 2); catch e, disp(e.message); end
         ...nonzeros outside the diagonal blocks...
         \enddoctest
+        \endlang
 
         \sa diagcat
 
@@ -827,16 +893,20 @@ namespace casadi {
         \param incr1 Rows per block, must be positive
         \param incr2 Columns per block, must be positive
 
+        \lang{python}
         \doctest
         >>> diagsplit(DM([[1, 2, 0, 0], [0, 0, 7, 8]]), 1, 2)
         [DM([[1, 2]]), DM([[7, 8]])]
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> v = diagsplit(DM([1 2 0 0; 0 0 7 8]), 1, 2); disp(v{1}), disp(v{2})
         [[1, 2]]
         [[7, 8]]
         \enddoctest
+        \endlang
 
         \sa diagcat
 
@@ -855,6 +925,7 @@ namespace casadi {
         \param x List of matrices of any shape
         \return Column vector of the same type as the arguments
 
+        \lang{python}
         \doctest
         >>> veccat(DM([[1, 2], [3, 4]]), 5)
         DM([1, 3, 2, 4, 5])
@@ -863,13 +934,16 @@ namespace casadi {
         >>> veccat().shape
         (0, 1)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> veccat(DM([1 2; 3 4]), 5)
         [1, 3, 2, 4, 5]
         >> veccat(MX.sym('x', 2, 2), MX.sym('y', 1, 3))
         vertcat(vec(x), y')
         \enddoctest
+        \endlang
 
         \sa vec, vertcat
 
@@ -906,6 +980,7 @@ namespace casadi {
         \param blas Name of the BLAS plugin for dense numeric products
         \return Matrix of size x.size1() by y.size2()
 
+        \lang{python}
         \doctest
         >>> A = DM([[1, 2], [3, 4]])
         >>> mtimes(A, A)
@@ -925,8 +1000,10 @@ namespace casadi {
           ...
         RuntimeError: ...incompatible dimensions...
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> A = DM([1 2; 3 4]);
         >> A * A
         [[7, 10],
@@ -939,6 +1016,7 @@ namespace casadi {
         >> try, A * DM.ones(3, 1); catch e, disp(e.message); end
         ...incompatible dimensions...
         \enddoctest
+        \endlang
 
         \sa mac, times, norm_0_mul
 
@@ -954,6 +1032,7 @@ namespace casadi {
         An empty list raises an error; a single matrix is returned as is.
         See the 2-arg `mtimes` for the meaning of `blas`.
 
+        \lang{python}
         \doctest
         >>> mtimes([DM([[1, 2]]), DM([[1, 0], [0, 2]]), DM([1, 1])])
         DM(5)
@@ -962,6 +1041,7 @@ namespace casadi {
           ...
         RuntimeError: ...must not be empty...
         \enddoctest
+        \endlang
 
         \identifier{3w} */
     inline friend MatType mtimes(const std::vector<MatType> &args,
@@ -985,6 +1065,7 @@ namespace casadi {
         \param z Matrix to add to; its sparsity pattern selects the computed entries
         \return Matrix with the sparsity pattern of \p z
 
+        \lang{python}
         \doctest
         >>> A = DM([[1, 2], [3, 4]])
         >>> mac(A, A, DM.eye(2))
@@ -998,8 +1079,10 @@ namespace casadi {
         >>> mac(MX.sym("x", 2, 3), MX.sym("y", 3, 2), MX.sym("z", Sparsity.diag(2)))
         MX(mac(x,y,z))
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> A = DM([1 2; 3 4]);
         >> mac(A, A, DM.eye(2))
         [[8, 00],
@@ -1010,6 +1093,7 @@ namespace casadi {
         >> mac(MX.sym('x', 2, 3), MX.sym('y', 3, 2), MX.sym('z', Sparsity.diag(2)))
         mac(x,y,z)
         \enddoctest
+        \endlang
 
         \sa mtimes
 
@@ -1024,6 +1108,7 @@ namespace casadi {
 
         Returns the transpose of \p X; the sparsity pattern is transposed along. Same as X.T().
 
+        \lang{python}
         \doctest
         >>> transpose(DM([[1, 2, 3]]))
         DM([1, 2, 3])
@@ -1032,8 +1117,10 @@ namespace casadi {
         >>> transpose(Sparsity.lower(2)) == Sparsity.upper(2)
         True
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> DM([1 2 3])'
         [1, 2, 3]
         >> MX.sym('x', 2, 3)'
@@ -1041,6 +1128,7 @@ namespace casadi {
         >> transpose(Sparsity.lower(2)) == Sparsity.upper(2)
         1
         \enddoctest
+        \endlang
 
         \identifier{3y} */
     inline friend MatType transpose(const MatType& X) {
@@ -1063,6 +1151,7 @@ namespace casadi {
         c \n
         d \n
 
+        \lang{python}
         \doctest
         >>> vec(DM([[1, 2], [3, 4]]))
         DM([1, 3, 2, 4])
@@ -1071,8 +1160,10 @@ namespace casadi {
         >>> vec(MX.sym("x", 1, 3))
         MX(x')
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> vec(DM([1 2; 3 4]))
         [1, 3, 2, 4]
         >> vec(DM.eye(2))
@@ -1080,6 +1171,7 @@ namespace casadi {
         >> vec(MX.sym('x', 1, 3))
         x'
         \enddoctest
+        \endlang
 
         \sa veccat, reshape
 
@@ -1100,6 +1192,7 @@ namespace casadi {
         \param nrow Number of rows of the result, or -1
         \param ncol Number of columns of the result, or -1
 
+        \lang{python}
         \doctest
         >>> x = DM([[1, 2, 3], [4, 5, 6]])
         >>> reshape(x, 3, 2)
@@ -1118,8 +1211,10 @@ namespace casadi {
           ...
         RuntimeError: ...number of elements must remain the same...
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = DM([1 2 3; 4 5 6]);
         >> reshape(x, 3, 2)
         [[1, 5],
@@ -1134,6 +1229,7 @@ namespace casadi {
         >> try, reshape(x, 4, 2); catch e, disp(e.message); end
         ...number of elements must remain the same...
         \enddoctest
+        \endlang
 
         \sa vec, sparsity_cast, transpose
 
@@ -1146,18 +1242,22 @@ namespace casadi {
 
         Same as reshape(x, rc[0], rc[1]).
 
+        \lang{python}
         \doctest
         >>> reshape(DM([1, 2, 3, 4]), (2, 2))
         DM(
         [[1, 3],
          [2, 4]])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> reshape(DM([1; 2; 3; 4]), [2, 2])
         [[1, 3],
          [2, 4]]
         \enddoctest
+        \endlang
 
         \identifier{41} */
     inline friend MatType reshape(const MatType& x, std::pair<casadi_int, casadi_int> rc) {
@@ -1170,6 +1270,7 @@ namespace casadi {
         nonzeros in column-major order), otherwise an error is raised. Useful when the target
         pattern is already available, e.g. to undo a vec.
 
+        \lang{python}
         \doctest
         >>> reshape(SX.sym("x", 2, 2), Sparsity.dense(4, 1))
         SX([x_0, x_1, x_2, x_3])
@@ -1178,14 +1279,17 @@ namespace casadi {
           ...
         RuntimeError: ...Reshape mismatch...
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> reshape(SX.sym('x', 2, 2), Sparsity.dense(4, 1))
         [x_0, x_1, x_2, x_3]
         >> x = MX.sym('x', Sparsity.diag(2));
         >> try, reshape(x, Sparsity.dense(4, 1)); catch e, disp(e.message); end
         ...Reshape mismatch...
         \enddoctest
+        \endlang
 
         \sa sparsity_cast
 
@@ -1205,6 +1309,7 @@ namespace casadi {
         \param sp Target pattern with x.nnz() nonzeros
         \return Matrix of the same type as \p x with pattern \p sp
 
+        \lang{python}
         \doctest
         >>> sparsity_cast(DM([[1, 2], [3, 4]]), Sparsity.dense(1, 4))
         DM([[1, 3, 2, 4]])
@@ -1217,8 +1322,10 @@ namespace casadi {
           ...
         RuntimeError: ...Mismatching nonzero count...
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> sparsity_cast(DM([1 2; 3 4]), Sparsity.dense(1, 4))
         [[1, 3, 2, 4]]
         >> sparsity_cast(DM.eye(3), Sparsity.dense(3, 1))
@@ -1229,6 +1336,7 @@ namespace casadi {
         >> try, sparsity_cast(x, Sparsity.dense(3, 1)); catch e, disp(e.message); end
         ...Mismatching nonzero count...
         \enddoctest
+        \endlang
 
         \sa reshape
 
@@ -1247,6 +1355,7 @@ namespace casadi {
         \param x Matrix (or Sparsity); only x.sparsity() is used
         \return Structural rank, at most min(size1, size2)
 
+        \lang{python}
         \doctest
         >>> sprank(Sparsity.diag(3))
         3
@@ -1257,8 +1366,10 @@ namespace casadi {
         >>> sprank(DM(2, 3))
         0
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> sprank(Sparsity.diag(3))
         3
         >> sprank(Sparsity.triplet(3, 3, [0, 1, 2], [0, 0, 0]))
@@ -1268,6 +1379,7 @@ namespace casadi {
         >> sprank(DM(2, 3))
         0
         \enddoctest
+        \endlang
 
         \identifier{43} */
     inline friend casadi_int sprank(const MatType& x) {
@@ -1280,6 +1392,7 @@ namespace casadi {
         patterns without forming the product. The inner dimensions must match, otherwise an
         error is raised.
 
+        \lang{python}
         \doctest
         >>> norm_0_mul(DM.eye(3), DM.ones(3, 2))
         6
@@ -1290,8 +1403,10 @@ namespace casadi {
           ...
         RuntimeError: ...Dimension error...
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> norm_0_mul(DM.eye(3), DM.ones(3, 2))
         6
         >> norm_0_mul(Sparsity.diag(3), Sparsity.diag(3))
@@ -1299,6 +1414,7 @@ namespace casadi {
         >> try, norm_0_mul(DM.ones(2, 3), DM.ones(2, 3)); catch e, disp(e.message); end
         ...Dimension error...
         \enddoctest
+        \endlang
 
         \sa mtimes
 
@@ -1315,6 +1431,7 @@ namespace casadi {
         \param x Matrix (or Sparsity); any shape
         \param includeDiagonal False to drop the diagonal as well
 
+        \lang{python}
         \doctest
         >>> x = DM([[1, 2, 3], [4, 5, 6]])
         >>> triu(x)
@@ -1328,8 +1445,10 @@ namespace casadi {
         >>> triu(MX.sym("x", 2, 2))
         MX(project(x))
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = DM([1 2 3; 4 5 6]);
         >> triu(x)
         [[1, 2, 3],
@@ -1340,6 +1459,7 @@ namespace casadi {
         >> triu(MX.sym('x', 2, 2))
         project(x)
         \enddoctest
+        \endlang
 
         \sa tril
 
@@ -1355,6 +1475,7 @@ namespace casadi {
         \param x Matrix (or Sparsity); any shape
         \param includeDiagonal False to drop the diagonal as well
 
+        \lang{python}
         \doctest
         >>> x = DM([[1, 2, 3], [4, 5, 6]])
         >>> tril(x)
@@ -1366,8 +1487,10 @@ namespace casadi {
         [[00, 00, 00],
          [4, 00, 00]])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = DM([1 2 3; 4 5 6]);
         >> tril(x)
         [[1, 00, 00],
@@ -1376,6 +1499,7 @@ namespace casadi {
         [[00, 00, 00],
          [4, 00, 00]]
         \enddoctest
+        \endlang
 
         \sa triu
 
@@ -1390,6 +1514,7 @@ namespace casadi {
         The result is a.size1()*b.size1() by a.size2()*b.size2() with the Kronecker product of
         the sparsity patterns.
 
+        \lang{python}
         \doctest
         >>> kron(DM([[1, 2]]), DM([[1], [10]]))
         DM(
@@ -1404,8 +1529,10 @@ namespace casadi {
         >>> kron(MX.sym("a", 2, 2), MX.sym("b", 1, 2)).shape
         (2, 4)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> kron(DM([1 2]), DM([1; 10]))
         [[1, 2],
          [10, 20]]
@@ -1417,6 +1544,7 @@ namespace casadi {
         >> size(kron(MX.sym('a', 2, 2), MX.sym('b', 1, 2)))
         2 4
         \enddoctest
+        \endlang
 
         \identifier{47} */
     inline friend MatType kron(const MatType& a, const MatType& b) {
@@ -1433,6 +1561,7 @@ namespace casadi {
         \param n Number of vertical repetitions, non-negative
         \param m Number of horizontal repetitions, non-negative
 
+        \lang{python}
         \doctest
         >>> repmat(DM([[1, 2]]), 2, 2)
         DM(
@@ -1449,8 +1578,10 @@ namespace casadi {
         >>> repmat(DM.ones(2, 3), 0, 2).shape
         (0, 6)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> repmat(DM([1 2]), 2, 2)
         [[1, 2, 1, 2],
          [1, 2, 1, 2]]
@@ -1464,6 +1595,7 @@ namespace casadi {
         >> size(repmat(DM.ones(2, 3), 0, 2))
         0 6
         \enddoctest
+        \endlang
 
         \identifier{48} */
     inline friend MatType repmat(const MatType &A, casadi_int n, casadi_int m=1) {
@@ -1474,15 +1606,19 @@ namespace casadi {
 
         Same as repmat(A, rc[0], rc[1]).
 
+        \lang{python}
         \doctest
         >>> repmat(DM(7), (1, 3))
         DM([[7, 7, 7]])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> repmat(DM(7), [1, 3])
         [[7, 7, 7]]
         \enddoctest
+        \endlang
 
         \identifier{49} */
     inline friend MatType repmat(const MatType &A, const std::pair<casadi_int, casadi_int>& rc) {
@@ -1639,6 +1775,7 @@ namespace casadi {
         product ones(1, size1) * x, so it is a mtimes node for MX. A column of structural zeros
         sums to a structural zero. For Sparsity only the pattern is computed.
 
+        \lang{python}
         \doctest
         >>> sum1(DM([[1, 2, 3], [4, 5, 6]]))
         DM([[5, 7, 9]])
@@ -1649,8 +1786,10 @@ namespace casadi {
         >>> sum1(DM(0, 3))
         DM([[00, 00, 00]])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> sum1(DM([1 2 3; 4 5 6]))
         [[5, 7, 9]]
         >> sum(DM([1 2 3; 4 5 6]), 1)
@@ -1662,6 +1801,7 @@ namespace casadi {
         >> sum1(DM(0, 3))
         [[00, 00, 00]]
         \enddoctest
+        \endlang
 
         \sa sum2, sum
 
@@ -1673,6 +1813,7 @@ namespace casadi {
         Returns a column vector with the sum over the columns, as MATLAB sum(x, 2); implemented
         as the product x * ones(size2, 1). A row of structural zeros sums to a structural zero.
 
+        \lang{python}
         \doctest
         >>> sum2(DM([[1, 2, 3], [4, 5, 6]]))
         DM([6, 15])
@@ -1681,8 +1822,10 @@ namespace casadi {
         >>> sum2(DM(3, 3))
         DM([00, 00, 00])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> sum2(DM([1 2 3; 4 5 6]))
         [6, 15]
         >> sum(DM([1 2 3; 4 5 6]), 2)
@@ -1692,6 +1835,7 @@ namespace casadi {
         >> sum2(DM(3, 3))
         [00, 00, 00]
         \enddoctest
+        \endlang
 
         \sa sum1, sum
 
@@ -1704,6 +1848,7 @@ namespace casadi {
         matrix sums to a structural zero. The Python function also accepts an axis argument:
         sum(x, 0) is sum1(x) and sum(x, 1) is sum2(x).
 
+        \lang{python}
         \doctest
         >>> sum(DM([[1, 2, 3], [4, 5, 6]]))
         DM(21)
@@ -1714,8 +1859,10 @@ namespace casadi {
         >>> sum(DM(3, 0))
         DM(00)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> sum(DM([1 2 3; 4 5 6]), 'all')
         21
         >> sum(DM([1 2 3; 4 5 6]))
@@ -1725,6 +1872,7 @@ namespace casadi {
         >> sum(DM(3, 0), 'all')
         00
         \enddoctest
+        \endlang
 
         \sa sum1, sum2
 

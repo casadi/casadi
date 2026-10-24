@@ -76,6 +76,7 @@ class DaeBuilderInternal;
     (named `der(x)`, `__alg__0`, `__assign__..`, `__when__0`, ...) are created as equations
     are added; they show up in `all()`.
 
+    \lang{python}
     \doctest
     >>> dae = DaeBuilder("rocket")
     >>> a = dae.add("a", "parameter", "tunable")
@@ -94,8 +95,10 @@ class DaeBuilderInternal;
     >>> f([0, 0, 1], 1, 0.5)
     DM([0, -8.81, -1])
     \enddoctest
+    \endlang
 
-    \doctest{matlab}
+    \lang{matlab}
+    \doctest
     >> dae = DaeBuilder('rocket');
     >> a = dae.add('a', 'parameter', 'tunable'); u = dae.add('u', 'input');
     >> h = dae.add('h', struct('start', 0)); v = dae.add('v', struct('start', 0, 'unit', 'm/s'));
@@ -113,6 +116,7 @@ class DaeBuilderInternal;
     >> f([0; 0; 1], 1, 0.5)
     [0, -8.81, -1]
     \enddoctest
+    \endlang
 
     \date 2012-2021
     \author Joel Andersson
@@ -160,6 +164,7 @@ class CASADI_EXPORT DaeBuilder
         - `"enable_ls_serialization"` (bool, true): honour the serialization layered
           standard of an FMU
 
+      \lang{python}
       \doctest
       >>> dae = DaeBuilder("rocket")
       >>> dae.name(), dae.symbolic(), dae.all()
@@ -175,8 +180,10 @@ class CASADI_EXPORT DaeBuilder
       ...   print("No such option" in str(e))
       True
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> dae = DaeBuilder('rocket');
       >> dae.name(), isempty(dae.all())
       rocket
@@ -188,6 +195,7 @@ class CASADI_EXPORT DaeBuilder
       >> contains(msg, 'No such option')
       1
       \enddoctest
+      \endlang
 
       \sa load_fmi_description, symbolic
 
@@ -197,6 +205,7 @@ class CASADI_EXPORT DaeBuilder
 
   /** \brief Name of instance
 
+      \lang{python}
       \doctest
       >>> dae = DaeBuilder("rocket")
       >>> dae.name()
@@ -204,14 +213,17 @@ class CASADI_EXPORT DaeBuilder
       >>> dae.create()
       Function(rocket_dae:(t[0],x[0],z[0],p[0],u[0])->(ode[0],alg[0],quad[0],zero[0]) MXFunction)
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> dae = DaeBuilder('rocket');
       >> dae.name()
       rocket
       >> dae.create()
       rocket_dae:(t[0],x[0],z[0],p[0],u[0])->(ode[0],alg[0],quad[0],zero[0]) MXFunction
       \enddoctest
+      \endlang
 
       \identifier{5d} */
   const std::string& name() const;
@@ -225,6 +237,7 @@ class CASADI_EXPORT DaeBuilder
       is raised. Without an explicit declaration a hidden variable named `"time"` exists in
       `all()` but is not categorized as `t`.
 
+      \lang{python}
       \doctest
       >>> dae = DaeBuilder("m")
       >>> t = dae.add("t", "independent")
@@ -241,8 +254,10 @@ class CASADI_EXPORT DaeBuilder
       ...   print("No explicit time variable" in str(e))
       True
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> dae = DaeBuilder('m'); t = dae.add('t', 'independent'); x = dae.add('x');
       >> dae.time(), dae.has_t(), dae.t_new()
       t
@@ -257,6 +272,7 @@ class CASADI_EXPORT DaeBuilder
       >> try, dae.time(); catch e, disp(contains(e.message, 'No explicit time variable')); end
       1
       \enddoctest
+      \endlang
 
       \sa has_t, t_new
 
@@ -279,6 +295,7 @@ class CASADI_EXPORT DaeBuilder
       A continuous variable becomes a differential state once its time derivative is given
       a defining equation with `eq`; it is an algebraic variable `z` before that.
 
+      \lang{python}
       \doctest
       >>> dae = DaeBuilder("m")
       >>> x = dae.add("x")
@@ -289,8 +306,10 @@ class CASADI_EXPORT DaeBuilder
       >>> dae.x(), dae.z(), dae.nx()
       (['x'], ['y'], 1)
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> dae = DaeBuilder('m'); x = dae.add('x'); y = dae.add('y');
       >> isempty(dae.x()), dae.z()
       1
@@ -302,6 +321,7 @@ class CASADI_EXPORT DaeBuilder
       y
       1
       \enddoctest
+      \endlang
 
       \sa z, q, nx, all, inputs
 
@@ -314,6 +334,7 @@ class CASADI_EXPORT DaeBuilder
       `all("y")`. Outputs are also members of another category (`x`, `w`, `z`, ...);
       `outputs("y")` gives their expressions.
 
+      \lang{python}
       \doctest
       >>> dae = DaeBuilder("m")
       >>> x = dae.add("x", "output")
@@ -330,8 +351,10 @@ class CASADI_EXPORT DaeBuilder
       >>> dae.y(), dae.ny()
       (['x'], 1)
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> dae = DaeBuilder('m'); x = dae.add('x', 'output'); y = dae.add('y', 'output');
       >> w = dae.add('w');
       >> dae.eq(dae.der(x), -w); dae.eq(w, x^2); dae.eq(y, 2*x);
@@ -351,6 +374,7 @@ class CASADI_EXPORT DaeBuilder
       x
       1
       \enddoctest
+      \endlang
 
       \sa set_causality, set_all, ny, outputs
 
@@ -375,6 +399,7 @@ class CASADI_EXPORT DaeBuilder
       `set_category(name, "q")` or automatically with the constructor option
       `"detect_quad"`.
 
+      \lang{python}
       \doctest
       >>> dae = DaeBuilder("m")
       >>> x = dae.add("x")
@@ -387,8 +412,10 @@ class CASADI_EXPORT DaeBuilder
       >>> dae.x(), dae.q(), dae.outputs("quad")
       (['x'], ['q'], [MX(sq(x))])
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> dae = DaeBuilder('m'); x = dae.add('x'); q = dae.add('q');
       >> dae.eq(dae.der(x), -x); dae.eq(dae.der(q), x^2);
       >> dae.x(), isempty(dae.q())
@@ -401,6 +428,7 @@ class CASADI_EXPORT DaeBuilder
       q
       sq(x)
       \enddoctest
+      \endlang
 
       \sa set_category, x, nq
 
@@ -416,6 +444,7 @@ class CASADI_EXPORT DaeBuilder
       \return List of (column vector) expressions, one per variable; empty when the
         category is empty
 
+      \lang{python}
       \doctest
       >>> dae = DaeBuilder("m")
       >>> x = dae.add("x")
@@ -431,8 +460,10 @@ class CASADI_EXPORT DaeBuilder
       ...   print("not an input category" in str(e))
       True
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> dae = DaeBuilder('m'); x = dae.add('x'); z = dae.add('z'); u = dae.add('u', 'input');
       >> dae.eq(dae.der(x), -x + z*u); dae.eq(0, x - 2*z);
       >> cellfun(@disp, dae.inputs('x')), cellfun(@disp, dae.inputs('z'))
@@ -444,6 +475,7 @@ class CASADI_EXPORT DaeBuilder
       >> try, dae.inputs('ode'); catch e, disp(contains(e.message, 'not an input category')); end
       1
       \enddoctest
+      \endlang
 
       \sa outputs, var, all
 
@@ -461,6 +493,7 @@ class CASADI_EXPORT DaeBuilder
       \param cat One of the output categories above; an input category is an error
       \return List of expressions, empty when the category is empty
 
+      \lang{python}
       \doctest
       >>> dae = DaeBuilder("m")
       >>> x = dae.add("x")
@@ -476,8 +509,10 @@ class CASADI_EXPORT DaeBuilder
       ...   print("No input category" in str(e))
       True
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> dae = DaeBuilder('m'); x = dae.add('x'); z = dae.add('z'); u = dae.add('u', 'input');
       >> dae.eq(dae.der(x), -x + z*u); dae.eq(0, x - 2*z);
       >> cellfun(@disp, dae.outputs('ode')), cellfun(@disp, dae.outputs('alg'))
@@ -488,6 +523,7 @@ class CASADI_EXPORT DaeBuilder
       >> try, dae.outputs('x'); catch e, disp(contains(e.message, 'No input category')); end
       1
       \enddoctest
+      \endlang
 
       \sa inputs, wdef, ddef, create
 
@@ -529,6 +565,7 @@ class CASADI_EXPORT DaeBuilder
       Names of the variables of category `p` (causality `"parameter"`, variability
       `"tunable"`, floating-point type), in category order. Equivalent to `all("p")`.
 
+      \lang{python}
       \doctest
       >>> dae = DaeBuilder("m")
       >>> p = dae.add("p", "parameter", "tunable")
@@ -537,8 +574,10 @@ class CASADI_EXPORT DaeBuilder
       >>> dae.p(), dae.c(), dae.u()
       (['p'], ['c'], ['u'])
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> dae = DaeBuilder('m'); p = dae.add('p', 'parameter', 'tunable');
       >> c = dae.add('c', 'parameter', 'fixed'); u = dae.add('u', 'input');
       >> dae.p(), dae.c(), dae.u()
@@ -546,6 +585,7 @@ class CASADI_EXPORT DaeBuilder
       c
       u
       \enddoctest
+      \endlang
 
       \sa c, u, np, set_variability
 
@@ -604,6 +644,7 @@ class CASADI_EXPORT DaeBuilder
       `eq(v, expr)`; the derivative variables `der(x)` of the states are dependent variables
       too.
 
+      \lang{python}
       \doctest
       >>> dae = DaeBuilder("m")
       >>> x = dae.add("x")
@@ -615,8 +656,10 @@ class CASADI_EXPORT DaeBuilder
       >>> dae.wdef()
       [MX(sin(x)), MX((-w))]
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> dae = DaeBuilder('m'); x = dae.add('x'); w = dae.add('w');
       >> dae.eq(w, sin(x)); dae.eq(dae.der(x), -w);
       >> dae.w()
@@ -626,6 +669,7 @@ class CASADI_EXPORT DaeBuilder
       sin(x)
       (-w)
       \enddoctest
+      \endlang
 
       \sa wdef, dependent_fun, eliminate, nw
 
@@ -648,6 +692,7 @@ class CASADI_EXPORT DaeBuilder
       The variable expressions that have an initial equation, in the order the equations
       were set with `set_init`; `init_rhs()` holds the matching right-hand sides.
 
+      \lang{python}
       \doctest
       >>> dae = DaeBuilder("m")
       >>> x = dae.add("x")
@@ -657,14 +702,17 @@ class CASADI_EXPORT DaeBuilder
       >>> dae.init_lhs(), dae.init_rhs()
       ([MX(x)], [MX((2.*p))])
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> dae = DaeBuilder('m'); x = dae.add('x'); p = dae.add('p', 'parameter', 'tunable');
       >> dae.eq(dae.der(x), -x); dae.set_init('x', 2*p);
       >> cellfun(@disp, dae.init_lhs()), cellfun(@disp, dae.init_rhs())
       x
       (2.*p)
       \enddoctest
+      \endlang
 
       \sa init_rhs, set_init
 
@@ -716,6 +764,7 @@ class CASADI_EXPORT DaeBuilder
       Number of variables of category `x`, i.e. the length of `x()`. Vector-valued
       variables count once.
 
+      \lang{python}
       \doctest
       >>> dae = DaeBuilder("m")
       >>> pos = dae.add("pos", dict(dimension=[3]))
@@ -723,14 +772,17 @@ class CASADI_EXPORT DaeBuilder
       >>> dae.nx(), dae.create()
       (1, Function(m_dae:(t[0],x[3],z[0],p[0],u[0])->(ode[3],alg[0],quad[0],zero[0]) MXFunction))
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> dae = DaeBuilder('m'); pos = dae.add('pos', struct('dimension', 3));
       >> dae.eq(dae.der(pos), -pos);
       >> dae.nx(), dae.create()
       1
       m_dae:(t[0],x[3],z[0],p[0],u[0])->(ode[3],alg[0],quad[0],zero[0]) MXFunction
       \enddoctest
+      \endlang
 
       \sa x
 
@@ -862,6 +914,7 @@ class CASADI_EXPORT DaeBuilder
         - `"description"`, `"unit"`, `"display_unit"` (string): meta data
       \return Symbolic expression of the new variable, named like the variable
 
+      \lang{python}
       \doctest
       >>> dae = DaeBuilder("m")
       >>> x = dae.add("x")
@@ -887,8 +940,10 @@ class CASADI_EXPORT DaeBuilder
       ...   print("requires 'fixed' or 'tunable'" in str(e))
       True
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> dae = DaeBuilder('m'); x = dae.add('x');
       >> x, size(x), dae.category('x'), dae.causality('x')
       x
@@ -917,6 +972,7 @@ class CASADI_EXPORT DaeBuilder
       >> contains(msg, 'requires ''fixed'' or ''tunable''')
       1
       \enddoctest
+      \endlang
 
       \sa eq, der, var, category, set_category
 
@@ -984,6 +1040,7 @@ class CASADI_EXPORT DaeBuilder
         after broadcasting
       \param opts Must be empty
 
+      \lang{python}
       \doctest
       >>> dae = DaeBuilder("m")
       >>> x = dae.add("x")
@@ -1015,8 +1072,10 @@ class CASADI_EXPORT DaeBuilder
       ...   print("Mismatched dimensions" in str(e))
       True
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> dae = DaeBuilder('m'); x = dae.add('x'); y = dae.add('y');
       >> z = dae.add('z'); w = dae.add('w');
       >> isempty(dae.x()), dae.z(), isempty(dae.w())
@@ -1059,6 +1118,7 @@ class CASADI_EXPORT DaeBuilder
       >> contains(msg, 'Mismatched dimensions')
       1
       \enddoctest
+      \endlang
 
       \sa der, when, set_init, add
 
@@ -1077,6 +1137,7 @@ class CASADI_EXPORT DaeBuilder
       \param eqs Names returned by `reinit` or `assign`; may be empty
       \param opts Must be empty
 
+      \lang{python}
       \doctest
       >>> dae = DaeBuilder("ball")
       >>> h = dae.add("h", dict(start=5))
@@ -1097,8 +1158,10 @@ class CASADI_EXPORT DaeBuilder
       ...   print("Only strict inequality" in str(e))
       True
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> dae = DaeBuilder('ball');
       >> h = dae.add('h', struct('start', 5)); v = dae.add('v', struct('start', 0));
       >> dae.eq(dae.der(h), v); dae.eq(dae.der(v), -9.81);
@@ -1115,6 +1178,7 @@ class CASADI_EXPORT DaeBuilder
       >> contains(msg, 'Only strict inequality')
       1
       \enddoctest
+      \endlang
 
       \sa reinit, assign, transition, nzero
 
@@ -1132,6 +1196,7 @@ class CASADI_EXPORT DaeBuilder
       \param val Expression in model variables
       \return Name of the created assignment variable, e.g. `__assign__b__`
 
+      \lang{python}
       \doctest
       >>> dae = DaeBuilder("m")
       >>> x = dae.add("x", dict(start=0))
@@ -1154,8 +1219,10 @@ class CASADI_EXPORT DaeBuilder
         when (1-x) < 0 :
           b := 1
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> dae = DaeBuilder('m'); x = dae.add('x', struct('start', 0));
       >> b = dae.add('b', struct('type', 'Boolean', 'start', false));
       >> dae.eq(dae.der(x), 1);
@@ -1176,6 +1243,7 @@ class CASADI_EXPORT DaeBuilder
         when (1-x) < 0 :
           b := 1
       \enddoctest
+      \endlang
 
       \sa when, reinit
 
@@ -1192,6 +1260,7 @@ class CASADI_EXPORT DaeBuilder
       \param val Expression in model variables
       \return Name of the created variable, e.g. `__reinit__v__0`
 
+      \lang{python}
       \doctest
       >>> dae = DaeBuilder("ball")
       >>> h = dae.add("h", dict(start=5))
@@ -1205,8 +1274,10 @@ class CASADI_EXPORT DaeBuilder
       >>> dae.nzero()
       1
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> dae = DaeBuilder('ball');
       >> h = dae.add('h', struct('start', 5)); v = dae.add('v', struct('start', 0));
       >> dae.eq(dae.der(h), v); dae.eq(dae.der(v), -9.81);
@@ -1216,6 +1287,7 @@ class CASADI_EXPORT DaeBuilder
       >> dae.when(h < 0, {r}); disp(dae.nzero())
       1
       \enddoctest
+      \endlang
 
       \sa when, assign, pre
 
@@ -1230,6 +1302,7 @@ class CASADI_EXPORT DaeBuilder
       \param name Model variable
       \param init_rhs Expression in model variables, or an empty expression to remove
 
+      \lang{python}
       \doctest
       >>> dae = DaeBuilder("m")
       >>> x = dae.add("x")
@@ -1244,8 +1317,10 @@ class CASADI_EXPORT DaeBuilder
       >>> dae.init_lhs(), dae.init_rhs()
       ([], [])
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> dae = DaeBuilder('m'); x = dae.add('x'); p = dae.add('p', 'parameter', 'tunable');
       >> dae.eq(dae.der(x), -x);
       >> numel(dae.init_lhs()), numel(dae.init_rhs())
@@ -1260,6 +1335,7 @@ class CASADI_EXPORT DaeBuilder
       0
       0
       \enddoctest
+      \endlang
 
       \sa init_lhs, init_rhs
 
@@ -1271,15 +1347,19 @@ class CASADI_EXPORT DaeBuilder
       Raises an error if there is more than one independent variable or if it is not
       scalar. Called by `disp` with `more` set and by `add_lc`.
 
+      \lang{python}
       \doctest
       >>> dae = DaeBuilder("m")
       >>> dae.sanity_check()
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> dae = DaeBuilder('m');
       >> dae.sanity_check()
       \enddoctest
+      \endlang
 
       \identifier{2ky} */
   void sanity_check() const;
@@ -1294,6 +1374,7 @@ class CASADI_EXPORT DaeBuilder
       \param cat Category name, e.g. `"x"`
       \param v All current members of the category, in the new order
 
+      \lang{python}
       \doctest
       >>> dae = DaeBuilder("m")
       >>> x = dae.add("x")
@@ -1311,8 +1392,10 @@ class CASADI_EXPORT DaeBuilder
       ...   print("1 elements provided for 2 components" in str(e))
       True
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> dae = DaeBuilder('m'); x = dae.add('x'); y = dae.add('y');
       >> dae.eq(dae.der(x), -y); dae.eq(dae.der(y), x);
       >> disp(dae.x()), cellfun(@disp, dae.outputs('ode'))
@@ -1330,6 +1413,7 @@ class CASADI_EXPORT DaeBuilder
       >> contains(msg, '1 elements provided for 2 components')
       1
       \enddoctest
+      \endlang
 
       \sa set_all, all
 
@@ -1354,6 +1438,7 @@ class CASADI_EXPORT DaeBuilder
       \param v Category name
       \param name Variables that should form the category, in order
 
+      \lang{python}
       \doctest
       >>> dae = DaeBuilder("m")
       >>> x = dae.add("x")
@@ -1375,8 +1460,10 @@ class CASADI_EXPORT DaeBuilder
       ...   print("Duplicate names" in str(e))
       True
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> dae = DaeBuilder('m'); x = dae.add('x'); u1 = dae.add('u1', 'input');
       >> p1 = dae.add('p1', 'parameter', 'tunable');
       >> dae.eq(dae.der(x), -x + u1*p1);
@@ -1398,6 +1485,7 @@ class CASADI_EXPORT DaeBuilder
       >> contains(msg, 'Duplicate names')
       1
       \enddoctest
+      \endlang
 
       \sa reorder, set_category, set_causality
 
@@ -1419,6 +1507,7 @@ class CASADI_EXPORT DaeBuilder
 
       \param cat `"c"`, `"d"`, `"w"` or `"q"`
 
+      \lang{python}
       \doctest
       >>> dae = DaeBuilder("m")
       >>> x = dae.add("x")
@@ -1436,8 +1525,10 @@ class CASADI_EXPORT DaeBuilder
       ...   print("Elimination not supported" in str(e))
       True
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> dae = DaeBuilder('m'); x = dae.add('x'); w1 = dae.add('w1'); w2 = dae.add('w2');
       >> dae.eq(w2, w1^2); dae.eq(w1, 2*x); dae.eq(dae.der(x), -w2);
       >> dae.eliminate('w');
@@ -1449,6 +1540,7 @@ class CASADI_EXPORT DaeBuilder
       >> contains(msg, 'Elimination not supported')
       1
       \enddoctest
+      \endlang
 
       \sa sort, dependent_fun, lift
 
@@ -1464,6 +1556,7 @@ class CASADI_EXPORT DaeBuilder
 
       \param cat `"c"`, `"d"` or `"w"`
 
+      \lang{python}
       \doctest
       >>> dae = DaeBuilder("m")
       >>> x = dae.add("x")
@@ -1478,8 +1571,10 @@ class CASADI_EXPORT DaeBuilder
       >>> dae.w(), dae.wdef()
       (['w1', 'w2', 'der(x)'], [MX((2.*x)), MX(sq(w1)), MX((-w2))])
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> dae = DaeBuilder('m'); x = dae.add('x'); w1 = dae.add('w1'); w2 = dae.add('w2');
       >> dae.eq(w2, w1^2); dae.eq(w1, 2*x); dae.eq(dae.der(x), -w2);
       >> disp(dae.w()), cellfun(@disp, dae.wdef())
@@ -1498,6 +1593,7 @@ class CASADI_EXPORT DaeBuilder
       sq(w1)
       (-w2)
       \enddoctest
+      \endlang
 
       \sa eliminate, reorder
 
@@ -1517,6 +1613,7 @@ class CASADI_EXPORT DaeBuilder
       \param lift_shared Lift subexpressions that are used more than once
       \param lift_calls Lift calls to embedded Function objects, including their arguments
 
+      \lang{python}
       \doctest
       >>> a = MX.sym("a")
       >>> F = Function("F", [a], [sin(a) + a**2])
@@ -1535,8 +1632,10 @@ class CASADI_EXPORT DaeBuilder
       >>> dae.create("f", ["z", "w"], ["alg", "wdef"])
       Function(f:(z[2],w[5])->(alg[2],wdef[5]) MXFunction)
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> a = MX.sym('a'); F = Function('F', {a}, {sin(a) + a^2});
       >> dae = DaeBuilder('m'); x = dae.add('x'); y = dae.add('y');
       >> dae.eq(0, x - F(y)); dae.eq(0, y - F(x)^2 - F(y));
@@ -1559,6 +1658,7 @@ class CASADI_EXPORT DaeBuilder
       >> dae.create('f', {'z', 'w'}, {'alg', 'wdef'})
       f:(z[2],w[5])->(alg[2],wdef[5]) MXFunction
       \enddoctest
+      \endlang
 
       \sa eliminate, w, wdef
 
@@ -1609,6 +1709,7 @@ class CASADI_EXPORT DaeBuilder
       \param opts Function options
       \return The created function
 
+      \lang{python}
       \doctest
       >>> dae = DaeBuilder("m")
       >>> x = dae.add("x")
@@ -1626,8 +1727,10 @@ class CASADI_EXPORT DaeBuilder
       ...   print("Cannot find dependent" in str(e))
       True
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> dae = DaeBuilder('m'); x = dae.add('x'); w = dae.add('w');
       >> dae.eq(w, sin(x)); dae.eq(dae.der(x), -w);
       >> f = dae.add_fun('wfun', {'x'}, {'w'}); disp(f)
@@ -1639,6 +1742,7 @@ class CASADI_EXPORT DaeBuilder
       >> contains(msg, 'Cannot find dependent')
       1
       \enddoctest
+      \endlang
 
       \sa fun, has_fun, gather_fun
 
@@ -1651,6 +1755,7 @@ class CASADI_EXPORT DaeBuilder
 
       Stores \p f under its own name; a stored function with the same name is an error.
 
+      \lang{python}
       \doctest
       >>> a = MX.sym("a")
       >>> F = Function("F", [a], [a**2])
@@ -1660,8 +1765,10 @@ class CASADI_EXPORT DaeBuilder
       >>> [g.name() for g in dae.fun()]
       ['F']
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> a = MX.sym('a'); F = Function('F', {a}, {a^2});
       >> dae = DaeBuilder('m');
       >> dae.add_fun(F)
@@ -1669,6 +1776,7 @@ class CASADI_EXPORT DaeBuilder
       >> cellfun(@(g) disp(g.name()), dae.fun())
       F
       \enddoctest
+      \endlang
 
       \identifier{2l7} */
   Function add_fun(const Function& f);
@@ -1695,6 +1803,7 @@ class CASADI_EXPORT DaeBuilder
 
       Returns the stored function with this name; an unknown name is an error.
 
+      \lang{python}
       \doctest
       >>> a = MX.sym("a")
       >>> dae = DaeBuilder("m")
@@ -1707,8 +1816,10 @@ class CASADI_EXPORT DaeBuilder
       ...   print("No such function" in str(e))
       True
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> a = MX.sym('a'); dae = DaeBuilder('m');
       >> f = dae.add_fun(Function('F', {a}, {a^2}));
       >> dae.fun('F')
@@ -1716,6 +1827,7 @@ class CASADI_EXPORT DaeBuilder
       >> try, dae.fun('nope'); catch e, disp(contains(e.message, 'No such function')); end
       1
       \enddoctest
+      \endlang
 
       \sa has_fun, add_fun
 
@@ -1733,6 +1845,7 @@ class CASADI_EXPORT DaeBuilder
 
       \param max_depth How deep to look into nested function calls; `-1` for unlimited
 
+      \lang{python}
       \doctest
       >>> a = MX.sym("a")
       >>> F = Function("F", [a], [a**2])
@@ -1745,8 +1858,10 @@ class CASADI_EXPORT DaeBuilder
       >>> [g.name() for g in dae.fun()]
       ['F']
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> a = MX.sym('a'); F = Function('F', {a}, {a^2});
       >> dae = DaeBuilder('m'); x = dae.add('x');
       >> dae.eq(dae.der(x), F(x));
@@ -1756,6 +1871,7 @@ class CASADI_EXPORT DaeBuilder
       >> cellfun(@(g) disp(g.name()), dae.fun())
       F
       \enddoctest
+      \endlang
 
       \sa fun, add_fun
 
@@ -1861,6 +1977,7 @@ class CASADI_EXPORT DaeBuilder
       \param f_out Output categories in the combination, e.g. `["ode", "alg"]`; must be
         non-empty without duplicates
 
+      \lang{python}
       \doctest
       >>> dae = DaeBuilder("m")
       >>> x = dae.add("x")
@@ -1875,8 +1992,10 @@ class CASADI_EXPORT DaeBuilder
       >>> H(1, 2, 1, 1)
       (DM(2), DM(-1))
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> dae = DaeBuilder('m'); x = dae.add('x'); z = dae.add('z');
       >> dae.eq(dae.der(x), -x*z); dae.eq(0, z - x^2);
       >> dae.add_lc('gamma', {'ode', 'alg'});
@@ -1887,6 +2006,7 @@ class CASADI_EXPORT DaeBuilder
       2
       -1
       \enddoctest
+      \endlang
 
       \sa create
 
@@ -1924,6 +2044,7 @@ class CASADI_EXPORT DaeBuilder
         also `"aux"` (names of variables reported in `stats()` after evaluation),
         `"enable_ad"`, `"parallelization"` and the other FmuFunction options
 
+      \lang{python}
       \doctest
       >>> dae = DaeBuilder("m")
       >>> x = dae.add("x")
@@ -1960,8 +2081,10 @@ class CASADI_EXPORT DaeBuilder
       ...   print('Cannot process "w" as output' in str(e))
       True
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> dae = DaeBuilder('m'); x = dae.add('x'); z = dae.add('z'); u = dae.add('u', 'input');
       >> p = dae.add('p', 'parameter', 'tunable');
       >> c = dae.add('c', 'parameter', 'fixed', struct('start', 3));
@@ -1989,6 +2112,7 @@ class CASADI_EXPORT DaeBuilder
       >> contains(msg, 'Cannot process "w" as output')
       1
       \enddoctest
+      \endlang
 
       \sa oracle, add_lc, dependent_fun, transition
 
@@ -2008,6 +2132,7 @@ class CASADI_EXPORT DaeBuilder
       \param name    Name assigned to the resulting function object
       \param opts    Optional settings
 
+      \lang{python}
       \doctest
       >>> dae = DaeBuilder("m")
       >>> x = dae.add("x")
@@ -2019,8 +2144,10 @@ class CASADI_EXPORT DaeBuilder
       >>> f(0, 1, [], [], 3)
       (DM(2), DM(0x1), DM(0x1), DM(0x1))
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> dae = DaeBuilder('m'); x = dae.add('x'); u = dae.add('u', 'input');
       >> dae.eq(dae.der(x), -x + u);
       >> f = dae.create('mydae'); disp(f)
@@ -2033,6 +2160,7 @@ class CASADI_EXPORT DaeBuilder
       >> res = f('t', 0, 'x', 1, 'u', 3); disp(res.ode)
       2
       \enddoctest
+      \endlang
 
       \sa transition
 
@@ -2058,6 +2186,7 @@ class CASADI_EXPORT DaeBuilder
       \param s_out `"d"`, `"w"` or both; anything else is an error
       \return Function with one (concatenated) output per entry of \p s_out
 
+      \lang{python}
       \doctest
       >>> dae = DaeBuilder("m")
       >>> x = dae.add("x")
@@ -2078,8 +2207,10 @@ class CASADI_EXPORT DaeBuilder
       ...   print("cannot be both input and output" in str(e))
       True
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> dae = DaeBuilder('m'); x = dae.add('x'); w1 = dae.add('w1'); w2 = dae.add('w2');
       >> p = dae.add('p', 'parameter', 'tunable');
       >> dae.eq(w1, 2*x); dae.eq(w2, w1^2 + p); dae.eq(dae.der(x), -w2);
@@ -2091,6 +2222,7 @@ class CASADI_EXPORT DaeBuilder
       >> contains(msg, 'cannot be both input and output')
       1
       \enddoctest
+      \endlang
 
       \sa w, d, create, eliminate
 
@@ -2108,6 +2240,7 @@ class CASADI_EXPORT DaeBuilder
       \param fname Function name
       \param index Event index; out of range is an error
 
+      \lang{python}
       \doctest
       >>> dae = DaeBuilder("ball")
       >>> h = dae.add("h", dict(start=5))
@@ -2126,8 +2259,10 @@ class CASADI_EXPORT DaeBuilder
       ...   print("Illegal event index" in str(e))
       True
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> dae = DaeBuilder('ball');
       >> h = dae.add('h', struct('start', 5)); v = dae.add('v', struct('start', 0));
       >> dae.eq(dae.der(h), v); dae.eq(dae.der(v), -9.81);
@@ -2141,6 +2276,7 @@ class CASADI_EXPORT DaeBuilder
       >> contains(msg, 'Illegal event index')
       1
       \enddoctest
+      \endlang
 
       \sa when, create
 
@@ -2154,6 +2290,7 @@ class CASADI_EXPORT DaeBuilder
       `transition(fname, 0)` with a dummy index input, for several events a `switch` over
       the per-event functions. Without when equations a null Function is returned.
 
+      \lang{python}
       \doctest
       >>> dae = DaeBuilder("ball")
       >>> h = dae.add("h", dict(start=5))
@@ -2166,8 +2303,10 @@ class CASADI_EXPORT DaeBuilder
       >>> dae.transition("tr")
       Function(tr:(index[],t[0],x[2],z[0],p[0],u[0])->(post_x[2],post_z[0]) MXFunction)
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> dae = DaeBuilder('ball');
       >> h = dae.add('h', struct('start', 5)); v = dae.add('v', struct('start', 0));
       >> dae.eq(dae.der(h), v); dae.eq(dae.der(v), -9.81);
@@ -2177,6 +2316,7 @@ class CASADI_EXPORT DaeBuilder
       >> dae.transition('tr')
       tr:(index[],t[0],x[2],z[0],p[0],u[0])->(post_x[2],post_z[0]) MXFunction
       \enddoctest
+      \endlang
 
       \sa when, create
 
@@ -2197,6 +2337,7 @@ class CASADI_EXPORT DaeBuilder
       entries, named after the variable. An unknown name is an error. Also available via
       the call operator.
 
+      \lang{python}
       \doctest
       >>> dae = DaeBuilder("m")
       >>> x = dae.add("x", dict(dimension=[2]))
@@ -2210,8 +2351,10 @@ class CASADI_EXPORT DaeBuilder
       ...   print("No such variable" in str(e))
       True
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> dae = DaeBuilder('m'); x = dae.add('x', struct('dimension', 2));
       >> dae.var('x'), size(dae.var('x'))
       x
@@ -2222,6 +2365,7 @@ class CASADI_EXPORT DaeBuilder
       >> try, dae.var('y'); catch e, disp(contains(e.message, 'No such variable')); end
       1
       \enddoctest
+      \endlang
 
       \sa has, all, inputs
 
@@ -2236,6 +2380,7 @@ class CASADI_EXPORT DaeBuilder
       by `der` for a symbolic model, or the variables marked as derivatives in an imported
       model structure.
 
+      \lang{python}
       \doctest
       >>> dae = DaeBuilder("m")
       >>> x = dae.add("x")
@@ -2247,8 +2392,10 @@ class CASADI_EXPORT DaeBuilder
       >>> dae.der()
       ['der(x)', 'der(y)']
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> dae = DaeBuilder('m'); x = dae.add('x'); y = dae.add('y');
       >> isempty(dae.der())
       1
@@ -2257,6 +2404,7 @@ class CASADI_EXPORT DaeBuilder
       der(x)
       der(y)
       \enddoctest
+      \endlang
 
       \identifier{2fz} */
   std::vector<std::string> der() const;
@@ -2266,6 +2414,7 @@ class CASADI_EXPORT DaeBuilder
       The names of the derivative variables of the given variables; a variable without a
       derivative variable is an error.
 
+      \lang{python}
       \doctest
       >>> dae = DaeBuilder("m")
       >>> x = dae.add("x")
@@ -2281,8 +2430,10 @@ class CASADI_EXPORT DaeBuilder
       ...   print("No derivative expression" in str(e))
       True
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> dae = DaeBuilder('m'); x = dae.add('x'); y = dae.add('y');
       >> p = dae.add('p', 'parameter', 'tunable');
       >> dae.eq(dae.der(x), -y); dae.eq(dae.der(y), x);
@@ -2293,6 +2444,7 @@ class CASADI_EXPORT DaeBuilder
       >> try, dae.der('p'); catch e, disp(contains(e.message, 'No derivative expression')); end
       1
       \enddoctest
+      \endlang
 
       \identifier{2lm} */
   std::vector<std::string> der(const std::vector<std::string>& name) const;
@@ -2308,6 +2460,7 @@ class CASADI_EXPORT DaeBuilder
       inputs and discrete variables is 0. The expression must be a column vector in model
       variables.
 
+      \lang{python}
       \doctest
       >>> dae = DaeBuilder("m")
       >>> x = dae.add("x")
@@ -2334,8 +2487,10 @@ class CASADI_EXPORT DaeBuilder
       ...   print("No such variable" in str(e))
       True
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> dae = DaeBuilder('m'); x = dae.add('x'); y = dae.add('y');
       >> p = dae.add('p', 'parameter', 'tunable');
       >> dae.der(x)
@@ -2356,6 +2511,7 @@ class CASADI_EXPORT DaeBuilder
       >> try, dae.der(MX.sym('foo')); catch e, disp(contains(e.message, 'No such variable')); end
       1
       \enddoctest
+      \endlang
 
       \sa eq, der, var
 
@@ -2400,6 +2556,7 @@ class CASADI_EXPORT DaeBuilder
       The right-hand side of the explicit equation defining the variable; a variable
       without binding equation is an error.
 
+      \lang{python}
       \doctest
       >>> dae = DaeBuilder("m")
       >>> x = dae.add("x")
@@ -2409,14 +2566,17 @@ class CASADI_EXPORT DaeBuilder
       >>> dae.beq("w"), dae.beq("der(x)")
       (MX(sin(x)), MX((-w)))
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> dae = DaeBuilder('m'); x = dae.add('x'); w = dae.add('w');
       >> dae.eq(w, sin(x)); dae.eq(dae.der(x), -w);
       >> dae.beq('w'), dae.beq('der(x)')
       sin(x)
       (-w)
       \enddoctest
+      \endlang
 
       \sa has_beq, wdef
 
@@ -2429,6 +2589,7 @@ class CASADI_EXPORT DaeBuilder
       The FMI value reference of a variable: imported from the model description, or by
       default the index of the variable in the instance.
 
+      \lang{python}
       \doctest
       >>> dae = DaeBuilder("m")
       >>> x = dae.add("x")
@@ -2439,8 +2600,10 @@ class CASADI_EXPORT DaeBuilder
       >>> dae.value_reference("x")
       100
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> dae = DaeBuilder('m'); x = dae.add('x'); y = dae.add('y');
       >> dae.value_reference('x'), dae.value_reference('y')
       1
@@ -2449,6 +2612,7 @@ class CASADI_EXPORT DaeBuilder
       >> dae.value_reference('x')
       100
       \enddoctest
+      \endlang
 
       \identifier{2ls} */
   casadi_int value_reference(const std::string& name) const;
@@ -2461,6 +2625,7 @@ class CASADI_EXPORT DaeBuilder
       Free-text description of a variable, also settable with the `"description"` option
       of `add`.
 
+      \lang{python}
       \doctest
       >>> dae = DaeBuilder("m")
       >>> x = dae.add("x", dict(description="position"))
@@ -2470,8 +2635,10 @@ class CASADI_EXPORT DaeBuilder
       >>> dae.description("x")
       'height'
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> dae = DaeBuilder('m'); x = dae.add('x', struct('description', 'position'));
       >> dae.description('x')
       position
@@ -2479,6 +2646,7 @@ class CASADI_EXPORT DaeBuilder
       >> dae.description('x')
       height
       \enddoctest
+      \endlang
 
       \identifier{2lt} */
   std::string description(const std::string& name) const;
@@ -2493,6 +2661,7 @@ class CASADI_EXPORT DaeBuilder
       `"boolean"`, `"string"`, `"enum"`). Setting accepts FMI 3 names; other versions or
       names are an error.
 
+      \lang{python}
       \doctest
       >>> dae = DaeBuilder("m")
       >>> x = dae.add("x")
@@ -2508,8 +2677,10 @@ class CASADI_EXPORT DaeBuilder
       ...   print("No such enum" in str(e))
       True
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> dae = DaeBuilder('m'); x = dae.add('x'); n = dae.add('n', struct('type', 'Int32'));
       >> dae.type('x'), dae.type('x', 2), dae.type('n'), dae.type('n', 2)
       Float64
@@ -2522,6 +2693,7 @@ class CASADI_EXPORT DaeBuilder
       >> try, dae.set_type('x', 'bogus'); catch e, disp(contains(e.message, 'No such enum')); end
       1
       \enddoctest
+      \endlang
 
       \identifier{2lu} */
   std::string type(const std::string& name, casadi_int fmi_version = 3) const;
@@ -2533,6 +2705,7 @@ class CASADI_EXPORT DaeBuilder
       One of `"parameter"`, `"calculatedParameter"`, `"input"`, `"output"`, `"local"`,
       `"independent"`.
 
+      \lang{python}
       \doctest
       >>> dae = DaeBuilder("m")
       >>> t = dae.add("t", "independent")
@@ -2541,8 +2714,10 @@ class CASADI_EXPORT DaeBuilder
       >>> dae.causality("t"), dae.causality("u"), dae.causality("x")
       ('independent', 'input', 'local')
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> dae = DaeBuilder('m'); t = dae.add('t', 'independent'); u = dae.add('u', 'input');
       >> x = dae.add('x');
       >> dae.causality('t'), dae.causality('u'), dae.causality('x')
@@ -2550,6 +2725,7 @@ class CASADI_EXPORT DaeBuilder
       input
       local
       \enddoctest
+      \endlang
 
       \sa set_causality, variability, category
 
@@ -2563,6 +2739,7 @@ class CASADI_EXPORT DaeBuilder
       constants can be exchanged freely; states not used in any right-hand side can
       become quadrature states or lose their category.
 
+      \lang{python}
       \doctest
       >>> dae = DaeBuilder("m")
       >>> u = dae.add("u", "input")
@@ -2573,8 +2750,10 @@ class CASADI_EXPORT DaeBuilder
       >>> dae.categories("u"), dae.categories("x"), dae.categories("q")
       (['p', 'u', 'c'], ['x'], ['x', 'q', ''])
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> dae = DaeBuilder('m'); u = dae.add('u', 'input'); x = dae.add('x'); q = dae.add('q');
       >> dae.eq(dae.der(x), -x); dae.eq(dae.der(q), x^2);
       >> dae.categories('u'), dae.categories('x')
@@ -2585,6 +2764,7 @@ class CASADI_EXPORT DaeBuilder
       >> strjoin(cellstr(dae.categories('q')), ',')
       x,q,
       \enddoctest
+      \endlang
 
       \sa category, set_category
 
@@ -2604,6 +2784,7 @@ class CASADI_EXPORT DaeBuilder
 
       No other changes are permitted.
 
+      \lang{python}
       \doctest
       >>> dae = DaeBuilder("m")
       >>> x = dae.add("x")
@@ -2620,8 +2801,10 @@ class CASADI_EXPORT DaeBuilder
       ...   print("Cannot change causality" in str(e))
       True
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> dae = DaeBuilder('m'); x = dae.add('x'); y = dae.add('y', 'output');
       >> dae.eq(dae.der(x), -x); dae.eq(y, 2*x);
       >> dae.set_causality('y', 'local'); dae.set_causality('x', 'output');
@@ -2632,6 +2815,7 @@ class CASADI_EXPORT DaeBuilder
       >> contains(msg, 'Cannot change causality')
       1
       \enddoctest
+      \endlang
 
       \sa causality, set_variability, set_category, set_all
 
@@ -2656,6 +2840,7 @@ class CASADI_EXPORT DaeBuilder
 
       Other changes are not permitted.
 
+      \lang{python}
       \doctest
       >>> dae = DaeBuilder("m")
       >>> u = dae.add("u", "input")
@@ -2676,8 +2861,10 @@ class CASADI_EXPORT DaeBuilder
       ...   print("Cannot change variability" in str(e))
       True
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> dae = DaeBuilder('m'); u = dae.add('u', 'input'); x = dae.add('x');
       >> dae.eq(dae.der(x), -u*x);
       >> dae.set_variability('u', 'fixed');
@@ -2697,6 +2884,7 @@ class CASADI_EXPORT DaeBuilder
       >> contains(msg, 'Cannot change variability')
       1
       \enddoctest
+      \endlang
 
       \sa variability, set_causality, set_category
 
@@ -2724,6 +2912,7 @@ class CASADI_EXPORT DaeBuilder
 
       Other changes are not permitted. Causality and variability is updated accordingly.
 
+      \lang{python}
       \doctest
       >>> dae = DaeBuilder("m")
       >>> u = dae.add("u", "input")
@@ -2746,8 +2935,10 @@ class CASADI_EXPORT DaeBuilder
       ...   print("Cannot change category of x from 'x' to 'q'" in str(e))
       True
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> dae = DaeBuilder('m'); u = dae.add('u', 'input'); x = dae.add('x'); q = dae.add('q');
       >> dae.eq(dae.der(x), -x); dae.eq(dae.der(q), x^2);
       >> dae.set_category('q', 'q');
@@ -2770,6 +2961,7 @@ class CASADI_EXPORT DaeBuilder
       >> contains(msg, 'Cannot change category of x from ''x'' to ''q''')
       1
       \enddoctest
+      \endlang
 
       \sa category, categories, set_all
 
@@ -2783,6 +2975,7 @@ class CASADI_EXPORT DaeBuilder
       default follows from causality and variability per the FMI specification; it can be
       given with the `"initial"` option of `add`. Other values are an error.
 
+      \lang{python}
       \doctest
       >>> dae = DaeBuilder("m")
       >>> x = dae.add("x", dict(initial="approx"))
@@ -2794,8 +2987,10 @@ class CASADI_EXPORT DaeBuilder
       >>> dae.initial("x")
       'exact'
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> dae = DaeBuilder('m'); x = dae.add('x', struct('initial', 'approx'));
       >> p = dae.add('p', 'parameter', 'tunable'); u = dae.add('u', 'input');
       >> dae.initial('x'), dae.initial('p'), dae.initial('u')
@@ -2806,6 +3001,7 @@ class CASADI_EXPORT DaeBuilder
       >> dae.initial('x')
       exact
       \enddoctest
+      \endlang
 
       \identifier{2lz} */
   std::string initial(const std::string& name) const;
@@ -2818,6 +3014,7 @@ class CASADI_EXPORT DaeBuilder
       Unit string of a variable, e.g. `"m/s"`; empty by default. Also settable with the
       `"unit"` option of `add`.
 
+      \lang{python}
       \doctest
       >>> dae = DaeBuilder("m")
       >>> v = dae.add("v", dict(unit="m/s"))
@@ -2827,8 +3024,10 @@ class CASADI_EXPORT DaeBuilder
       >>> dae.unit("v")
       'km/h'
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> dae = DaeBuilder('m'); v = dae.add('v', struct('unit', 'm/s'));
       >> dae.unit('v')
       m/s
@@ -2836,6 +3035,7 @@ class CASADI_EXPORT DaeBuilder
       >> dae.unit('v')
       km/h
       \enddoctest
+      \endlang
 
       \identifier{2m0} */
   std::string unit(const std::string& name) const;
@@ -2858,6 +3058,7 @@ class CASADI_EXPORT DaeBuilder
       Product of the dimensions, i.e. the length of the variable's column vector
       expression.
 
+      \lang{python}
       \doctest
       >>> dae = DaeBuilder("m")
       >>> x = dae.add("x")
@@ -2865,8 +3066,10 @@ class CASADI_EXPORT DaeBuilder
       >>> dae.numel("x"), dae.numel("m"), dae.dimension("m"), dae.var("m").shape
       (1, 6, [2, 3], (6, 1))
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> dae = DaeBuilder('m'); x = dae.add('x'); m = dae.add('m', struct('dimension', [2 3]));
       >> dae.numel('x'), dae.numel('m')
       1
@@ -2875,6 +3078,7 @@ class CASADI_EXPORT DaeBuilder
       2 3
       6 1
       \enddoctest
+      \endlang
 
       \sa dimension, var
 
@@ -2896,6 +3100,7 @@ class CASADI_EXPORT DaeBuilder
       Start time of the default experiment: imported from the model description or set
       with `set_start_time`; nan when unknown.
 
+      \lang{python}
       \doctest
       >>> dae = DaeBuilder("m")
       >>> dae.start_time(), dae.stop_time(), dae.tolerance(), dae.step_size()
@@ -2907,8 +3112,10 @@ class CASADI_EXPORT DaeBuilder
       >>> dae.start_time(), dae.stop_time(), dae.tolerance(), dae.step_size()
       (0.0, 10.0, 1e-06, 0.01)
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> dae = DaeBuilder('m');
       >> fprintf('%g %g %g %g\n', dae.start_time, dae.stop_time, dae.tolerance, dae.step_size)
       NaN NaN NaN NaN
@@ -2917,6 +3124,7 @@ class CASADI_EXPORT DaeBuilder
       >> fprintf('%g %g %g %g\n', dae.start_time, dae.stop_time, dae.tolerance, dae.step_size)
       0 10 1e-06 0.01
       \enddoctest
+      \endlang
 
       \sa set_start_time, stop_time
 
@@ -2963,6 +3171,7 @@ class CASADI_EXPORT DaeBuilder
       `"nominal"`, `"start"` or `"value"` (the current value, see `get`). Any other
       attribute name, or a non-scalar variable, is an error.
 
+      \lang{python}
       \doctest
       >>> dae = DaeBuilder("m")
       >>> x = dae.add("x", dict(start=1, min=-2, nominal=10))
@@ -2981,8 +3190,10 @@ class CASADI_EXPORT DaeBuilder
       ...   print("No such enum" in str(e))
       True
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> dae = DaeBuilder('m'); x = dae.add('x', struct('start', 1, 'min', -2, 'nominal', 10));
       >> v = dae.add('v', struct('dimension', 2, 'start', [1 2]));
       >> dae.attribute('start', 'x'), dae.attribute('min', 'x')
@@ -2998,6 +3209,7 @@ class CASADI_EXPORT DaeBuilder
       >> try, dae.attribute('unit', 'x'); catch e, disp(contains(e.message, 'No such enum')); end
       1
       \enddoctest
+      \endlang
 
       \sa min, max, nominal, start, get
 
@@ -3011,6 +3223,7 @@ class CASADI_EXPORT DaeBuilder
 
       The `"min"` attribute; `-inf` by default. Only scalar variables are supported.
 
+      \lang{python}
       \doctest
       >>> dae = DaeBuilder("m")
       >>> x = dae.add("x", dict(min=-2, max=2, nominal=10))
@@ -3022,8 +3235,10 @@ class CASADI_EXPORT DaeBuilder
       >>> dae.min(["x"]), dae.max("x"), dae.nominal(["x"])
       ([0.0], 5.0, [2.0])
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> dae = DaeBuilder('m'); x = dae.add('x', struct('min', -2, 'max', 2, 'nominal', 10));
       >> dae.min('x'), dae.max('x'), dae.nominal('x')
       -2
@@ -3035,6 +3250,7 @@ class CASADI_EXPORT DaeBuilder
       5
       2
       \enddoctest
+      \endlang
 
       \sa set_min, max, nominal
 
@@ -3060,6 +3276,7 @@ class CASADI_EXPORT DaeBuilder
 
       The start values of a variable as a list with `numel` entries, also for scalars.
 
+      \lang{python}
       \doctest
       >>> dae = DaeBuilder("m")
       >>> x = dae.add("x", dict(start=1))
@@ -3079,8 +3296,10 @@ class CASADI_EXPORT DaeBuilder
       ...   print("expected number of elements (2) or number of variables (1)" in str(e))
       True
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> dae = DaeBuilder('m'); x = dae.add('x', struct('start', 1));
       >> v = dae.add('v', struct('dimension', 2));
       >> dae.start('x'), dae.start('v'), dae.start({'x', 'v'})
@@ -3097,6 +3316,7 @@ class CASADI_EXPORT DaeBuilder
       >> contains(msg, 'expected number of elements (2) or number of variables (1)')
       1
       \enddoctest
+      \endlang
 
       \sa set_start, get
 
@@ -3126,6 +3346,7 @@ class CASADI_EXPORT DaeBuilder
       initialized from its `"start"` option and is nan when unset. A vector-valued variable
       gets all elements set.
 
+      \lang{python}
       \doctest
       >>> dae = DaeBuilder("m")
       >>> c = dae.add("c", "parameter", "fixed")
@@ -3147,8 +3368,10 @@ class CASADI_EXPORT DaeBuilder
       >>> dae.get(["c", "x"])
       [nan, nan]
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> dae = DaeBuilder('m'); c = dae.add('c', 'parameter', 'fixed');
       >> x = dae.add('x', struct('start', 1)); v = dae.add('v', struct('dimension', 2));
       >> s = dae.add('s', struct('type', 'String'));
@@ -3169,9 +3392,11 @@ class CASADI_EXPORT DaeBuilder
       4
       5 6
       \enddoctest
+      \endlang
 
       The value of a constant is baked into the functions created afterwards:
 
+      \lang{python}
       \doctest
       >>> dae = DaeBuilder("m")
       >>> c = dae.add("c", "parameter", "fixed")
@@ -3181,14 +3406,17 @@ class CASADI_EXPORT DaeBuilder
       >>> dae.create("f", ["x"], ["ode"])(2)
       DM(-6)
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> dae = DaeBuilder('m'); c = dae.add('c', 'parameter', 'fixed'); x = dae.add('x');
       >> dae.eq(dae.der(x), -c*x);
       >> dae.set('c', 3);
       >> f = dae.create('f', {'x'}, {'ode'}); disp(f(2))
       -6
       \enddoctest
+      \endlang
 
       \sa get, reset, start, c
 
@@ -3214,10 +3442,12 @@ class CASADI_EXPORT DaeBuilder
       True for a symbolically constructed model (or a symbolic model description), false
       for an imported standard FMU whose equations live in a binary.
 
+      \lang{python}
       \doctest
       >>> DaeBuilder("m").symbolic()
       True
       \enddoctest
+      \endlang
 
       \sa load_fmi_description, oracle
 
@@ -3273,6 +3503,7 @@ class CASADI_EXPORT DaeBuilder
 
   /** \brief Check if a particular variable exists
 
+      \lang{python}
       \doctest
       >>> dae = DaeBuilder("m")
       >>> x = dae.add("x")
@@ -3281,8 +3512,10 @@ class CASADI_EXPORT DaeBuilder
       >>> dae.der(x), dae.has("der(x)")
       (MX(der(x)), True)
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> dae = DaeBuilder('m'); x = dae.add('x');
       >> dae.has('x'), dae.has('der(x)'), dae.has('time')
       1
@@ -3292,6 +3525,7 @@ class CASADI_EXPORT DaeBuilder
       der(x)
       1
       \enddoctest
+      \endlang
 
       \sa all, var
 
@@ -3303,6 +3537,7 @@ class CASADI_EXPORT DaeBuilder
       Names of all variables in creation order, including the hidden `"time"` variable
       and the internal helper variables created by `eq`, `when`, `assign` and `reinit`.
 
+      \lang{python}
       \doctest
       >>> dae = DaeBuilder("m")
       >>> x = dae.add("x")
@@ -3312,8 +3547,10 @@ class CASADI_EXPORT DaeBuilder
       >>> dae.all("x"), dae.all("w"), dae.all("calculated")
       (['x'], ['der(x)'], ['__assign__der(x)__'])
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> dae = DaeBuilder('m'); x = dae.add('x'); dae.eq(dae.der(x), -x);
       >> dae.all()
       time
@@ -3325,6 +3562,7 @@ class CASADI_EXPORT DaeBuilder
       der(x)
       __assign__der(x)__
       \enddoctest
+      \endlang
 
       \sa has, x, w
 
@@ -3352,6 +3590,7 @@ class CASADI_EXPORT DaeBuilder
       \param lifted_calls Replace embedded function calls in `wdef` by zeros, for use with
         `create` with `lifted_calls`; incompatible with \p elim_w
 
+      \lang{python}
       \doctest
       >>> dae = DaeBuilder("m")
       >>> x = dae.add("x")
@@ -3368,8 +3607,10 @@ class CASADI_EXPORT DaeBuilder
       >>> dae.oracle(True).class_name(), dae.oracle(False, True).name_in()
       ('SXFunction', ['t', 'p', 'd', 'u', 'x', 'z', 'q'])
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> dae = DaeBuilder('m'); x = dae.add('x'); w = dae.add('w');
       >> dae.eq(w, sin(x)); dae.eq(dae.der(x), -w);
       >> f = dae.oracle();
@@ -3386,6 +3627,7 @@ class CASADI_EXPORT DaeBuilder
       >> g = dae.oracle(false, true); disp(strjoin(cellstr(g.name_in()), ' '))
       t p d u x z q
       \enddoctest
+      \endlang
 
       \sa create, symbolic
 
@@ -3404,6 +3646,7 @@ class CASADI_EXPORT DaeBuilder
       \param inames Names of variables to differentiate with respect to
       \return Sparsity pattern of size `len(onames)` by `len(inames)`
 
+      \lang{python}
       \doctest
       >>> dae = DaeBuilder("m")
       >>> x = dae.add("x")
@@ -3412,13 +3655,16 @@ class CASADI_EXPORT DaeBuilder
       >>> dae.jac_sparsity(["der(x)"], ["x", "u"])
       Sparsity(1x2,0nz)
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> dae = DaeBuilder('m'); x = dae.add('x'); u = dae.add('u', 'input');
       >> dae.eq(dae.der(x), -x*u);
       >> dae.jac_sparsity({'der(x)'}, {'x', 'u'})
       1x2,0nz
       \enddoctest
+      \endlang
 
       \sa load_fmi_description, export_fmu
 

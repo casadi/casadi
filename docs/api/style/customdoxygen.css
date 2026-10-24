@@ -1368,7 +1368,8 @@ div.doctest div {
   padding-left: 2em;
 }
 
-div.doctest:before {
-  content: "Python example:";
-}
+div.lang-python div.doctest:before { content: "Python example:"; }
+div.lang-matlab div.doctest:before { content: "MATLAB example:"; }
+div.lang-julia div.doctest:before { content: "Julia example:"; }
+div.lang-javascript div.doctest:before { content: "JavaScript example:"; }
 

@@ -232,10 +232,18 @@ def _tag_examples(lines):
         out += [pad + '.. code-block:: pycon', pad + '   :class: ' + cls, '']
         cind = min(len(l) - len(l.lstrip()) for l in content)
         out += [pad + '   ' + l[cind:] if l.strip() else '' for l in body]
-        for lang, text in extra:
-            out += ['', pad + '.. code-block:: ' + _LEXER.get(lang, 'text'),
-                    pad + '   :class: doctest doctest-' + lang, '']
-            out += [pad + '   ' + l if l.strip() else '' for l in text.split('\n')]
+        for lang, parts in extra:
+            sub = pad
+            if len(parts) > 1 or parts[0][0] != 'doctest':  # prose too: one tagged container
+                out += ['', pad + '.. container:: doctest doctest-' + lang]
+                sub = pad + '   '
+            for kind, text in parts:
+                if kind == 'text':
+                    out += [''] + [sub + l for l in text.split('\n')]
+                    continue
+                out += ['', sub + '.. code-block:: ' + (_LEXER.get(lang, 'text') if kind == 'doctest' else 'text'),
+                        sub + '   :class: doctest doctest-' + lang, '']
+                out += [sub + '   ' + l if l.strip() else '' for l in text.split('\n')]
         out.append('')
         i = j
     return out

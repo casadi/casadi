@@ -62,6 +62,7 @@ class OptiCallback;
     iteration number after every solver iteration, and opti.debug.value() inside it returns
     the current iterate. Calling opti.callback() without argument removes it.
 
+    \lang{python}
     \doctest
     >>> opti = Opti()
     >>> x = opti.variable()
@@ -76,8 +77,10 @@ class OptiCallback;
     >>> round(sol.value(opti.f), 6)
     0.0
     \enddoctest
+    \endlang
 
-    \doctest{matlab}
+    \lang{matlab}
+    \doctest
     >> opti = Opti();
     >> x = opti.variable(); y = opti.variable();
     >> opti.minimize((y-x^2)^2);
@@ -90,9 +93,11 @@ class OptiCallback;
     >> round(sol.value(opti.f), 6)
     0
     \enddoctest
+    \endlang
 
     Parametric problems are re-solved by changing parameter values:
 
+    \lang{python}
     \doctest
     >>> opti = Opti()
     >>> x = opti.variable(2)
@@ -109,8 +114,10 @@ class OptiCallback;
     >>> round(sol.value(sum1(x)), 4)
     1.0
     \enddoctest
+    \endlang
 
-    \doctest{matlab}
+    \lang{matlab}
+    \doctest
     >> opti = Opti();
     >> x = opti.variable(2); p = opti.parameter();
     >> opti.minimize(sumsqr(x-p));
@@ -123,9 +130,11 @@ class OptiCallback;
     >> round(sol.value(sum1(x)), 4)
     1
     \enddoctest
+    \endlang
 
     An iteration callback:
 
+    \lang{python}
     \doctest
     >>> opti = Opti()
     >>> x = opti.variable()
@@ -141,8 +150,10 @@ class OptiCallback;
     >>> len(history)
     2
     \enddoctest
+    \endlang
 
-    \doctest{matlab}
+    \lang{matlab}
+    \doctest
     >> opti = Opti(); x = opti.variable(); opti.minimize((x-1)^2);
     >> opti.solver('ipopt', struct('print_time', false), struct('print_level', 0, 'sb', 'yes'));
     >> opti.callback(@(i) fprintf('%d %.3f\n', i, opti.debug.value(x)));
@@ -152,6 +163,7 @@ class OptiCallback;
     >> opti.callback();
     >> sol = opti.solve();
     \enddoctest
+    \endlang
 
     \sa OptiSol, OptiAdvanced, nlpsol, qpsol
 
@@ -172,6 +184,7 @@ public:
              objective must then be quadratic and the constraints linear or second-order cone.
              Any other string raises an error.
 
+      \lang{python}
       \doctest
       >>> opti = Opti()
       >>> opti.nx, opti.np, opti.ng
@@ -190,8 +203,10 @@ public:
       ...   print(str(e).splitlines()[-1])
       Specified problem type 'lp'unknown. Choose 'nlp' (default) or 'conic'.
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> opti = Opti(); fprintf('%d %d %d\n', opti.nx, opti.np, opti.ng)
       0 0 0
       >> opti = Opti('conic'); x = opti.variable(2);
@@ -203,6 +218,7 @@ public:
       >> try, Opti('lp'); catch e, disp(contains(e.message, 'Specified problem type')); end
       1
       \enddoctest
+      \endlang
 
       \identifier{17} */
   Opti(const std::string& problem_type="nlp");
@@ -225,6 +241,7 @@ public:
       \param attribute "full" (default) or "symmetric"; anything else raises an error
       \return A dense MX symbol of shape n-by-m
 
+      \lang{python}
       \doctest
       >>> opti = Opti()
       >>> x = opti.variable()
@@ -243,8 +260,10 @@ public:
       ...   print(str(e).splitlines()[-1])
       You specified attribute 'symmetric', while matrix is not even square, but 2-by-3.
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> opti = Opti(); x = opti.variable(); X = opti.variable(3, 2);
       >> size(x), size(X), X.is_symbolic()
       1 1
@@ -258,6 +277,7 @@ public:
       >> try, opti.variable(2, 3, 'symmetric'); catch e, disp(contains(e.message, 'not even')); end
       1
       \enddoctest
+      \endlang
 
       \identifier{18} */
   MX variable(casadi_int n=1, casadi_int m=1, const std::string& attribute="full");
@@ -278,6 +298,7 @@ public:
       \param attribute "full" (default) or "symmetric"
       \return A dense MX symbol of shape n-by-m
 
+      \lang{python}
       \doctest
       >>> opti = Opti()
       >>> x = opti.variable()
@@ -293,8 +314,10 @@ public:
       >>> round(opti.solve().value(x), 4)
       2.0
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> opti = Opti(); x = opti.variable(); p = opti.parameter(2);
       >> opti.minimize(sumsqr(x-p));
       >> opti.solver('ipopt', struct('print_time', false), struct('print_level', 0, 'sb', 'yes'));
@@ -303,6 +326,7 @@ public:
       >> opti.set_value(p, [1; 3]); sol = opti.solve(); disp(round(sol.value(x), 4))
       2
       \enddoctest
+      \endlang
 
       \identifier{19} */
   MX parameter(casadi_int n=1, casadi_int m=1, const std::string& attribute="full");
@@ -320,6 +344,7 @@ public:
       \param f Scalar MX expression to minimize
       \param linear_scale The solver sees f divided by this factor (default 1)
 
+      \lang{python}
       \doctest
       >>> opti = Opti()
       >>> x = opti.variable(2)
@@ -333,8 +358,10 @@ public:
       ...   print(str(e).splitlines()[-1])
       Objective must be scalar, got 2x1.
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> opti = Opti(); x = opti.variable(2);
       >> opti.minimize(sumsqr(x)); opti.minimize(x(1)^2, 2);
       >> opti.f, opti.f_linear_scale
@@ -343,6 +370,7 @@ public:
       >> try, opti.minimize(x); catch e, disp(contains(e.message, 'Objective must be scalar')); end
       1
       \enddoctest
+      \endlang
 
       \identifier{1a} */
   void minimize(const MX& f, double linear_scale=1);
@@ -379,6 +407,7 @@ public:
       \param options Dict with optional entries "meta" (dict stored in the user_dict of the
              constraint) and "stacktrace"; any other key raises an error
 
+      \lang{python}
       \doctest
       >>> opti = Opti()
       >>> x = opti.variable(3)
@@ -408,8 +437,10 @@ public:
       ...   print("MX symbol 'w' of shape 1x1, declared outside of Opti" in str(e))
       True
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> opti = Opti(); x = opti.variable(3); y = opti.variable(); p = opti.parameter();
       >> opti.subject_to(x >= 0);
       >> opti.subject_to(x(1) + x(2) == p);
@@ -426,9 +457,11 @@ public:
       >> try, opti.subject_to(w <= 3); catch e, disp(contains(e.message, 'outside of Opti')); end
       1
       \enddoctest
+      \endlang
 
       Elementwise constraints on matrices need vec(); options attach metadata:
 
+      \lang{python}
       \doctest
       >>> opti = Opti()
       >>> A = opti.variable(2, 2)
@@ -446,8 +479,10 @@ public:
       >>> opti.ng, opti.user_dict(con)["label"]
       (4, 'nonneg')
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> opti = Opti(); A = opti.variable(2, 2);
       >> opti.subject_to(A >= 0); opti.minimize(sumsqr(A));
       >> opti.solver('ipopt', struct('print_time', false), struct('print_level', 0, 'sb', 'yes'));
@@ -458,6 +493,7 @@ public:
       >> d = opti.user_dict(con); fprintf('%d %s\n', opti.ng, d.label)
       4 nonneg
       \enddoctest
+      \endlang
 
       \sa bounded, subject_to(), dual, lbg, ubg, g
 
@@ -474,6 +510,7 @@ public:
       can be restated (typical when the constraint set changes between solves). The objective,
       variables, parameters, values and initial guesses are kept.
 
+      \lang{python}
       \doctest
       >>> opti = Opti()
       >>> x = opti.variable()
@@ -493,8 +530,10 @@ public:
       ...   print(str(e).splitlines()[-2])
       This expression has a dual for a constraint that is not given to Opti:
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> opti = Opti(); x = opti.variable(); con = x >= 1;
       >> opti.subject_to(con); opti.minimize(x^2); disp(opti.ng)
       1
@@ -505,6 +544,7 @@ public:
       >> try, sol.value(opti.dual(con)); catch e, disp(contains(e.message, 'not given')); end
       1
       \enddoctest
+      \endlang
 
       \identifier{2ms} */
   void subject_to();
@@ -527,6 +567,7 @@ public:
 
       No stability is guaranteed for option names; they belong to the plugins.
 
+      \lang{python}
       \doctest
       >>> opti = Opti()
       >>> x = opti.variable()
@@ -545,8 +586,10 @@ public:
       >>> round(opti.solve().value(x), 4)
       2.0
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> opti = Opti(); x = opti.variable(); opti.minimize((x-2)^2);
       >> try, opti.solve(); catch e, disp(contains(e.message, 'You must call ''solver''')); end
       1
@@ -559,6 +602,7 @@ public:
       >> opti.solver('sqpmethod', opts); sol = opti.solve(); disp(round(sol.value(x), 4))
       2
       \enddoctest
+      \endlang
 
       \sa nlpsol, qpsol, solve
 
@@ -580,6 +624,7 @@ public:
       \param x Variable (or linear mapping of variables) to initialize
       \param v Numerical value; scalars are broadcast to the shape of \p x
 
+      \lang{python}
       \doctest
       >>> opti = Opti()
       >>> x = opti.variable(2)
@@ -599,8 +644,10 @@ public:
       ...   print("Use symbols or simple mappings of symbols" in str(e))
       True
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> opti = Opti(); x = opti.variable(2); p = opti.parameter();
       >> opti.set_initial(x, 1); opti.set_initial(10*x(1), 2);
       >> ini = opti.initial(); disp(ini{1})
@@ -610,9 +657,11 @@ public:
       >> try, opti.set_initial(x(1)*x(2), 1); catch e, disp(contains(e.message, 'simple')); end
       1
       \enddoctest
+      \endlang
 
       Warm start from a previous solution:
 
+      \lang{python}
       \doctest
       >>> opti = Opti()
       >>> x = opti.variable()
@@ -627,8 +676,10 @@ public:
       >>> opti.solve().stats()["iter_count"] < sol.stats()["iter_count"]
       True
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> opti = Opti(); x = opti.variable(); y = opti.variable();
       >> opti.minimize((y-x^2)^2); opti.subject_to(x^2+y^2==1); opti.subject_to(x+y>=1);
       >> opti.solver('ipopt', struct('print_time', false), struct('print_level', 0, 'sb', 'yes'));
@@ -639,6 +690,7 @@ public:
       >> s2.iter_count < s1.iter_count
       1
       \enddoctest
+      \endlang
 
       \sa set_value, initial, value_variables
 
@@ -660,6 +712,7 @@ public:
       \param x Parameter (or linear mapping of parameters)
       \param v Numerical value; scalars are broadcast
 
+      \lang{python}
       \doctest
       >>> opti = Opti()
       >>> x = opti.variable()
@@ -677,8 +730,10 @@ public:
       >>> opti.value(p)
       array([7., 7.])
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> opti = Opti(); x = opti.variable(); p = opti.parameter(2);
       >> opti.set_value(p, [1; 2]); opti.set_value(p(2), 5); disp(opti.value(p)')
       1 5
@@ -687,6 +742,7 @@ public:
       >> opti.set_value({p==7}); disp(opti.value(p)')
       7 7
       \enddoctest
+      \endlang
 
       \sa set_initial, value_parameters
 
@@ -704,6 +760,7 @@ public:
       \param x A decision variable (pure symbol, not an expression)
       \param domain "real" or "integer"; anything else raises an error
 
+      \lang{python}
       \doctest
       >>> opti = Opti()
       >>> x = opti.variable()
@@ -721,8 +778,10 @@ public:
       ...   print("Unknown domain 'binary'. Known values are 'real', 'integer'." in str(e))
       True
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> opti = Opti(); x = opti.variable(); opti.set_domain(x, 'integer');
       >> opti.minimize((x-1.4)^2);
       >> opti.solver('ipopt', struct('print_time', false), struct('print_level', 0, 'sb', 'yes'));
@@ -731,6 +790,7 @@ public:
       >> try, opti.set_domain(x, 'binary'); catch e, disp(contains(e.message, 'Unknown')); end
       1
       \enddoctest
+      \endlang
 
       \identifier{27t} */
   void set_domain(const MX& x, const std::string& domain);
@@ -745,6 +805,7 @@ public:
       \param scale Scalar or matrix of the shape of \p x (default 1)
       \param offset Scalar or matrix of the shape of \p x (default 0)
 
+      \lang{python}
       \doctest
       >>> opti = Opti()
       >>> T = opti.variable()
@@ -757,8 +818,10 @@ public:
       >>> round(float(opti.debug.arg()["x0"]), 4)
       -13.6575
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> opti = Opti(); T = opti.variable();
       >> opti.set_linear_scale(T, 20, 273.15); opti.minimize((T-300)^2);
       >> opti.solver('ipopt', struct('print_time', false), struct('print_level', 0, 'sb', 'yes'));
@@ -770,6 +833,7 @@ public:
       >> a = opti.debug.arg(); disp(round(full(a.x0), 4))
       -13.6575
       \enddoctest
+      \endlang
 
       \sa x_linear_scale, x_linear_scale_offset, scale_helper
 
@@ -787,6 +851,7 @@ public:
 
       \return OptiSol copy of the problem and its solution
 
+      \lang{python}
       \doctest
       >>> opti = Opti()
       >>> x = opti.variable()
@@ -805,8 +870,10 @@ public:
       >>> round(sol.value(x), 1), sol.stats()["success"]
       (1.0, True)
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> opti = Opti(); x = opti.variable(); opti.minimize((x-1)^6);
       >> ipopt = struct('print_level', 0, 'max_iter', 2, 'sb', 'yes');
       >> opti.solver('ipopt', struct('print_time', false), ipopt);
@@ -820,6 +887,7 @@ public:
       1
       1
       \enddoctest
+      \endlang
 
       \sa solve_limited, OptiSol, stats, return_status
 
@@ -832,6 +900,7 @@ public:
       time limit (unified_return_status "SOLVER_RET_LIMITED"); other failures such as
       infeasibility still raise.
 
+      \lang{python}
       \doctest
       >>> opti = Opti()
       >>> x = opti.variable()
@@ -842,8 +911,10 @@ public:
       >>> sol.stats()["unified_return_status"], round(sol.value(x), 2)
       ('SOLVER_RET_LIMITED', 0.36)
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> opti = Opti(); x = opti.variable(); opti.minimize((x-1)^6);
       >> ipopt = struct('print_level', 0, 'max_iter', 2, 'sb', 'yes');
       >> opti.solver('ipopt', struct('print_time', false), ipopt);
@@ -852,6 +923,7 @@ public:
       SOLVER_RET_LIMITED
       0.3600
       \enddoctest
+      \endlang
 
       \identifier{1e} */
   OptiSol solve_limited();
@@ -873,6 +945,7 @@ public:
       \return The numerical value. In Python a scalar becomes a float, a dense matrix a
               numpy array and a sparse matrix a scipy sparse matrix.
 
+      \lang{python}
       \doctest
       >>> opti = Opti()
       >>> x = opti.variable()
@@ -895,8 +968,10 @@ public:
       >>> type(sol.value(vertcat(x, p))).__name__, sol.value(DM([1, 2]))
       ('ndarray', array([1., 2.]))
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> opti = Opti(); x = opti.variable(); p = opti.parameter();
       >> opti.minimize((x-p)^2); opti.set_value(p, 3);
       >> opti.value(2*p)
@@ -915,6 +990,7 @@ public:
       2 1
       1 2
       \enddoctest
+      \endlang
 
       \sa initial, value_variables, OptiSol::value
 
@@ -931,6 +1007,7 @@ public:
       "iter_count". Raises an error before the first solve(). No stability is guaranteed for
       the plugin-specific entries.
 
+      \lang{python}
       \doctest
       >>> opti = Opti()
       >>> x = opti.variable()
@@ -941,8 +1018,10 @@ public:
       >>> s["success"], s["return_status"], s["unified_return_status"], s["iter_count"]
       (True, 'Solve_Succeeded', 'SOLVER_RET_SUCCESS', 1)
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> opti = Opti(); x = opti.variable(); opti.minimize((x-1)^2);
       >> opti.solver('ipopt', struct('print_time', false), struct('print_level', 0, 'sb', 'yes'));
       >> sol = opti.solve(); s = sol.stats();
@@ -952,6 +1031,7 @@ public:
       SOLVER_RET_SUCCESS
       1
       \enddoctest
+      \endlang
 
       \identifier{1f} */
   Dict stats() const;
@@ -962,6 +1042,7 @@ public:
       "Infeasible_Problem_Detected" for Ipopt), or "unknown" when no solve has happened.
       No stability is guaranteed for the strings.
 
+      \lang{python}
       \doctest
       >>> opti = Opti()
       >>> x = opti.variable()
@@ -977,8 +1058,10 @@ public:
       ...   print(opti.return_status())
       Infeasible_Problem_Detected
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> opti = Opti(); x = opti.variable(); opti.minimize(x^2);
       >> opti.return_status()
       unknown
@@ -987,6 +1070,7 @@ public:
       >> try, opti.solve(); catch e, disp(opti.return_status()); end
       Infeasible_Problem_Detected
       \enddoctest
+      \endlang
 
       \identifier{1g} */
   std::string return_status() const;
@@ -997,6 +1081,7 @@ public:
       guess. Pass the list to value() to evaluate an expression at the initial guess, or to
       set_initial() of another Opti instance with the same symbols.
 
+      \lang{python}
       \doctest
       >>> opti = Opti()
       >>> x = opti.variable()
@@ -1007,14 +1092,17 @@ public:
       >>> opti.value(x**2+1, opti.initial())
       5.0
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> opti = Opti(); x = opti.variable(); opti.set_initial(x, 2); opti.minimize(x^2);
       >> ini = opti.initial(); disp(ini{1})
       (2==opti..._x_1)
       >> opti.value(x^2+1, opti.initial())
       5
       \enddoctest
+      \endlang
 
       \identifier{266} */
   std::vector<MX> initial() const;
@@ -1025,6 +1113,7 @@ public:
       value_parameters() gives value==par for every parameter with its set value. Both feed
       set_initial()/set_value() to transfer a solution to the next solve or to another Opti.
 
+      \lang{python}
       \doctest
       >>> opti = Opti()
       >>> x = opti.variable()
@@ -1039,8 +1128,10 @@ public:
       >>> opti.value(x, opti.initial())
       2.0
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> opti = Opti(); x = opti.variable(); p = opti.parameter();
       >> opti.minimize((x-p)^2); opti.set_value(p, 2);
       >> opti.solver('ipopt', struct('print_time', false), struct('print_level', 0, 'sb', 'yes'));
@@ -1051,6 +1142,7 @@ public:
       >> opti.set_initial(sol.value_variables()); disp(opti.value(x, opti.initial()))
       2
       \enddoctest
+      \endlang
 
       \identifier{267} */
   std::vector<MX> value_variables() const;
@@ -1064,6 +1156,7 @@ public:
       lam_g; output the Lagrangian Hessian); other names raise an error. The result can be
       handed to a solver that accepts custom derivative functions.
 
+      \lang{python}
       \doctest
       >>> opti = Opti()
       >>> x = opti.variable()
@@ -1077,8 +1170,10 @@ public:
       >>> hs(x=3, p=0)
       {'g': DM(7), 'jac_g_x': DM(2)}
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> opti = Opti(); x = opti.variable(); p = opti.parameter();
       >> opti.set_linear_scale(x, 2, 1); opti.minimize((x-p)^2); opti.subject_to(x >= 0);
       >> J = jacobian(opti.g, opti.x);
@@ -1087,6 +1182,7 @@ public:
       7
       2
       \enddoctest
+      \endlang
 
       \identifier{2ci} */
   Function scale_helper(const Function& h) const;
@@ -1099,6 +1195,7 @@ public:
       corresponding entries of lam_g. Keep a reference to the constraint expression when you
       need its dual later.
 
+      \lang{python}
       \doctest
       >>> opti = Opti()
       >>> x = opti.variable()
@@ -1121,8 +1218,10 @@ public:
       ...   print(str(e).splitlines()[-1])
       Constraint not present in Opti stack.
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> opti = Opti(); x = opti.variable(); opti.minimize((x-3)^2);
       >> con = x <= 1; opti.subject_to(con);
       >> opti.solver('ipopt', struct('print_time', false), struct('print_level', 0, 'sb', 'yes'));
@@ -1135,6 +1234,7 @@ public:
       >> try, opti.dual(x >= 4); catch e, disp(contains(e.message, 'Constraint not present')); end
       1
       \enddoctest
+      \endlang
 
       \sa lam_g
 
@@ -1146,6 +1246,7 @@ public:
       Counts the nonzeros of all variables that appear in the objective or constraints.
       In Python this is a read-only property.
 
+      \lang{python}
       \doctest
       >>> opti = Opti()
       >>> x = opti.variable(3)
@@ -1154,12 +1255,15 @@ public:
       >>> opti.nx
       3
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> opti = Opti(); x = opti.variable(3); y = opti.variable();
       >> opti.minimize(sumsqr(x)); disp(opti.nx)
       3
       \enddoctest
+      \endlang
 
       \identifier{268} */
   casadi_int nx() const;
@@ -1169,6 +1273,7 @@ public:
       Counts the nonzeros of all parameters that appear in the problem. In Python this is a
       read-only property.
 
+      \lang{python}
       \doctest
       >>> opti = Opti()
       >>> x = opti.variable()
@@ -1177,12 +1282,15 @@ public:
       >>> opti.np
       4
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> opti = Opti(); x = opti.variable(); p = opti.parameter(2, 2);
       >> opti.minimize(x*sum1(vec(p))); disp(opti.np)
       4
       \enddoctest
+      \endlang
 
       \identifier{269} */
   casadi_int np() const;
@@ -1192,6 +1300,7 @@ public:
       Total number of constraint rows; a double-bounded constraint counts once. In Python
       this is a read-only property.
 
+      \lang{python}
       \doctest
       >>> opti = Opti()
       >>> x = opti.variable(2)
@@ -1200,12 +1309,15 @@ public:
       >>> opti.ng
       3
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> opti = Opti(); x = opti.variable(2);
       >> opti.subject_to(0 <= x <= 1); opti.subject_to(x(1) == x(2)); disp(opti.ng)
       3
       \enddoctest
+      \endlang
 
       \identifier{26a} */
   casadi_int ng() const;
@@ -1216,6 +1328,7 @@ public:
       the variables that appear in the problem. Use it with jacobian(), hessian() or
       to_function(). In Python this is a read-only property.
 
+      \lang{python}
       \doctest
       >>> opti = Opti()
       >>> x = opti.variable(2)
@@ -1228,8 +1341,10 @@ public:
       >>> sol.value(jacobian(opti.f, opti.x))
       array([0., 0., 0.])
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> opti = Opti(); x = opti.variable(2); y = opti.variable();
       >> opti.minimize(sumsqr(x) + y^2); disp(size(opti.x))
       3 1
@@ -1237,6 +1352,7 @@ public:
       >> sol = opti.solve(); disp(sol.value(jacobian(opti.f, opti.x)))
       0 0 0
       \enddoctest
+      \endlang
 
       \identifier{26b} */
   MX x() const;
@@ -1246,6 +1362,7 @@ public:
       Restricted to the parameters that appear in the problem. In Python this is a read-only
       property.
 
+      \lang{python}
       \doctest
       >>> opti = Opti()
       >>> x = opti.variable()
@@ -1254,12 +1371,15 @@ public:
       >>> opti.p.shape
       (2, 1)
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> opti = Opti(); x = opti.variable(); p = opti.parameter(2);
       >> opti.minimize(x*p(1)); disp(size(opti.p))
       2 1
       \enddoctest
+      \endlang
 
       \identifier{26c} */
   MX p() const;
@@ -1269,6 +1389,7 @@ public:
       The expression g passed to the solver, with lbg <= g <= ubg. In Python this is a
       read-only property.
 
+      \lang{python}
       \doctest
       >>> opti = Opti()
       >>> x = opti.variable()
@@ -1278,13 +1399,16 @@ public:
       >>> print(opti.g)
       vertcat(opti..._x_1, sq(opti..._x_1))
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> opti = Opti(); x = opti.variable();
       >> opti.subject_to(x >= 1); opti.subject_to(x^2 == 4); opti.minimize(x);
       >> opti.g
       vertcat(opti..._x_1, sq(opti..._x_1))
       \enddoctest
+      \endlang
 
       \identifier{26d} */
   MX g() const;
@@ -1293,6 +1417,7 @@ public:
 
       In Python this is a read-only property.
 
+      \lang{python}
       \doctest
       >>> opti = Opti()
       >>> x = opti.variable()
@@ -1302,13 +1427,16 @@ public:
       >>> print(opti.f)
       sq(opti..._x_1)
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> opti = Opti(); x = opti.variable(); disp(opti.f)
       0
       >> opti.minimize(x^2); disp(opti.f)
       sq(opti..._x_1)
       \enddoctest
+      \endlang
 
       \identifier{26e} */
   MX f() const;
@@ -1319,6 +1447,7 @@ public:
       the parameters (constants otherwise), with -inf/inf for one-sided constraints. In
       Python these are read-only properties.
 
+      \lang{python}
       \doctest
       >>> opti = Opti()
       >>> x = opti.variable()
@@ -1330,14 +1459,17 @@ public:
       >>> print(opti.lbg, opti.ubg)
       vertcat(1, -inf, 4) vertcat(inf, opti..._p_1, 4)
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> opti = Opti(); x = opti.variable(); p = opti.parameter();
       >> opti.subject_to(x >= 1); opti.subject_to(x <= p); opti.subject_to(x^2 == 4);
       >> opti.minimize(x); disp(opti.lbg), disp(opti.ubg)
       vertcat(1, -inf, 4)
       vertcat(inf, opti..._p_1, 4)
       \enddoctest
+      \endlang
 
       \identifier{26f} */
   MX lbg() const;
@@ -1360,6 +1492,7 @@ public:
       the active bound. Useful for the Lagrangian Hessian, warm starting (set_initial) and
       as input or output of to_function(). In Python this is a read-only property.
 
+      \lang{python}
       \doctest
       >>> opti = Opti()
       >>> x = opti.variable()
@@ -1374,8 +1507,10 @@ public:
       >>> sol.value(hessian(opti.f + dot(opti.lam_g, opti.g), opti.x)[0])
       2.0
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> opti = Opti(); x = opti.variable(); p = opti.parameter();
       >> opti.minimize(x^2); opti.subject_to(x >= p); opti.set_value(p, 1);
       >> opti.solver('ipopt', struct('print_time', false), struct('print_level', 0, 'sb', 'yes'));
@@ -1384,6 +1519,7 @@ public:
       >> H = hessian(opti.f + dot(opti.lam_g, opti.g), opti.x); disp(sol.value(H))
       2
       \enddoctest
+      \endlang
 
       \sa dual
 
@@ -1413,6 +1549,7 @@ public:
       \param name_out Optional output names (same length as \p res)
       \param opts Function options
 
+      \lang{python}
       \doctest
       >>> opti = Opti()
       >>> x = opti.variable()
@@ -1439,8 +1576,10 @@ public:
       ...   print(str(e).splitlines()[-1])
       Argument 0 is not purely symbolic.
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> opti = Opti(); x = opti.variable(); y = opti.variable(); p = opti.parameter();
       >> opti.minimize((x-p)^2 + (y-x)^2); opti.subject_to(x >= 0);
       >> opti.solver('ipopt', struct('print_time', false), struct('print_level', 0, 'sb', 'yes'));
@@ -1457,6 +1596,7 @@ public:
       >> try, opti.to_function('F', {p+1}, {x}); catch e, disp(contains(e.message, 'symbolic')); end
       1
       \enddoctest
+      \endlang
 
       \sa nlpsol
 
@@ -1488,6 +1628,7 @@ public:
       chained comparison lb <= expr <= ub raises an error for MX. A static method; the
       instance is not needed.
 
+      \lang{python}
       \doctest
       >>> opti = Opti()
       >>> x = opti.variable(2)
@@ -1496,6 +1637,7 @@ public:
       >>> opti.ng, opti.lbg, opti.ubg
       (3, MX(vertcat(all_-1(2x1), 0)), MX(ones(3x1)))
       \enddoctest
+      \endlang
 
       \identifier{1k} */
   static MX bounded(const MX& lb, const MX& expr, const MX& ub) { return (lb<=expr)<= ub; }
@@ -1509,6 +1651,7 @@ public:
       Changes to the copy do not affect the original. No API stability is guaranteed for the
       extra methods. In Python this is a read-only property: opti.debug.value(x).
 
+      \lang{python}
       \doctest
       >>> opti = Opti()
       >>> x = opti.variable()
@@ -1524,8 +1667,10 @@ public:
       >>> print(opti.debug.x_describe(0))
       Opti decision variable 'opti..._x_1' of shape 1x1, called from ...
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> opti = Opti(); x = opti.variable(); opti.minimize((x-1)^6);
       >> ipopt = struct('print_level', 0, 'max_iter', 2, 'sb', 'yes');
       >> opti.solver('ipopt', struct('print_time', false), ipopt);
@@ -1535,6 +1680,7 @@ public:
       >> opti.debug.x_describe(1)
       Opti decision variable 'opti..._x_1' of shape 1x1, called from ...
       \enddoctest
+      \endlang
 
       \sa OptiAdvanced, advanced, copy
 
@@ -1546,6 +1692,7 @@ public:
       Same as debug(); the name signals use of the unstable OptiAdvanced API rather than
       debugging. In Python this is a read-only property.
 
+      \lang{python}
       \doctest
       >>> opti = Opti()
       >>> x = opti.variable()
@@ -1553,13 +1700,16 @@ public:
       >>> print(opti.advanced.symvar())
       [MX(opti..._x_1)]
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> opti = Opti(); x = opti.variable(); opti.minimize(x^2);
       >> sv = opti.advanced.symvar(); disp(numel(sv)), disp(sv{1})
       1
       opti..._x_1
       \enddoctest
+      \endlang
 
       \identifier{1m} */
   OptiAdvanced advanced() const;
@@ -1570,6 +1720,7 @@ public:
       constraints, values, initial guesses and solver state. Updating the copy does not update
       the original.
 
+      \lang{python}
       \doctest
       >>> opti = Opti()
       >>> x = opti.variable()
@@ -1579,12 +1730,15 @@ public:
       >>> opti.ng, opti2.ng
       (0, 1)
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> opti = Opti(); x = opti.variable(); opti.minimize(x^2);
       >> opti2 = opti.copy(); opti2.subject_to(x >= 2); fprintf('%d %d\n', opti.ng, opti2.ng)
       0 1
       \enddoctest
+      \endlang
 
       \identifier{1n} */
   Opti copy() const;
@@ -1599,6 +1753,7 @@ public:
       \param m Symbol, expression of symbols, or constraint expression
       \param meta Dict entries to add (existing keys are overwritten)
 
+      \lang{python}
       \doctest
       >>> opti = Opti()
       >>> x = opti.variable()
@@ -1612,8 +1767,10 @@ public:
       >>> opti.user_dict(con)["name"]
       'nonneg'
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> opti = Opti(); x = opti.variable();
       >> opti.update_user_dict(x, struct('name', 'speed', 'unit', 'm/s'));
       >> d = opti.user_dict(x); fprintf('%s %s %d\n', d.name, d.unit, isfield(d, 'stacktrace'))
@@ -1622,6 +1779,7 @@ public:
       >> d = opti.user_dict(con); disp(d.name)
       nonneg
       \enddoctest
+      \endlang
 
       \identifier{1o} */
   void update_user_dict(const MX& m, const Dict& meta);
@@ -1630,6 +1788,7 @@ public:
 
       \param m A single symbol or a constraint expression; other expressions raise an error
 
+      \lang{python}
       \doctest
       >>> opti = Opti()
       >>> x = opti.variable()
@@ -1641,13 +1800,16 @@ public:
       ...   print(str(e).splitlines()[-1])
       Symbol expected, got expression.
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> opti = Opti(); x = opti.variable(); disp(fieldnames(opti.user_dict(x)))
       {'stacktrace'}
       >> try, opti.user_dict(x+1); catch e, disp(contains(e.message, 'Symbol expected')); end
       1
       \enddoctest
+      \endlang
 
       \identifier{2mw} */
   Dict user_dict(const MX& m) const;
@@ -1660,6 +1822,7 @@ public:
       Shows the instance number, the number of variables, parameters and constraints that
       appear in the problem, whether the solver is up to date and the last return status.
 
+      \lang{python}
       \doctest
       >>> opti = Opti()
       >>> x = opti.variable(2)
@@ -1674,8 +1837,10 @@ public:
         CasADi solver needs updating.
       }
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> opti = Opti(); x = opti.variable(2);
       >> opti.minimize(sumsqr(x)); opti.subject_to(x(1) >= 1); disp(opti)
       Opti {
@@ -1686,6 +1851,7 @@ public:
         CasADi solver needs updating.
       }
       \enddoctest
+      \endlang
 
       \identifier{2mx} */
   void disp(std::ostream& stream, bool more=false) const;
@@ -1837,6 +2003,7 @@ public:
       get_function() gives access to the derivative functions. In Python this is a read-only
       property.
 
+      \lang{python}
       \doctest
       >>> opti = Opti()
       >>> x = opti.variable(2)
@@ -1848,8 +2015,10 @@ public:
       >>> S.name(), S.class_name(), S.name_in()
       ('solver', 'IpoptInterface', ['x0', 'p', 'lbx', 'ubx', 'lbg', 'ubg', 'lam_x0', 'lam_g0'])
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> opti = Opti(); x = opti.variable(2);
       >> opti.minimize(sumsqr(x)); opti.subject_to(x(1) >= 1);
       >> opti.solver('ipopt', struct('print_time', false), struct('print_level', 0, 'sb', 'yes'));
@@ -1859,6 +2028,7 @@ public:
       IpoptInterface
       x0 p lbx ubx lbg ubg lam_x0 lam_g0
       \enddoctest
+      \endlang
 
       \identifier{2n0} */
   Function casadi_solver() const;
@@ -1868,6 +2038,7 @@ public:
       True when no decision variable of this instance appears in \p expr (constants count
       as parametric).
 
+      \lang{python}
       \doctest
       >>> opti = Opti()
       >>> x = opti.variable()
@@ -1875,12 +2046,15 @@ public:
       >>> opti.debug.is_parametric(2*p), opti.debug.is_parametric(x*p)
       (True, False)
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> opti = Opti(); x = opti.variable(); p = opti.parameter();
       >> fprintf('%d %d\n', opti.debug.is_parametric(2*p), opti.debug.is_parametric(x*p))
       1 0
       \enddoctest
+      \endlang
 
       \identifier{2n1} */
   bool is_parametric(const MX& expr) const;
@@ -1893,6 +2067,7 @@ public:
       symbols of this instance that \p expr depends on, optionally filtered by \p type.
       The result is ordered by creation.
 
+      \lang{python}
       \doctest
       >>> opti = Opti()
       >>> x = opti.variable()
@@ -1903,8 +2078,10 @@ public:
       >>> print(opti.debug.symvar(y*p + 1), opti.debug.symvar(y*p, OPTI_PAR))
       [MX(opti..._p_1), MX(opti..._x_2)] [MX(opti..._p_1)]
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> opti = Opti(); x = opti.variable(); p = opti.parameter(); y = opti.variable();
       >> sv = opti.debug.symvar(); disp(numel(sv)), disp(sv{2})
       3
@@ -1916,6 +2093,7 @@ public:
       1
       opti..._p_1
       \enddoctest
+      \endlang
 
       \identifier{1u} */
   std::vector<MX> symvar() const;
@@ -1928,6 +2106,7 @@ public:
       Returns the MetaCon that subject_to() would store: the constraint type, canonical
       expression and bounds.
 
+      \lang{python}
       \doctest
       >>> opti = Opti()
       >>> x = opti.variable()
@@ -1937,8 +2116,10 @@ public:
       >>> opti.debug.canon_expr(x + 1).type == OPTI_UNKNOWN
       True
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> opti = Opti(); x = opti.variable();
       >> c = opti.debug.canon_expr(0 <= x <= 1);
       >> c.type == OPTI_DOUBLE_INEQUALITY, c.lb, c.ub, c.canon
@@ -1949,6 +2130,7 @@ public:
       >> c = opti.debug.canon_expr(x + 1); disp(c.type == OPTI_UNKNOWN)
       1
       \enddoctest
+      \endlang
 
       \identifier{2n2} */
   MetaCon canon_expr(const MX& expr) const;
@@ -1972,6 +2154,7 @@ public:
 
       Empty before the problem has been baked (solve, or any method that bakes).
 
+      \lang{python}
       \doctest
       >>> opti = Opti()
       >>> x = opti.variable()
@@ -1984,8 +2167,10 @@ public:
       >>> print(d.active_symvar(OPTI_VAR), d.active_values(OPTI_VAR))
       [MX(opti..._x_1)] [DM(0)]
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> opti = Opti(); x = opti.variable(); y = opti.variable(); opti.minimize(x^2);
       >> d = opti.debug; disp(isempty(d.active_symvar(OPTI_VAR)))
       1
@@ -1994,6 +2179,7 @@ public:
       opti..._x_1
       0
       \enddoctest
+      \endlang
 
       \identifier{2n3} */
   std::vector<MX> active_symvar(VariableType type) const;
@@ -2002,6 +2188,7 @@ public:
 
   /** \brief Get the variable that owns entry i of the flattened x vector
 
+      \lang{python}
       \doctest
       >>> opti = Opti()
       >>> x = opti.variable(2)
@@ -2010,19 +2197,23 @@ public:
       >>> print(opti.debug.x_lookup(1), opti.debug.x_lookup(2))
       opti..._x_1 opti..._x_2
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> opti = Opti(); x = opti.variable(2); y = opti.variable();
       >> opti.minimize(sumsqr(x) + y^2);
       >> opti.debug.x_lookup(2), opti.debug.x_lookup(3)
       opti..._x_1
       opti..._x_2
       \enddoctest
+      \endlang
 
       \identifier{2n4} */
   MX x_lookup(casadi_index i) const;
   /** \brief Get the constraint expression that owns row i of g
 
+      \lang{python}
       \doctest
       >>> opti = Opti()
       >>> x = opti.variable(2)
@@ -2031,13 +2222,16 @@ public:
       >>> print(opti.debug.g_lookup(2))
       (1==(opti..._x_1[0]+opti..._x_1[1]))
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> opti = Opti(); x = opti.variable(2);
       >> opti.subject_to(x >= 0); opti.subject_to(x(1) + x(2) == 1);
       >> opti.debug.g_lookup(3)
       (1==(opti..._x_1[0]+opti..._x_1[1]))
       \enddoctest
+      \endlang
 
       \identifier{2n5} */
   MX g_lookup(casadi_index i) const;
@@ -2057,6 +2251,7 @@ public:
 
       \param opts "max_stacktrace_depth" (default 1)
 
+      \lang{python}
       \doctest
       >>> opti = Opti()
       >>> x = opti.variable(3)
@@ -2065,18 +2260,22 @@ public:
       Opti decision variable 'opti..._x_1' of shape 3x1, called from ...
       At nonzero 2.
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> opti = Opti(); x = opti.variable(3); opti.minimize(sumsqr(x));
       >> opti.debug.x_describe(3)
       Opti decision variable 'opti..._x_1' of shape 3x1, called from ...
       At nonzero 3.
       \enddoctest
+      \endlang
 
       \identifier{2n6} */
   std::string x_describe(casadi_index i, const Dict& opts=Dict()) const;
   /** \brief Describe row i of the constraint vector g
 
+      \lang{python}
       \doctest
       >>> opti = Opti()
       >>> x = opti.variable(3)
@@ -2085,13 +2284,16 @@ public:
       Opti constraint of shape 3x1, called from ...
       At nonzero 1, part 0.
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> opti = Opti(); x = opti.variable(3); opti.subject_to(x >= 0);
       >> opti.debug.g_describe(2)
       Opti constraint of shape 3x1, called from ...
       At nonzero 2, part 0.
       \enddoctest
+      \endlang
 
       \identifier{2n7} */
   std::string g_describe(casadi_index i, const Dict& opts=Dict()) const;
@@ -2101,6 +2303,7 @@ public:
       Opti instance or was declared outside of Opti. For a constraint: its shape and origin.
       For another expression: the symbols it depends on.
 
+      \lang{python}
       \doctest
       >>> opti = Opti()
       >>> x = opti.variable()
@@ -2112,8 +2315,10 @@ public:
         Opti decision variable 'opti..._x_1' of shape 1x1, called from ...
         Opti parameter 'opti..._p_1' of shape 1x1, called from ...
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> opti = Opti(); x = opti.variable(); p = opti.parameter();
       >> opti.debug.describe(MX.sym('w'))
       MX symbol 'w' of shape 1x1, declared outside of Opti.
@@ -2122,6 +2327,7 @@ public:
         Opti decision variable 'opti..._x_1' of shape 1x1, called from ...
         Opti parameter 'opti..._p_1' of shape 1x1, called from ...
       \enddoctest
+      \endlang
 
       \identifier{2n8} */
   std::string describe(const MX& x, casadi_index indent=0, const Dict& opts=Dict()) const;
@@ -2136,6 +2342,7 @@ public:
       \param tol Violation threshold (default 0, which also lists rounding-level violations)
       \param opts Passed to g_describe
 
+      \lang{python}
       \doctest
       >>> opti = Opti()
       >>> x = opti.variable()
@@ -2156,8 +2363,10 @@ public:
       -inf <= ... <= -1 (viol ...)
       Opti constraint of shape 1x1, called from ...
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> opti = Opti(); x = opti.variable(); opti.minimize(x^2);
       >> opti.subject_to(x >= 1); opti.subject_to(x <= -1);
       >> opti.solver('ipopt', struct('print_time', false), struct('print_level', 0, 'sb', 'yes'));
@@ -2171,6 +2380,7 @@ public:
       -inf <= ... <= -1 (viol ...)
       Opti constraint of shape 1x1, called from ...
       \enddoctest
+      \endlang
 
       \identifier{2n9} */
   void show_infeasibilities(double tol=0, const Dict& opts=Dict()) const;
@@ -2181,6 +2391,7 @@ public:
       and ubg. solve_actual() then runs the solver on such a dict, and res() stores its
       result so that value() works. Together they allow custom solver invocations.
 
+      \lang{python}
       \doctest
       >>> opti = Opti()
       >>> x = opti.variable()
@@ -2199,8 +2410,10 @@ public:
       >>> round(d.value(x), 4), sorted(d.res().keys())
       (1.0, ['f', 'g', 'lam_g', 'lam_p', 'lam_x', 'x'])
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> opti = Opti(); x = opti.variable(); p = opti.parameter();
       >> opti.minimize((x-p)^2); opti.subject_to(x <= 1); opti.set_value(p, 3);
       >> opti.solver('ipopt', struct('print_time', false), struct('print_level', 0, 'sb', 'yes'));
@@ -2215,6 +2428,7 @@ public:
       1
       {'f'} {'g'} {'lam_g'} {'lam_p'} {'lam_x'} {'x'}
       \enddoctest
+      \endlang
 
       \identifier{2na} */
   void solve_prepare();
@@ -2229,6 +2443,7 @@ public:
   DMDict res() const;
   /** \brief Get the constraint expressions as passed to subject_to
 
+      \lang{python}
       \doctest
       >>> opti = Opti()
       >>> x = opti.variable()
@@ -2237,14 +2452,17 @@ public:
       >>> print(opti.debug.constraints())
       [MX((0<=opti..._x_1)), MX((1<=(sq(opti..._x_1)<=4)))]
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> opti = Opti(); x = opti.variable();
       >> opti.subject_to(x >= 0); opti.subject_to(1 <= x^2 <= 4);
       >> c = opti.debug.constraints(); disp(c{1}), disp(c{2})
       (0<=opti..._x_1)
       ((1<=sq(opti..._x_1))<=4)
       \enddoctest
+      \endlang
 
       \identifier{2nb} */
   std::vector<MX> constraints() const;
@@ -2304,6 +2522,7 @@ protected:
     returns, so several OptiSol objects can be kept and compared. The API is guaranteed to
     be stable.
 
+    \lang{python}
     \doctest
     >>> opti = Opti()
     >>> x = opti.variable()
@@ -2317,8 +2536,10 @@ protected:
     >>> round(sol1.value(x), 4), round(sol2.value(x), 4)
     (1.0, 2.0)
     \enddoctest
+    \endlang
 
-    \doctest{matlab}
+    \lang{matlab}
+    \doctest
     >> opti = Opti(); x = opti.variable(); p = opti.parameter();
     >> opti.minimize((x-p)^2);
     >> opti.solver('ipopt', struct('print_time', false), struct('print_level', 0, 'sb', 'yes'));
@@ -2327,6 +2548,7 @@ protected:
     >> fprintf('%.4f %.4f\n', sol1.value(x), sol2.value(x))
     1.0000 2.0000
     \enddoctest
+    \endlang
 
     \date 2017
     \author Joris Gillis, Erik Lambrechts
@@ -2350,6 +2572,7 @@ class CASADI_EXPORT OptiSol : public SWIG_IF_ELSE(PrintableCommon, Printable<Opt
         \param x Expression (MX) in the symbols of the Opti; a DM is returned as is
         \param values Optional list of assignments var==value
 
+        \lang{python}
         \doctest
         >>> opti = Opti()
         >>> x = opti.variable()
@@ -2368,8 +2591,10 @@ class CASADI_EXPORT OptiSol : public SWIG_IF_ELSE(PrintableCommon, Printable<Opt
         >>> sol.value(jacobian(opti.g, opti.x)).shape
         (2, 2)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> opti = Opti(); x = opti.variable(); y = opti.variable();
         >> opti.minimize((y-x^2)^2); opti.subject_to(x^2+y^2==1); opti.subject_to(x+y>=1);
         >> opti.solver('ipopt', struct('print_time', false), struct('print_level', 0, 'sb', 'yes'));
@@ -2384,6 +2609,7 @@ class CASADI_EXPORT OptiSol : public SWIG_IF_ELSE(PrintableCommon, Printable<Opt
         >> size(sol.value(jacobian(opti.g, opti.x)))
         2 2
         \enddoctest
+        \endlang
 
         \identifier{2nd} */
     native_DM value(const MX& x, const std::vector<MX>& values=std::vector<MX>()) const;
@@ -2397,6 +2623,7 @@ class CASADI_EXPORT OptiSol : public SWIG_IF_ELSE(PrintableCommon, Printable<Opt
         for every parameter. Pass them to Opti::set_initial / Opti::set_value to warm start
         the next solve.
 
+        \lang{python}
         \doctest
         >>> opti = Opti()
         >>> x = opti.variable()
@@ -2411,8 +2638,10 @@ class CASADI_EXPORT OptiSol : public SWIG_IF_ELSE(PrintableCommon, Printable<Opt
         >>> opti.solve().stats()["iter_count"]
         0
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> opti = Opti(); x = opti.variable(); p = opti.parameter();
         >> opti.minimize((x-p)^2); opti.set_value(p, 2);
         >> opti.solver('ipopt', struct('print_time', false), struct('print_level', 0, 'sb', 'yes'));
@@ -2424,6 +2653,7 @@ class CASADI_EXPORT OptiSol : public SWIG_IF_ELSE(PrintableCommon, Printable<Opt
         >> s = sol2.stats(); disp(s.iter_count)
         0
         \enddoctest
+        \endlang
 
         \identifier{2ne} */
     std::vector<MX> value_variables() const;
@@ -2434,6 +2664,7 @@ class CASADI_EXPORT OptiSol : public SWIG_IF_ELSE(PrintableCommon, Printable<Opt
         The dict returned by the nlpsol/qpsol plugin, passed as-is ("success",
         "return_status", "iter_count", ...). No stability is guaranteed for the entries.
 
+        \lang{python}
         \doctest
         >>> opti = Opti()
         >>> x = opti.variable()
@@ -2443,14 +2674,17 @@ class CASADI_EXPORT OptiSol : public SWIG_IF_ELSE(PrintableCommon, Printable<Opt
         >>> sol.stats()["success"], sol.stats()["return_status"]
         (True, 'Solve_Succeeded')
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> opti = Opti(); x = opti.variable(); opti.minimize((x-1)^2);
         >> opti.solver('ipopt', struct('print_time', false), struct('print_level', 0, 'sb', 'yes'));
         >> sol = opti.solve(); s = sol.stats(); disp(s.success), disp(s.return_status)
         1
         Solve_Succeeded
         \enddoctest
+        \endlang
 
         \identifier{1w} */
     Dict stats() const;
@@ -2460,6 +2694,7 @@ class CASADI_EXPORT OptiSol : public SWIG_IF_ELSE(PrintableCommon, Printable<Opt
         An Opti holding the state at the time of the solve; opti.debug on it gives the
         OptiAdvanced accessors. In Python this is a read-only property.
 
+        \lang{python}
         \doctest
         >>> opti = Opti()
         >>> x = opti.variable()
@@ -2469,8 +2704,10 @@ class CASADI_EXPORT OptiSol : public SWIG_IF_ELSE(PrintableCommon, Printable<Opt
         >>> sol.opti.return_status(), round(sol.opti.debug.value(x), 4)
         ('Solve_Succeeded', 1.0)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> opti = Opti(); x = opti.variable(); opti.minimize((x-1)^2);
         >> opti.solver('ipopt', struct('print_time', false), struct('print_level', 0, 'sb', 'yes'));
         >> sol = opti.solve(); o = sol.opti;
@@ -2478,6 +2715,7 @@ class CASADI_EXPORT OptiSol : public SWIG_IF_ELSE(PrintableCommon, Printable<Opt
         Solve_Succeeded
         1
         \enddoctest
+        \endlang
 
         \identifier{2nf} */
     Opti opti() const { return optistack_; } // NOLINT(cppcoreguidelines-slicing)

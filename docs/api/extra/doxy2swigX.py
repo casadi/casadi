@@ -97,6 +97,21 @@ def tidy_spacing(t):
   return re.sub(r"([(\[])\s+", r"\1", t).strip()
 
 
+def tidy_lang(text):
+  """One blank line before each <lang:x> or </lang> line, none after it."""
+  out = []
+  for l in text.split("\n"):
+    if re.match(r"(<lang:\w+>|</lang>)$", l):
+      while out and out[-1] == "":
+        out.pop()
+      if out and not re.match(r"(<lang:\w+>|</lang>)$", out[-1]):
+        out.append("")
+    elif l == "" and out and re.match(r"(<lang:\w+>|</lang>)$", out[-1]):
+      continue
+    out.append(l)
+  return "\n".join(out)
+
+
 class Doxy2SWIG_X(Doxy2SWIG):
 
   def __init__(self, *args, **kwargs):
@@ -126,6 +141,7 @@ class Doxy2SWIG_X(Doxy2SWIG):
 
     self.docstringmap = {}
     self.active_docstring = None
+    self.lang = None  # open \lang group
     self.add_text_counter = 0
     self.src = args[0]
     del self.ignores[self.ignores.index("programlisting")]
@@ -202,16 +218,8 @@ class Doxy2SWIG_X(Doxy2SWIG):
         
   def write(self, fname):
         o = my_open_write(fname)
-        if self.multi:
-            for p in self.pieces:
-              pp = p#.encode("ascii","ignore")
-              pp = re.sub("[A-Z_]*_EXPORT ","",pp)
-              o.write(pp)
-        else:
-            for p in self.clean_pieces(self.pieces):
-              pp = p#.encode("ascii","ignore")
-              pp = re.sub("[A-Z_]*_EXPORT ","",pp)
-              o.write(pp)
+        pieces = self.pieces if self.multi else self.clean_pieces(self.pieces)
+        o.write(tidy_lang("".join(re.sub("[A-Z_]*_EXPORT ","",p) for p in pieces)))
         o.close()
         
   def do_doxygenindex(self, node):
@@ -253,8 +261,22 @@ class Doxy2SWIG_X(Doxy2SWIG):
       self.add_text(("-"*length) + "\n\n")
 
   def do_htmlonly(self,node):
-    pass
-    
+    if "class='doctest'" in astext(node, escape=False) and self.lang is None:
+      raise Exception("%s: \\doctest outside a \\lang group" % self.src)
+
+  # \lang{x} ... \endlang: SWIG keeps the section of its target language, see %feature("docstring:lang")
+  def do_casadilang(self, node):
+    if self.lang is not None:
+      raise Exception("%s: nested \\lang group" % self.src)
+    self.lang = node.attributes['name'].value
+    self.add_text("\n\n<lang:" + self.lang + ">\n\n")
+
+  def do_casadiendlang(self, node):
+    if self.lang is None:
+      raise Exception("%s: \\endlang without \\lang" % self.src)
+    self.lang = None
+    self.add_text("\n\n</lang>\n\n")
+
   def do_programlisting(self,node):
     self.add_text("\n\n::\n\n")
     for codeline in node.getElementsByTagName("codeline"):
@@ -262,19 +284,11 @@ class Doxy2SWIG_X(Doxy2SWIG):
     
     
   def do_verbatim(self, node):
-    lang = None
-    try:
-      m = re.search(r"doctest-(\w+)", node.previousSibling.firstChild.data)
-      if node.previousSibling.tagName == "htmlonly" and m: lang = m.group(1)
-    except Exception:
-      pass
-    if lang and lang != "python":
-      return  # other languages reach the web page through docs/api/extra/doctest_sidecar.py
-    self.add_text("\n\n::\n\n")
     text = node.firstChild.data
     text = "\n".join(["  " +i for i in text.split("\n")])
-
-    self.add_text(text.replace("\n","%%newline%%").replace('\\', r'\\\\').replace('"', r'\"')+"\n\n")
+    text = text.replace("\n","%%newline%%").replace('\\', r'\\\\').replace('"', r'\"')
+    self.add_text("\n\n::\n\n")
+    self.add_text(text+"\n\n")
 
   # Google-style sections: napoleon ends them at the first dedented line, so the prose that
   # follows a \param list in the header stays prose (numpy-style sections would swallow it).

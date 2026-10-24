@@ -101,6 +101,7 @@ namespace casadi {
         solved with linear solver "sens_linsol" (default "qr").
       The plugin options follow in the tables below.
 
+      \lang{python}
       \doctest
       >>> x = SX.sym("x"); y = SX.sym("y")
       >>> qp = {"x": vertcat(x, y), "f": x**2 + y**2 + x*y - 3*x, "g": x + y}
@@ -120,8 +121,10 @@ namespace casadi {
       >>> S.stats()["success"], S.stats()["return_status"]
       (True, 'success')
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> x = SX.sym('x'); y = SX.sym('y');
       >> qp = struct('x', vertcat(x, y), 'f', x^2 + y^2 + x*y - 3*x, 'g', x + y);
       >> opts = struct('print_iter', false, 'print_header', false, 'print_info', false);
@@ -156,7 +159,9 @@ namespace casadi {
       1
       success
       \enddoctest
+      \endlang
 
+      \lang{python}
       \doctest
       >>> H = DM([[2, 1], [1, 2]]); g = DM([-3, 0]); A = DM([[1, 1]])
       >>> opts = {"print_iter": False, "print_header": False, "print_info": False}
@@ -177,8 +182,10 @@ namespace casadi {
       ...     print("square & symmetric" in str(e))
       True
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> H = DM([2 1; 1 2]); g = DM([-3; 0]); A = DM([1 1]);
       >> opts = struct('print_iter', false, 'print_header', false, 'print_info', false);
       >> C = conic('C', 'qrqp', struct('h', H.sparsity(), 'a', A.sparsity()), opts); disp(C)
@@ -198,7 +205,9 @@ namespace casadi {
       >> contains(msg, 'square & symmetric')
       1
       \enddoctest
+      \endlang
 
+      \lang{python}
       \doctest
       >>> x = SX.sym("x")
       >>> opts = {"print_iter": False, "print_header": False, "print_info": False}
@@ -215,8 +224,10 @@ namespace casadi {
       ...     print("integer support" in str(e))
       True
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> x = SX.sym('x'); qp = struct('x', x, 'f', x^2, 'g', x);
       >> opts = struct('print_iter', false, 'print_header', false, 'print_info', false);
       >> S = qpsol('S', 'qrqp', qp, setfield(opts, 'error_on_fail', false));
@@ -233,6 +244,7 @@ namespace casadi {
       >> contains(msg, 'integer support')
       1
       \enddoctest
+      \endlang
 
       \generalsection{Conic}
       \pluginssection{Conic}
@@ -266,12 +278,15 @@ namespace casadi {
       h, g, a, lba, uba, lbx, ubx, x0, lam_x0, lam_a0, q, p. A Function created by qpsol
       uses the nlpsol scheme instead.
 
+      \lang{python}
       \doctest
       >>> conic_in()
       ['h', 'g', 'a', 'lba', 'uba', 'lbx', 'ubx', 'x0', 'lam_x0', 'lam_a0', 'q', 'p']
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> conic_in()
       h
       g
@@ -286,6 +301,7 @@ namespace casadi {
       q
       p
       \enddoctest
+      \endlang
 
       \sa conic_out, conic_n_in, nlpsol_in
 
@@ -297,18 +313,22 @@ namespace casadi {
       Returns the names of the 4 outputs of a Function created by conic, in order:
       x, cost, lam_a, lam_x.
 
+      \lang{python}
       \doctest
       >>> conic_out()
       ['x', 'cost', 'lam_a', 'lam_x']
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> conic_out()
       x
       cost
       lam_a
       lam_x
       \enddoctest
+      \endlang
 
       \sa conic_in, conic_n_out
 
@@ -319,17 +339,21 @@ namespace casadi {
 
       \param ind Index in 0..conic_n_in()-1; any other value gives an empty string
 
+      \lang{python}
       \doctest
       >>> conic_in(0), conic_in(11), repr(conic_in(12))
       ('h', 'p', "''")
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> conic_in(0), conic_in(11), isempty(conic_in(12))
       h
       p
       1
       \enddoctest
+      \endlang
 
       \identifier{1eg} */
   CASADI_EXPORT std::string conic_in(casadi_int ind);
@@ -338,46 +362,58 @@ namespace casadi {
 
       \param ind Index in 0..conic_n_out()-1; any other value gives an empty string
 
+      \lang{python}
       \doctest
       >>> conic_out(1), repr(conic_out(4))
       ('cost', "''")
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> conic_out(1), isempty(conic_out(4))
       cost
       1
       \enddoctest
+      \endlang
 
       \identifier{1eh} */
   CASADI_EXPORT std::string conic_out(casadi_int ind);
 
   /** \brief Get the number of QP solver inputs
 
+      \lang{python}
       \doctest
       >>> conic_n_in()
       12
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> conic_n_in()
       12
       \enddoctest
+      \endlang
 
       \identifier{1ei} */
   CASADI_EXPORT casadi_int conic_n_in();
 
   /** \brief Get the number of QP solver outputs
 
+      \lang{python}
       \doctest
       >>> conic_n_out()
       4
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> conic_n_out()
       4
       \enddoctest
+      \endlang
 
       \identifier{1ej} */
   CASADI_EXPORT casadi_int conic_n_out();
@@ -387,16 +423,20 @@ namespace casadi {
       Returns the names of the plugin-specific options only; the options shared by all plugins
       (e.g. "print_time", "discrete") are not included. Raises an error for an unknown plugin.
 
+      \lang{python}
       \doctest
       >>> "max_iter" in conic_options("qrqp"), "discrete" in conic_options("qrqp")
       (True, False)
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> opts = cellstr(conic_options('qrqp'));
       >> ismember({'max_iter', 'discrete'}, opts)
       1 0
       \enddoctest
+      \endlang
 
       \sa conic_option_type, conic_option_info
 
@@ -409,16 +449,20 @@ namespace casadi {
       \param op Option name; an unknown option raises an error
       \return Type name such as "OT_INT", "OT_BOOL", "OT_STRING"
 
+      \lang{python}
       \doctest
       >>> conic_option_type("qrqp", "max_iter"), conic_option_type("qrqp", "print_iter")
       ('OT_INT', 'OT_BOOL')
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> conic_option_type('qrqp', 'max_iter'), conic_option_type('qrqp', 'print_iter')
       OT_INT
       OT_BOOL
       \enddoctest
+      \endlang
 
       \identifier{1el} */
   CASADI_EXPORT std::string conic_option_type(const std::string& name, const std::string& op);
@@ -428,15 +472,19 @@ namespace casadi {
       \param name Plugin name
       \param op Option name; an unknown option raises an error
 
+      \lang{python}
       \doctest
       >>> conic_option_info("qrqp", "max_iter")
       'Maximum number of iterations [1000].'
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> conic_option_info('qrqp', 'max_iter')
       Maximum number of iterations [1000].
       \enddoctest
+      \endlang
 
       \identifier{1em} */
   CASADI_EXPORT std::string conic_option_info(const std::string& name, const std::string& op);
@@ -445,16 +493,20 @@ namespace casadi {
 
       Tries to load the plugin \p name if it is not loaded yet; false when it is not found.
 
+      \lang{python}
       \doctest
       >>> has_conic("qrqp"), has_conic("no_such_plugin")
       (True, False)
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> has_conic('qrqp'), has_conic('no_such_plugin')
       1
       0
       \enddoctest
+      \endlang
 
       \identifier{2od} */
   CASADI_EXPORT bool has_conic(const std::string& name);
@@ -464,6 +516,7 @@ namespace casadi {
       Normally plugins are loaded on first use; this raises an error when the plugin cannot be
       found.
 
+      \lang{python}
       \doctest
       >>> try:
       ...     load_conic("no_such_plugin")
@@ -471,12 +524,15 @@ namespace casadi {
       ...     print("no_such_plugin" in str(e))
       True
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> try, load_conic('no_such_plugin'); catch e, msg = e.message; end
       >> contains(msg, 'no_such_plugin')
       1
       \enddoctest
+      \endlang
 
       \identifier{2oe} */
   CASADI_EXPORT void load_conic(const std::string& name);
@@ -485,15 +541,19 @@ namespace casadi {
 
       The text includes the plugin-specific option table.
 
+      \lang{python}
       \doctest
       >>> "active-set" in doc_conic("qrqp")
       True
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> contains(doc_conic('qrqp'), 'active-set')
       1
       \enddoctest
+      \endlang
 
       \identifier{2of} */
   CASADI_EXPORT std::string doc_conic(const std::string& name);
@@ -507,6 +567,7 @@ namespace casadi {
       \param f Function created by conic (not qpsol)
       \param filename Output file name
 
+      \lang{python}
       \doctest
       >>> import os, tempfile
       >>> C = conic("C", "qrqp", {"h": Sparsity.dense(1)}, {"print_header": False})
@@ -518,8 +579,10 @@ namespace casadi {
       True
       >>> os.remove(fn); os.rmdir(d)
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> C = conic('C', 'qrqp', struct('h', Sparsity.dense(1)), struct('print_header', false));
       >> fn = [tempname '.txt'];
       >> try, conic_debug(C, fn); catch e, msg = e.message; end
@@ -527,6 +590,7 @@ namespace casadi {
       1
       >> delete(fn)
       \enddoctest
+      \endlang
 
       \identifier{2og} */
   CASADI_EXPORT void conic_debug(const Function& f, const std::string &filename);

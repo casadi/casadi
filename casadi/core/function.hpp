@@ -65,6 +65,7 @@ namespace casadi {
       The exceptions to immutability are options changed with change_option and the cache
       of derivative functions.
 
+      \lang{python}
       \doctest
       >>> x = SX.sym("x"); y = SX.sym("y", 2)
       >>> f = Function("f", [x, y], [x*y, sin(x)], ["x", "y"], ["r", "s"])
@@ -79,8 +80,10 @@ namespace casadi {
       >>> f(z, [3, 4])
       (MX(f(z, [3, 4]){0}), MX(f(z, [3, 4]){1}))
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> x = SX.sym('x'); y = SX.sym('y', 2);
       >> f = Function('f', {x, y}, {x*y, sin(x)}, {'x', 'y'}, {'r', 's'});
       >> f
@@ -95,6 +98,7 @@ namespace casadi {
       f(z, [3, 4]){0}
       f(z, [3, 4]){1}
       \enddoctest
+      \endlang
 
       \author Joel Andersson
       \date 2010-2017
@@ -106,15 +110,19 @@ namespace casadi {
   public:
     /** \brief Get the type name, always "Function"
 
+        \lang{python}
         \doctest
         >>> Function.type_name()
         'Function'
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> Function.type_name()
         Function
         \enddoctest
+        \endlang
 
         \identifier{1ux} */
     static std::string type_name() {return "Function";}
@@ -124,17 +132,21 @@ namespace casadi {
         A null Function has name "null", is_null() is true, and any other member
         function raises an error. Use it only as a placeholder to be assigned later.
 
+        \lang{python}
         \doctest
         >>> f = Function()
         >>> f.is_null(), f.name()
         (True, 'null')
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> f = Function(); disp(f.is_null()), disp(f.name())
         1
         null
         \enddoctest
+        \endlang
 
         \identifier{1uy} */
     Function();
@@ -182,6 +194,7 @@ namespace casadi {
         is in neither list raises "Unknown dictionary entry". A missing key gives an
         empty (0-by-0) input or output.
 
+        \lang{python}
         \doctest
         >>> x = SX.sym("x"); y = SX.sym("y", 2)
         >>> f = Function("f", [x, y], [x*y, sin(x)])
@@ -208,8 +221,10 @@ namespace casadi {
         ...   print("Function name is not valid" in str(e))
         True
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x'); y = SX.sym('y', 2);
         >> f = Function('f', {x, y}, {x*y, sin(x)}); disp(f)
         f:(i0,i1[2])->(o0[2],o1) SXFunction
@@ -229,6 +244,7 @@ namespace casadi {
         >> try, Function('my func', {x}, {x}); catch e, disp(contains(e.message, 'not valid')); end
         1
         \enddoctest
+        \endlang
 
         \sa expand, check_name, has_free
 
@@ -268,6 +284,7 @@ namespace casadi {
         \param name_out Output names; defaults to o0, o1, ...
         \param opts Options, see the table below
 
+        \lang{python}
         \doctest
         >>> x = MX.sym("x", 2); A = MX.sym("A", 2, 2)
         >>> f = Function("f", [A, x], [A @ x, norm_2(x)], ["A", "x"], ["Ax", "nrm"])
@@ -281,8 +298,10 @@ namespace casadi {
         >>> g.class_name()
         'SXFunction'
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = MX.sym('x', 2); A = MX.sym('A', 2, 2);
         >> f = Function('f', {A, x}, {A*x, norm_2(x)}, {'A', 'x'}, {'Ax', 'nrm'}); disp(f)
         f:(A[2x2],x[2])->(Ax[2],nrm) MXFunction
@@ -294,6 +313,7 @@ namespace casadi {
         >> g = Function('g', {x}, {x}, struct('post_expand', true)); disp(g.class_name())
         SXFunction
         \enddoctest
+        \endlang
 
         \sa expand, has_free
 
@@ -426,6 +446,7 @@ namespace casadi {
         \param opts Options for the SXFunction constructor, e.g. "live_variables", "cse"
         \return SXFunction
 
+        \lang{python}
         \doctest
         >>> x = MX.sym("x", 2)
         >>> f = Function("f", [x], [x.T @ x, 2*x], ["x"], ["q", "y"])
@@ -448,8 +469,10 @@ namespace casadi {
         >>> Function("h", [A, x], [solve(A, x, "symbolicqr")]).expand().class_name()
         'SXFunction'
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = MX.sym('x', 2);
         >> f = Function('f', {x}, {x'*x, 2*x}, {'x'}, {'q', 'y'});
         >> f, f.n_instructions()
@@ -469,6 +492,7 @@ namespace casadi {
         >> Function('h', {A, x}, {solve(A, x, 'symbolicqr')}).expand().class_name()
         SXFunction
         \enddoctest
+        \endlang
 
         \sa Function::Function, transform
 
@@ -511,6 +535,7 @@ namespace casadi {
         \param passes Explicit list of passes
         \param opts Dict form: task booleans and "verbose"; passes form: "verbose" only
 
+        \lang{python}
         \doctest
         >>> z = MX.sym("z"); w = MX.sym("w")
         >>> f = Function("f", [z, w], [sin(z)*cos(z) + sin(z)*cos(z)], ["z", "w"], ["r"])
@@ -529,8 +554,10 @@ namespace casadi {
         ...   print("unknown pass verb" in str(e))
         True
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> z = MX.sym('z'); w = MX.sym('w');
         >> f = Function('f', {z, w}, {sin(z)*cos(z) + sin(z)*cos(z)}, {'z', 'w'}, {'r'});
         >> f, f.n_instructions()
@@ -546,6 +573,7 @@ namespace casadi {
         >> try, f.transform({{'nope'}}); catch e, disp(contains(e.message, 'unknown pass')); end
         1
         \enddoctest
+        \endlang
 
         \sa expand
 
@@ -576,6 +604,7 @@ namespace casadi {
 
     /** \brief Get the number of function inputs
 
+        \lang{python}
         \doctest
         >>> x = SX.sym("x"); y = SX.sym("y")
         >>> f = Function("f", [x, y], [x+y, x-y, x*y])
@@ -584,8 +613,10 @@ namespace casadi {
         >>> Function("g", [], [DM(1)]).n_in()
         0
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x'); y = SX.sym('y');
         >> f = Function('f', {x, y}, {x+y, x-y, x*y});
         >> fprintf('%d %d\n', f.n_in(), f.n_out())
@@ -593,6 +624,7 @@ namespace casadi {
         >> Function('g', {}, {DM(1)}).n_in()
         0
         \enddoctest
+        \endlang
 
         \sa n_out, name_in, size_in
 
@@ -601,17 +633,21 @@ namespace casadi {
 
     /** \brief Get the number of function outputs
 
+        \lang{python}
         \doctest
         >>> x = SX.sym("x")
         >>> Function("f", [x], [x, 2*x]).n_out()
         2
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x');
         >> Function('f', {x}, {x, 2*x}).n_out()
         2
         \enddoctest
+        \endlang
 
         \sa n_in, name_out, size_out
 
@@ -626,6 +662,7 @@ namespace casadi {
         raises an error listing the available names, an index out of range raises an
         error.
 
+        \lang{python}
         \doctest
         >>> f = Function("f", [SX.sym("A", 2, 3), SX.sym("b", 2)], [SX(0)], ["A", "b"], ["c"])
         >>> f.size_in(0), f.size1_in("A"), f.size2_in("A")
@@ -638,8 +675,10 @@ namespace casadi {
         ...   print("Available names are: [A, b]" in str(e))
         True
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> f = Function('f', {SX.sym('A', 2, 3), SX.sym('b', 2)}, {SX(0)}, {'A', 'b'}, {'c'});
         >> disp(f.size_in(0)), fprintf('%d %d\n', f.size1_in('A'), f.size2_in('A'))
         2 3
@@ -649,6 +688,7 @@ namespace casadi {
         >> try, f.size_in('nope'); catch e, disp(contains(e.message, 'Available names')); end
         1
         \enddoctest
+        \endlang
 
         \sa size_out, sparsity_in, nnz_in, numel_in
 
@@ -668,14 +708,17 @@ namespace casadi {
 
         Same conventions as size_in, size1_in and size2_in.
 
+        \lang{python}
         \doctest
         >>> x = SX.sym("x", 3)
         >>> f = Function("f", [x], [x.T, SX(2, 2)])
         >>> f.size_out(0), f.size_out("o1"), f.size1_out(0), f.size2_out(1)
         ((1, 3), (2, 2), 1, 2)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x', 3);
         >> f = Function('f', {x}, {x', SX(2, 2)});
         >> f.size_out(0), f.size_out('o1')
@@ -684,6 +727,7 @@ namespace casadi {
         >> fprintf('%d %d\n', f.size1_out(0), f.size2_out(1))
         1 2
         \enddoctest
+        \endlang
 
         \sa size_in, sparsity_out
 
@@ -704,6 +748,7 @@ namespace casadi {
         Without argument, the sum over all inputs. The nonzero count is what numerical
         evaluation reads for the input; it is smaller than numel_in for sparse inputs.
 
+        \lang{python}
         \doctest
         >>> f = Function("f", [SX.sym("x", 2), SX.sym("D", Sparsity.diag(3))], [SX(1)])
         >>> f.nnz_in(0), f.nnz_in(1), f.nnz_in()
@@ -711,14 +756,17 @@ namespace casadi {
         >>> f.numel_in(0), f.numel_in(1), f.numel_in()
         (2, 9, 11)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> f = Function('f', {SX.sym('x', 2), SX.sym('D', Sparsity.diag(3))}, {SX(1)});
         >> fprintf('%d %d %d\n', f.nnz_in(0), f.nnz_in(1), f.nnz_in())
         2 3 5
         >> fprintf('%d %d %d\n', f.numel_in(0), f.numel_in(1), f.numel_in())
         2 9 11
         \enddoctest
+        \endlang
 
         \sa nnz_out, numel_in, sparsity_in
 
@@ -733,19 +781,23 @@ namespace casadi {
 
         Without argument, the sum over all outputs.
 
+        \lang{python}
         \doctest
         >>> x = SX.sym("x", 2)
         >>> f = Function("f", [x], [x, diag(x), SX(1, 1)])
         >>> f.nnz_out(0), f.nnz_out(1), f.nnz_out(2), f.nnz_out()
         (2, 2, 0, 4)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x', 2);
         >> f = Function('f', {x}, {x, diag(x), SX(1, 1)});
         >> fprintf('%d %d %d %d\n', f.nnz_out(0), f.nnz_out(1), f.nnz_out(2), f.nnz_out())
         2 2 0 4
         \enddoctest
+        \endlang
 
         \sa nnz_in, numel_out, sparsity_out
 
@@ -772,17 +824,21 @@ namespace casadi {
 
         Counts structural zeros too, unlike nnz_in.
 
+        \lang{python}
         \doctest
         >>> f = Function("f", [SX.sym("D", Sparsity.diag(3))], [SX(1)])
         >>> f.numel_in(0), f.nnz_in(0), f.numel_in("i0")
         (9, 3, 9)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> f = Function('f', {SX.sym('D', Sparsity.diag(3))}, {SX(1)});
         >> fprintf('%d %d %d\n', f.numel_in(0), f.nnz_in(0), f.numel_in('i0'))
         9 3 9
         \enddoctest
+        \endlang
 
         \sa nnz_in, numel_out
 
@@ -795,19 +851,23 @@ namespace casadi {
     ///@{
     /** \brief Get the number of elements (rows times columns) of one output, or of all
 
+        \lang{python}
         \doctest
         >>> x = SX.sym("x", 2)
         >>> f = Function("f", [x], [SX(2, 2), x])
         >>> f.numel_out(0), f.numel_out(1), f.numel_out()
         (4, 2, 6)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x', 2);
         >> f = Function('f', {x}, {SX(2, 2), x});
         >> fprintf('%d %d %d\n', f.numel_out(0), f.numel_out(1), f.numel_out())
         4 2 6
         \enddoctest
+        \endlang
 
         \sa nnz_out, numel_in
 
@@ -823,6 +883,7 @@ namespace casadi {
         Solver objects have fixed schemes, e.g. x0, p, lbx, ubx, lbg, ubg, lam_x0, lam_g0
         for nlpsol.
 
+        \lang{python}
         \doctest
         >>> x = SX.sym("x"); y = SX.sym("y")
         >>> Function("f", [x, y], [x+y]).name_in()
@@ -831,8 +892,10 @@ namespace casadi {
         >>> f.name_in(), f.name_in(1), f.name_out()
         (['x', 'y'], 'y', ['r'])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x'); y = SX.sym('y');
         >> Function('f', {x, y}, {x+y}).name_in()
         i0
@@ -844,6 +907,7 @@ namespace casadi {
         y
         r
         \enddoctest
+        \endlang
 
         \sa name_out, index_in, has_in
 
@@ -854,18 +918,22 @@ namespace casadi {
 
         Defaults are o0, o1, ... when the constructor was given no names.
 
+        \lang{python}
         \doctest
         >>> x = SX.sym("x")
         >>> Function("f", [x], [x, 2*x]).name_out()
         ['o0', 'o1']
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x');
         >> Function('f', {x}, {x, 2*x}).name_out()
         o0
         o1
         \enddoctest
+        \endlang
 
         \sa name_in, index_out, has_out
 
@@ -887,6 +955,7 @@ namespace casadi {
         Raises an error listing the available names when no input is called \p name.
         Use has_in to test without raising.
 
+        \lang{python}
         \doctest
         >>> f = Function("f", [SX.sym("x"), SX.sym("y")], [SX(0)], ["x", "y"], ["r"])
         >>> f.index_in("y"), f.index_out("r")
@@ -897,14 +966,17 @@ namespace casadi {
         ...   print('could not find entry "z". Available names are: [x, y]' in str(e))
         True
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> f = Function('f', {SX.sym('x'), SX.sym('y')}, {SX(0)}, {'x', 'y'}, {'r'});
         >> fprintf('%d %d\n', f.index_in('y'), f.index_out('r'))
         1 0
         >> try, f.index_in('z'); catch e, disp(contains(e.message, 'find entry "z"')); end
         1
         \enddoctest
+        \endlang
 
         \sa index_out, has_in, name_in
 
@@ -920,17 +992,21 @@ namespace casadi {
 
     /** \brief Check whether an input with the given name exists
 
+        \lang{python}
         \doctest
         >>> f = Function("f", [SX.sym("x")], [SX(0)], ["x"], ["r"])
         >>> f.has_in("x"), f.has_in("r"), f.has_out("r"), f.has_out("x")
         (True, False, True, False)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> f = Function('f', {SX.sym('x')}, {SX(0)}, {'x'}, {'r'});
         >> fprintf('%d %d %d %d\n', f.has_in('x'), f.has_in('r'), f.has_out('r'), f.has_out('x'))
         1 0 1 0
         \enddoctest
+        \endlang
 
         \sa has_out, index_in
 
@@ -951,6 +1027,7 @@ namespace casadi {
         define their own: nlpsol uses -inf for lbx and lbg, inf for ubx and ubg, 0 for the
         rest.
 
+        \lang{python}
         \doctest
         >>> x = SX.sym("x"); y = SX.sym("y", 2)
         >>> f = Function("f", [x, y], [x + y], ["x", "y"], ["r"])
@@ -960,8 +1037,10 @@ namespace casadi {
         >>> g.default_in(1), g(x=3), g(y=[0, 1])
         (2.0, {'r': DM([5, 5])}, {'r': DM([1, 2])})
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x'); y = SX.sym('y', 2);
         >> f = Function('f', {x, y}, {x + y}, {'x', 'y'}, {'r'});
         >> disp(f.default_in(0)), res = f('x', 3); disp(res.r)
@@ -974,6 +1053,7 @@ namespace casadi {
         [5, 5]
         [1, 2]
         \enddoctest
+        \endlang
 
         \sa max_in, min_in, nominal_in, convert_in
 
@@ -984,17 +1064,21 @@ namespace casadi {
 
         restricts it)
 
+        \lang{python}
         \doctest
         >>> f = Function("f", [SX.sym("x")], [SX(0)])
         >>> f.max_in(0), f.min_in(0)
         (inf, -inf)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> f = Function('f', {SX.sym('x')}, {SX(0)});
         >> fprintf('%g %g\n', f.max_in(0), f.min_in(0))
         Inf -Inf
         \enddoctest
+        \endlang
 
         \sa min_in, default_in
 
@@ -1014,20 +1098,24 @@ namespace casadi {
 
         A list of length nnz_in(ind), all ones unless the class defines scaling.
 
+        \lang{python}
         \doctest
         >>> x = SX.sym("x", 2)
         >>> f = Function("f", [x], [vertcat(x, 1)])
         >>> f.nominal_in(0), f.nominal_out(0)
         ([1.0, 1.0], [1.0, 1.0, 1.0])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x', 2);
         >> f = Function('f', {x}, {vertcat(x, 1)});
         >> f.nominal_in(0), f.nominal_out(0)
         1 1
         1 1 1
         \enddoctest
+        \endlang
 
         \sa nominal_out, default_in
 
@@ -1047,6 +1135,7 @@ namespace casadi {
         outside it are dropped silently. Symbolic inputs keep the pattern of the expression
         passed to the constructor.
 
+        \lang{python}
         \doctest
         >>> f = Function("f", [SX.sym("D", Sparsity.diag(2))], [SX(0)], ["D"], ["r"])
         >>> f.sparsity_in(0)
@@ -1056,8 +1145,10 @@ namespace casadi {
         >>> f.sparsity_out(0)
         Sparsity(1x1)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> f = Function('f', {SX.sym('D', Sparsity.diag(2))}, {SX(0)}, {'D'}, {'r'});
         >> f.sparsity_in(0)
         2x2,2nz
@@ -1066,6 +1157,7 @@ namespace casadi {
         >> f.sparsity_out(0)
         1x1
         \enddoctest
+        \endlang
 
         \sa sparsity_out, size_in, nnz_in
 
@@ -1095,6 +1187,7 @@ namespace casadi {
         printout marks them with a '#'. Without argument, the list for all inputs or
         outputs is returned.
 
+        \lang{python}
         \doctest
         >>> x = SX.sym("x"); n = SX.sym("n")
         >>> f = Function("f", [x, n], [x*n], ["x", "n"], ["r"], {"is_diff_in": [True, False]})
@@ -1105,8 +1198,10 @@ namespace casadi {
         >>> f.jacobian()
         Function(jac_f:(x,#n,out_r[1x1,0nz])->(jac_r_x,#jac_r_n[1x1,0nz]) SXFunction)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x'); n = SX.sym('n');
         >> opts = struct('is_diff_in', [true, false]);
         >> f = Function('f', {x, n}, {x*n}, {'x', 'n'}, {'r'}, opts); disp(f)
@@ -1118,6 +1213,7 @@ namespace casadi {
         >> f.jacobian()
         jac_f:(x,#n,out_r[1x1,0nz])->(jac_r_x,#jac_r_n[1x1,0nz]) SXFunction
         \enddoctest
+        \endlang
 
         \sa jacobian
 
@@ -1161,6 +1257,7 @@ namespace casadi {
         \param opts "helper_options" and "final_options" (dicts for the intermediate and
           the returned function) and any Function option for the result
 
+        \lang{python}
         \doctest
         >>> x = SX.sym("x", 2); p = SX.sym("p")
         >>> f = Function("f", [x, p], [p*dot(x, x), x[0]*x[1]], ["x", "p"], ["f", "g"])
@@ -1184,8 +1281,10 @@ namespace casadi {
         ...   print('Cannot process "q" as output. Available: f,g.' in str(e))
         True
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x', 2); p = SX.sym('p');
         >> f = Function('f', {x, p}, {p*dot(x, x), x(1)*x(2)}, {'x', 'p'}, {'f', 'g'});
         >> g = f.factory('g', {'x', 'p'}, {'jac:f:x', 'hess:f:x:x', 'jac:g:x'}); disp(g)
@@ -1208,6 +1307,7 @@ namespace casadi {
         >> contains(msg, 'Cannot process "q" as output. Available: f,g.')
         1
         \enddoctest
+        \endlang
 
         \sa jacobian, forward, reverse, which_depends
 
@@ -1223,6 +1323,7 @@ namespace casadi {
         For nlpsol, qpsol, rootfinder and integrator objects this is the Function with the
         problem expressions (e.g. nlp:(x,p)->(f,g)); for other classes an error is raised.
 
+        \lang{python}
         \doctest
         >>> x = SX.sym("x")
         >>> opts = {"qpsol": "qrqp", "print_header": False, "print_iteration": False,
@@ -1236,8 +1337,10 @@ namespace casadi {
         ...   print("'oracle' not defined for SXFunction" in str(e))
         True
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x');
         >> opts = struct('qpsol', 'qrqp', 'print_header', false, 'print_iteration', false);
         >> opts.print_time = false; opts.qpsol_options = struct('print_header', false);
@@ -1247,6 +1350,7 @@ namespace casadi {
         >> try, S.oracle().oracle(); catch e, disp(contains(e.message, 'not defined')); end
         1
         \enddoctest
+        \endlang
 
         \sa get_function, find_functions
 
@@ -1262,6 +1366,7 @@ namespace casadi {
 
         \param name Name of the wrapper; defaults to "wrap_" + name()
 
+        \lang{python}
         \doctest
         >>> x = SX.sym("x")
         >>> f = Function("f", [x], [sin(x)], ["x"], ["y"])
@@ -1271,8 +1376,10 @@ namespace casadi {
         >>> f.wrap("g").name()
         'g'
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x');
         >> f = Function('f', {x}, {sin(x)}, {'x'}, {'y'});
         >> w = f.wrap(); disp(w), disp(w.n_instructions()), disp(w.get_function())
@@ -1282,6 +1389,7 @@ namespace casadi {
         >> f.wrap('g').name()
         g
         \enddoctest
+        \endlang
 
         \sa wrap_as_needed, expand
 
@@ -1298,6 +1406,7 @@ namespace casadi {
         function itself when \p opts is empty and \p name equals its current name; the
         unnamed overload always wraps, under the name "wrap_" + name().
 
+        \lang{python}
         \doctest
         >>> x = SX.sym("x")
         >>> f = Function("f", [x], [sin(x)])
@@ -1306,8 +1415,10 @@ namespace casadi {
         >>> f.wrap_as_needed("g", {"ad_weight": 1}).name()
         'g'
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x');
         >> f = Function('f', {x}, {sin(x)});
         >> f.wrap_as_needed('f', struct()).class_name()
@@ -1317,6 +1428,7 @@ namespace casadi {
         >> f.wrap_as_needed('g', struct('ad_weight', 1)).name()
         g
         \enddoctest
+        \endlang
 
         \sa wrap
 
@@ -1339,6 +1451,7 @@ namespace casadi {
         \param order 1 (any dependence) or 2 (nonlinear dependence); other values raise
         \param tr Transpose the relation, see above
 
+        \lang{python}
         \doctest
         >>> x = SX.sym("x"); y = SX.sym("y", 2)
         >>> f = Function("f", [x, y], [x*y[0], y[1]**2 + x, 3], ["x", "y"], ["a", "b", "c"])
@@ -1351,8 +1464,10 @@ namespace casadi {
         >>> f.which_depends("x", ["a"], 2)
         [False]
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x'); y = SX.sym('y', 2);
         >> f = Function('f', {x, y}, {x*y(1), y(2)^2 + x, 3}, {'x', 'y'}, {'a', 'b', 'c'});
         >> f.which_depends('y', {'a', 'b'})
@@ -1364,6 +1479,7 @@ namespace casadi {
         >> f.which_depends('x', {'a'}, 2)
         0
         \enddoctest
+        \endlang
 
         \sa factory, jac_sparsity
 
@@ -1374,6 +1490,7 @@ namespace casadi {
 
     /** \brief Print the name and shape of every input and output
 
+        \lang{python}
         \doctest
         >>> f = Function("f", [SX.sym("x", 2), SX.sym("p")], [SX(1, 3)], ["x", "p"], ["r"])
         >>> f.print_dimensions()
@@ -1383,8 +1500,10 @@ namespace casadi {
         Number of outputs: 1
         Output 0 ("r"): 1x3
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> f = Function('f', {SX.sym('x', 2), SX.sym('p')}, {SX(1, 3)}, {'x', 'p'}, {'r'});
         >> f.print_dimensions()
         Number of inputs: 2
@@ -1393,6 +1512,7 @@ namespace casadi {
         Number of outputs: 1
         Output 0 ("r"): 1x3
         \enddoctest
+        \endlang
 
         \sa size_in, sparsity_in
 
@@ -1414,17 +1534,21 @@ namespace casadi {
 
         notice
 
+        \lang{python}
         \doctest
         >>> f = Function("f", [SX.sym("x")], [SX(0)])
         >>> f.print_option("verbose")
         > "verbose"          [OT_BOOL]      "Verbose evaluation -- for debugging"
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> f = Function('f', {SX.sym('x')}, {SX(0)});
         >> f.print_option('verbose')
         > "verbose"          [OT_BOOL]      "Verbose evaluation -- for debugging"
         \enddoctest
+        \endlang
 
         \sa print_options, has_option
 
@@ -1433,17 +1557,21 @@ namespace casadi {
 
     /** \brief Check whether this class accepts an option with the given name
 
+        \lang{python}
         \doctest
         >>> f = Function("f", [SX.sym("x")], [SX(0)])
         >>> f.has_option("live_variables"), f.has_option("ipopt")
         (True, False)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> f = Function('f', {SX.sym('x')}, {SX(0)});
         >> fprintf('%d %d\n', f.has_option('live_variables'), f.has_option('ipopt'))
         1 0
         \enddoctest
+        \endlang
 
         \sa print_options, change_option
 
@@ -1458,6 +1586,7 @@ namespace casadi {
         and "print_instructions". Any other existing option raises "cannot be changed";
         an unknown name raises "does not exist".
 
+        \lang{python}
         \doctest
         >>> f = Function("f", [SX.sym("x")], [SX(0)])
         >>> f.change_option("verbose", False)
@@ -1467,14 +1596,17 @@ namespace casadi {
         ...   print("Option 'cse' cannot be changed" in str(e))
         True
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> f = Function('f', {SX.sym('x')}, {SX(0)});
         >> f.change_option('verbose', false)
         >> try, f.change_option('cse', true); catch e, msg = e.message; end
         >> contains(msg, 'Option ''cse'' cannot be changed')
         1
         \enddoctest
+        \endlang
 
         \sa has_option
 
@@ -1495,17 +1627,21 @@ namespace casadi {
         ignored and this returns false; it is true for classes that reuse the outputs,
         for example to avoid recomputing a solver solution.
 
+        \lang{python}
         \doctest
         >>> f = Function("f", [SX.sym("x")], [SX(0)])
         >>> f.uses_output()
         False
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> f = Function('f', {SX.sym('x')}, {SX(0)});
         >> f.uses_output()
         0
         \enddoctest
+        \endlang
 
         \sa jacobian, forward, reverse
 
@@ -1564,6 +1700,7 @@ namespace casadi {
       cannot be calculated" for classes without any derivative support. For a single
       block, factory("...", ..., ["jac:r:x"]) avoids computing the others.
 
+      \lang{python}
       \doctest
       >>> x = SX.sym("x"); y = SX.sym("y", 2)
       >>> f = Function("f", [x, y], [x*y, sin(x)], ["x", "y"], ["r", "s"])
@@ -1577,8 +1714,10 @@ namespace casadi {
       >>> f.jacobian().name_out()
       ['jac_r_x', 'jac_r_y', 'jac_s_x', 'jac_s_y']
       \enddoctest
+      \endlang
 
-      \doctest{matlab}
+      \lang{matlab}
+      \doctest
       >> x = SX.sym('x'); y = SX.sym('y', 2);
       >> f = Function('f', {x, y}, {x*y, sin(x)}, {'x', 'y'}, {'r', 's'});
       >> J = f.jacobian(); disp(J)
@@ -1596,6 +1735,7 @@ namespace casadi {
       jac_s_x
       jac_s_y
       \enddoctest
+      \endlang
 
       \sa factory, forward, reverse, jac_sparsity, uses_output
 
@@ -1635,6 +1775,7 @@ namespace casadi {
         \param never_inline SX only: keep the call as an opaque call node inside the
           SX expression instead of inlining it
 
+        \lang{python}
         \doctest
         >>> x = SX.sym("x"); y = SX.sym("y", 2)
         >>> f = Function("f", [x, y], [x*y, sin(x)], ["x", "y"], ["r", "s"])
@@ -1671,8 +1812,10 @@ namespace casadi {
         ...   print("Input 1 (y) has mismatching shape. Got 3-by-1" in str(e))
         True
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x'); y = SX.sym('y', 2);
         >> f = Function('f', {x, y}, {x*y, sin(x)}, {'x', 'y'}, {'r', 's'});
         >> res = f.call({2, [3; 4]}); disp(res{1}), disp(res{2})
@@ -1709,6 +1852,7 @@ namespace casadi {
         >> try, f(1, [1; 2; 3]); catch e, disp(contains(e.message, 'Got 3-by-1')); end
         1
         \enddoctest
+        \endlang
 
         \sa default_in, convert_in, map, mapsum
 
@@ -1853,6 +1997,7 @@ namespace casadi {
         \param x List of n_in() MX arguments
         \param parallelization "serial" only; other values raise an error
 
+        \lang{python}
         \doctest
         >>> x = SX.sym("x"); y = SX.sym("y")
         >>> f = Function("f", [x, y], [x*y, x - y], ["x", "y"], ["p", "d"])
@@ -1864,8 +2009,10 @@ namespace casadi {
         >>> evalf(f.mapsum([2, DM([[1, 2, 3]])])[0])
         DM(12)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x'); y = SX.sym('y');
         >> f = Function('f', {x, y}, {x*y, x - y}, {'x', 'y'}, {'p', 'd'});
         >> res = f.mapsum({MX.sym('a'), MX.sym('b', 1, 3)}); disp(res{1})
@@ -1876,6 +2023,7 @@ namespace casadi {
         >> evalf(res{1})
         12
         \enddoctest
+        \endlang
 
         \sa map, call
 
@@ -1914,6 +2062,7 @@ namespace casadi {
           min(n_in, n_out)
         \param opts "base" plus options for the resulting MXFunction
 
+        \lang{python}
         \doctest
         >>> x = SX.sym("x"); u = SX.sym("u")
         >>> step = Function("step", [x, u], [x + u, x*u], ["x", "u"], ["x_next", "y"])
@@ -1934,8 +2083,10 @@ namespace casadi {
         ...   print("mapaccum: N must be positive" in str(e))
         True
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x'); u = SX.sym('u');
         >> step = Function('step', {x, u}, {x + u, x*u}, {'x', 'u'}, {'x_next', 'y'});
         >> F = step.mapaccum(3); disp(F)
@@ -1953,6 +2104,7 @@ namespace casadi {
         >> try, step.mapaccum(0); catch e, disp(contains(e.message, 'N must be positive')); end
         1
         \enddoctest
+        \endlang
 
         \sa map, fold
 
@@ -1991,6 +2143,7 @@ namespace casadi {
         \param max_num_threads With "thread" or "openmp": split the n evaluations into
           at most this many parallel chunks, each a serial map
 
+        \lang{python}
         \doctest
         >>> x = SX.sym("x"); p = SX.sym("p")
         >>> f = Function("f", [x, p], [p*x**2], ["x", "p"], ["y"])
@@ -2006,8 +2159,10 @@ namespace casadi {
         >>> f.map(1) is f, f.map(1).name()
         (False, 'f')
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x'); p = SX.sym('p');
         >> f = Function('f', {x, p}, {p*x^2}, {'x', 'p'}, {'y'});
         >> F = f.map(3); disp(F)
@@ -2021,6 +2176,7 @@ namespace casadi {
         >> f.map(1).name()
         f
         \enddoctest
+        \endlang
 
         \sa mapaccum, mapsum, call
 
@@ -2040,6 +2196,7 @@ namespace casadi {
         MXFunction built with \p opts; masks must have length n_in and n_out (an empty
         \p reduce_out means no reduction).
 
+        \lang{python}
         \doctest
         >>> x = SX.sym("x"); p = SX.sym("p")
         >>> f = Function("f", [x, p], [p*x, x], ["x", "p"], ["y", "z"])
@@ -2051,8 +2208,10 @@ namespace casadi {
         >>> f.map(3, [False, True], [True, False])(DM([[1, 2, 3]]), 2)
         (DM(12), DM([[1, 2, 3]]))
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x'); p = SX.sym('p');
         >> f = Function('f', {x, p}, {p*x, x}, {'x', 'p'}, {'y', 'z'});
         >> F = f.map('F', 'serial', 3, {'p'}, {'y'}); disp(F)
@@ -2065,6 +2224,7 @@ namespace casadi {
         12
         [[1, 2, 3]]
         \enddoctest
+        \endlang
 
         \sa map, mapsum
 
@@ -2096,6 +2256,7 @@ namespace casadi {
         \param order_out Indices of the original outputs to keep, in the new order
         \param opts Options for the new function
 
+        \lang{python}
         \doctest
         >>> x = SX.sym("x"); y = SX.sym("y")
         >>> f = Function("f", [x, y], [x + y, x - y, 2*x], ["x", "y"], ["a", "b", "c"])
@@ -2105,8 +2266,10 @@ namespace casadi {
         >>> f.slice("h", [0], [2])
         Function(h:(x)->(c) SXFunction)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x'); y = SX.sym('y');
         >> f = Function('f', {x, y}, {x + y, x - y, 2*x}, {'x', 'y'}, {'a', 'b', 'c'});
         >> g = f.slice('g', [1, 0], [2, 0]); disp(g)
@@ -2117,6 +2280,7 @@ namespace casadi {
         >> f.slice('h', 0, 2)
         h:(x)->(c) SXFunction
         \enddoctest
+        \endlang
 
         \sa factory
 
@@ -2140,6 +2304,7 @@ namespace casadi {
         \param f_def Default branch for indices out of range
         \param opts Function options
 
+        \lang{python}
         \doctest
         >>> x = SX.sym("x")
         >>> f0 = Function("f0", [x], [x]); f1 = Function("f1", [x], [x**2])
@@ -2152,8 +2317,10 @@ namespace casadi {
         >>> sw(MX.sym("k"), MX.sym("v"))
         MX(sw(k, v){0})
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x');
         >> f0 = Function('f0', {x}, {x}); f1 = Function('f1', {x}, {x^2});
         >> fdef = Function('fdef', {x}, {-x});
@@ -2164,6 +2331,7 @@ namespace casadi {
         >> sw(MX.sym('k'), MX.sym('v'))
         sw(k, v){0}
         \enddoctest
+        \endlang
 
         \sa if_else
 
@@ -2178,6 +2346,7 @@ namespace casadi {
         Shorthand for if_else with a zero-returning function of the same signature as
         the false branch; evaluating with a zero condition skips \p f entirely.
 
+        \lang{python}
         \doctest
         >>> x = SX.sym("x")
         >>> f = Function("f", [x], [x**2])
@@ -2185,8 +2354,10 @@ namespace casadi {
         >>> c, c(0, 3), c(1, 3)
         (Function(c:(i0,i1)->(o0) Switch), DM(0), DM(9))
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x');
         >> f = Function('f', {x}, {x^2});
         >> c = Function.conditional('c', f); disp(c)
@@ -2194,6 +2365,7 @@ namespace casadi {
         >> [c(0, 3), c(1, 3)]
         [[0, 9]]
         \enddoctest
+        \endlang
 
         \sa if_else
 
@@ -2218,6 +2390,7 @@ namespace casadi {
         \param opts "lookup_mode" (per dimension: "linear", "exact", "binary") and
           Function options
 
+        \lang{python}
         \doctest
         >>> f = Function.bspline("f", [[0, 0, 0, 1, 2, 2, 2]], [0, 1, 2, 3], [2])
         >>> f
@@ -2233,8 +2406,10 @@ namespace casadi {
         ...   print("must match knot list length" in str(e))
         True
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> knots = {[0, 0, 0, 1, 2, 2, 2]};
         >> f = Function.bspline('f', knots, [0, 1, 2, 3], 2); disp(f)
         f:(i0)->(o0) MXFunction
@@ -2247,6 +2422,7 @@ namespace casadi {
         >> contains(msg, 'must match knot list length')
         1
         \enddoctest
+        \endlang
 
         \sa interpolant, MX::bspline
 
@@ -2264,6 +2440,7 @@ namespace casadi {
         selects \p f_false. Only the selected branch is evaluated numerically. The
         signature is taken from \p f_false (see conditional).
 
+        \lang{python}
         \doctest
         >>> x = SX.sym("x")
         >>> f = Function.if_else("f", Function("t", [x], [x**2]), Function("e", [x], [x]))
@@ -2272,8 +2449,10 @@ namespace casadi {
         >>> f(1, 3), f(0, 3), f(5, 3)
         (DM(9), DM(3), DM(9))
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x');
         >> f_true = Function('t', {x}, {x^2}); f_false = Function('e', {x}, {x});
         >> f = Function.if_else('f', f_true, f_false); disp(f)
@@ -2281,6 +2460,7 @@ namespace casadi {
         >> [f(1, 3), f(0, 3), f(5, 3)]
         [[9, 3, 9]]
         \enddoctest
+        \endlang
 
         \sa conditional
 
@@ -2299,6 +2479,7 @@ namespace casadi {
         "Derivatives cannot be calculated" when none applies. Results are cached while
         alive. \p nfwd must be positive.
 
+        \lang{python}
         \doctest
         >>> x = SX.sym("x"); y = SX.sym("y", 2)
         >>> f = Function("f", [x, y], [x*y, sin(x)], ["x", "y"], ["r", "s"])
@@ -2310,8 +2491,10 @@ namespace casadi {
         >>> print(f.forward(2))
         fwd2_f:(x,y[2],out_r[2x1,0nz],out_s[1x1,0nz],fwd_x[1x2],fwd_y[2x2])->(...) SXFunction
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x'); y = SX.sym('y', 2);
         >> f = Function('f', {x, y}, {x*y, sin(x)}, {'x', 'y'}, {'r', 's'});
         >> F = f.forward(1); disp(F)
@@ -2322,6 +2505,7 @@ namespace casadi {
         >> f.forward(2)
         fwd2_f:(x,y[2],out_r[2x1,0nz],out_s[1x1,0nz],fwd_x[1x2],fwd_y[2x2])->(...) SXFunction
         \enddoctest
+        \endlang
 
         \sa reverse, jacobian, factory
 
@@ -2337,6 +2521,7 @@ namespace casadi {
         to the full Jacobian when the class has no reverse mode; raises when it has no
         derivatives at all. Results are cached while alive. \p nadj must be positive.
 
+        \lang{python}
         \doctest
         >>> x = SX.sym("x"); y = SX.sym("y", 2)
         >>> f = Function("f", [x, y], [x*y, sin(x)], ["x", "y"], ["r", "s"])
@@ -2347,8 +2532,10 @@ namespace casadi {
         >>> R(1, [2, 3], 0, 0, [1, 1], 0)
         (DM(5), DM([1, 1]))
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x'); y = SX.sym('y', 2);
         >> f = Function('f', {x, y}, {x*y, sin(x)}, {'x', 'y'}, {'r', 's'});
         >> R = f.reverse(1); disp(R)
@@ -2357,6 +2544,7 @@ namespace casadi {
         5
         [1, 1]
         \enddoctest
+        \endlang
 
         \sa forward, jacobian, factory
 
@@ -2371,6 +2559,7 @@ namespace casadi {
         \param compact When true, the pattern is over the nonzeros of output and input
           (nnz_out-by-nnz_in) rather than over all elements (numel_out-by-numel_in)
 
+        \lang{python}
         \doctest
         >>> x = SX.sym("x"); D = SX.sym("D", Sparsity.diag(2))
         >>> f = Function("f", [x, D], [x*D, sin(x)])
@@ -2379,8 +2568,10 @@ namespace casadi {
         >>> f.jac_sparsity(True)
         [Sparsity(2x1), Sparsity(2x2,2nz), Sparsity(1x1), Sparsity(1x2,0nz)]
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x'); D = SX.sym('D', Sparsity.diag(2));
         >> f = Function('f', {x, D}, {x*D, sin(x)});
         >> sp = f.jac_sparsity(); disp(numel(sp)), cellfun(@disp, sp)
@@ -2395,6 +2586,7 @@ namespace casadi {
         1x1
         1x2,0nz
         \enddoctest
+        \endlang
 
         \sa jacobian, which_depends
 
@@ -2405,14 +2597,17 @@ namespace casadi {
 
         \p iind
 
+        \lang{python}
         \doctest
         >>> x = SX.sym("x"); D = SX.sym("D", Sparsity.diag(2))
         >>> f = Function("f", [x, D], [x*D, sin(x)])
         >>> f.jac_sparsity(0, 1), f.jac_sparsity(0, 1, True), f.jac_sparsity(1, 1)
         (Sparsity(4x4,2nz), Sparsity(2x2,2nz), Sparsity(1x4,0nz))
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x'); D = SX.sym('D', Sparsity.diag(2));
         >> f = Function('f', {x, D}, {x*D, sin(x)});
         >> f.jac_sparsity(0, 1), f.jac_sparsity(0, 1, true), f.jac_sparsity(1, 1)
@@ -2420,6 +2615,7 @@ namespace casadi {
         2x2,2nz
         1x4,0nz
         \enddoctest
+        \endlang
 
         \sa jacobian
 
@@ -2449,6 +2645,7 @@ namespace casadi {
           "real_min", "unroll_args", "codegen_scalars", "avoid_stack", "thread_safe",
           "force_canonical"
 
+        \lang{python}
         \doctest
         >>> import os
         >>> x = SX.sym("x"); y = SX.sym("y", 2)
@@ -2464,8 +2661,10 @@ namespace casadi {
         ('g.c', 1)
         >>> os.remove("g.c"); os.remove("g.h")
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x'); y = SX.sym('y', 2);
         >> f = Function('f', {x, y}, {x*y, sin(x)}, {'x', 'y'}, {'r', 's'});
         >> fname = f.generate('f.c'); disp(fname), disp(isfile('f.c'))
@@ -2482,6 +2681,7 @@ namespace casadi {
         1
         >> delete('g.c'); delete('g.h');
         \enddoctest
+        \endlang
 
         \sa CodeGenerator, generate_in, generate_out, jit, external
 
@@ -2517,6 +2717,7 @@ namespace casadi {
         input sparsities. The arguments follow the shape rules of call (scalars are
         broadcast); a file with the wrong number of values raises a dimension error.
 
+        \lang{python}
         \doctest
         >>> import os
         >>> f = Function("f", [SX.sym("x"), SX.sym("y", 2)], [SX(0)])
@@ -2527,8 +2728,10 @@ namespace casadi {
         [DM(1), DM([2, 3])]
         >>> os.remove("f_in.txt")
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> f = Function('f', {SX.sym('x'), SX.sym('y', 2)}, {SX(0)});
         >> f.generate_in('f_in.txt', {1, [2; 3]});
         >> fileread('f_in.txt')
@@ -2540,6 +2743,7 @@ namespace casadi {
         [2, 3]
         >> delete('f_in.txt');
         \enddoctest
+        \endlang
 
         \sa generate_out, nz_from_in, nz_to_in, generate
 
@@ -2554,6 +2758,7 @@ namespace casadi {
         Same format as generate_in, for the outputs: the file written by generated code
         with option "main" can be read back and compared with the result of call.
 
+        \lang{python}
         \doctest
         >>> import os
         >>> x = SX.sym("x")
@@ -2563,8 +2768,10 @@ namespace casadi {
         [DM(1.5), DM(3)]
         >>> os.remove("f_out.txt")
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x');
         >> f = Function('f', {x}, {x, 2*x});
         >> f.generate_out('f_out.txt', f.call({1.5}));
@@ -2573,6 +2780,7 @@ namespace casadi {
         3
         >> delete('f_out.txt');
         \enddoctest
+        \endlang
 
         \sa generate_in, nz_from_out, nz_to_out
 
@@ -2593,6 +2801,7 @@ namespace casadi {
         \param lang "matlab"
         \param options "indent_level" (integer)
 
+        \lang{python}
         \doctest
         >>> x = SX.sym("x")
         >>> f = Function("f", [x], [sin(x)])
@@ -2604,8 +2813,10 @@ namespace casadi {
         ...   print("Only matlab language supported" in str(e))
         True
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x');
         >> f = Function('f', {x}, {sin(x)});
         >> code = strsplit(f.export_code('matlab'), newline); disp(code{1})
@@ -2613,6 +2824,7 @@ namespace casadi {
         >> try, f.export_code('python'); catch e, disp(contains(e.message, 'Only matlab')); end
         1
         \enddoctest
+        \endlang
 
         \sa generate
 
@@ -2642,6 +2854,7 @@ namespace casadi {
 
         \param opts "debug" (bool) adds consistency markers to the stream
 
+        \lang{python}
         \doctest
         >>> x = SX.sym("x")
         >>> f = Function("f", [x], [sin(x)], ["x"], ["y"])
@@ -2650,14 +2863,17 @@ namespace casadi {
         >>> g, g(1)
         (Function(f:(x)->(y) SXFunction), DM(0.841471))
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x');
         >> f = Function('f', {x}, {sin(x)}, {'x'}, {'y'});
         >> s = f.serialize(); g = Function.deserialize(s); disp(g), disp(g(1))
         f:(x)->(y) SXFunction
         0.841471
         \enddoctest
+        \endlang
 
         \sa deserialize, save, load
 
@@ -2698,6 +2914,7 @@ namespace casadi {
         \param fname File name
         \param opts Serializer options, e.g. "debug"
 
+        \lang{python}
         \doctest
         >>> import os
         >>> x = SX.sym("x")
@@ -2708,8 +2925,10 @@ namespace casadi {
         (Function(f:(i0)->(o0) SXFunction), DM(9))
         >>> os.remove("f.casadi")
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x');
         >> f = Function('f', {x}, {x^2});
         >> f.save('f.casadi'); g = Function.load('f.casadi'); disp(g), disp(g(3))
@@ -2717,6 +2936,7 @@ namespace casadi {
         9
         >> delete('f.casadi');
         \enddoctest
+        \endlang
 
         \sa load, serialize, FileSerializer
 
@@ -2762,6 +2982,7 @@ namespace casadi {
         \param mem Memory object (from checkout) whose statistics to return; 0 is the
           memory used by ordinary calls
 
+        \lang{python}
         \doctest
         >>> x = SX.sym("x")
         >>> f = Function("f", [x], [x**2], {"record_time": True})
@@ -2774,8 +2995,10 @@ namespace casadi {
         >>> sorted(f.stats().keys())
         ['n_call_total', 't_proc_total', 't_wall_total']
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x');
         >> f = Function('f', {x}, {x^2}, struct('record_time', true));
         >> try, f.stats(); catch e, disp(contains(e.message, 'first evaluate it numerically')); end
@@ -2783,6 +3006,7 @@ namespace casadi {
         >> r = f(2); disp(strjoin(sort(fieldnames(f.stats()))', ' '))
         n_call_total t_proc_total t_wall_total
         \enddoctest
+        \endlang
 
         \sa checkout
 
@@ -2797,6 +3021,7 @@ namespace casadi {
         they are not the symbols the function was constructed from. All inputs (no
         argument), one by index, or one by name.
 
+        \lang{python}
         \doctest
         >>> f = Function("f", [SX.sym("a"), SX.sym("B", Sparsity.diag(2))], [SX(0)],
         ...              ["a", "B"], ["r"])
@@ -2809,8 +3034,10 @@ namespace casadi {
         >>> f.sx_out(), f.mx_out(0)
         ([SX(r)], MX(r))
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> a = SX.sym('a'); B = SX.sym('B', Sparsity.diag(2));
         >> f = Function('f', {a, B}, {SX(0)}, {'a', 'B'}, {'r'});
         >> in = f.sx_in(); disp(in{1}), disp(in{2})
@@ -2824,6 +3051,7 @@ namespace casadi {
         r
         r
         \enddoctest
+        \endlang
 
         \sa sx_out, mx_out, sparsity_in
 
@@ -2878,6 +3106,7 @@ namespace casadi {
         and nz_to_out do the same for the outputs with nnz_out(). This is the memory
         layout that generated C code and FunctionBuffer use.
 
+        \lang{python}
         \doctest
         >>> f = Function("f", [SX.sym("x"), SX.sym("D", Sparsity.diag(2))], [SX(0)])
         >>> f.nz_from_in([1, DM([[2, 0], [0, 3]])])
@@ -2892,8 +3121,10 @@ namespace casadi {
         ...   print("Dimension mismatch. Expecting 3, got 2" in str(e))
         True
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> f = Function('f', {SX.sym('x'), SX.sym('D', Sparsity.diag(2))}, {SX(0)});
         >> f.nz_from_in({1, DM([2, 0; 0, 3])})
         1 2 3
@@ -2904,6 +3135,7 @@ namespace casadi {
         >> try, f.nz_to_in([1, 2]); catch e, disp(contains(e.message, 'Expecting 3, got 2')); end
         1
         \enddoctest
+        \endlang
 
         \sa convert_in, generate_in, FunctionBuffer
 
@@ -2924,6 +3156,7 @@ namespace casadi {
         check), for any of DM, SX and MX. Useful to prepare arguments for call or
         generate_in.
 
+        \lang{python}
         \doctest
         >>> f = Function("f", [SX.sym("x"), SX.sym("y")], [SX(0), SX(1)], ["x", "y"], ["a", "b"])
         >>> f.convert_in([1, 2])
@@ -2938,8 +3171,10 @@ namespace casadi {
         ...   print('could not find entry "z"' in str(e))
         True
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> f = Function('f', {SX.sym('x'), SX.sym('y')}, {SX(0), SX(1)}, {'x', 'y'}, {'a', 'b'});
         >> s = f.convert_in({1, 2}); disp(s.x), disp(s.y)
         1
@@ -2954,6 +3189,7 @@ namespace casadi {
         >> contains(msg, 'could not find entry "z"')
         1
         \enddoctest
+        \endlang
 
         \sa call, default_in, nz_from_in
 
@@ -2979,6 +3215,7 @@ namespace casadi {
         Such a function can be called symbolically but not numerically, expanded,
         code-generated or differentiated into a numerically usable form.
 
+        \lang{python}
         \doctest
         >>> x = SX.sym("x"); p = SX.sym("p")
         >>> f = Function("f", [x], [x*p], {"allow_free": True})
@@ -2994,8 +3231,10 @@ namespace casadi {
         >>> Function("g", [x], [x]).has_free()
         False
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x'); p = SX.sym('p');
         >> f = Function('f', {x}, {x*p}, struct('allow_free', true));
         >> disp(f.has_free()), disp(f.get_free()), fr = f.free_sx(); disp(fr{1})
@@ -3009,6 +3248,7 @@ namespace casadi {
         >> Function('g', {x}, {x}).has_free()
         0
         \enddoctest
+        \endlang
 
         \sa get_free, free_sx, free_mx
 
@@ -3031,19 +3271,23 @@ namespace casadi {
 
     /** \brief Get the free variables of an MXFunction as MX symbols; other classes raise
 
+        \lang{python}
         \doctest
         >>> x = MX.sym("x"); p = MX.sym("p")
         >>> f = Function("f", [x], [x*p], {"allow_free": True})
         >>> f.free_mx()
         [MX(p)]
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = MX.sym('x'); p = MX.sym('p');
         >> f = Function('f', {x}, {x*p}, struct('allow_free', true));
         >> fr = f.free_mx(); disp(fr{1})
         p
         \enddoctest
+        \endlang
 
         \sa has_free, free_sx
 
@@ -3064,17 +3308,21 @@ namespace casadi {
         Counts the unique nodes of the output expressions, inputs included; a cheap
         measure of graph size for comparing transformations. Other classes raise.
 
+        \lang{python}
         \doctest
         >>> x = MX.sym("x")
         >>> Function("f", [x], [sin(x) + sin(x)]).n_nodes()
         4
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = MX.sym('x');
         >> Function('f', {x}, {sin(x) + sin(x)}).n_nodes()
         4
         \enddoctest
+        \endlang
 
         \sa n_instructions
 
@@ -3088,6 +3336,7 @@ namespace casadi {
         instruction_output, instruction_constant and instruction_MX inspect them by
         index. Other classes raise.
 
+        \lang{python}
         \doctest
         >>> x = SX.sym("x"); y = SX.sym("y")
         >>> f = Function("f", [x, y], [x*y + 1])
@@ -3104,8 +3353,10 @@ namespace casadi {
         >>> f.instruction_id(3) == OP_CONST, f.instruction_constant(3)
         (True, 1.0)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x'); y = SX.sym('y');
         >> f = Function('f', {x, y}, {x*y + 1});
         >> f.n_instructions()
@@ -3119,6 +3370,7 @@ namespace casadi {
         1
         1
         \enddoctest
+        \endlang
 
         \sa instruction_id, instructions_sx, n_nodes
 
@@ -3168,14 +3420,17 @@ namespace casadi {
 
         SXFunction raises; use instructions_sx instead.
 
+        \lang{python}
         \doctest
         >>> x = MX.sym("x")
         >>> f = Function("f", [x], [2*sin(x)])
         >>> [str(f.instruction_MX(k)) for k in range(f.n_instructions())]
         ['input[0][0]', 'sin(x)', '(2.*sin(x))', 'output[0][0]']
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = MX.sym('x');
         >> f = Function('f', {x}, {2*sin(x)});
         >> for k = 0:f.n_instructions()-1, disp(f.instruction_MX(k)); end
@@ -3184,6 +3439,7 @@ namespace casadi {
         (2.*sin(x))
         output[0][0]
         \enddoctest
+        \endlang
 
         \sa n_instructions, instructions_sx
 
@@ -3195,19 +3451,23 @@ namespace casadi {
         Entry k is the expression computed by instruction k; input and output
         instructions have no expression and are nan. MXFunction raises.
 
+        \lang{python}
         \doctest
         >>> x = SX.sym("x")
         >>> f = Function("f", [x], [2*sin(x)])
         >>> f.instructions_sx()
         SX(@1=nan, @2=sin(x), [@1, @2, (2.*@2), @1])
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x');
         >> f = Function('f', {x}, {2*sin(x)});
         >> f.instructions_sx()
         @1=nan, @2=sin(x), [@1, @2, (2.*@2), @1]
         \enddoctest
+        \endlang
 
         \sa n_instructions, instruction_MX
 
@@ -3222,17 +3482,21 @@ namespace casadi {
         Both are true for SXFunction and MXFunction; classes without it fall back to
         dense Jacobian sparsity patterns.
 
+        \lang{python}
         \doctest
         >>> f = Function("f", [SX.sym("x")], [SX(0)])
         >>> f.has_spfwd(), f.has_sprev()
         (True, True)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> f = Function('f', {SX.sym('x')}, {SX(0)});
         >> fprintf('%d %d\n', f.has_spfwd(), f.has_sprev())
         1 1
         \enddoctest
+        \endlang
 
         \sa jac_sparsity
 
@@ -3246,17 +3510,21 @@ namespace casadi {
         sz_arg, sz_res, sz_iw and sz_w are the sizes of the arg, res, iw and w arrays of
         the low-level evaluation interface used by generated code and FunctionBuffer.
 
+        \lang{python}
         \doctest
         >>> f = Function("f", [SX.sym("x"), SX.sym("y")], [SX(0)])
         >>> f.sz_arg(), f.sz_res(), f.sz_iw(), f.sz_w()
         (2, 1, 0, 1)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> f = Function('f', {SX.sym('x'), SX.sym('y')}, {SX(0)});
         >> fprintf('%d %d %d %d\n', f.sz_arg(), f.sz_res(), f.sz_iw(), f.sz_w())
         2 1 0 1
         \enddoctest
+        \endlang
 
         \sa sz_res, sz_iw, sz_w, FunctionBuffer
 
@@ -3320,15 +3588,19 @@ namespace casadi {
 
     /** \brief Get the name given at construction ("null" for a null object)
 
+        \lang{python}
         \doctest
         >>> Function("f", [SX.sym("x")], [SX(0)]).name()
         'f'
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> Function('f', {SX.sym('x')}, {SX(0)}).name()
         f
         \enddoctest
+        \endlang
 
         \sa check_name
 
@@ -3343,6 +3615,7 @@ namespace casadi {
         base classes match as well ("Nlpsol" for an Ipopt solver, "Map" for a ThreadMap,
         "FunctionInternal" for everything).
 
+        \lang{python}
         \doctest
         >>> f = Function("f", [SX.sym("x")], [SX(0)])
         >>> f.is_a("SXFunction"), f.is_a("MXFunction"), f.class_name()
@@ -3350,14 +3623,17 @@ namespace casadi {
         >>> f.map(2, "thread").is_a("Map"), f.map(2, "thread").is_a("Map", False)
         (True, False)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> f = Function('f', {SX.sym('x')}, {SX(0)});
         >> fprintf('%d %d %s\n', f.is_a('SXFunction'), f.is_a('MXFunction'), f.class_name())
         1 0 SXFunction
         >> F = f.map(2, 'thread'); fprintf('%d %d\n', F.is_a('Map'), F.is_a('Map', false))
         1 0
         \enddoctest
+        \endlang
 
         \sa class_name
 
@@ -3371,14 +3647,17 @@ namespace casadi {
         keywords "null", "jac", "hess". Constructors and generate raise for invalid
         names; names must be valid C identifiers because they appear in generated code.
 
+        \lang{python}
         \doctest
         >>> Function.check_name("f_1"), Function.check_name("1f")
         (True, False)
         >>> Function.check_name("a__b"), Function.check_name("jac"), Function.check_name("")
         (False, False, False)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> fprintf('%d %d\n', Function.check_name('f_1'), Function.check_name('1f'))
         1 0
         >> fprintf('%d %d\n', Function.check_name('a__b'), Function.check_name('jac'))
@@ -3386,6 +3665,7 @@ namespace casadi {
         >> Function.check_name('')
         0
         \enddoctest
+        \endlang
 
         \sa fix_name
 
@@ -3398,14 +3678,17 @@ namespace casadi {
         non-letter gets an "a" prepended, the empty string becomes "unnamed" and a
         keyword gets "1" appended. A valid name is returned unchanged.
 
+        \lang{python}
         \doctest
         >>> Function.fix_name("my func!"), Function.fix_name("1f"), Function.fix_name("")
         ('my_func_', 'a1f', 'unnamed')
         >>> Function.fix_name("jac"), Function.fix_name("ok")
         ('jac1', 'ok')
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> Function.fix_name('my func!'), Function.fix_name('1f')
         my_func_
         a1f
@@ -3415,6 +3698,7 @@ namespace casadi {
         >> Function.fix_name('ok')
         ok
         \enddoctest
+        \endlang
 
         \sa check_name
 
@@ -3431,6 +3715,7 @@ namespace casadi {
         Raises "DeserializingStream sanity check failed" for data that is not a
         serialized CasADi object.
 
+        \lang{python}
         \doctest
         >>> x = SX.sym("x")
         >>> f = Function.deserialize(Function("f", [x], [2*x]).serialize())
@@ -3442,8 +3727,10 @@ namespace casadi {
         ...   print("sanity check failed" in str(e))
         True
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x');
         >> f = Function.deserialize(Function('f', {x}, {2*x}).serialize());
         >> f(3)
@@ -3452,6 +3739,7 @@ namespace casadi {
         >> contains(msg, 'sanity check failed')
         1
         \enddoctest
+        \endlang
 
         \sa serialize, load
 
@@ -3476,6 +3764,7 @@ namespace casadi {
 
     /** \brief Raise an error unless input \p i is \p nrow-by-\p ncol
 
+        \lang{python}
         \doctest
         >>> f = Function("f", [SX.sym("x", 2)], [SX(1, 3)])
         >>> f.assert_size_in(0, 2, 1)
@@ -3485,14 +3774,17 @@ namespace casadi {
         ...   print("Expected 2-by-1 but got 1-by-3" in str(e))
         True
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> f = Function('f', {SX.sym('x', 2)}, {SX(1, 3)});
         >> f.assert_size_in(0, 2, 1)
         >> try, f.assert_size_out(0, 2, 1); catch e, msg = e.message; end
         >> contains(msg, 'Expected 2-by-1 but got 1-by-3')
         1
         \enddoctest
+        \endlang
 
         \sa assert_size_out, size_in
 
@@ -3520,6 +3812,7 @@ namespace casadi {
         concurrent evaluation from several threads with the low-level interface and
         separate stats. Release it with release when done.
 
+        \lang{python}
         \doctest
         >>> f = Function("f", [SX.sym("x")], [SX(0)])
         >>> m = f.checkout()
@@ -3527,13 +3820,16 @@ namespace casadi {
         1
         >>> f.release(m)
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> f = Function('f', {SX.sym('x')}, {SX(0)});
         >> m = f.checkout(); disp(m)
         1
         >> f.release(m)
         \enddoctest
+        \endlang
 
         \sa release, stats, FunctionBuffer
 
@@ -3558,6 +3854,7 @@ namespace casadi {
         references: an entry stays only while some other reference keeps the function
         alive. Option "cache" prepopulates it, e.g. with a hand-written Jacobian.
 
+        \lang{python}
         \doctest
         >>> x = SX.sym("x")
         >>> f = Function("f", [x], [sin(x)])
@@ -3567,8 +3864,10 @@ namespace casadi {
         >>> list(f.cache().keys())
         ['jac_f']
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x');
         >> f = Function('f', {x}, {sin(x)});
         >> isempty(fieldnames(f.cache()))
@@ -3576,6 +3875,7 @@ namespace casadi {
         >> J = f.jacobian(); disp(strjoin(fieldnames(f.cache()), ' '))
         jac_f
         \enddoctest
+        \endlang
 
         \sa jacobian, forward, reverse
 
@@ -3592,6 +3892,7 @@ namespace casadi {
         has_function only answers true for solver objects; for SX and MX functions it is
         false even for names in this list.
 
+        \lang{python}
         \doctest
         >>> x = MX.sym("x")
         >>> f = Function("f", [x], [sin(x)]).expand()
@@ -3606,8 +3907,10 @@ namespace casadi {
         ...   print("No such function 'h'" in str(e))
         True
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = MX.sym('x');
         >> f = Function('f', {x}, {sin(x)}).expand();
         >> g = Function('g', {x}, {f(x) + 1});
@@ -3619,6 +3922,7 @@ namespace casadi {
         >> try, g.get_function('h'); catch e, disp(contains(e.message, 'No such function')); end
         1
         \enddoctest
+        \endlang
 
         \sa has_function, find_functions, oracle
 
@@ -3650,6 +3954,7 @@ namespace casadi {
           owned functions, a negative number means no limit
         \return Unique list of embedded functions
 
+        \lang{python}
         \doctest
         >>> x = MX.sym("x")
         >>> inner = Function("inner", [x], [sin(x)]).expand()
@@ -3664,8 +3969,10 @@ namespace casadi {
         >>> Function("o2", [x], [middle(x)*2]).get_function()
         ['inner']
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = MX.sym('x');
         >> inner = Function('inner', {x}, {sin(x)}).expand();
         >> middle = Function('middle', {x}, {inner(x) + 1});
@@ -3680,6 +3987,7 @@ namespace casadi {
         >> Function('o2', {x}, {middle(x)*2}).get_function()
         inner
         \enddoctest
+        \endlang
 
         \sa find_function, get_function
 
@@ -3701,17 +4009,21 @@ namespace casadi {
         Empty for most classes; e.g. a Switch (conditional, if_else) reports its branch
         functions.
 
+        \lang{python}
         \doctest
         >>> x = SX.sym("x")
         >>> Function("f", [x], [x]).info()
         {}
         \enddoctest
+        \endlang
 
-        \doctest{matlab}
+        \lang{matlab}
+        \doctest
         >> x = SX.sym('x');
         >> isempty(fieldnames(Function('f', {x}, {x}).info()))
         1
         \enddoctest
+        \endlang
 
         \identifier{2mn} */
     Dict info() const;
@@ -3773,6 +4085,7 @@ namespace casadi {
     In Python, Function.buffer() returns a pair (FunctionBuffer, callable): the callable
     runs one evaluation; bind numpy arrays with memoryview.
 
+    \lang{python}
     \doctest
     >>> x = SX.sym("x"); y = SX.sym("y", 2)
     >>> f = Function("f", [x, y], [x*y], ["x", "y"], ["r"])
@@ -3791,6 +4104,7 @@ namespace casadi {
     ...   print("Buffer is not large enough" in str(e))
     True
     \enddoctest
+    \endlang
 
     \sa Function::nz_from_in, Function::checkout, Function::sz_w
 
