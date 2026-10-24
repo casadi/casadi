@@ -664,6 +664,10 @@ class Sparsitytests(casadiTestCase):
     with self.assertRaisesRegex(Exception, r"Row index \(2\) out of bounds \[0,2\["):
       ca.Sparsity.triplet(2, 2, [2], [0])
 
+  def test_scc_square(self):
+    with self.assertRaisesRegex(Exception, "Expected a square pattern"):
+      ca.Sparsity.dense(2, 3).scc()
+
   def test_eq_foreign_operand(self):
     # issue #4407: comparing against an unrelated type follows the Python data
     # model (NotImplemented -> False) instead of raising NotImplementedError.

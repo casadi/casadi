@@ -712,6 +712,7 @@ namespace casadi {
   }
 
   casadi_int Sparsity::scc(std::vector<casadi_int>& index, std::vector<casadi_int>& offset) const {
+    casadi_assert(is_square(), "Expected a square pattern, but got " + dim() + ".");
     return (*this)->scc(index, offset);
   }
 
