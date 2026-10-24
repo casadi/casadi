@@ -76,30 +76,30 @@ namespace casadi {
   }
 
   Sparsity::Sparsity(casadi_int nrow, casadi_int ncol) {
-    casadi_assert_dev(nrow>=0);
-    casadi_assert_dev(ncol>=0);
+    casadi_assert(nrow>=0 && ncol>=0,
+      "Dimensions must be non-negative, got " + str(nrow) + "-by-" + str(ncol));
     std::vector<casadi_int> row, colind(ncol+1, 0);
     assign_cached(nrow, ncol, colind, row);
   }
 
   Sparsity::Sparsity(const std::pair<casadi_int, casadi_int>& rc) {
-    casadi_assert_dev(rc.first>=0);
-    casadi_assert_dev(rc.second>=0);
+    casadi_assert(rc.first>=0 && rc.second>=0,
+      "Dimensions must be non-negative, got " + str(rc.first) + "-by-" + str(rc.second));
     std::vector<casadi_int> row, colind(rc.second+1, 0);
     assign_cached(rc.first, rc.second, colind, row);
   }
 
   Sparsity::Sparsity(casadi_int nrow, casadi_int ncol, const std::vector<casadi_int>& colind,
                      const std::vector<casadi_int>& row, bool order_rows) {
-    casadi_assert_dev(nrow>=0);
-    casadi_assert_dev(ncol>=0);
+    casadi_assert(nrow>=0 && ncol>=0,
+      "Dimensions must be non-negative, got " + str(nrow) + "-by-" + str(ncol));
     assign_cached(nrow, ncol, colind, row, order_rows);
   }
 
   Sparsity::Sparsity(casadi_int nrow, casadi_int ncol,
       const casadi_int* colind, const casadi_int* row, bool order_rows) {
-    casadi_assert_dev(nrow>=0);
-    casadi_assert_dev(ncol>=0);
+    casadi_assert(nrow>=0 && ncol>=0,
+      "Dimensions must be non-negative, got " + str(nrow) + "-by-" + str(ncol));
     if (colind==nullptr || colind[ncol]==nrow*ncol) {
       *this = dense(nrow, ncol);
     } else {
@@ -1028,8 +1028,8 @@ namespace casadi {
   }
 
   Sparsity Sparsity::dense(casadi_int nrow, casadi_int ncol) {
-    casadi_assert_dev(nrow>=0);
-    casadi_assert_dev(ncol>=0);
+    casadi_assert(nrow>=0 && ncol>=0,
+      "Dimensions must be non-negative, got " + str(nrow) + "-by-" + str(ncol));
     // Column offset
     std::vector<casadi_int> colind(ncol+1);
     for (casadi_int cc=0; cc<ncol+1; ++cc) colind[cc] = cc*nrow;
@@ -1146,8 +1146,8 @@ namespace casadi {
                              const std::vector<casadi_int>& col, std::vector<casadi_int>& mapping,
                              bool invert_mapping) {
     // Assert dimensions
-    casadi_assert_dev(nrow>=0);
-    casadi_assert_dev(ncol>=0);
+    casadi_assert(nrow>=0 && ncol>=0,
+      "Dimensions must be non-negative, got " + str(nrow) + "-by-" + str(ncol));
     casadi_assert(col.size()==row.size(), "inconsistent lengths");
 
     // Create the return sparsity pattern and access vectors

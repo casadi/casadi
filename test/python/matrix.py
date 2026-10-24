@@ -1365,6 +1365,12 @@ class Matrixtests(casadiTestCase):
   def test_det_empty_column(self):
     self.checkarray(ca.det(ca.DM(ca.Sparsity.triplet(2, 2, [0, 1], [0, 0]), [1, 2])), ca.DM(0))
 
+  def test_negative_size_checks(self):
+    with self.assertInException("must be a multiple of n"):
+      ca.repsum(ca.DM([1, 2, 3]), 2)
+    with self.assertInException("Dimensions must be non-negative"):
+      ca.MX.sym("x", -1, 1)
+
   def test_inplace(self):
     n = 10
     x = ca.MX.sym("x",n)
