@@ -1030,6 +1030,13 @@ assert(strcmp(casadi.veccat().dim(), '0x1'));
 assert(strcmp(reshape(DM.eye(2), [], 1).dim(), '4x1'));
 assert(strcmp(reshape(DM.eye(2), 1, []).dim(), '1x4'));
 
+% inv is the matrix inverse for MX too
+A = MX.sym('A', 2, 2);
+f = Function('f', {A}, {inv(A), inv(A, 'qr')});
+[r1, r2] = f(DM([2 0; 0 4]));
+assert(norm(full(r1) - [0.5 0; 0 0.25]) < 1e-12);
+assert(norm(full(r2) - [0.5 0; 0 0.25]) < 1e-12);
+
 disp('success')
 
 
