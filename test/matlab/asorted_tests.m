@@ -1037,6 +1037,13 @@ f = Function('f', {A}, {inv(A), inv(A, 'qr')});
 assert(norm(full(r1) - [0.5 0; 0 0.25]) < 1e-12);
 assert(norm(full(r2) - [0.5 0; 0 0.25]) < 1e-12);
 
+% einstein and bspline_dual as free functions
+a = MX.sym('a', 4);
+C = einstein(a, a, [2 2], [2 2], [2 2], [-1 -2], [-2 -3], [-1 -3]);
+assert(strcmp(C.dim(), '4x1'));
+B = bspline_dual([0.5 1.5], {[0 0 0 0 1 2 2 2 2]}, 3);
+assert(all(size(B) == [2 5]));
+
 disp('success')
 
 
