@@ -1757,6 +1757,8 @@ namespace casadi {
 
   template<typename MatType>
   MatType SparsityInterface<MatType>::repmat(const MatType& x, casadi_int n, casadi_int m) {
+    casadi_assert(n>=0 && m>=0,
+      "repmat(x,n,m): n (" + str(n) + ") and m (" + str(m) + ") must be non-negative");
     if (n==1 && m==1) return x;
     MatType allrows = vertcat(std::vector<MatType>(n, x));
     if (n==0) allrows = MatType(0, x.size2());
