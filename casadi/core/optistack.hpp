@@ -1853,7 +1853,7 @@ public:
       >> opti = Opti(); x = opti.variable(2);
       >> opti.minimize(sumsqr(x)); opti.subject_to(x(1) >= 1);
       >> opti.solver('ipopt', struct('print_time', false), struct('print_level', 0, 'sb', 'yes'));
-      >> sol = opti.solve(); S = opti.debug.solver();
+      >> sol = opti.solve(); S = opti.debug.casadi_solver();
       >> S.name(), S.class_name(), strjoin(cellstr(S.name_in()), ' ')
       solver
       IpoptInterface

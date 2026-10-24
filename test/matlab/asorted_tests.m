@@ -1049,6 +1049,19 @@ dae = DaeBuilder('m');
 xs = dae.add('x');
 assert(is_equal(dae('x'), xs));
 
+% OptiAdvanced.casadi_solver, deprecated solver(), and the inherited solver(name, ...)
+opti = Opti();
+x = opti.variable();
+opti.minimize(x^2);
+opti.solver('ipopt', struct('print_time', false), struct('print_level', 0, 'sb', 'yes'));
+opti.solve();
+assert(strcmp(opti.debug.casadi_solver().name(), 'solver'));
+lastwarn('');
+assert(strcmp(opti.debug.solver().name(), 'solver'));
+[~, id] = lastwarn();
+assert(strcmp(id, 'casadi:deprecated'));
+opti.debug.solver('sqpmethod', struct('qpsol', 'qrqp', 'print_time', false));
+
 disp('success')
 
 
