@@ -3962,6 +3962,11 @@ namespace casadi {
     return std::vector<std::string>();
   }
 
+  bool FunctionInternal::has_function(const std::string& fname) const {
+    std::vector<std::string> fnames = get_function();
+    return std::find(fnames.begin(), fnames.end(), fname)!=fnames.end();
+  }
+
   const Function& FunctionInternal::get_function(const std::string &name) const {
     casadi_error("'get_function' not defined for " + class_name());
     static Function singleton;

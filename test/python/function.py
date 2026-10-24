@@ -5585,6 +5585,14 @@ class Functiontests(casadiTestCase):
     f = ca.Function.jit("f", "b[0] = a[0]*a[0];", ["a"], ["b"], {"compiler": "shell"})
     self.checkarray(f.jacobian()(3, 0), ca.DM(6), digits=5)
 
+  def test_has_function(self):
+    x = ca.MX.sym("x")
+    f = ca.Function("f", [x], [x**2], {"never_inline": True})
+    g = ca.Function("g", [x], [f(x)+1])
+    self.assertEqual(g.get_function(), ["f"])
+    self.assertTrue(g.has_function("f"))
+    self.assertFalse(g.has_function("h"))
+
   def test_activity(self):
     # issue #3019: value-level "signal activity" propagation (Function::activity).
     # True/active = possibly nonzero. The expected output activity is never hard-coded:
