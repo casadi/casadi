@@ -4894,6 +4894,10 @@ DECL M casadi_densify(const M& x) {
   return densify(x);
 }
 
+DECL M casadi_densify(const M& x, const M& val) {
+  return densify(x, val);
+}
+
 DECL M casadi_project(const M& A, const Sparsity& sp, bool intersect=false) {
   return project(A, sp, intersect);
 }

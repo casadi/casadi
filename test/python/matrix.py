@@ -1352,6 +1352,9 @@ class Matrixtests(casadiTestCase):
       with self.assertInException("must be at least 1"):
         ca.linspace(ca.DM(0), ca.DM(1), n)
 
+  def test_densify_value(self):
+    self.checkarray(ca.densify(ca.DM(ca.Sparsity.diag(2), 1), 5), ca.DM([[1, 5], [5, 1]]))
+
   def test_inplace(self):
     n = 10
     x = ca.MX.sym("x",n)
