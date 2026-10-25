@@ -96,6 +96,24 @@ class OptiCallback;
     \enddoctest
     \endlang
 
+    \lang{julia}
+    \doctest
+    julia> opti = ca.Opti();
+    julia> x = ca.variable(opti);
+    julia> y = ca.variable(opti);
+    julia> ca.minimize(opti, (y - x^2)^2)
+    julia> ca.subject_to(opti, x^2 + y^2 == 1)
+    julia> ca.subject_to(opti, x + y >= 1)
+    julia> ca.solver(opti, "ipopt", Dict("print_time" => false),
+                      Dict("print_level" => 0, "sb" => "yes"))
+    julia> sol = ca.solve(opti);
+    julia> ca.value(sol, x), ca.value(sol, y)
+    (0.7862, 0.6180)
+    julia> ca.value(sol, ca.f(opti))
+    0
+    \enddoctest
+    \endlang
+
     Parametric problems are re-solved by changing parameter values:
 
     \lang{python}
@@ -133,6 +151,26 @@ class OptiCallback;
     \enddoctest
     \endlang
 
+    \lang{julia}
+    \doctest
+    julia> opti = ca.Opti();
+    julia> x = ca.variable(opti, 2);
+    julia> p = ca.parameter(opti);
+    julia> ca.minimize(opti, ca.sumsqr(x - p))
+    julia> ca.subject_to(opti, 1 <= (sum(x) <= 2))
+    julia> ca.solver(opti, "ipopt", Dict("print_time" => false),
+                      Dict("print_level" => 0, "sb" => "yes"))
+    julia> ca.set_value(opti, p, 3)
+    julia> sol = ca.solve(opti);
+    julia> ca.value(sol, sum(x))
+    2.0
+    julia> ca.set_value(opti, p, 0)
+    julia> sol = ca.solve(opti);
+    julia> ca.value(sol, sum(x))
+    1.0
+    \enddoctest
+    \endlang
+
     An iteration callback:
 
     \lang{python}
@@ -163,6 +201,27 @@ class OptiCallback;
     1 1.000
     >> opti.callback();
     >> sol = opti.solve();
+    \enddoctest
+    \endlang
+
+    \lang{julia}
+    \doctest
+    julia> opti = ca.Opti();
+    julia> x = ca.variable(opti);
+    julia> ca.minimize(opti, (x - 1)^2)
+    julia> ca.solver(opti, "ipopt", Dict("print_time" => false),
+                      Dict("print_level" => 0, "sb" => "yes"))
+    julia> history = Tuple{Int,Float64}[];
+    julia> ca.callback(opti, i -> push!(history, (i, ca.value(ca.debug(opti), x))))
+    julia> sol = ca.solve(opti);
+    julia> history
+    2-element Vector{Tuple{Int64, Float64}}:
+     (0, 0.0)
+     (1, 1.0)
+    julia> ca.callback(opti)
+    julia> sol = ca.solve(opti);
+    julia> length(history)
+    2
     \enddoctest
     \endlang
 
@@ -218,6 +277,30 @@ public:
       0.5000 0.5000
       >> try, Opti('lp'); catch e, disp(contains(e.message, 'Specified problem type')); end
       1
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> opti = ca.Opti();
+      julia> ca.nx(opti), ca.np(opti), ca.ng(opti)
+      (0, 0, 0)
+      julia> opti = ca.Opti("conic");
+      julia> x = ca.variable(opti, 2);
+      julia> ca.minimize(opti, ca.sumsqr(x - 1))
+      julia> ca.subject_to(opti, x[1] + x[2] <= 1)
+      julia> ca.solver(opti, "qrqp", Dict("print_time" => false, "print_iter" => false,
+                                           "print_header" => false, "print_info" => false))
+      julia> ca.value(ca.solve(opti), x)
+      2-element Vector{Float64}:
+       0.5
+       0.5
+      julia> try
+                 ca.Opti("lp")
+             catch e
+                 println(last(split(sprint(showerror, e), "\n")))
+             end
+      Specified problem type 'lp'unknown. Choose 'nlp' (default) or 'conic'.
       \enddoctest
       \endlang
 
@@ -280,6 +363,28 @@ public:
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> opti = ca.Opti();
+      julia> x = ca.variable(opti);
+      julia> X = ca.variable(opti, 3, 2);
+      julia> size(x), size(X), ca.is_symbolic(X)
+      ((1, 1), (3, 2), true)
+      julia> S = ca.variable(opti, 2, 2, "symmetric");
+      julia> size(S), ca.is_symbolic(S)
+      ((2, 2), false)
+      julia> ca.minimize(opti, ca.sumsqr(X) + x^2 + ca.sumsqr(S))
+      julia> ca.nx(opti)
+      10
+      julia> try
+                 ca.variable(opti, 2, 3, "symmetric")
+             catch e
+                 println(last(split(sprint(showerror, e), "\n")))
+             end
+      You specified attribute 'symmetric', while matrix is not even square, but 2-by-3.
+      \enddoctest
+      \endlang
+
       \identifier{18} */
   MX variable(casadi_int n=1, casadi_int m=1, const std::string& attribute="full");
   /// Create a decision variable with a given sparsity pattern; only "full" is supported
@@ -329,6 +434,26 @@ public:
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> opti = ca.Opti();
+      julia> x = ca.variable(opti);
+      julia> p = ca.parameter(opti, 2);
+      julia> ca.minimize(opti, ca.sumsqr(x - p))
+      julia> ca.solver(opti, "ipopt", Dict("print_time" => false),
+                        Dict("print_level" => 0, "sb" => "yes"))
+      julia> try
+                 ca.solve(opti)
+             catch e
+                 println(split(sprint(showerror, e), "\n")[end-1])
+             end
+      You have forgotten to assign a value to a parameter ('set_value'), or have set it to NaN/Inf:
+      julia> ca.set_value(opti, p, [1, 3])
+      julia> ca.value(ca.solve(opti), x)
+      2.0
+      \enddoctest
+      \endlang
+
       \identifier{19} */
   MX parameter(casadi_int n=1, casadi_int m=1, const std::string& attribute="full");
   /// Create a parameter with a given sparsity pattern
@@ -370,6 +495,23 @@ public:
       2
       >> try, opti.minimize(x); catch e, disp(contains(e.message, 'Objective must be scalar')); end
       1
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> opti = ca.Opti();
+      julia> x = ca.variable(opti, 2);
+      julia> ca.minimize(opti, ca.sumsqr(x))
+      julia> opti.minimize(x[1]^2, 2)
+      julia> print(ca.f(opti), " ", ca.f_linear_scale(opti))
+      sq(opti..._x_1[0]) 2.0
+      julia> try
+                 ca.minimize(opti, x)
+             catch e
+                 println(last(split(sprint(showerror, e), "\n")))
+             end
+      Objective must be scalar, got 2x1.
       \enddoctest
       \endlang
 
@@ -460,6 +602,42 @@ public:
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> opti = ca.Opti();
+      julia> x = ca.variable(opti, 3);
+      julia> y = ca.variable(opti);
+      julia> p = ca.parameter(opti);
+      julia> ca.subject_to(opti, x >= 0)
+      julia> ca.subject_to(opti, x[1] + x[2] == p)
+      julia> ca.subject_to(opti, -1 <= (y <= 1))
+      julia> ca.subject_to(opti, [y >= x[3], y*x[1] >= 1])
+      julia> ca.ng(opti)
+      7
+      julia> print(ca.lbg(opti), " ", ca.ubg(opti))
+      vertcat(zeros(3x1), opti..._p_1, -1, -inf, 1) vertcat(inf(3x1), opti..._p_1, 1, 0, inf)
+      julia> try
+                 ca.subject_to(opti, 0 <= y <= 1)
+             catch e
+                 println(typeof(e))
+             end
+      TypeError
+      julia> try
+                 ca.subject_to(opti, ca.MX(2) <= 3)
+             catch e
+                 println(last(split(sprint(showerror, e), "\n")))
+             end
+      You passed a constant to `subject_to`. You need a symbol to form a constraint.
+      julia> try
+                 ca.subject_to(opti, ca.MX.sym("w") <= 3)
+             catch e
+                 msg = "MX symbol 'w' of shape 1x1, declared outside of Opti"
+                 println(occursin(msg, sprint(showerror, e)))
+             end
+      true
+      \enddoctest
+      \endlang
+
       Elementwise constraints on matrices need vec(); options attach metadata:
 
       \lang{python}
@@ -493,6 +671,28 @@ public:
       >> opti.subject_to(con, struct('meta', struct('label', 'nonneg')));
       >> d = opti.user_dict(con); fprintf('%d %s\n', opti.ng, d.label)
       4 nonneg
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> opti = ca.Opti();
+      julia> A = ca.variable(opti, 2, 2);
+      julia> ca.subject_to(opti, A >= 0)
+      julia> ca.minimize(opti, ca.sumsqr(A))
+      julia> ca.solver(opti, "ipopt", Dict("print_time" => false),
+                        Dict("print_level" => 0, "sb" => "yes"))
+      julia> try
+                 ca.solve(opti)
+             catch e
+                 println(occursin("Psd constraints not implemented yet", sprint(showerror, e)))
+             end
+      true
+      julia> ca.subject_to(opti)
+      julia> con = vec(A) >= 0;
+      julia> ca.subject_to(opti, con, Dict("meta" => Dict("label" => "nonneg")))
+      julia> ca.ng(opti), ca.user_dict(opti, con)["label"]
+      (4, "nonneg")
       \enddoctest
       \endlang
 
@@ -544,6 +744,30 @@ public:
       >> sol = opti.solve();
       >> try, sol.value(opti.dual(con)); catch e, disp(contains(e.message, 'not given')); end
       1
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> opti = ca.Opti();
+      julia> x = ca.variable(opti);
+      julia> con = x >= 1;
+      julia> ca.subject_to(opti, con)
+      julia> ca.minimize(opti, x^2)
+      julia> ca.ng(opti)
+      1
+      julia> ca.subject_to(opti)
+      julia> ca.ng(opti)
+      0
+      julia> ca.solver(opti, "ipopt", Dict("print_time" => false),
+                        Dict("print_level" => 0, "sb" => "yes"))
+      julia> sol = ca.solve(opti);
+      julia> try
+                 ca.value(sol, ca.dual(opti, con))
+             catch e
+                 println(split(sprint(showerror, e), "\n")[end-1])
+             end
+      This expression has a dual for a constraint that is not given to Opti:
       \enddoctest
       \endlang
 
@@ -605,6 +829,30 @@ public:
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> opti = ca.Opti();
+      julia> x = ca.variable(opti);
+      julia> ca.minimize(opti, (x - 2)^2)
+      julia> try
+                 ca.solve(opti)
+             catch e
+                 println(occursin("You must call 'solver' on the Opti stack", sprint(showerror, e)))
+             end
+      true
+      julia> ca.solver(opti, "ipopt", Dict("print_time" => false),
+                        Dict("print_level" => 0, "sb" => "yes"))
+      julia> ca.value(ca.solve(opti), x)
+      2.0
+      julia> qp_opts = Dict("print_iter" => false, "print_header" => false, "print_info" => false);
+      julia> ca.solver(opti, "sqpmethod", Dict("print_time" => false, "print_header" => false,
+                 "print_iteration" => false, "print_status" => false, "qpsol" => "qrqp",
+                 "qpsol_options" => qp_opts))
+      julia> ca.value(ca.solve(opti), x)
+      2.0
+      \enddoctest
+      \endlang
+
       \sa nlpsol, qpsol, solve
 
       \identifier{1c} */
@@ -660,6 +908,31 @@ public:
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> opti = ca.Opti();
+      julia> x = ca.variable(opti, 2);
+      julia> p = ca.parameter(opti);
+      julia> ca.set_initial(opti, x, 1)
+      julia> ca.set_initial(opti, 10*x[1], 2)
+      julia> print(ca.initial(opti))
+      MX[([0.2, 1]==opti..._x_1)]
+      julia> try
+                 ca.set_initial(opti, p, 1)
+             catch e
+                 println(last(split(sprint(showerror, e), "\n")))
+             end
+      You cannot set an initial value for a parameter. Did you mean 'set_value'?
+      julia> try
+                 ca.set_initial(opti, x[1]*x[2], 1)
+             catch e
+                 msg = "Use symbols or simple mappings of symbols"
+                 println(occursin(msg, sprint(showerror, e)))
+             end
+      true
+      \enddoctest
+      \endlang
+
       Warm start from a previous solution:
 
       \lang{python}
@@ -690,6 +963,24 @@ public:
       >> sol2 = opti.solve(); s1 = sol.stats(); s2 = sol2.stats();
       >> s2.iter_count < s1.iter_count
       1
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> opti = ca.Opti();
+      julia> x = ca.variable(opti);
+      julia> y = ca.variable(opti);
+      julia> ca.minimize(opti, (y - x^2)^2)
+      julia> ca.subject_to(opti, x^2 + y^2 == 1)
+      julia> ca.subject_to(opti, x + y >= 1)
+      julia> ca.solver(opti, "ipopt", Dict("print_time" => false),
+                        Dict("print_level" => 0, "sb" => "yes"))
+      julia> sol = ca.solve(opti);
+      julia> opti.set_initial(ca.value_variables(sol))
+      julia> ca.set_initial(opti, ca.lam_g(opti), ca.value(sol, ca.lam_g(opti)))
+      julia> ca.stats(ca.solve(opti))["iter_count"] < ca.stats(sol)["iter_count"]
+      true
       \enddoctest
       \endlang
 
@@ -745,6 +1036,31 @@ public:
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> opti = ca.Opti();
+      julia> x = ca.variable(opti);
+      julia> p = ca.parameter(opti, 2);
+      julia> ca.set_value(opti, p, [1, 2])
+      julia> ca.set_value(opti, p[2], 5)
+      julia> ca.value(opti, p)
+      2-element Vector{Float64}:
+       1.0
+       5.0
+      julia> try
+                 ca.set_value(opti, x, 1)
+             catch e
+                 println(last(split(sprint(showerror, e), "\n")))
+             end
+      You cannot set a value for a variable. Did you mean 'set_initial'?
+      julia> ca.set_value(opti, [p == 7])
+      julia> ca.value(opti, p)
+      2-element Vector{Float64}:
+       7.0
+       7.0
+      \enddoctest
+      \endlang
+
       \sa set_initial, value_parameters
 
       \identifier{1d} */
@@ -793,6 +1109,30 @@ public:
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> opti = ca.Opti();
+      julia> x = ca.variable(opti);
+      julia> ca.set_domain(opti, x, "integer")
+      julia> ca.minimize(opti, (x - 1.4)^2)
+      julia> ca.solver(opti, "ipopt", Dict("print_time" => false),
+                        Dict("print_level" => 0, "sb" => "yes"))
+      julia> try
+                 ca.solve(opti)
+             catch e
+                 println(last(split(sprint(showerror, e), "\n")))
+             end
+      Discrete variables require a solver with integer support
+      julia> try
+                 ca.set_domain(opti, x, "binary")
+             catch e
+                 msg = "Unknown domain 'binary'. Known values are 'real', 'integer'."
+                 println(occursin(msg, sprint(showerror, e)))
+             end
+      true
+      \enddoctest
+      \endlang
+
       \identifier{27t} */
   void set_domain(const MX& x, const std::string& domain);
 
@@ -833,6 +1173,22 @@ public:
       273.15
       >> a = opti.debug.arg(); disp(a.x0)
       -13.6575
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> opti = ca.Opti();
+      julia> T = ca.variable(opti);
+      julia> ca.set_linear_scale(opti, T, 20, 273.15)
+      julia> ca.minimize(opti, (T - 300)^2)
+      julia> ca.solver(opti, "ipopt", Dict("print_time" => false),
+                        Dict("print_level" => 0, "sb" => "yes"))
+      julia> sol = ca.solve(opti);
+      julia> ca.value(sol, T)
+      300.0
+      julia> ca.x_linear_scale(opti), ca.x_linear_scale_offset(opti)
+      (20, 273.15)
       \enddoctest
       \endlang
 
@@ -890,6 +1246,31 @@ public:
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> opti = ca.Opti();
+      julia> x = ca.variable(opti);
+      julia> ca.minimize(opti, (x - 1)^6)
+      julia> ca.solver(opti, "ipopt", Dict("print_time" => false),
+                        Dict("print_level" => 0, "max_iter" => 2, "sb" => "yes"))
+      julia> try
+                 ca.solve(opti)
+             catch e
+                 msg = sprint(showerror, e)
+                 println(occursin("Solver failed", msg), " ",
+                         occursin("'Maximum_Iterations_Exceeded'", msg))
+             end
+      true true
+      julia> ca.value(ca.debug(opti), x), ca.return_status(opti)
+      (0.36, "Maximum_Iterations_Exceeded")
+      julia> ca.solver(opti, "ipopt", Dict("print_time" => false),
+                        Dict("print_level" => 0, "sb" => "yes"))
+      julia> sol = ca.solve(opti);
+      julia> ca.value(sol, x), ca.stats(sol)["success"]
+      (1.0, true)
+      \enddoctest
+      \endlang
+
       \sa solve_limited, OptiSol, stats, return_status
 
       \identifier{2mu} */
@@ -923,6 +1304,19 @@ public:
       >> s.unified_return_status, sol.value(x)
       SOLVER_RET_LIMITED
       0.36
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> opti = ca.Opti();
+      julia> x = ca.variable(opti);
+      julia> ca.minimize(opti, (x - 1)^6)
+      julia> ca.solver(opti, "ipopt", Dict("print_time" => false),
+                        Dict("print_level" => 0, "max_iter" => 2, "sb" => "yes"))
+      julia> sol = ca.solve_limited(opti);
+      julia> ca.stats(sol)["unified_return_status"], ca.value(sol, x)
+      ("SOLVER_RET_LIMITED", 0.36)
       \enddoctest
       \endlang
 
@@ -999,6 +1393,37 @@ public:
       \enddoctest
       \endlang
 
+      \lang{julia}
+      A scalar becomes a Float64, any other value a dense Matrix{Float64}.
+
+      \doctest
+      julia> opti = ca.Opti();
+      julia> x = ca.variable(opti);
+      julia> p = ca.parameter(opti);
+      julia> ca.minimize(opti, (x - p)^2)
+      julia> ca.set_value(opti, p, 3)
+      julia> ca.value(opti, 2*p)
+      6.0
+      julia> try
+                 ca.value(opti, x)
+             catch e
+                 println(last(split(sprint(showerror, e), "\n")))
+             end
+      This action is forbidden since you have not solved the Opti stack yet (with calling 'solve').
+      julia> opti.value(x + p, [x == 1]), opti.value(x^2, ca.initial(opti))
+      (4.0, 0.0)
+      julia> ca.solver(opti, "ipopt", Dict("print_time" => false),
+                        Dict("print_level" => 0, "sb" => "yes"))
+      julia> sol = ca.solve(opti);
+      julia> ca.value(opti, x), ca.value(sol, x)
+      (3.0, 3.0)
+      julia> sol.value(x + p, [p == 10])
+      13.0
+      julia> ca.value(sol, [x; p]), ca.value(sol, ca.DM([1, 2]))
+      ([3.0, 3.0], [1.0, 2.0])
+      \enddoctest
+      \endlang
+
       \sa initial, value_variables, OptiSol::value
 
       \identifier{2mv} */
@@ -1037,6 +1462,20 @@ public:
       Solve_Succeeded
       SOLVER_RET_SUCCESS
       1
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> opti = ca.Opti();
+      julia> x = ca.variable(opti);
+      julia> ca.minimize(opti, (x - 1)^2)
+      julia> ca.solver(opti, "ipopt", Dict("print_time" => false),
+                        Dict("print_level" => 0, "sb" => "yes"))
+      julia> sol = ca.solve(opti);
+      julia> s = ca.stats(sol);
+      julia> s["success"], s["return_status"], s["unified_return_status"], s["iter_count"]
+      (true, "Solve_Succeeded", "SOLVER_RET_SUCCESS", 1)
       \enddoctest
       \endlang
 
@@ -1079,6 +1518,26 @@ public:
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> opti = ca.Opti();
+      julia> x = ca.variable(opti);
+      julia> ca.minimize(opti, x^2)
+      julia> ca.return_status(opti)
+      "unknown"
+      julia> ca.subject_to(opti, x >= 1)
+      julia> ca.subject_to(opti, x <= -1)
+      julia> ca.solver(opti, "ipopt", Dict("print_time" => false),
+                        Dict("print_level" => 0, "sb" => "yes"))
+      julia> try
+                 ca.solve(opti)
+             catch e
+                 println(ca.return_status(opti))
+             end
+      Infeasible_Problem_Detected
+      \enddoctest
+      \endlang
+
       \identifier{1g} */
   std::string return_status() const;
 
@@ -1108,6 +1567,19 @@ public:
       (2==opti..._x_1)
       >> opti.value(x^2+1, opti.initial())
       5
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> opti = ca.Opti();
+      julia> x = ca.variable(opti);
+      julia> ca.set_initial(opti, x, 2)
+      julia> ca.minimize(opti, x^2)
+      julia> print(ca.initial(opti))
+      MX[(2==opti..._x_1)]
+      julia> opti.value(x^2 + 1, ca.initial(opti))
+      5.0
       \enddoctest
       \endlang
 
@@ -1151,6 +1623,24 @@ public:
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> opti = ca.Opti();
+      julia> x = ca.variable(opti);
+      julia> p = ca.parameter(opti);
+      julia> ca.minimize(opti, (x - p)^2)
+      julia> ca.set_value(opti, p, 2)
+      julia> ca.solver(opti, "ipopt", Dict("print_time" => false),
+                        Dict("print_level" => 0, "sb" => "yes"))
+      julia> sol = ca.solve(opti);
+      julia> print(ca.value_variables(opti), " ", ca.value_parameters(opti))
+      MX[(2==opti..._x_1)] MX[(2==opti..._p_1)]
+      julia> opti.set_initial(ca.value_variables(sol))
+      julia> opti.value(x, ca.initial(opti))
+      2.0
+      \enddoctest
+      \endlang
+
       \identifier{267} */
   std::vector<MX> value_variables() const;
   std::vector<MX> value_parameters() const;
@@ -1188,6 +1678,25 @@ public:
       >> hs = opti.scale_helper(h); r = hs('x', 3, 'p', 0); disp(r.g), disp(r.jac_g_x)
       7
       2
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> opti = ca.Opti();
+      julia> x = ca.variable(opti);
+      julia> p = ca.parameter(opti);
+      julia> ca.set_linear_scale(opti, x, 2, 1)
+      julia> ca.minimize(opti, (x - p)^2)
+      julia> ca.subject_to(opti, x >= 0)
+      julia> g, X = ca.g(opti), ca.x(opti);
+      julia> h = ca.Function("nlp_jac_g", [X, ca.p(opti)], [g, ca.jacobian(g, X)],
+                             ["x", "p"], ["g", "jac_g_x"]);
+      julia> hs = ca.scale_helper(opti, h);
+      julia> hs(x=3, p=0)
+      Dict{String, DM} with 2 entries:
+        "g" => 7
+        "jac_g_x" => 2
       \enddoctest
       \endlang
 
@@ -1245,6 +1754,37 @@ public:
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> opti = ca.Opti();
+      julia> x = ca.variable(opti);
+      julia> ca.minimize(opti, (x - 3)^2)
+      julia> con = x <= 1;
+      julia> ca.subject_to(opti, con)
+      julia> ca.solver(opti, "ipopt", Dict("print_time" => false),
+                        Dict("print_level" => 0, "sb" => "yes"))
+      julia> sol = ca.solve(opti);
+      julia> ca.value(sol, ca.dual(opti, con))
+      4.0
+      julia> ca.value(sol, ca.lam_g(opti))
+      4.0
+      julia> ca.subject_to(opti)
+      julia> con = x >= 4;
+      julia> ca.subject_to(opti, con)
+      julia> sol = ca.solve(opti);
+      julia> ca.value(sol, ca.dual(opti, con))
+      2.0
+      julia> ca.value(sol, ca.lam_g(opti))
+      -2.0
+      julia> try
+                 ca.dual(opti, x >= 4)
+             catch e
+                 println(last(split(sprint(showerror, e), "\n")))
+             end
+      Constraint not present in Opti stack.
+      \enddoctest
+      \endlang
+
       \sa lam_g
 
       \identifier{1h} */
@@ -1270,6 +1810,17 @@ public:
       \doctest
       >> opti = Opti(); x = opti.variable(3); y = opti.variable();
       >> opti.minimize(sumsqr(x)); disp(opti.nx)
+      3
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> opti = ca.Opti();
+      julia> x = ca.variable(opti, 3);
+      julia> y = ca.variable(opti);
+      julia> ca.minimize(opti, ca.sumsqr(x))
+      julia> ca.nx(opti)
       3
       \enddoctest
       \endlang
@@ -1301,6 +1852,17 @@ public:
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> opti = ca.Opti();
+      julia> x = ca.variable(opti);
+      julia> p = ca.parameter(opti, 2, 2);
+      julia> ca.minimize(opti, x*sum(vec(p)))
+      julia> ca.np(opti)
+      4
+      \enddoctest
+      \endlang
+
       \identifier{269} */
   casadi_int np() const;
 
@@ -1324,6 +1886,17 @@ public:
       \doctest
       >> opti = Opti(); x = opti.variable(2);
       >> opti.subject_to(0 <= x <= 1); opti.subject_to(x(1) == x(2)); disp(opti.ng)
+      3
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> opti = ca.Opti();
+      julia> x = ca.variable(opti, 2);
+      julia> ca.subject_to(opti, 0 <= (x <= 1))
+      julia> ca.subject_to(opti, x[1] == x[2])
+      julia> ca.ng(opti)
       3
       \enddoctest
       \endlang
@@ -1363,6 +1936,25 @@ public:
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> opti = ca.Opti();
+      julia> x = ca.variable(opti, 2);
+      julia> y = ca.variable(opti);
+      julia> ca.minimize(opti, ca.sumsqr(x) + y^2)
+      julia> size(ca.x(opti))
+      (3, 1)
+      julia> ca.solver(opti, "ipopt", Dict("print_time" => false),
+                        Dict("print_level" => 0, "sb" => "yes"))
+      julia> sol = ca.solve(opti);
+      julia> ca.value(sol, ca.jacobian(ca.f(opti), ca.x(opti)))
+      3-element Vector{Float64}:
+       0.0
+       0.0
+       0.0
+      \enddoctest
+      \endlang
+
       \identifier{26b} */
   MX x() const;
 
@@ -1387,6 +1979,17 @@ public:
       >> opti = Opti(); x = opti.variable(); p = opti.parameter(2);
       >> opti.minimize(x*p(1)); disp(size(opti.p))
       2 1
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> opti = ca.Opti();
+      julia> x = ca.variable(opti);
+      julia> p = ca.parameter(opti, 2);
+      julia> ca.minimize(opti, x*p[1])
+      julia> size(ca.p(opti))
+      (2, 1)
       \enddoctest
       \endlang
 
@@ -1419,6 +2022,18 @@ public:
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> opti = ca.Opti();
+      julia> x = ca.variable(opti);
+      julia> ca.subject_to(opti, x >= 1)
+      julia> ca.subject_to(opti, x^2 == 4)
+      julia> ca.minimize(opti, x)
+      julia> ca.g(opti)
+      MX(vertcat(opti33_x_1, sq(opti33_x_1)))
+      \enddoctest
+      \endlang
+
       \identifier{26d} */
   MX g() const;
 
@@ -1444,6 +2059,18 @@ public:
       0
       >> opti.minimize(x^2); disp(opti.f)
       sq(opti..._x_1)
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> opti = ca.Opti();
+      julia> x = ca.variable(opti);
+      julia> ca.f(opti)
+      MX(0)
+      julia> ca.minimize(opti, x^2)
+      julia> ca.f(opti)
+      MX(sq(opti34_x_1))
       \enddoctest
       \endlang
 
@@ -1477,6 +2104,20 @@ public:
       >> opti.minimize(x); disp(opti.lbg), disp(opti.ubg)
       vertcat(1, -inf, 4)
       vertcat(inf, opti..._p_1, 4)
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> opti = ca.Opti();
+      julia> x = ca.variable(opti);
+      julia> p = ca.parameter(opti);
+      julia> ca.subject_to(opti, x >= 1)
+      julia> ca.subject_to(opti, x <= p)
+      julia> ca.subject_to(opti, x^2 == 4)
+      julia> ca.minimize(opti, x)
+      julia> print(ca.lbg(opti), " ", ca.ubg(opti))
+      vertcat(1, -inf, 4) vertcat(inf, opti..._p_1, 4)
       \enddoctest
       \endlang
 
@@ -1527,6 +2168,25 @@ public:
       -2
       >> H = hessian(opti.f + dot(opti.lam_g, opti.g), opti.x); disp(sol.value(H))
       2
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> opti = ca.Opti();
+      julia> x = ca.variable(opti);
+      julia> p = ca.parameter(opti);
+      julia> ca.minimize(opti, x^2)
+      julia> ca.subject_to(opti, x >= p)
+      julia> ca.set_value(opti, p, 1)
+      julia> ca.solver(opti, "ipopt", Dict("print_time" => false),
+                        Dict("print_level" => 0, "sb" => "yes"))
+      julia> sol = ca.solve(opti);
+      julia> ca.value(sol, ca.lam_g(opti))
+      -2.0
+      julia> L = ca.f(opti) + ca.dot(ca.lam_g(opti), ca.g(opti));
+      julia> ca.value(sol, ca.hessian(L, ca.x(opti))[1])
+      2.0
       \enddoctest
       \endlang
 
@@ -1607,6 +2267,36 @@ public:
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> opti = ca.Opti();
+      julia> x = ca.variable(opti);
+      julia> y = ca.variable(opti);
+      julia> p = ca.parameter(opti);
+      julia> ca.minimize(opti, (x - p)^2 + (y - x)^2)
+      julia> ca.subject_to(opti, x >= 0)
+      julia> ca.solver(opti, "ipopt", Dict("print_time" => false),
+                        Dict("print_level" => 0, "sb" => "yes"))
+      julia> F = ca.to_function(opti, "F", [p, x], [[x; y], ca.lam_g(opti)],
+                                ["p", "x0"], ["xy", "lam"])
+      Function(F:(p,x0)->(xy[2],lam) MXFunction)
+      julia> r = F(p=2, x0=1);
+      julia> r["xy"], r["lam"]
+      ([2, 2], 0.0000)
+      julia> ca.stats(F)["success"]
+      true
+      julia> F = ca.to_function(opti, "F", Dict("p" => p, "x" => x), ["p"], ["x"]);
+      julia> F(3)
+      DM(3)
+      julia> try
+                 ca.to_function(opti, "F", [p + 1], [x])
+             catch e
+                 println(last(split(sprint(showerror, e), "\n")))
+             end
+      Argument 0 is not purely symbolic.
+      \enddoctest
+      \endlang
+
       \sa nlpsol
 
       \identifier{1j} */
@@ -1645,6 +2335,17 @@ public:
       >>> opti.subject_to(Opti.bounded(0, x[0] + x[1], 1))
       >>> opti.ng, opti.lbg, opti.ubg
       (3, MX(vertcat(all_-1(2x1), 0)), MX(ones(3x1)))
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> opti = ca.Opti();
+      julia> x = ca.variable(opti, 2);
+      julia> ca.subject_to(opti, ca.bounded(-1, x, 1))
+      julia> ca.subject_to(opti, ca.Opti.bounded(0, x[1] + x[2], 1))
+      julia> ca.ng(opti), ca.lbg(opti), ca.ubg(opti)
+      (3, vertcat(all_-1(2x1), 0), ones(3x1))
       \enddoctest
       \endlang
 
@@ -1691,6 +2392,24 @@ public:
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> opti = ca.Opti();
+      julia> x = ca.variable(opti);
+      julia> ca.minimize(opti, (x - 1)^6)
+      julia> ca.solver(opti, "ipopt", Dict("print_time" => false),
+                        Dict("print_level" => 0, "max_iter" => 2, "sb" => "yes"))
+      julia> try
+                 ca.solve(opti)
+             catch e
+             end
+      julia> ca.value(ca.debug(opti), x)
+      0.36
+      julia> print(ca.x_describe(ca.debug(opti), 0))
+      Opti decision variable 'opti..._x_1' of shape 1x1, called from ...
+      \enddoctest
+      \endlang
+
       \sa OptiAdvanced, advanced, copy
 
       \identifier{1l} */
@@ -1720,6 +2439,16 @@ public:
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> opti = ca.Opti();
+      julia> x = ca.variable(opti);
+      julia> ca.minimize(opti, x^2)
+      julia> print(ca.symvar(ca.advanced(opti)))
+      MX[opti..._x_1]
+      \enddoctest
+      \endlang
+
       \identifier{1m} */
   OptiAdvanced advanced() const;
 
@@ -1746,6 +2475,18 @@ public:
       >> opti = Opti(); x = opti.variable(); opti.minimize(x^2);
       >> opti2 = opti.copy(); opti2.subject_to(x >= 2); fprintf('%d %d\n', opti.ng, opti2.ng)
       0 1
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> opti = ca.Opti();
+      julia> x = ca.variable(opti);
+      julia> ca.minimize(opti, x^2)
+      julia> opti2 = opti.copy();
+      julia> ca.subject_to(opti2, x >= 2)
+      julia> ca.ng(opti), ca.ng(opti2)
+      (0, 1)
       \enddoctest
       \endlang
 
@@ -1790,6 +2531,22 @@ public:
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> opti = ca.Opti();
+      julia> x = ca.variable(opti);
+      julia> ca.update_user_dict(opti, x, Dict("name" => "speed", "unit" => "m/s"))
+      julia> d = ca.user_dict(opti, x);
+      julia> d["name"], d["unit"], haskey(d, "stacktrace")
+      ("speed", "m/s", true)
+      julia> con = x >= 0;
+      julia> ca.subject_to(opti, con)
+      julia> ca.update_user_dict(opti, con, Dict("name" => "nonneg"))
+      julia> ca.user_dict(opti, con)["name"]
+      "nonneg"
+      \enddoctest
+      \endlang
+
       \identifier{1o} */
   void update_user_dict(const MX& m, const Dict& meta);
   void update_user_dict(const std::vector<MX>& m, const Dict& meta);
@@ -1817,6 +2574,22 @@ public:
       {'stacktrace'}
       >> try, opti.user_dict(x+1); catch e, disp(contains(e.message, 'Symbol expected')); end
       1
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> opti = ca.Opti();
+      julia> x = ca.variable(opti);
+      julia> sort(collect(keys(ca.user_dict(opti, x))))
+      1-element Vector{String}:
+       "stacktrace"
+      julia> try
+                 ca.user_dict(opti, x + 1)
+             catch e
+                 println(last(split(sprint(showerror, e), "\n")))
+             end
+      Symbol expected, got expression.
       \enddoctest
       \endlang
 
@@ -1859,6 +2632,23 @@ public:
         #constraints: 1 (ng = 1)
         CasADi solver needs updating.
       }
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> opti = ca.Opti();
+      julia> x = ca.variable(opti, 2);
+      julia> ca.minimize(opti, ca.sumsqr(x))
+      julia> ca.subject_to(opti, x[1] >= 1)
+      julia> opti
+      Opti(Opti {
+        instance #45
+        #variables: 1 (nx = 2)
+        #parameters: 0 (np = 0)
+        #constraints: 1 (ng = 1)
+        CasADi solver needs updating.
+      })
       \enddoctest
       \endlang
 
@@ -2039,6 +2829,23 @@ public:
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> opti = ca.Opti();
+      julia> x = ca.variable(opti, 2);
+      julia> ca.minimize(opti, ca.sumsqr(x))
+      julia> ca.subject_to(opti, x[1] >= 1)
+      julia> ca.solver(opti, "ipopt", Dict("print_time" => false),
+                        Dict("print_level" => 0, "sb" => "yes"))
+      julia> sol = ca.solve(opti);
+      julia> S = opti.debug.casadi_solver;
+      julia> ca.name(S), ca.class_name(S)
+      ("solver", "IpoptInterface")
+      julia> print(ca.name_in(S))
+      ["x0", "p", "lbx", "ubx", "lbg", "ubg", "lam_x0", "lam_g0"]
+      \enddoctest
+      \endlang
+
       \identifier{2n0} */
   Function casadi_solver() const;
 
@@ -2062,6 +2869,17 @@ public:
       >> opti = Opti(); x = opti.variable(); p = opti.parameter();
       >> fprintf('%d %d\n', opti.debug.is_parametric(2*p), opti.debug.is_parametric(x*p))
       1 0
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> opti = ca.Opti();
+      julia> x = ca.variable(opti);
+      julia> p = ca.parameter(opti);
+      julia> d = ca.debug(opti);
+      julia> ca.is_parametric(d, 2*p), ca.is_parametric(d, x*p)
+      (true, false)
       \enddoctest
       \endlang
 
@@ -2104,6 +2922,20 @@ public:
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> opti = ca.Opti();
+      julia> x = ca.variable(opti);
+      julia> p = ca.parameter(opti);
+      julia> y = ca.variable(opti);
+      julia> d = ca.debug(opti);
+      julia> print(ca.symvar(d))
+      MX[opti..._x_1, opti..._p_1, opti..._x_2]
+      julia> print(ca.symvar(d, y*p + 1), " ", ca.symvar(d, y*p, ca.OPTI_PAR))
+      MX[opti..._p_1, opti..._x_2] MX[opti..._p_1]
+      \enddoctest
+      \endlang
+
       \identifier{1u} */
   std::vector<MX> symvar() const;
   std::vector<MX> symvar(const MX& expr) const;
@@ -2138,6 +2970,18 @@ public:
       opti..._x_1
       >> c = opti.debug.canon_expr(x + 1); disp(c.type == OPTI_UNKNOWN)
       1
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> opti = ca.Opti();
+      julia> x = opti.variable();
+      julia> c = ca.canon_expr(opti.debug, 0 <= (x <= 1));
+      julia> println(c.type == ca.OPTI_DOUBLE_INEQUALITY, " ", c.lb, " ", c.ub, " ", c.canon)
+      true 0 1 opti..._x_1
+      julia> ca.canon_expr(opti.debug, x + 1).type == ca.OPTI_UNKNOWN
+      true
       \enddoctest
       \endlang
 
@@ -2190,6 +3034,21 @@ public:
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> opti = ca.Opti();
+      julia> x = ca.variable(opti);
+      julia> y = ca.variable(opti);
+      julia> ca.minimize(opti, x^2)
+      julia> d = ca.debug(opti);
+      julia> ca.active_symvar(d, ca.OPTI_VAR)
+      MX[]
+      julia> ca.bake(d)
+      julia> print(ca.active_symvar(d, ca.OPTI_VAR), " ", ca.active_values(d, ca.OPTI_VAR))
+      MX[opti..._x_1] DM[0]
+      \enddoctest
+      \endlang
+
       \identifier{2n3} */
   std::vector<MX> active_symvar(VariableType type) const;
   /// Initial guesses (or parameter values) of the symbols returned by active_symvar
@@ -2218,6 +3077,18 @@ public:
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> opti = ca.Opti();
+      julia> x = ca.variable(opti, 2);
+      julia> y = ca.variable(opti);
+      julia> ca.minimize(opti, ca.sumsqr(x) + y^2)
+      julia> d = ca.debug(opti);
+      julia> print(ca.x_lookup(d, 1), " ", ca.x_lookup(d, 2))
+      opti..._x_1 opti..._x_2
+      \enddoctest
+      \endlang
+
       \identifier{2n4} */
   MX x_lookup(casadi_index i) const;
   /** \brief Get the constraint expression that owns row i of g
@@ -2239,6 +3110,17 @@ public:
       >> opti.subject_to(x >= 0); opti.subject_to(x(1) + x(2) == 1);
       >> opti.debug.g_lookup(3)
       (1==(opti..._x_1[0]+opti..._x_1[1]))
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> opti = ca.Opti();
+      julia> x = ca.variable(opti, 2);
+      julia> ca.subject_to(opti, x >= 0)
+      julia> ca.subject_to(opti, x[1] + x[2] == 1)
+      julia> ca.g_lookup(ca.debug(opti), 2)
+      MX((1==(opti52_x_1[0]+opti52_x_1[1])))
       \enddoctest
       \endlang
 
@@ -2280,6 +3162,17 @@ public:
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> opti = ca.Opti();
+      julia> x = ca.variable(opti, 3);
+      julia> ca.minimize(opti, ca.sumsqr(x))
+      julia> print(ca.x_describe(ca.debug(opti), 2))
+      Opti decision variable 'opti..._x_1' of shape 3x1, called from ...
+      At nonzero 2.
+      \enddoctest
+      \endlang
+
       \identifier{2n6} */
   std::string x_describe(casadi_index i, const Dict& opts=Dict()) const;
   /** \brief Describe row i of the constraint vector g
@@ -2301,6 +3194,17 @@ public:
       >> opti.debug.g_describe(2)
       Opti constraint of shape 3x1, called from ...
       At nonzero 2, part 0.
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> opti = ca.Opti();
+      julia> x = ca.variable(opti, 3);
+      julia> ca.subject_to(opti, x >= 0)
+      julia> print(ca.g_describe(ca.debug(opti), 1))
+      Opti constraint of shape 3x1, called from ...
+      At nonzero 1, part 0.
       \enddoctest
       \endlang
 
@@ -2332,6 +3236,20 @@ public:
       >> opti.debug.describe(MX.sym('w'))
       MX symbol 'w' of shape 1x1, declared outside of Opti.
       >> opti.debug.describe(x*p)
+      General expression, dependent on 2 symbols:
+        Opti decision variable 'opti..._x_1' of shape 1x1, called from ...
+        Opti parameter 'opti..._p_1' of shape 1x1, called from ...
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> opti = ca.Opti();
+      julia> x = ca.variable(opti);
+      julia> p = ca.parameter(opti);
+      julia> ca.describe(ca.debug(opti), ca.MX.sym("w"))
+      "MX symbol 'w' of shape 1x1, declared outside of Opti."
+      julia> print(ca.describe(ca.debug(opti), x*p))
       General expression, dependent on 2 symbols:
         Opti decision variable 'opti..._x_1' of shape 1x1, called from ...
         Opti parameter 'opti..._p_1' of shape 1x1, called from ...
@@ -2391,6 +3309,30 @@ public:
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> opti = ca.Opti();
+      julia> x = ca.variable(opti);
+      julia> ca.minimize(opti, x^2)
+      julia> ca.subject_to(opti, x >= 1)
+      julia> ca.subject_to(opti, x <= -1)
+      julia> ca.solver(opti, "ipopt", Dict("print_time" => false),
+                        Dict("print_level" => 0, "sb" => "yes"))
+      julia> try
+                 ca.solve(opti)
+             catch e
+             end
+      julia> ca.show_infeasibilities(ca.debug(opti), 1e-6)
+      Violated constraints (tol 1e-06), in order of declaration:
+      ------- i = 0/2 ------
+      1 <= ... <= inf (viol ...)
+      Opti constraint of shape 1x1, called from ...
+      ------- i = 1/2 ------
+      -inf <= ... <= -1 (viol ...)
+      Opti constraint of shape 1x1, called from ...
+      \enddoctest
+      \endlang
+
       \identifier{2n9} */
   void show_infeasibilities(double tol=0, const Dict& opts=Dict()) const;
 
@@ -2439,6 +3381,32 @@ public:
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> opti = ca.Opti();
+      julia> x = opti.variable();
+      julia> p = opti.parameter();
+      julia> opti.minimize((x - p)^2)
+      julia> opti.subject_to(x <= 1)
+      julia> opti.set_value(p, 3)
+      julia> opti.solver("ipopt", Dict("print_time" => false), Dict("print_level" => 0, "sb" => "yes"))
+      julia> sol = opti.solve();
+      julia> d = opti.debug;
+      julia> ca.solve_prepare(d)
+      julia> sort(collect(ca.arg(d)), by=first)
+      5-element Vector{Pair{String, DM}}:
+       "lam_g0" => 0
+          "lbg" => -inf
+            "p" => 3
+          "ubg" => 1
+           "x0" => 0
+      julia> r = ca.solve_actual(d, ca.arg(d));
+      julia> ca.res(d, r)
+      julia> ca.value(d, x), sort(collect(keys(ca.res(d))))
+      (1.0, ["f", "g", "lam_g", "lam_p", "lam_x", "x"])
+      \enddoctest
+      \endlang
+
       \identifier{2na} */
   void solve_prepare();
   /// Run the solver on an argument dict (see solve_prepare)
@@ -2470,6 +3438,17 @@ public:
       >> c = opti.debug.constraints(); disp(c{1}), disp(c{2})
       (0<=opti..._x_1)
       ((1<=sq(opti..._x_1))<=4)
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> opti = ca.Opti();
+      julia> x = ca.variable(opti);
+      julia> ca.subject_to(opti, x >= 0)
+      julia> ca.subject_to(opti, 1 <= (x^2 <= 4))
+      julia> print(ca.constraints(ca.debug(opti)))
+      MX[(0<=opti..._x_1), (1<=(sq(opti..._x_1)<=4))]
       \enddoctest
       \endlang
 
@@ -2560,6 +3539,23 @@ protected:
     \enddoctest
     \endlang
 
+    \lang{julia}
+    \doctest
+    julia> opti = ca.Opti();
+    julia> x = ca.variable(opti);
+    julia> p = ca.parameter(opti);
+    julia> ca.minimize(opti, (x - p)^2)
+    julia> ca.solver(opti, "ipopt", Dict("print_time" => false),
+                      Dict("print_level" => 0, "sb" => "yes"))
+    julia> ca.set_value(opti, p, 1)
+    julia> sol1 = ca.solve(opti);
+    julia> ca.set_value(opti, p, 2)
+    julia> sol2 = ca.solve(opti);
+    julia> ca.value(sol1, x), ca.value(sol2, x)
+    (1.0, 2.0)
+    \enddoctest
+    \endlang
+
     \date 2017
     \author Joris Gillis, Erik Lambrechts
 
@@ -2625,6 +3621,30 @@ class CASADI_EXPORT OptiSol : public SWIG_IF_ELSE(PrintableCommon, Printable<Opt
         \enddoctest
         \endlang
 
+        \lang{julia}
+        A scalar becomes a Float64, any other value a dense Matrix{Float64}.
+
+        \doctest
+        julia> opti = ca.Opti();
+        julia> x = ca.variable(opti);
+        julia> y = ca.variable(opti);
+        julia> ca.minimize(opti, (y - x^2)^2)
+        julia> ca.subject_to(opti, x^2 + y^2 == 1)
+        julia> ca.subject_to(opti, x + y >= 1)
+        julia> ca.solver(opti, "ipopt", Dict("print_time" => false),
+                          Dict("print_level" => 0, "sb" => "yes"))
+        julia> sol = ca.solve(opti);
+        julia> ca.value(sol, x), size(ca.value(sol, [x; y]))
+        (0.7862, (2,))
+        julia> sol.value(ca.f(opti), [y == 2])
+        1.9098
+        julia> sol.value(x^2 + y, ca.initial(opti))
+        0.0
+        julia> size(ca.value(sol, ca.jacobian(ca.g(opti), ca.x(opti))))
+        (2, 2)
+        \enddoctest
+        \endlang
+
         \identifier{2nd} */
     native_DM value(const MX& x, const std::vector<MX>& values=std::vector<MX>()) const;
     native_DM value(const DM& x, const std::vector<MX>& values=std::vector<MX>()) const;
@@ -2669,6 +3689,24 @@ class CASADI_EXPORT OptiSol : public SWIG_IF_ELSE(PrintableCommon, Printable<Opt
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> opti = ca.Opti();
+        julia> x = ca.variable(opti);
+        julia> p = ca.parameter(opti);
+        julia> ca.minimize(opti, (x - p)^2)
+        julia> ca.set_value(opti, p, 2)
+        julia> ca.solver(opti, "ipopt", Dict("print_time" => false),
+                          Dict("print_level" => 0, "sb" => "yes"))
+        julia> sol = ca.solve(opti);
+        julia> print(ca.value_variables(sol), " ", ca.value_parameters(sol))
+        MX[(2==opti..._x_1)] MX[(2==opti..._p_1)]
+        julia> opti.set_initial(ca.value_variables(sol))
+        julia> ca.stats(ca.solve(opti))["iter_count"]
+        0
+        \enddoctest
+        \endlang
+
         \identifier{2ne} */
     std::vector<MX> value_variables() const;
     std::vector<MX> value_parameters() const;
@@ -2700,6 +3738,19 @@ class CASADI_EXPORT OptiSol : public SWIG_IF_ELSE(PrintableCommon, Printable<Opt
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> opti = ca.Opti();
+        julia> x = ca.variable(opti);
+        julia> ca.minimize(opti, (x - 1)^2)
+        julia> ca.solver(opti, "ipopt", Dict("print_time" => false),
+                          Dict("print_level" => 0, "sb" => "yes"))
+        julia> sol = ca.solve(opti);
+        julia> ca.stats(sol)["success"], ca.stats(sol)["return_status"]
+        (true, "Solve_Succeeded")
+        \enddoctest
+        \endlang
+
         \identifier{1w} */
     Dict stats() const;
 
@@ -2728,6 +3779,19 @@ class CASADI_EXPORT OptiSol : public SWIG_IF_ELSE(PrintableCommon, Printable<Opt
         >> o.return_status(), o.debug.value(x)
         Solve_Succeeded
         1
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> opti = ca.Opti();
+        julia> x = ca.variable(opti);
+        julia> ca.minimize(opti, (x - 1)^2)
+        julia> ca.solver(opti, "ipopt", Dict("print_time" => false),
+                          Dict("print_level" => 0, "sb" => "yes"))
+        julia> sol = ca.solve(opti);
+        julia> ca.return_status(ca.opti(sol)), ca.value(ca.debug(ca.opti(sol)), x)
+        ("Solve_Succeeded", 1.0)
         \enddoctest
         \endlang
 

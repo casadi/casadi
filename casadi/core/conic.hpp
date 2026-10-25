@@ -161,6 +161,42 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> x = ca.SX.sym("x"); y = ca.SX.sym("y");
+      julia> qp = Dict("x" => [x; y], "f" => x^2 + y^2 + x*y - 3*x, "g" => x + y);
+      julia> opts = Dict("print_iter" => false, "print_header" => false, "print_info" => false);
+      julia> S = ca.qpsol("S", "qrqp", qp, opts);
+      julia> ca.name_in(S)
+      8-element Vector{String}:
+       "x0"
+       "p"
+       "lbx"
+       "ubx"
+       "lbg"
+       "ubg"
+       "lam_x0"
+       "lam_g0"
+      julia> ca.name_out(S)
+      6-element Vector{String}:
+       "x"
+       "f"
+       "g"
+       "lam_x"
+       "lam_g"
+       "lam_p"
+      julia> sol = S(lbg=1, ubg=1, lbx=0);
+      julia> sol["x"], sol["f"]
+      ([1, 0], -2)
+      julia> sol["lam_g"], sol["lam_x"]
+      (1, [0, -2])
+      julia> sol["g"], size(sol["lam_p"])
+      (1, (0, 0))
+      julia> ca.stats(S)["success"], ca.stats(S)["return_status"]
+      (true, "success")
+      \enddoctest
+      \endlang
+
       \lang{python}
       \doctest
       >>> H = DM([[2, 1], [1, 2]]); g = DM([-3, 0]); A = DM([[1, 1]])
@@ -207,6 +243,30 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> H = ca.DM([2 1; 1 2]); g = ca.DM([-3, 0]); A = ca.DM([1 1]);
+      julia> opts = Dict("print_iter" => false, "print_header" => false, "print_info" => false);
+      julia> C = ca.conic("C", "qrqp", Dict("h" => ca.sparsity(H), "a" => ca.sparsity(A)), opts);
+      julia> ca.class_name(C), ca.n_in(C), ca.name_out(C)
+      ("Qrqp", 12, ["x", "cost", "lam_a", "lam_x"])
+      julia> sol = C(h=H, g=g, a=A, lba=1, uba=1, lbx=0);
+      julia> sol["x"], sol["cost"]
+      ([1, 0], -2)
+      julia> sol["lam_a"], sol["lam_x"]
+      (1, [0, -2])
+      julia> LP = ca.conic("LP", "qrqp", Dict("a" => ca.sparsity(A)), opts);
+      julia> LP(g=g, a=A, lba=1, uba=1, lbx=0, ubx=1)["x"]
+      DM([1, 0])
+      julia> try
+                 ca.conic("C", "qrqp", Dict("h" => ca.Sparsity.upper(2)), opts)
+             catch e
+                 println(occursin("square & symmetric", sprint(showerror, e)))
+             end
+      true
+      \enddoctest
+      \endlang
+
       \lang{python}
       \doctest
       >>> x = SX.sym("x")
@@ -243,6 +303,27 @@ namespace casadi {
       >> try, qpsol('S', 'qrqp', qp, opts); catch e, msg = e.message; end
       >> contains(msg, 'integer support')
       1
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> x = ca.SX.sym("x");
+      julia> opts = Dict("print_iter" => false, "print_header" => false, "print_info" => false);
+      julia> qp = Dict("x" => x, "f" => x^2, "g" => x);
+      julia> S = ca.qpsol("S", "qrqp", qp, merge(opts, Dict("error_on_fail" => false)));
+      julia> sol = S(lbx=0, ubx=1, lbg=2, ubg=3);
+      julia> ca.stats(S)["success"]
+      false
+      julia> S = ca.qpsol("S", "qrqp", Dict("x" => x, "f" => x^2 - 4*x, "g" => 2*x), opts);
+      julia> S(ubx=1)["lam_x"], S(lbx=3)["lam_x"], S(ubg=2)["lam_g"]
+      (2, -2, 1)
+      julia> try
+                 ca.qpsol("S", "qrqp", qp, merge(opts, Dict("discrete" => [true])))
+             catch e
+                 println(occursin("integer support", sprint(showerror, e)))
+             end
+      true
       \enddoctest
       \endlang
 
@@ -303,6 +384,25 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> ca.conic_in()
+      12-element Vector{String}:
+       "h"
+       "g"
+       "a"
+       "lba"
+       "uba"
+       "lbx"
+       "ubx"
+       "x0"
+       "lam_x0"
+       "lam_a0"
+       "q"
+       "p"
+      \enddoctest
+      \endlang
+
       \sa conic_out, conic_n_in, nlpsol_in
 
       \identifier{1ee} */
@@ -327,6 +427,17 @@ namespace casadi {
       cost
       lam_a
       lam_x
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> ca.conic_out()
+      4-element Vector{String}:
+       "x"
+       "cost"
+       "lam_a"
+       "lam_x"
       \enddoctest
       \endlang
 
@@ -355,6 +466,13 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> ca.conic_in(0), ca.conic_in(11), ca.conic_in(12)
+      ("h", "p", "")
+      \enddoctest
+      \endlang
+
       \identifier{1eg} */
   CASADI_EXPORT std::string conic_in(casadi_int ind);
 
@@ -377,6 +495,13 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> ca.conic_out(1), ca.conic_out(4)
+      ("cost", "")
+      \enddoctest
+      \endlang
+
       \identifier{1eh} */
   CASADI_EXPORT std::string conic_out(casadi_int ind);
 
@@ -396,6 +521,13 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> ca.conic_n_in()
+      12
+      \enddoctest
+      \endlang
+
       \identifier{1ei} */
   CASADI_EXPORT casadi_int conic_n_in();
 
@@ -411,6 +543,13 @@ namespace casadi {
       \lang{matlab}
       \doctest
       >> conic_n_out()
+      4
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> ca.conic_n_out()
       4
       \enddoctest
       \endlang
@@ -435,6 +574,13 @@ namespace casadi {
       >> opts = cellstr(conic_options('qrqp'));
       >> ismember({'max_iter', 'discrete'}, opts)
       1 0
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> "max_iter" in ca.conic_options("qrqp"), "discrete" in ca.conic_options("qrqp")
+      (true, false)
       \enddoctest
       \endlang
 
@@ -464,6 +610,13 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> ca.conic_option_type("qrqp", "max_iter"), ca.conic_option_type("qrqp", "print_iter")
+      ("OT_INT", "OT_BOOL")
+      \enddoctest
+      \endlang
+
       \identifier{1el} */
   CASADI_EXPORT std::string conic_option_type(const std::string& name, const std::string& op);
 
@@ -486,6 +639,13 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> ca.conic_option_info("qrqp", "max_iter")
+      "Maximum number of iterations [1000]."
+      \enddoctest
+      \endlang
+
       \identifier{1em} */
   CASADI_EXPORT std::string conic_option_info(const std::string& name, const std::string& op);
 
@@ -505,6 +665,13 @@ namespace casadi {
       >> has_conic('qrqp'), has_conic('no_such_plugin')
       1
       0
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> ca.has_conic("qrqp"), ca.has_conic("no_such_plugin")
+      (true, false)
       \enddoctest
       \endlang
 
@@ -534,6 +701,17 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> try
+                 ca.load_conic("no_such_plugin")
+             catch e
+                 println(occursin("no_such_plugin", sprint(showerror, e)))
+             end
+      true
+      \enddoctest
+      \endlang
+
       \identifier{2oe} */
   CASADI_EXPORT void load_conic(const std::string& name);
 
@@ -552,6 +730,13 @@ namespace casadi {
       \doctest
       >> contains(doc_conic('qrqp'), 'active-set')
       1
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> occursin("active-set", ca.doc_conic("qrqp"))
+      true
       \enddoctest
       \endlang
 
@@ -589,6 +774,21 @@ namespace casadi {
       >> contains(msg, 'generateNativeCode not defined')
       1
       >> delete(fn)
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> opts = Dict("print_header" => false);
+      julia> C = ca.conic("C", "qrqp", Dict("h" => ca.Sparsity.dense(1)), opts);
+      julia> d = mktempdir(); fn = joinpath(d, "C_debug.txt");
+      julia> try
+                 ca.conic_debug(C, fn)
+             catch e
+                 println(occursin("generateNativeCode not defined", sprint(showerror, e)))
+             end
+      true
+      julia> rm(d, recursive=true)
       \enddoctest
       \endlang
 

@@ -61,7 +61,7 @@ end
     @test C.is_symmetric(C.diag(_S, 4))
     @test C.is_symmetric(C.lower(_S, 3)) == false
     t = C.dense(_S, 3, 5)
-    tT = C.transpose(t)
+    tT = C.T(t)
     @test (C.size1(tT), C.size2(tT)) == (5, 3)
 end
 
@@ -112,4 +112,61 @@ end
     @test (C.size1(d), C.size2(d)) == (4, 3)
     @test C.nnz(d) == 3
     @test C.get_col(C.sparsity(d)) == C.get_col(sp)
+end
+
+@testset "== / isequal / hash compare patterns" begin
+    @test C.dense(_S, 2) == C.dense(_S, 2)
+    @test C.dense(_S, 2) != C.diag(_S, 2)
+    @test isequal(C.lower(_S, 3), C.lower(_S, 3))
+    @test hash(C.lower(_S, 3)) == hash(C.lower(_S, 3))
+    @test length(Set([C.dense(_S, 2), C.dense(_S, 2), C.diag(_S, 2)])) == 2
+    @test Sparsity() == Sparsity()
+end
+
+@testset "size / length / isempty" begin
+    s = C.dense(_S, 2, 3)
+    @test size(s) == (2, 3) && size(s, 1) == 2 && size(s, 2) == 3 && size(s, 3) == 1
+    @test_throws BoundsError size(s, 0)
+    @test_throws BoundsError size(DM([1, 2]), 0)
+    @test length(s) == 6
+    @test !isempty(s) && isempty(Sparsity(2, 0))
+    @test isempty(SX()) && isempty(DM(Sparsity(0, 3))) && isempty(MX())
+    @test !isempty(sym(SX, "x")) && !isempty(DM([1, 2]))
+end
+
+@testset "output arguments are returned" begin
+    sp, mapping = C.triplet(_S, 3, 3, [2, 0, 1], [1, 0, 0], false)
+    @test C.nnz(sp) == 3 && mapping == [1, 2, 0]
+    n, index, offset = C.scc(C.banded(_S, 3, 1))
+    @test n == 1 && index == [0, 1, 2] && offset == [0, 3]
+    T, m = C.transpose(C.lower(_S, 2), false)
+    @test C.is_equal(T, C.T(C.lower(_S, 2))) && length(m) == 3
+end
+
+@testset "in/out arguments are returned" begin
+    @test C.get_nz(C.dense(_S, 2, 2), [0, 3]) == [0, 3]
+    @test C.get_nz(C.diag(_S, 2), [1, 3]) == [-1, 1]
+end
+
+@testset "pattern algebra: + * .* ' and concatenation" begin
+    d = C.diag(_S, 2); D = C.dense(_S, 2, 2)
+    @test d + D == D
+    @test d .* D == d && d .+ D == D
+    @test C.diag(_S, 2) * C.dense(_S, 2, 1) == C.dense(_S, 2, 1)
+    @test C.lower(_S, 2)' == C.upper(_S, 2) && transpose(C.lower(_S, 2)) == C.upper(_S, 2)
+    @test size([d d]) == (2, 4) && size([d; d]) == (4, 2) && size([d D; D d]) == (4, 4)
+    @test C.nnz([d D; D d]) == 12
+    @test diagcat(d, d) == C.diag(_S, 4) && diagcat([d, d]) == C.diag(_S, 4)
+end
+
+@testset "coloring defaults" begin
+    @test C.size2(C.uni_coloring(C.diag(_S, 3))) == 1
+    @test C.size2(C.star_coloring(C.diag(_S, 5))) == 1
+    @test C.size2(C.star_coloring2(C.diag(_S, 5))) == 1
+    @test C.uni_coloring(C.diag(_S, 3), Sparsity()) == C.uni_coloring(C.diag(_S, 3))
+end
+
+@testset "null Sparsity displays" begin
+    @test repr("text/plain", Sparsity()) == "Sparsity(NULL)"
+    @test repr(Sparsity()) == "NULL"
 end

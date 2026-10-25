@@ -2,11 +2,11 @@
 #
 # Usage: julia docs/api/extra/doctest_julia.jl <blocks.txt>
 # The file holds blocks separated by lines `#### <name>`; each block is the text between
-# \doctest and \enddoctest of a \lang{julia} group. Needs CASADI_JL pointing at a dir holding CasADiNative.jl
-# (default: the worktree build dir swig/julia/CasADiNative). Exit code = number of failing blocks.
+# \doctest and \enddoctest of a \lang{julia} group. Needs CasADiNative importable (the environment
+# test/julia/package/make_package.jl builds from a build tree). Exit code = number of failing blocks.
+# Each block runs in a fresh module where `ca` is CasADiNative (`import CasADiNative as ca`).
 
-const _jl_dir = get(ENV, "CASADI_JL", joinpath(@__DIR__, "..", "..", "..", "build", "swig", "julia", "CasADiNative"))
-include(joinpath(_jl_dir, "CasADiNative.jl"))
+import CasADiNative
 
 function parse_blocks(path)
     blocks = Tuple{String,String}[]
@@ -48,7 +48,27 @@ function parse_examples(text)
     out
 end
 
-norm(s) = join(filter(!isempty, [strip(l) for l in split(strip(s), "\n")]), "\n")
+# Dict iteration order differs between Julia versions: compare a Dict's entry lines sorted
+function sortdicts(s)
+    lines = split(s, "\n")
+    out, i = String[], 1
+    while i <= length(lines)
+        push!(out, lines[i])
+        if occursin(r"Dict\{.*\} with \d+ entr(y|ies):$", lines[i])
+            j = i + 1
+            while j <= length(lines) && startswith(lines[j], "  ")
+                j += 1
+            end
+            append!(out, sort(lines[i+1:j-1]))
+            i = j
+        else
+            i += 1
+        end
+    end
+    join(out, "\n")
+end
+
+norm(s) = join(filter(!isempty, [strip(l) for l in split(sortdicts(strip(s)), "\n")]), "\n")
 
 # Numbers as in doctest_headers.py: half a unit in the last written digit, at least 1e-9 relative
 const NUMBER = r"(?<![\w.@])[-+]?(?:\d+\.\d*|\.\d+|\d+)(?:[eE][-+]?\d+)?(?![\w.])"
@@ -83,29 +103,43 @@ function matches(expected, got)
     occursin(Regex("^" * replace(pat, "\n" => "\\n") * "\$", "s"), g)
 end
 
-function run_block(name, text)
+# A fresh module per block, with CasADiNative imported as `ca`
+function block_module(name)
     mod = Module(Symbol("Doctest_", replace(name, r"\W" => "_")))
-    Core.eval(mod, :(import $(nameof(@__MODULE__)).CasADiNative as ca))
+    Core.eval(mod, :(import CasADiNative as ca))
     Core.eval(mod, :(const CasADiNative = $(CasADiNative)))
+    mod
+end
+
+# Printed output plus, unless the source ends with `;`, the REPL display of the result
+function eval_example(mod, src)
+    path, io = mktemp()
+    got = ""
+    try
+        result = redirect_stdout(io) do
+            r = Core.eval(mod, Meta.parseall(src))
+            Libc.flush_cstdio()
+            r
+        end
+        close(io)
+        got = read(path, String)
+        if !endswith(rstrip(src), ";") && result !== nothing
+            rio = IOBuffer(); show(rio, MIME("text/plain"), result)
+            got *= String(take!(rio))
+        end
+    catch err
+        isopen(io) && close(io)
+        got = read(path, String) * "ERROR: " * sprint(showerror, err)
+    end
+    rm(path, force=true)
+    got
+end
+
+function run_block(name, text)
+    mod = block_module(name)
     ok = true
     for (src, expected) in parse_examples(text)
-        path, io = mktemp()
-        got = ""
-        try
-            result = redirect_stdout(io) do
-                Core.eval(mod, Meta.parseall(src))
-            end
-            close(io)
-            got = read(path, String)
-            if !endswith(rstrip(src), ";") && result !== nothing
-                rio = IOBuffer(); show(rio, MIME("text/plain"), result)
-                got *= String(take!(rio))
-            end
-        catch err
-            isopen(io) && close(io)
-            got = read(path, String) * "ERROR: " * sprint(showerror, err)
-        end
-        rm(path, force=true)
+        got = eval_example(mod, src)
         if !matches(expected, got)
             ok = false
             println("**********************************************************************")
@@ -115,7 +149,10 @@ function run_block(name, text)
     ok
 end
 
-blocks = parse_blocks(ARGS[1])
-nfail = count(!, [run_block(n, t) for (n, t) in blocks])
-println("doctest_julia: $(length(blocks)) blocks, $nfail failures")
-exit(nfail)
+if abspath(PROGRAM_FILE) == @__FILE__
+    blocks = parse_blocks(ARGS[1])
+    nex = sum(length(parse_examples(t)) for (_, t) in blocks; init=0)
+    nfail = count(!, [run_block(n, t) for (n, t) in blocks])
+    println("julia: $(length(blocks)) blocks, $nex examples, $nfail failures")
+    exit(nfail)
+end

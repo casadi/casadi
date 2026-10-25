@@ -118,6 +118,26 @@ class DaeBuilderInternal;
     \enddoctest
     \endlang
 
+    \lang{julia}
+    \doctest
+    julia> dae = ca.DaeBuilder("rocket");
+    julia> a = ca.add(dae, "a", "parameter", "tunable");
+    julia> u = ca.add(dae, "u", "input");
+    julia> h = ca.add(dae, "h", Dict("start" => 0));
+    julia> v = ca.add(dae, "v", Dict("start" => 0, "unit" => "m/s"));
+    julia> m = ca.add(dae, "m", Dict("start" => 1));
+    julia> ca.eq(dae, ca.der(dae, h), v)
+    julia> ca.eq(dae, ca.der(dae, v), (u - a*v^2)/m - 9.81)
+    julia> ca.eq(dae, ca.der(dae, m), -u^2)
+    julia> ca.x(dae), ca.u(dae), ca.p(dae)
+    (["h", "v", "m"], ["u"], ["a"])
+    julia> f = ca.create(dae, "f", ["x", "u", "p"], ["ode"])
+    Function(f:(x[3],u,p)->(ode[3]) MXFunction)
+    julia> f([0, 0, 1], 1, 0.5)
+    DM([0, -8.81, -1])
+    \enddoctest
+    \endlang
+
     \date 2012-2021
     \author Joel Andersson
 
@@ -197,6 +217,26 @@ class CASADI_EXPORT DaeBuilder
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> dae = ca.DaeBuilder("rocket");
+      julia> ca.name(dae), ca.symbolic(dae), ca.all(dae)
+      ("rocket", true, String[])
+      julia> try
+                 ca.DaeBuilder("m", "/nonexistent/path")
+             catch e
+                 println("import failed")
+             end
+      import failed
+      julia> try
+                 ca.DaeBuilder("m", "", Dict("foo" => true))
+             catch e
+                 println(occursin("No such option", sprint(showerror, e)))
+             end
+      true
+      \enddoctest
+      \endlang
+
       \sa load_fmi_description, symbolic
 
       \identifier{2ko} */
@@ -222,6 +262,16 @@ class CASADI_EXPORT DaeBuilder
       rocket
       >> dae.create()
       rocket_dae:(t[0],x[0],z[0],p[0],u[0])->(ode[0],alg[0],quad[0],zero[0]) MXFunction
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> dae = ca.DaeBuilder("rocket");
+      julia> ca.name(dae)
+      "rocket"
+      julia> ca.create(dae)
+      Function(rocket_dae:(t[0],x[0],z[0],p[0],u[0])->(ode[0],alg[0],quad[0],zero[0]) MXFunction)
       \enddoctest
       \endlang
 
@@ -274,6 +324,26 @@ class CASADI_EXPORT DaeBuilder
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> dae = ca.DaeBuilder("m");
+      julia> t = ca.add(dae, "t", "independent");
+      julia> x = ca.add(dae, "x");
+      julia> dae.time(), ca.has_t(dae), ca.t_new(dae)
+      (t, true, ["t"])
+      julia> dae = ca.DaeBuilder("m");
+      julia> x = ca.add(dae, "x");
+      julia> ca.all(dae), ca.has_t(dae), ca.t_new(dae)
+      (["time", "x"], false, String[])
+      julia> try
+                 dae.time()
+             catch e
+                 println(occursin("No explicit time variable", sprint(showerror, e)))
+             end
+      true
+      \enddoctest
+      \endlang
+
       \sa has_t, t_new
 
       \identifier{2by} */
@@ -320,6 +390,19 @@ class CASADI_EXPORT DaeBuilder
       x
       y
       1
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> dae = ca.DaeBuilder("m");
+      julia> x = ca.add(dae, "x");
+      julia> y = ca.add(dae, "y");
+      julia> ca.x(dae), ca.z(dae)
+      (String[], ["x", "y"])
+      julia> ca.eq(dae, ca.der(dae, x), -y)
+      julia> ca.x(dae), ca.z(dae), ca.nx(dae)
+      (["x"], ["y"], 1)
       \enddoctest
       \endlang
 
@@ -373,6 +456,27 @@ class CASADI_EXPORT DaeBuilder
       >> dae.y(), dae.ny()
       x
       1
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> dae = ca.DaeBuilder("m");
+      julia> x = ca.add(dae, "x", "output");
+      julia> y = ca.add(dae, "y", "output");
+      julia> w = ca.add(dae, "w");
+      julia> ca.eq(dae, ca.der(dae, x), -w)
+      julia> ca.eq(dae, w, x^2)
+      julia> ca.eq(dae, y, 2*x)
+      julia> ca.y(dae), ca.x(dae), ca.w(dae)
+      (["x", "y"], ["x"], ["der(x)", "w", "y"])
+      julia> ca.outputs(dae, "y")
+      2-element Vector{MX}:
+       MX(x)
+       MX(y)
+      julia> ca.set_causality(dae, "y", "local")
+      julia> ca.y(dae), ca.ny(dae)
+      (["x"], 1)
       \enddoctest
       \endlang
 
@@ -430,6 +534,21 @@ class CASADI_EXPORT DaeBuilder
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> dae = ca.DaeBuilder("m");
+      julia> x = ca.add(dae, "x");
+      julia> q = ca.add(dae, "q");
+      julia> ca.eq(dae, ca.der(dae, x), -x)
+      julia> ca.eq(dae, ca.der(dae, q), x^2)
+      julia> ca.x(dae), ca.q(dae)
+      (["x", "q"], String[])
+      julia> ca.set_category(dae, "q", "q")
+      julia> ca.x(dae), ca.q(dae), ca.outputs(dae, "quad")
+      (["x"], ["q"], MX[sq(x)])
+      \enddoctest
+      \endlang
+
       \sa set_category, x, nq
 
       \identifier{2fw} */
@@ -474,6 +593,25 @@ class CASADI_EXPORT DaeBuilder
       0
       >> try, dae.inputs('ode'); catch e, disp(contains(e.message, 'not an input category')); end
       1
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> dae = ca.DaeBuilder("m");
+      julia> x = ca.add(dae, "x");
+      julia> z = ca.add(dae, "z");
+      julia> u = ca.add(dae, "u", "input");
+      julia> ca.eq(dae, ca.der(dae, x), -x + z*u)
+      julia> ca.eq(dae, 0, x - 2*z)
+      julia> ca.inputs(dae, "x"), ca.inputs(dae, "z"), ca.inputs(dae, "u"), ca.inputs(dae, "p")
+      (MX[x], MX[z], MX[u], MX[])
+      julia> try
+                 ca.inputs(dae, "ode")
+             catch e
+                 println(occursin("not an input category", sprint(showerror, e)))
+             end
+      true
       \enddoctest
       \endlang
 
@@ -522,6 +660,25 @@ class CASADI_EXPORT DaeBuilder
       0
       >> try, dae.outputs('x'); catch e, disp(contains(e.message, 'No input category')); end
       1
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> dae = ca.DaeBuilder("m");
+      julia> x = ca.add(dae, "x");
+      julia> z = ca.add(dae, "z");
+      julia> u = ca.add(dae, "u", "input");
+      julia> ca.eq(dae, ca.der(dae, x), -x + z*u)
+      julia> ca.eq(dae, 0, x - 2*z)
+      julia> ca.outputs(dae, "ode"), ca.outputs(dae, "alg"), ca.outputs(dae, "y")
+      (MX[((z*u)-x)], MX[(-(x-(2.*z)))], MX[])
+      julia> try
+                 ca.outputs(dae, "x")
+             catch e
+                 println(occursin("No input category", sprint(showerror, e)))
+             end
+      true
       \enddoctest
       \endlang
 
@@ -584,6 +741,17 @@ class CASADI_EXPORT DaeBuilder
       p
       c
       u
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> dae = ca.DaeBuilder("m");
+      julia> p = ca.add(dae, "p", "parameter", "tunable");
+      julia> c = ca.add(dae, "c", "parameter", "fixed");
+      julia> u = ca.add(dae, "u", "input");
+      julia> ca.p(dae), ca.c(dae), ca.u(dae)
+      (["p"], ["c"], ["u"])
       \enddoctest
       \endlang
 
@@ -671,6 +839,24 @@ class CASADI_EXPORT DaeBuilder
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> dae = ca.DaeBuilder("m");
+      julia> x = ca.add(dae, "x");
+      julia> w = ca.add(dae, "w");
+      julia> ca.eq(dae, w, sin(x))
+      julia> ca.eq(dae, ca.der(dae, x), -w)
+      julia> ca.w(dae)
+      2-element Vector{String}:
+       "w"
+       "der(x)"
+      julia> ca.wdef(dae)
+      2-element Vector{MX}:
+       MX(sin(x))
+       MX((-w))
+      \enddoctest
+      \endlang
+
       \sa wdef, dependent_fun, eliminate, nw
 
       \identifier{5t} */
@@ -711,6 +897,17 @@ class CASADI_EXPORT DaeBuilder
       >> cellfun(@disp, dae.init_lhs()), cellfun(@disp, dae.init_rhs())
       x
       (2.*p)
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> dae = ca.DaeBuilder("m");
+      julia> x = ca.add(dae, "x");
+      julia> p = ca.add(dae, "p", "parameter", "tunable");
+      julia> ca.set_init(dae, "x", 2*p)
+      julia> ca.init_lhs(dae), ca.init_rhs(dae)
+      (MX[x], MX[(2.*p)])
       \enddoctest
       \endlang
 
@@ -781,6 +978,16 @@ class CASADI_EXPORT DaeBuilder
       >> dae.nx(), dae.create()
       1
       m_dae:(t[0],x[3],z[0],p[0],u[0])->(ode[3],alg[0],quad[0],zero[0]) MXFunction
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> dae = ca.DaeBuilder("m");
+      julia> pos = ca.add(dae, "pos", Dict("dimension" => [3]));
+      julia> ca.eq(dae, ca.der(dae, pos), -pos)
+      julia> ca.nx(dae), ca.create(dae)
+      (1, m_dae:(t[0],x[3],z[0],p[0],u[0])->(ode[3],alg[0],quad[0],zero[0]) MXFunction)
       \enddoctest
       \endlang
 
@@ -974,6 +1181,37 @@ class CASADI_EXPORT DaeBuilder
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> dae = ca.DaeBuilder("m");
+      julia> x = ca.add(dae, "x");
+      julia> x, size(x), ca.category(dae, "x"), ca.causality(dae, "x"), ca.variability(dae, "x")
+      (x, (1, 1), "z", "local", "continuous")
+      julia> p = ca.add(dae, "p", "parameter", "tunable");
+      julia> ca.category(dae, "p"), ca.variability(dae, "p")
+      ("p", "tunable")
+      julia> b = ca.add(dae, "b", "input", Dict("type" => "Boolean", "start" => false));
+      julia> ca.category(dae, "b"), ca.variability(dae, "b"), ca.type(dae, "b")
+      ("u", "discrete", "Boolean")
+      julia> opts = Dict("dimension" => [3], "start" => [1, 2, 3], "min" => 0, "unit" => "m");
+      julia> r = ca.add(dae, "r", opts);
+      julia> size(r), ca.start(dae, "r"), dae.min("r"), ca.unit(dae, "r")
+      ((3, 1), [1.0, 2.0, 3.0], 0.0, "m")
+      julia> try
+                 ca.add(dae, "x")
+             catch e
+                 println(occursin("already exists", sprint(showerror, e)))
+             end
+      true
+      julia> try
+                 ca.add(dae, "q", "parameter", "continuous")
+             catch e
+                 println(occursin("requires 'fixed' or 'tunable'", sprint(showerror, e)))
+             end
+      true
+      \enddoctest
+      \endlang
+
       \sa eq, der, var, category, set_category
 
       \identifier{2kp} */
@@ -1120,6 +1358,42 @@ class CASADI_EXPORT DaeBuilder
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> dae = ca.DaeBuilder("m");
+      julia> x = ca.add(dae, "x");
+      julia> y = ca.add(dae, "y");
+      julia> z = ca.add(dae, "z");
+      julia> w = ca.add(dae, "w");
+      julia> ca.x(dae), ca.z(dae), ca.w(dae)
+      (String[], ["x", "y", "z", "w"], String[])
+      julia> ca.eq(dae, ca.der(dae, x), -x + z)
+      julia> ca.x(dae), ca.z(dae), ca.w(dae)
+      (["x"], ["y", "z", "w"], ["der(x)"])
+      julia> ca.eq(dae, 0, x - 2*z)
+      julia> ca.z(dae), ca.outputs(dae, "alg")
+      (["y", "z", "w"], MX[(-(x-(2.*z)))])
+      julia> ca.eq(dae, w, x*z)
+      julia> ca.w(dae), ca.wdef(dae)
+      (["der(x)", "w"], MX[(z-x), (x*z)])
+      julia> ca.eq(dae, [ca.der(dae, y); w], [w; 1])
+      julia> ca.x(dae), ca.outputs(dae, "ode"), ca.outputs(dae, "alg")
+      (["x", "y"], MX[(z-x), w], MX[(-(x-(2.*z))), (-(w-1))])
+      julia> try
+                 ca.eq(dae, x, 1)
+             catch e
+                 println(occursin("Cannot handle left-hand-side", sprint(showerror, e)))
+             end
+      true
+      julia> try
+                 ca.eq(dae, [ca.der(dae, x); ca.der(dae, y)], [1, 2, 3])
+             catch e
+                 println(occursin("Mismatched dimensions", sprint(showerror, e)))
+             end
+      true
+      \enddoctest
+      \endlang
+
       \sa der, when, set_init, add
 
       \identifier{2kt} */
@@ -1177,6 +1451,29 @@ class CASADI_EXPORT DaeBuilder
       >> try, dae.when(h <= 0, {}); catch e, msg = e.message; end
       >> contains(msg, 'Only strict inequality')
       1
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> dae = ca.DaeBuilder("ball");
+      julia> h = ca.add(dae, "h", Dict("start" => 5));
+      julia> v = ca.add(dae, "v", Dict("start" => 0));
+      julia> ca.eq(dae, ca.der(dae, h), v)
+      julia> ca.eq(dae, ca.der(dae, v), -9.81)
+      julia> ca.when(dae, h < 0, [ca.reinit(dae, "v", -0.8*v)])
+      julia> ca.nzero(dae), ca.outputs(dae, "zero")
+      (1, MX[h])
+      julia> T = ca.transition(dae)
+      Function(ball_transition:(index[],t[0],x[2],z[0],p[0],u[0])->(post_x[2],post_z[0]) MXFunction)
+      julia> T(0, 0, [-0.1, -3], [], [], [])
+      ([-0.1, 2.4], 0x1)
+      julia> try
+                 ca.when(dae, h <= 0, String[])
+             catch e
+                 println(occursin("Only strict inequality", sprint(showerror, e)))
+             end
+      true
       \enddoctest
       \endlang
 
@@ -1245,6 +1542,31 @@ class CASADI_EXPORT DaeBuilder
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> dae = ca.DaeBuilder("m");
+      julia> x = ca.add(dae, "x", Dict("start" => 0));
+      julia> b = ca.add(dae, "b", Dict("type" => "Boolean", "start" => false));
+      julia> ca.eq(dae, ca.der(dae, x), 1)
+      julia> ca.assign(dae, "b", true)
+      "__assign__b__"
+      julia> ca.when(dae, x > 1, [ca.assign(dae, "b", true)])
+      julia> ca.disp(dae, true)
+      nt = 0, nx = 2, nz = 0, nq = 0, ny = 0, np = 0, nc = 0, nd = 0, nw = 1, nu = 0
+      Model variables:
+        x = [x, b]
+        w = [der(x)]
+      List of dependent variables (w):
+        der(x) := 1
+      Time derivatives of differential states (x):
+        x: der(x)
+        b: 0
+      When equations:
+        when (1-x) < 0 :
+          b := 1
+      \enddoctest
+      \endlang
+
       \sa when, reinit
 
       \identifier{2kv} */
@@ -1285,6 +1607,22 @@ class CASADI_EXPORT DaeBuilder
       __reinit__v__0
       calculated
       >> dae.when(h < 0, {r}); disp(dae.nzero())
+      1
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> dae = ca.DaeBuilder("ball");
+      julia> h = ca.add(dae, "h", Dict("start" => 5));
+      julia> v = ca.add(dae, "v", Dict("start" => 0));
+      julia> ca.eq(dae, ca.der(dae, h), v)
+      julia> ca.eq(dae, ca.der(dae, v), -9.81)
+      julia> r = ca.reinit(dae, "v", -0.8*v);
+      julia> r, ca.category(dae, r)
+      ("__reinit__v__0", "calculated")
+      julia> ca.when(dae, h < 0, [r])
+      julia> ca.nzero(dae)
       1
       \enddoctest
       \endlang
@@ -1337,6 +1675,22 @@ class CASADI_EXPORT DaeBuilder
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> dae = ca.DaeBuilder("m");
+      julia> x = ca.add(dae, "x");
+      julia> p = ca.add(dae, "p", "parameter", "tunable");
+      julia> ca.init_lhs(dae), ca.init_rhs(dae)
+      (MX[], MX[])
+      julia> ca.set_init(dae, "x", 2*p)
+      julia> ca.init_lhs(dae), ca.init_rhs(dae)
+      (MX[x], MX[(2.*p)])
+      julia> ca.set_init(dae, "x", ca.MX())
+      julia> ca.init_lhs(dae), ca.init_rhs(dae)
+      (MX[], MX[])
+      \enddoctest
+      \endlang
+
       \sa init_lhs, init_rhs
 
       \identifier{2kx} */
@@ -1358,6 +1712,13 @@ class CASADI_EXPORT DaeBuilder
       \doctest
       >> dae = DaeBuilder('m');
       >> dae.sanity_check()
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> dae = ca.DaeBuilder("m");
+      julia> ca.sanity_check(dae)
       \enddoctest
       \endlang
 
@@ -1412,6 +1773,27 @@ class CASADI_EXPORT DaeBuilder
       >> try, dae.reorder('x', {'y'}); catch e, msg = e.message; end
       >> contains(msg, '1 elements provided for 2 components')
       1
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> dae = ca.DaeBuilder("m");
+      julia> x = ca.add(dae, "x");
+      julia> y = ca.add(dae, "y");
+      julia> ca.eq(dae, ca.der(dae, x), -y)
+      julia> ca.eq(dae, ca.der(dae, y), x)
+      julia> ca.x(dae), ca.outputs(dae, "ode")
+      (["x", "y"], MX[(-y), x])
+      julia> ca.reorder(dae, "x", ["y", "x"])
+      julia> ca.x(dae), ca.outputs(dae, "ode")
+      (["y", "x"], MX[x, (-y)])
+      julia> try
+                 ca.reorder(dae, "x", ["y"])
+             catch e
+                 println(occursin("1 elements provided for 2 components", sprint(showerror, e)))
+             end
+      true
       \enddoctest
       \endlang
 
@@ -1487,6 +1869,30 @@ class CASADI_EXPORT DaeBuilder
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> dae = ca.DaeBuilder("m");
+      julia> x = ca.add(dae, "x");
+      julia> u1 = ca.add(dae, "u1", "input");
+      julia> p1 = ca.add(dae, "p1", "parameter", "tunable");
+      julia> ca.set_all(dae, "u", ["p1", "u1"])
+      julia> ca.u(dae), ca.p(dae), ca.c(dae)
+      (["p1", "u1"], String[], String[])
+      julia> ca.set_all(dae, "p", ["u1"])
+      julia> ca.u(dae), ca.p(dae), ca.c(dae)
+      (["p1"], ["u1"], String[])
+      julia> ca.set_all(dae, "y", ["x"])
+      julia> ca.y(dae), ca.causality(dae, "x")
+      (["x"], "output")
+      julia> try
+                 ca.set_all(dae, "x", ["x", "x"])
+             catch e
+                 println(occursin("Duplicate names", sprint(showerror, e)))
+             end
+      true
+      \enddoctest
+      \endlang
+
       \sa reorder, set_category, set_causality
 
       \identifier{2l0} */
@@ -1542,6 +1948,27 @@ class CASADI_EXPORT DaeBuilder
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> dae = ca.DaeBuilder("m");
+      julia> x = ca.add(dae, "x");
+      julia> w1 = ca.add(dae, "w1");
+      julia> w2 = ca.add(dae, "w2");
+      julia> ca.eq(dae, w2, w1^2)
+      julia> ca.eq(dae, w1, 2*x)
+      julia> ca.eq(dae, ca.der(dae, x), -w2)
+      julia> ca.eliminate(dae, "w")
+      julia> ca.w(dae), ca.outputs(dae, "ode"), ca.category(dae, "w1")
+      (String[], MX[(-sq((2.*x)))], "calculated")
+      julia> try
+                 ca.eliminate(dae, "x")
+             catch e
+                 println(occursin("Elimination not supported", sprint(showerror, e)))
+             end
+      true
+      \enddoctest
+      \endlang
+
       \sa sort, dependent_fun, lift
 
       \identifier{2l1} */
@@ -1592,6 +2019,23 @@ class CASADI_EXPORT DaeBuilder
       (2.*x)
       sq(w1)
       (-w2)
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> dae = ca.DaeBuilder("m");
+      julia> x = ca.add(dae, "x");
+      julia> w1 = ca.add(dae, "w1");
+      julia> w2 = ca.add(dae, "w2");
+      julia> ca.eq(dae, w2, w1^2)
+      julia> ca.eq(dae, w1, 2*x)
+      julia> ca.eq(dae, ca.der(dae, x), -w2)
+      julia> ca.w(dae), ca.wdef(dae)
+      (["w2", "w1", "der(x)"], MX[sq(w1), (2.*x), (-w2)])
+      julia> ca.sort(dae, "w")
+      julia> ca.w(dae), ca.wdef(dae)
+      (["w1", "w2", "der(x)"], MX[(2.*x), sq(w1), (-w2)])
       \enddoctest
       \endlang
 
@@ -1657,6 +2101,39 @@ class CASADI_EXPORT DaeBuilder
       (-((w_1-sq(w_3))-w_4))
       >> dae.create('f', {'z', 'w'}, {'alg', 'wdef'})
       f:(z[2],w[5])->(alg[2],wdef[5]) MXFunction
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> a = ca.MX.sym("a");
+      julia> F = ca.Function("F", [a], [sin(a) + a^2]);
+      julia> dae = ca.DaeBuilder("m");
+      julia> x = ca.add(dae, "x");
+      julia> y = ca.add(dae, "y");
+      julia> ca.eq(dae, 0, x - F(y))
+      julia> ca.eq(dae, 0, y - F(x)^2 - F(y))
+      julia> ca.lift(dae)
+      julia> ca.w(dae)
+      5-element Vector{String}:
+       "w_0"
+       "w_1"
+       "w_2"
+       "w_3"
+       "w_4"
+      julia> ca.wdef(dae)
+      5-element Vector{MX}:
+       MX(x)
+       MX(y)
+       MX(F(w_1){0})
+       MX(F(w_0){0})
+       MX(F(w_1){0})
+      julia> ca.outputs(dae, "alg")
+      2-element Vector{MX}:
+       MX((-(w_0-w_2)))
+       MX((-((w_1-sq(w_3))-w_4)))
+      julia> ca.create(dae, "f", ["z", "w"], ["alg", "wdef"])
+      Function(f:(z[2],w[5])->(alg[2],wdef[5]) MXFunction)
       \enddoctest
       \endlang
 
@@ -1744,6 +2221,25 @@ class CASADI_EXPORT DaeBuilder
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> dae = ca.DaeBuilder("m");
+      julia> x = ca.add(dae, "x");
+      julia> w = ca.add(dae, "w");
+      julia> ca.eq(dae, w, sin(x))
+      julia> f = ca.add_fun(dae, "wfun", ["x"], ["w"])
+      Function(wfun:(x)->(w) MXFunction)
+      julia> ca.has_fun(dae, "wfun"), ca.has_fun(dae, "nope")
+      (true, false)
+      julia> try
+                 ca.add_fun(dae, "bad", ["x"], ["x"])
+             catch e
+                 println(occursin("Cannot find dependent", sprint(showerror, e)))
+             end
+      true
+      \enddoctest
+      \endlang
+
       \sa fun, has_fun, gather_fun
 
       \identifier{2l6} */
@@ -1775,6 +2271,19 @@ class CASADI_EXPORT DaeBuilder
       F:(i0)->(o0) MXFunction
       >> cellfun(@(g) disp(g.name()), dae.fun())
       F
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> a = ca.MX.sym("a");
+      julia> F = ca.Function("F", [a], [a^2]);
+      julia> dae = ca.DaeBuilder("m");
+      julia> ca.add_fun(dae, F)
+      Function(F:(i0)->(o0) MXFunction)
+      julia> [ca.name(g) for g in ca.fun(dae)]
+      1-element Vector{String}:
+       "F"
       \enddoctest
       \endlang
 
@@ -1829,6 +2338,22 @@ class CASADI_EXPORT DaeBuilder
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> a = ca.MX.sym("a");
+      julia> dae = ca.DaeBuilder("m");
+      julia> f = ca.add_fun(dae, ca.Function("F", [a], [a^2]));
+      julia> ca.fun(dae, "F")
+      Function(F:(i0)->(o0) MXFunction)
+      julia> try
+                 ca.fun(dae, "nope")
+             catch e
+                 println(occursin("No such function", sprint(showerror, e)))
+             end
+      true
+      \enddoctest
+      \endlang
+
       \sa has_fun, add_fun
 
       \identifier{2la} */
@@ -1870,6 +2395,22 @@ class CASADI_EXPORT DaeBuilder
       >> dae.gather_fun();
       >> cellfun(@(g) disp(g.name()), dae.fun())
       F
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> a = ca.MX.sym("a");
+      julia> F = ca.Function("F", [a], [a^2]);
+      julia> dae = ca.DaeBuilder("m");
+      julia> x = ca.add(dae, "x");
+      julia> ca.eq(dae, ca.der(dae, x), F(x))
+      julia> [ca.name(g) for g in ca.fun(dae)]
+      String[]
+      julia> ca.gather_fun(dae)
+      julia> [ca.name(g) for g in ca.fun(dae)]
+      1-element Vector{String}:
+       "F"
       \enddoctest
       \endlang
 
@@ -2008,6 +2549,22 @@ class CASADI_EXPORT DaeBuilder
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> dae = ca.DaeBuilder("m");
+      julia> x = ca.add(dae, "x");
+      julia> z = ca.add(dae, "z");
+      julia> ca.eq(dae, ca.der(dae, x), -x*z)
+      julia> ca.eq(dae, 0, z - x^2)
+      julia> ca.add_lc(dae, "gamma", ["ode", "alg"])
+      julia> H = ca.create(dae, "H", ["x", "z", "lam_ode", "lam_alg"],
+                           ["hess_gamma_x_x", "hess_gamma_x_z"])
+      Function(H:(x,z,lam_ode,lam_alg)->(hess_gamma_x_x,hess_gamma_x_z) MXFunction)
+      julia> H(1, 2, 1, 1)
+      (2, -1)
+      \enddoctest
+      \endlang
+
       \sa create
 
       \identifier{2lf} */
@@ -2114,6 +2671,46 @@ class CASADI_EXPORT DaeBuilder
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> dae = ca.DaeBuilder("m");
+      julia> x = ca.add(dae, "x");
+      julia> z = ca.add(dae, "z");
+      julia> u = ca.add(dae, "u", "input");
+      julia> p = ca.add(dae, "p", "parameter", "tunable");
+      julia> c = ca.add(dae, "c", "parameter", "fixed", Dict("start" => 3));
+      julia> w = ca.add(dae, "w");
+      julia> y = ca.add(dae, "y", "output");
+      julia> ca.eq(dae, ca.der(dae, x), -c*x + z*u)
+      julia> ca.eq(dae, 0, x - p*z^2)
+      julia> ca.eq(dae, w, x + z)
+      julia> ca.eq(dae, y, w^2)
+      julia> f = ca.create(dae, "f", ["x", "z", "u", "p"], ["ode", "alg", "y"])
+      Function(f:(x,z,u,p)->(ode,alg,y) MXFunction)
+      julia> f(1, 2, 3, 4)
+      (3, 15, 9)
+      julia> J = ca.create(dae, "J", ["x", "z", "u", "p"], ["jac_ode_x", "jac_alg_z"]);
+      julia> J(1, 2, 3, 4)
+      (-3, 16)
+      julia> ca.create(dae, "g", ["x", "z", "w"], ["ode", "wdef"])
+      Function(g:(x,z,w[3])->(ode,wdef[3]) MXFunction)
+      julia> ca.create(dae, "s", ["x", "z", "u", "p"], ["ode"], true)
+      Function(s:(x,z,u,p)->(ode) SXFunction)
+      julia> try
+                 ca.create(dae, "f", ["x", "z", "c"], ["ode"])
+             catch e
+                 println(occursin("Cannot process \"c\" as input", sprint(showerror, e)))
+             end
+      true
+      julia> try
+                 ca.create(dae, "f", ["x", "z"], ["w"])
+             catch e
+                 println(occursin("Cannot process \"w\" as output", sprint(showerror, e)))
+             end
+      true
+      \enddoctest
+      \endlang
+
       \sa oracle, add_lc, dependent_fun, transition
 
       \identifier{6e} */
@@ -2159,6 +2756,21 @@ class CASADI_EXPORT DaeBuilder
       0x1
       >> res = f('t', 0, 'x', 1, 'u', 3); disp(res.ode)
       2
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> dae = ca.DaeBuilder("m");
+      julia> x = ca.add(dae, "x");
+      julia> u = ca.add(dae, "u", "input");
+      julia> ca.eq(dae, ca.der(dae, x), -x + u)
+      julia> f = ca.create(dae, "mydae")
+      Function(mydae:(t[0],x,z[0],p[0],u)->(ode,alg[0],quad[0],zero[0]) MXFunction)
+      julia> f(0, 1, [], [], 3)
+      (2, 0x1, 0x1, 0x1)
+      julia> f(t=0, x=1, u=3)["ode"]
+      DM(2)
       \enddoctest
       \endlang
 
@@ -2224,6 +2836,29 @@ class CASADI_EXPORT DaeBuilder
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> dae = ca.DaeBuilder("m");
+      julia> x = ca.add(dae, "x");
+      julia> w1 = ca.add(dae, "w1");
+      julia> w2 = ca.add(dae, "w2");
+      julia> p = ca.add(dae, "p", "parameter", "tunable");
+      julia> ca.eq(dae, w1, 2*x)
+      julia> ca.eq(dae, w2, w1^2 + p)
+      julia> ca.eq(dae, ca.der(dae, x), -w2)
+      julia> f = ca.dependent_fun(dae, "f", ["x", "p"], ["w"])
+      Function(f:(x,p)->(w[3]) MXFunction)
+      julia> f(1, 3)
+      DM([2, 7, -7])
+      julia> try
+                 ca.dependent_fun(dae, "f", ["x", "w"], ["w"])
+             catch e
+                 println(occursin("cannot be both input and output", sprint(showerror, e)))
+             end
+      true
+      \enddoctest
+      \endlang
+
       \sa w, d, create, eliminate
 
       \identifier{2lh} */
@@ -2278,6 +2913,27 @@ class CASADI_EXPORT DaeBuilder
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> dae = ca.DaeBuilder("ball");
+      julia> h = ca.add(dae, "h", Dict("start" => 5));
+      julia> v = ca.add(dae, "v", Dict("start" => 0));
+      julia> ca.eq(dae, ca.der(dae, h), v)
+      julia> ca.eq(dae, ca.der(dae, v), -9.81)
+      julia> ca.when(dae, h < 0, [ca.reinit(dae, "v", -0.8*v)])
+      julia> T = ca.transition(dae, "tr", 0)
+      Function(tr:(t[0],x[2],z[0],p[0],u[0])->(post_x[2],post_z[0]) MXFunction)
+      julia> T(0, [-0.1, -3], [], [], [])
+      ([-0.1, 2.4], 0x1)
+      julia> try
+                 ca.transition(dae, "tr", 1)
+             catch e
+                 println(occursin("Illegal event index", sprint(showerror, e)))
+             end
+      true
+      \enddoctest
+      \endlang
+
       \sa when, create
 
       \identifier{2li} */
@@ -2315,6 +2971,21 @@ class CASADI_EXPORT DaeBuilder
       >> dae.when(h < 0, {dae.reinit('v', -0.8*v)});
       >> dae.transition('tr')
       tr:(index[],t[0],x[2],z[0],p[0],u[0])->(post_x[2],post_z[0]) MXFunction
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> dae = ca.DaeBuilder("ball");
+      julia> h = ca.add(dae, "h", Dict("start" => 5));
+      julia> v = ca.add(dae, "v", Dict("start" => 0));
+      julia> ca.eq(dae, ca.der(dae, h), v)
+      julia> ca.eq(dae, ca.der(dae, v), -9.81)
+      julia> ca.is_null(ca.transition(dae))
+      true
+      julia> ca.when(dae, h < 0, [ca.reinit(dae, "v", -0.8*v)])
+      julia> ca.transition(dae, "tr")
+      Function(tr:(index[],t[0],x[2],z[0],p[0],u[0])->(post_x[2],post_z[0]) MXFunction)
       \enddoctest
       \endlang
 
@@ -2367,6 +3038,23 @@ class CASADI_EXPORT DaeBuilder
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> dae = ca.DaeBuilder("m");
+      julia> x = ca.add(dae, "x", Dict("dimension" => [2]));
+      julia> ca.var(dae, "x"), size(ca.var(dae, "x"))
+      (x, (2, 1))
+      julia> ca.has(dae, "x"), ca.has(dae, "y")
+      (true, false)
+      julia> try
+                 ca.var(dae, "y")
+             catch e
+                 println(occursin("No such variable", sprint(showerror, e)))
+             end
+      true
+      \enddoctest
+      \endlang
+
       \sa has, all, inputs
 
       \identifier{2ll} */
@@ -2403,6 +3091,22 @@ class CASADI_EXPORT DaeBuilder
       >> dae.der()
       der(x)
       der(y)
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> dae = ca.DaeBuilder("m");
+      julia> x = ca.add(dae, "x");
+      julia> y = ca.add(dae, "y");
+      julia> ca.der(dae)
+      String[]
+      julia> ca.eq(dae, ca.der(dae, x), -y)
+      julia> ca.eq(dae, ca.der(dae, y), x)
+      julia> ca.der(dae)
+      2-element Vector{String}:
+       "der(x)"
+       "der(y)"
       \enddoctest
       \endlang
 
@@ -2443,6 +3147,25 @@ class CASADI_EXPORT DaeBuilder
       der(y)
       >> try, dae.der('p'); catch e, disp(contains(e.message, 'No derivative expression')); end
       1
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> dae = ca.DaeBuilder("m");
+      julia> x = ca.add(dae, "x");
+      julia> y = ca.add(dae, "y");
+      julia> p = ca.add(dae, "p", "parameter", "tunable");
+      julia> ca.eq(dae, ca.der(dae, x), -y)
+      julia> ca.eq(dae, ca.der(dae, y), x)
+      julia> ca.der(dae, "x"), ca.der(dae, ["x", "y"])
+      ("der(x)", ["der(x)", "der(y)"])
+      julia> try
+                 ca.der(dae, "p")
+             catch e
+                 println(occursin("No derivative expression", sprint(showerror, e)))
+             end
+      true
       \enddoctest
       \endlang
 
@@ -2513,6 +3236,41 @@ class CASADI_EXPORT DaeBuilder
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> dae = ca.DaeBuilder("m");
+      julia> x = ca.add(dae, "x");
+      julia> y = ca.add(dae, "y");
+      julia> p = ca.add(dae, "p", "parameter", "tunable");
+      julia> ca.der(dae, x)
+      MX(der(x))
+      julia> ca.der(dae, [x; y])
+      MX(vertcat(der(x), der(y)))
+      julia> ca.der(dae, x*y + p)
+      MX(((y*der(x))+(x*der(y))))
+      julia> ca.der(dae, p)
+      MX(0)
+      julia> ca.z(dae)
+      4-element Vector{String}:
+       "x"
+       "y"
+       "der(x)"
+       "der(y)"
+      julia> try
+                 ca.der(dae, [x; y]')
+             catch e
+                 println(occursin("must be a vector", sprint(showerror, e)))
+             end
+      true
+      julia> try
+                 ca.der(dae, ca.MX.sym("foo"))
+             catch e
+                 println(occursin("No such variable", sprint(showerror, e)))
+             end
+      true
+      \enddoctest
+      \endlang
+
       \sa eq, der, var
 
       \identifier{2ln} */
@@ -2578,6 +3336,17 @@ class CASADI_EXPORT DaeBuilder
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> dae = ca.DaeBuilder("m");
+      julia> x = ca.add(dae, "x");
+      julia> w = ca.add(dae, "w");
+      julia> ca.eq(dae, w, sin(x))
+      julia> ca.beq(dae, "w")
+      MX(sin(x))
+      \enddoctest
+      \endlang
+
       \sa has_beq, wdef
 
       \identifier{2lr} */
@@ -2614,6 +3383,19 @@ class CASADI_EXPORT DaeBuilder
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> dae = ca.DaeBuilder("m");
+      julia> x = ca.add(dae, "x");
+      julia> y = ca.add(dae, "y");
+      julia> ca.value_reference(dae, "x"), ca.value_reference(dae, "y")
+      (1, 2)
+      julia> ca.set_value_reference(dae, "x", 100)
+      julia> ca.value_reference(dae, "x")
+      100
+      \enddoctest
+      \endlang
+
       \identifier{2ls} */
   casadi_int value_reference(const std::string& name) const;
   void set_value_reference(const std::string& name, casadi_int val);
@@ -2645,6 +3427,18 @@ class CASADI_EXPORT DaeBuilder
       >> dae.set_description('x', 'height');
       >> dae.description('x')
       height
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> dae = ca.DaeBuilder("m");
+      julia> x = ca.add(dae, "x", Dict("description" => "position"));
+      julia> ca.description(dae, "x")
+      "position"
+      julia> ca.set_description(dae, "x", "height")
+      julia> ca.description(dae, "x")
+      "height"
       \enddoctest
       \endlang
 
@@ -2695,6 +3489,25 @@ class CASADI_EXPORT DaeBuilder
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> dae = ca.DaeBuilder("m");
+      julia> x = ca.add(dae, "x");
+      julia> n = ca.add(dae, "n", Dict("type" => "Int32"));
+      julia> ca.type(dae, "x"), ca.type(dae, "x", 2), ca.type(dae, "n"), ca.type(dae, "n", 2)
+      ("Float64", "real", "Int32", "integer")
+      julia> ca.set_type(dae, "x", "Float32")
+      julia> ca.type(dae, "x")
+      "Float32"
+      julia> try
+                 ca.set_type(dae, "x", "bogus")
+             catch e
+                 println(occursin("No such enum", sprint(showerror, e)))
+             end
+      true
+      \enddoctest
+      \endlang
+
       \identifier{2lu} */
   std::string type(const std::string& name, casadi_int fmi_version = 3) const;
   void set_type(const std::string& name, const std::string& val);
@@ -2724,6 +3537,17 @@ class CASADI_EXPORT DaeBuilder
       independent
       input
       local
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> dae = ca.DaeBuilder("m");
+      julia> t = ca.add(dae, "t", "independent");
+      julia> u = ca.add(dae, "u", "input");
+      julia> x = ca.add(dae, "x");
+      julia> ca.causality(dae, "t"), ca.causality(dae, "u"), ca.causality(dae, "x")
+      ("independent", "input", "local")
       \enddoctest
       \endlang
 
@@ -2763,6 +3587,19 @@ class CASADI_EXPORT DaeBuilder
       x
       >> strjoin(cellstr(dae.categories('q')), ',')
       x,q,
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> dae = ca.DaeBuilder("m");
+      julia> u = ca.add(dae, "u", "input");
+      julia> x = ca.add(dae, "x");
+      julia> q = ca.add(dae, "q");
+      julia> ca.eq(dae, ca.der(dae, x), -x)
+      julia> ca.eq(dae, ca.der(dae, q), x^2)
+      julia> ca.categories(dae, "u"), ca.categories(dae, "x"), ca.categories(dae, "q")
+      (["p", "u", "c"], ["x"], ["x", "q", ""])
       \enddoctest
       \endlang
 
@@ -2814,6 +3651,25 @@ class CASADI_EXPORT DaeBuilder
       >> try, dae.set_causality('x', 'input'); catch e, msg = e.message; end
       >> contains(msg, 'Cannot change causality')
       1
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> dae = ca.DaeBuilder("m");
+      julia> x = ca.add(dae, "x");
+      julia> y = ca.add(dae, "y", "output");
+      julia> ca.eq(dae, y, 2*x)
+      julia> ca.set_causality(dae, "y", "local")
+      julia> ca.set_causality(dae, "x", "output")
+      julia> ca.y(dae), ca.causality(dae, "y")
+      (["x"], "local")
+      julia> try
+                 ca.set_causality(dae, "x", "input")
+             catch e
+                 println(occursin("Cannot change causality", sprint(showerror, e)))
+             end
+      true
       \enddoctest
       \endlang
 
@@ -2883,6 +3739,29 @@ class CASADI_EXPORT DaeBuilder
       >> try, dae.set_variability('x', 'discrete'); catch e, msg = e.message; end
       >> contains(msg, 'Cannot change variability')
       1
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> dae = ca.DaeBuilder("m");
+      julia> u = ca.add(dae, "u", "input");
+      julia> x = ca.add(dae, "x");
+      julia> ca.set_variability(dae, "u", "fixed")
+      julia> ca.u(dae), ca.c(dae), ca.causality(dae, "u")
+      (String[], ["u"], "parameter")
+      julia> ca.set_variability(dae, "u", "tunable")
+      julia> ca.p(dae), ca.causality(dae, "u")
+      (["u"], "parameter")
+      julia> ca.set_variability(dae, "u", "continuous")
+      julia> ca.u(dae), ca.causality(dae, "u")
+      (["u"], "input")
+      julia> try
+                 ca.set_variability(dae, "x", "discrete")
+             catch e
+                 println(occursin("Cannot change variability", sprint(showerror, e)))
+             end
+      true
       \enddoctest
       \endlang
 
@@ -2963,6 +3842,32 @@ class CASADI_EXPORT DaeBuilder
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> dae = ca.DaeBuilder("m");
+      julia> u = ca.add(dae, "u", "input");
+      julia> x = ca.add(dae, "x");
+      julia> q = ca.add(dae, "q");
+      julia> ca.eq(dae, ca.der(dae, x), -x)
+      julia> ca.eq(dae, ca.der(dae, q), x^2)
+      julia> ca.set_category(dae, "q", "q")
+      julia> ca.x(dae), ca.q(dae)
+      (["x"], ["q"])
+      julia> ca.set_category(dae, "q", "")
+      julia> ca.x(dae), ca.q(dae), ca.category(dae, "q")
+      (["x"], String[], "")
+      julia> ca.set_category(dae, "u", "p")
+      julia> ca.u(dae), ca.p(dae), ca.causality(dae, "u"), ca.variability(dae, "u")
+      (String[], ["u"], "parameter", "tunable")
+      julia> try
+                 ca.set_category(dae, "x", "q")
+             catch e
+                 println(occursin("Cannot change category of x from 'x' to 'q'", sprint(showerror, e)))
+             end
+      true
+      \enddoctest
+      \endlang
+
       \sa category, categories, set_all
 
       \identifier{2c4} */
@@ -3003,6 +3908,20 @@ class CASADI_EXPORT DaeBuilder
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> dae = ca.DaeBuilder("m");
+      julia> x = ca.add(dae, "x", Dict("initial" => "approx"));
+      julia> p = ca.add(dae, "p", "parameter", "tunable");
+      julia> u = ca.add(dae, "u", "input");
+      julia> ca.initial(dae, "x"), ca.initial(dae, "p"), ca.initial(dae, "u")
+      ("approx", "exact", "na")
+      julia> dae.set_initial("x", "exact")
+      julia> ca.initial(dae, "x")
+      "exact"
+      \enddoctest
+      \endlang
+
       \identifier{2lz} */
   std::string initial(const std::string& name) const;
   void set_initial(const std::string& name, const std::string& val);
@@ -3034,6 +3953,18 @@ class CASADI_EXPORT DaeBuilder
       >> dae.set_unit('v', 'km/h');
       >> dae.unit('v')
       km/h
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> dae = ca.DaeBuilder("m");
+      julia> v = ca.add(dae, "v", Dict("unit" => "m/s"));
+      julia> ca.unit(dae, "v")
+      "m/s"
+      julia> ca.set_unit(dae, "v", "km/h")
+      julia> ca.unit(dae, "v")
+      "km/h"
       \enddoctest
       \endlang
 
@@ -3080,6 +4011,16 @@ class CASADI_EXPORT DaeBuilder
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> dae = ca.DaeBuilder("m");
+      julia> x = ca.add(dae, "x");
+      julia> m = ca.add(dae, "m", Dict("dimension" => [2, 3]));
+      julia> ca.numel(dae, "x"), ca.numel(dae, "m"), ca.dimension(dae, "m"), size(ca.var(dae, "m"))
+      (1, 6, [2, 3], (6, 1))
+      \enddoctest
+      \endlang
+
       \sa dimension, var
 
       \identifier{2m2} */
@@ -3123,6 +4064,20 @@ class CASADI_EXPORT DaeBuilder
       >> dae.set_tolerance(1e-6); dae.set_step_size(0.01);
       >> fprintf('%g %g %g %g\n', dae.start_time, dae.stop_time, dae.tolerance, dae.step_size)
       0 10 1e-06 0.01
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> dae = ca.DaeBuilder("m");
+      julia> ca.start_time(dae), ca.stop_time(dae), ca.tolerance(dae), ca.step_size(dae)
+      (NaN, NaN, NaN, NaN)
+      julia> ca.set_start_time(dae, 0)
+      julia> ca.set_stop_time(dae, 10)
+      julia> ca.set_tolerance(dae, 1e-6)
+      julia> ca.set_step_size(dae, 0.01)
+      julia> ca.start_time(dae), ca.stop_time(dae), ca.tolerance(dae), ca.step_size(dae)
+      (0.0, 10.0, 1.0e-6, 0.01)
       \enddoctest
       \endlang
 
@@ -3211,6 +4166,28 @@ class CASADI_EXPORT DaeBuilder
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> dae = ca.DaeBuilder("m");
+      julia> x = ca.add(dae, "x", Dict("start" => 1, "min" => -2, "nominal" => 10));
+      julia> v = ca.add(dae, "v", Dict("dimension" => [2], "start" => [1, 2]));
+      julia> ca.attribute(dae, "start", "x"), ca.attribute(dae, "min", "x")
+      (1.0, -2.0)
+      julia> ca.attribute(dae, "start", ["x", "v"]), ca.attribute(dae, "nominal", ["x"])
+      ([1.0, 1.0, 2.0], [10.0])
+      julia> ca.set_attribute(dae, "min", "x", -1)
+      julia> ca.set_attribute(dae, "start", ["x", "v"], [9, 8, 7])
+      julia> dae.min("x"), ca.start(dae, "v")
+      (-1.0, [8.0, 7.0])
+      julia> try
+                 ca.attribute(dae, "unit", "x")
+             catch e
+                 println(occursin("No such enum", sprint(showerror, e)))
+             end
+      true
+      \enddoctest
+      \endlang
+
       \sa min, max, nominal, start, get
 
       \identifier{2m6} */
@@ -3249,6 +4226,20 @@ class CASADI_EXPORT DaeBuilder
       0
       5
       2
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> dae = ca.DaeBuilder("m");
+      julia> x = ca.add(dae, "x", Dict("min" => -2, "max" => 2, "nominal" => 10));
+      julia> dae.min("x"), dae.max("x"), ca.nominal(dae, "x")
+      (-2.0, 2.0, 10.0)
+      julia> ca.set_min(dae, "x", 0)
+      julia> ca.set_max(dae, ["x"], [5])
+      julia> ca.set_nominal(dae, "x", 2)
+      julia> dae.min(["x"]), dae.max("x"), ca.nominal(dae, ["x"])
+      ([0.0], 5.0, [2.0])
       \enddoctest
       \endlang
 
@@ -3315,6 +4306,36 @@ class CASADI_EXPORT DaeBuilder
       >> try, dae.set_start('v', [1 2 3]); catch e, msg = e.message; end
       >> contains(msg, 'expected number of elements (2) or number of variables (1)')
       1
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> dae = ca.DaeBuilder("m");
+      julia> x = ca.add(dae, "x", Dict("start" => 1));
+      julia> v = ca.add(dae, "v", Dict("dimension" => [2]));
+      julia> ca.start(dae, "x"), ca.start(dae, "v"), ca.start(dae, ["x", "v"])
+      ([1.0], [0.0, 0.0], [1.0, 0.0, 0.0])
+      julia> ca.set_start(dae, "v", [3, 4])
+      julia> ca.set_start(dae, ["x", "v"], [0, 1])
+      julia> ca.start(dae, ["x", "v"])
+      3-element Vector{Float64}:
+       0.0
+       1.0
+       1.0
+      julia> ca.set_start(dae, ["x", "v"], [1, 2, 3])
+      julia> ca.start(dae, ["x", "v"])
+      3-element Vector{Float64}:
+       1.0
+       2.0
+       3.0
+      julia> try
+                 ca.set_start(dae, "v", [1, 2, 3])
+             catch e
+                 msg = "expected number of elements (2) or number of variables (1)"
+                 println(occursin(msg, sprint(showerror, e)))
+             end
+      true
       \enddoctest
       \endlang
 
@@ -3394,6 +4415,38 @@ class CASADI_EXPORT DaeBuilder
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> dae = ca.DaeBuilder("m");
+      julia> c = ca.add(dae, "c", "parameter", "fixed");
+      julia> x = ca.add(dae, "x", Dict("start" => 1));
+      julia> v = ca.add(dae, "v", Dict("dimension" => [2]));
+      julia> s = ca.add(dae, "s", Dict("type" => "String"));
+      julia> ca.get(dae, "c"), ca.get(dae, "x"), ca.get(dae, "v"), ca.get(dae, "s")
+      (NaN, 1.0, [NaN, NaN], "")
+      julia> ca.set(dae, "c", 2.5)
+      julia> ca.set(dae, "v", 1)
+      julia> ca.set(dae, "s", "hello")
+      julia> ca.get(dae, ["c", "v", "s"])
+      3-element Vector{Any}:
+       2.5
+        [1.0, 1.0]
+        "hello"
+      julia> ca.set(dae, ["c", "x"], [3, 4])
+      julia> ca.set(dae, ["v"], [5, 6])
+      julia> ca.get(dae, ["c", "x", "v"])
+      3-element Vector{Any}:
+       3.0
+       4.0
+        [5.0, 6.0]
+      julia> ca.reset(dae)
+      julia> ca.get(dae, ["c", "x"])
+      2-element Vector{Any}:
+       NaN
+       NaN
+      \enddoctest
+      \endlang
+
       The value of a constant is baked into the functions created afterwards:
 
       \lang{python}
@@ -3415,6 +4468,18 @@ class CASADI_EXPORT DaeBuilder
       >> dae.set('c', 3);
       >> f = dae.create('f', {'x'}, {'ode'}); disp(f(2))
       -6
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> dae = ca.DaeBuilder("m");
+      julia> c = ca.add(dae, "c", "parameter", "fixed");
+      julia> x = ca.add(dae, "x");
+      julia> ca.eq(dae, ca.der(dae, x), -c*x)
+      julia> ca.set(dae, "c", 3)
+      julia> ca.create(dae, "f", ["x"], ["ode"])(2)
+      DM(-6)
       \enddoctest
       \endlang
 
@@ -3446,6 +4511,13 @@ class CASADI_EXPORT DaeBuilder
       \doctest
       >>> DaeBuilder("m").symbolic()
       True
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> ca.symbolic(ca.DaeBuilder("m"))
+      true
       \enddoctest
       \endlang
 
@@ -3527,6 +4599,17 @@ class CASADI_EXPORT DaeBuilder
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> dae = ca.DaeBuilder("m");
+      julia> x = ca.add(dae, "x");
+      julia> ca.has(dae, "x"), ca.has(dae, "der(x)"), ca.has(dae, "time")
+      (true, false, true)
+      julia> ca.der(dae, x), ca.has(dae, "der(x)")
+      (der(x), true)
+      \enddoctest
+      \endlang
+
       \sa all, var
 
       \identifier{2me} */
@@ -3561,6 +4644,22 @@ class CASADI_EXPORT DaeBuilder
       x
       der(x)
       __assign__der(x)__
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> dae = ca.DaeBuilder("m");
+      julia> x = ca.add(dae, "x");
+      julia> ca.eq(dae, ca.der(dae, x), -x)
+      julia> ca.all(dae)
+      4-element Vector{String}:
+       "time"
+       "x"
+       "der(x)"
+       "__assign__der(x)__"
+      julia> ca.all(dae, "x"), ca.all(dae, "w"), ca.all(dae, "calculated")
+      (["x"], ["der(x)"], ["__assign__der(x)__"])
       \enddoctest
       \endlang
 
@@ -3629,6 +4728,32 @@ class CASADI_EXPORT DaeBuilder
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> dae = ca.DaeBuilder("m");
+      julia> x = ca.add(dae, "x");
+      julia> w = ca.add(dae, "w");
+      julia> ca.eq(dae, w, sin(x))
+      julia> ca.eq(dae, ca.der(dae, x), -w)
+      julia> f = ca.oracle(dae);
+      julia> ca.name(f), ca.name_in(f)
+      ("mx_oracle", ["t", "p", "d", "w", "u", "x", "z", "q"])
+      julia> ca.name_out(f)
+      7-element Vector{String}:
+       "ode"
+       "alg"
+       "quad"
+       "zero"
+       "ddef"
+       "wdef"
+       "y"
+      julia> ca.size1_in(f, "w"), ca.size1_in(f, "p")
+      (2, 0)
+      julia> ca.class_name(ca.oracle(dae, true)), ca.name_in(ca.oracle(dae, false, true))
+      ("SXFunction", ["t", "p", "d", "u", "x", "z", "q"])
+      \enddoctest
+      \endlang
+
       \sa create, symbolic
 
       \identifier{2mh} */
@@ -3663,6 +4788,17 @@ class CASADI_EXPORT DaeBuilder
       >> dae.eq(dae.der(x), -x*u);
       >> dae.jac_sparsity({'der(x)'}, {'x', 'u'})
       1x2,0nz
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> dae = ca.DaeBuilder("m");
+      julia> x = ca.add(dae, "x");
+      julia> u = ca.add(dae, "u", "input");
+      julia> ca.eq(dae, ca.der(dae, x), -x*u)
+      julia> ca.jac_sparsity(dae, ["der(x)"], ["x", "u"])
+      Sparsity(1x2,0nz)
       \enddoctest
       \endlang
 

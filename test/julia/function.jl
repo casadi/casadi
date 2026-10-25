@@ -187,3 +187,27 @@ end
     inp = DM([1.0, 7.0])
     @test abs(Float64(fs(inp)) - Float64(fm(inp))) < 1e-10
 end
+
+@testset "vector and dict results are concretely typed" begin
+    x = sym(SX, "x"); y = sym(SX, "y", 2)
+    f = C.Function("f", [x, y], [x * y[1]], ["x", "y"], ["r"])
+    @test C.symvar(x) isa Vector{SX}
+    @test C.sx_in(f) isa Vector{SX}
+    @test C.vertsplit(DM([1, 2])) isa Vector{DM}
+    @test C.vertsplit(C.diag(Sparsity, 2)) isa Vector{Sparsity}
+    @test C.is_diff_in(f) isa Vector{Bool}
+    @test C.get_ccs(C.diag(Sparsity, 2)) isa Tuple{Vector{Int},Vector{Int}}
+    @test f(x = 2, y = [3, 4]) isa Dict{String,DM}
+    @test C.stats(f) isa Dict{String,Any}
+    @test C.info(C.diag(Sparsity, 2))["colind"] isa Vector{Int}
+    opti = Opti(); opti.variable()
+    @test C.initial(opti) isa Vector{MX}
+end
+
+@testset "convert_in / convert_out take a vector or a dict" begin
+    f = C.Function("f", [sym(SX, "x"), sym(SX, "y")], [SX(0)], ["x", "y"], ["r"])
+    d = C.convert_in(f, [1, 2])
+    @test d isa Dict{String,DM} && Float64(d["y"]) == 2
+    @test Float64(C.convert_in(f, Dict("y" => DM(3)))[2]) == 3
+    @test C.convert_out(f, [DM(5)]) isa Dict{String,DM}
+end

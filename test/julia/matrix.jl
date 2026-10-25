@@ -76,7 +76,33 @@ end
     @test Array(d) == [1.0 2.0; 3.0 4.0]
     @test collect(d) == [1.0 2.0; 3.0 4.0]
     @test eltype(DM) == Float64
-    # Vector{Float64} stays column-major nonzeros (documented back-compat)
-    @test Vector{Float64}(d) == [1.0, 3.0, 2.0, 4.0]
+    # a row or column converts to a dense Vector; a matrix does not
+    @test_throws DimensionMismatch Vector{Float64}(d)
+    @test Vector(DM([1, 2])) == [1.0, 2.0] && Vector{Float64}(DM([1 2])) == [1.0, 2.0]
+    @test Vector(DM(Sparsity(2, 1))) == [0.0, 0.0]
+    @test Bool(DM(2) > 1) === true && Bool(DM(0)) === false
+    @test_throws InexactError Bool(DM(2))
+    @test Int(DM(3)) === 3 && trunc(Int, DM(3.7)) === 3 && round(Int, DM(3.7)) === 4
+    @test Int(SX(3)) === 3 && Bool(MX(1)) === true
+    @test Float64(DM(Sparsity(1, 1))) == 0.0
     @test Float64(DM(7.0)) == 7.0
+end
+
+@testset "index by symbolic MX, by Sparsity, and nonzeros via x.nz" begin
+    v = sym(MX, "v", 4); k = sym(MX, "k")
+    @test Float64(C.Function("f", [v, k], [v[k]])([10, 20, 30, 40], 2)) == 20
+    @test Float64(C.Function("g", [v, k], [v.nz[k]])([10, 20, 30, 40], 3)) == 30
+    w = sym(MX, "w", 4); y = w + 0; y.nz[k] = 8
+    @test Vector(C.Function("h", [w, k], [y])([1, 2, 3, 4], 2)) == [1, 8, 3, 4]
+    A = DM([1 2 3; 4 5 6])
+    @test C.nnz(A[C.diag(Sparsity, 2, 3)]) == 2 && Matrix(A[C.diag(Sparsity, 2, 3)]) == [1 0 0; 0 5 0]
+    A[C.diag(Sparsity, 2, 3)] = 0
+    @test Matrix(A) == [0 2 3; 4 0 6]
+    @test C.sparsity(sym(MX, "X", 3, 3)[C.lower(Sparsity, 3)]) == C.lower(Sparsity, 3)
+    S = DM(C.lower(Sparsity, 3), [1, 2, 3, 4, 5, 6])
+    @test Float64(S.nz[3]) == 3 && Vector(S.nz[2:3]) == [2, 3] && Float64(S.nz[end]) == 6
+    @test length(S.nz) == 6
+    S.nz[1] = 9
+    @test Matrix(S)[1, 1] == 9
+    @test_throws BoundsError S.nz[7]
 end

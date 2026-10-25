@@ -19,10 +19,7 @@
 # Van der Pol OCP by direct collocation on Radau points, assembling the
 # collocation NLP by hand from one MX decision vector V. numpy poly1d helpers
 # become small array-based polynomial routines (coeffs highest-degree-first).
-const _jl_dir = get(ENV, "CASADI_JL",
-    joinpath(@__DIR__, "..", "..", "..", "julia-proto", "casadi-contact"))
-include(joinpath(_jl_dir, "CasADiNative.jl"))
-import .CasADiNative as ca
+import CasADiNative as ca
 
 function polymul(a, b)
     r = zeros(length(a) + length(b) - 1)

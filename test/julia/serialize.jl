@@ -62,3 +62,32 @@ end
     @test_throws Exception casadi_deserialize("garbage-not-valid")
     @test_throws Exception casadi_deserialize("")
 end
+
+@testset "Julia Serialization stores casadi's serialization" begin
+    rt(x) = (io = IOBuffer(); Serialization.serialize(io, x); Serialization.deserialize(seekstart(io)))
+    y = sym(SX, "y")
+    f = C.Function("f", [y], [sin(y)])
+    g = rt(f)
+    @test g isa C.Function && Float64(g(0.5)) ≈ sin(0.5)
+    @test Base.Matrix(rt(DM([1 2; 3 4]))) == [1 2; 3 4]
+    @test C.str(rt(C.Sparsity.lower(3))) == C.str(C.Sparsity.lower(3))
+    # SX/MX symbols stay shared within a context, as Python's pickle contexts
+    x = sym(MX, "x")
+    @test_throws ErrorException rt(x)
+    io = IOBuffer()
+    serialization_context() do
+        Serialization.serialize(io, (x, 2x))
+    end
+    a, b = deserialization_context() do
+        Serialization.deserialize(seekstart(io))
+    end
+    @test C.depends_on(b, a) && Float64(C.evalf(C.substitute(b, a, MX(3)))) == 6
+    @test_throws ErrorException rt(C.Opti())
+end
+
+@testset "deserializer.unpack()" begin
+    s = StringSerializer()
+    s.pack(DM(4))
+    @test Float64(StringDeserializer(s.encode()).unpack()) == 4
+    @test :unpack in propertynames(StringDeserializer(""))
+end

@@ -338,6 +338,39 @@ SWIG_Python_AppendOutput_Tuple(PyObject* result, PyObject* obj, int is_void) {
 %}
 #endif
 
+#ifdef SWIGJULIA
+%{
+  namespace casadi {
+    // Redirect printout to Julia's stdout/stderr
+    static jl_value_t* julia_write = 0;
+    static jl_value_t* julia_flush = 0;
+    static void julialogger(const char* s, std::streamsize num, bool error) {
+      // Threads Julia does not know print directly
+      if (!jl_get_pgcstack()) return casadi::Logger::writeDefault(s, num, error);
+      SwigJlGcUnsafe enter;
+      jl_value_t* str = jl_pchar_to_string(s, num);
+      JL_GC_PUSH1(&str);
+      if (!jl_call2(julia_write, str, error ? jl_true : jl_false)) jl_exception_clear();
+      JL_GC_POP();
+    }
+    static void juliaflush(bool error) {
+      if (!jl_get_pgcstack()) return casadi::Logger::flushDefault(error);
+      SwigJlGcUnsafe enter;
+      if (!jl_call1(julia_flush, error ? jl_true : jl_false)) jl_exception_clear();
+    }
+  } // namespace casadi
+%}
+%wrapper %{
+// Set from the Julia module's __init__; the module keeps write and flush alive
+extern "C" SWIGEXPORT void casadi_julia_logger(jl_value_t* write, jl_value_t* flush) {
+  casadi::julia_write = write;
+  casadi::julia_flush = flush;
+  casadi::Logger::writeFun = casadi::julialogger;
+  casadi::Logger::flush = casadi::juliaflush;
+}
+%}
+#endif // SWIGJULIA
+
 // Turn off the warnings that certain methods are effectively ignored, this seams to be a false warning,
 // for example vertcat(SXVector), vertcat(DMVector) and vertcat(MXVector) appears to work fine
 #pragma SWIG nowarn=509,303,302
@@ -536,6 +569,17 @@ namespace std {
 // std::exception there, so the std::exception catch already covers it).
 // Exceptions handling
 %include "exception.i"
+#ifdef SWIGJULIA
+// casadi runs GC-safe: it may wait on threads that call back into Julia
+%exception {
+  try {
+    SwigJlGcSafe gc_safe;
+    $action
+  } catch(const std::exception& e) {
+    SWIG_exception(SWIG_RuntimeError, e.what());
+  }
+}
+#else
 %exception {
   try {
     $action
@@ -543,6 +587,7 @@ namespace std {
     SWIG_exception(SWIG_RuntimeError, e.what());
   }
 }
+#endif
 
 // Python sometimes takes an approach to not check, but just try.
 // It expects a python error to be thrown.
@@ -1582,24 +1627,56 @@ namespace std {
 #endif
 
 #ifdef SWIGJULIA
-    // Element type of the Julia array a std::vector<M> becomes (boxed types only)
-    template<typename M> jl_value_t* julia_vector_eltype() { return (jl_value_t*)jl_any_type; }
-    template<> jl_value_t* julia_vector_eltype<std::string>() { return (jl_value_t*)jl_string_type; }
+    // Julia type a C++ M becomes: element type of vectors and value type of dicts
+    template<typename M> struct julia_eltype {
+      static jl_value_t* get() { return (jl_value_t*)jl_any_type; }
+    };
+    inline jl_value_t* julia_proxy_type(const char* name) {
+      std::map<std::string, jl_value_t*>::iterator it = swig_jl_proxy_types().find(name);
+      return it == swig_jl_proxy_types().end() ? (jl_value_t*)jl_any_type : it->second;
+    }
+#define JULIA_ELTYPE(M, E) \
+    template<> struct julia_eltype< M > { static jl_value_t* get() { return E; } };
+    JULIA_ELTYPE(std::string, (jl_value_t*)jl_string_type)
+    JULIA_ELTYPE(casadi_int, (jl_value_t*)jl_int64_type)
+    JULIA_ELTYPE(double, (jl_value_t*)jl_float64_type)
+    JULIA_ELTYPE(bool, (jl_value_t*)jl_bool_type)
+    JULIA_ELTYPE(Sparsity, julia_proxy_type("Sparsity"))
+    JULIA_ELTYPE(DM, julia_proxy_type("DM"))
+    JULIA_ELTYPE(SX, julia_proxy_type("SX"))
+    JULIA_ELTYPE(MX, julia_proxy_type("MX"))
+    JULIA_ELTYPE(Function, julia_proxy_type("Function"))
+    JULIA_ELTYPE(Linsol, julia_proxy_type("Linsol"))
+#undef JULIA_ELTYPE
+    template<typename M> struct julia_eltype<std::vector<M> > {
+      static jl_value_t* get() { return jl_apply_array_type(julia_eltype<M>::get(), 1); }
+    };
+    template<typename M> struct julia_eltype<std::map<std::string, M> > {
+      static jl_value_t* get() {
+        return jl_apply_type2(jl_get_global(jl_base_module, jl_symbol("Dict")),
+                              (jl_value_t*)jl_string_type, julia_eltype<M>::get());
+      }
+    };
 #endif
     template<typename M> GUESTOBJECT* from_ptr(const std::vector<M> *a) {
 #ifdef SWIGJULIA
       {
-        jl_value_t* atype = jl_apply_array_type(julia_vector_eltype<M>(), 1);
+        jl_value_t* atype = jl_apply_array_type((jl_value_t*)jl_any_type, 1);
         jl_array_t* arr = jl_alloc_array_1d(atype, a->size());
-        JL_GC_PUSH1(&arr);
+        jl_value_t* r = 0;
+        JL_GC_PUSH2(&arr, &r);
         for (size_t i = 0; i < a->size(); ++i) {
           M tmpv = (*a)[i];
           GUESTOBJECT* e = casadi::from_ptr(&tmpv);
           if (!e) { JL_GC_POP(); return 0; }
           jl_array_ptr_set(arr, i, e);
         }
+        // narrow Vector{Any} to the element type
+        r = jl_call2(jl_get_function(jl_base_module, "convert"),
+                     julia_eltype<std::vector<M> >::get(), (jl_value_t*)arr);
+        if (!r) { jl_exception_clear(); r = (jl_value_t*)arr; }
         JL_GC_POP();
-        return (GUESTOBJECT*)arr;
+        return (GUESTOBJECT*)r;
       }
 #endif
 #ifdef SWIGWASMJS
@@ -2094,10 +2171,9 @@ namespace std {
     template<typename M> GUESTOBJECT* from_ptr(const std::map<std::string, M> *a) {
 #ifdef SWIGJULIA
       {
-        jl_value_t* dict_f = jl_get_function(jl_base_module, "Dict");
         jl_value_t* set_f = jl_get_function(jl_base_module, "setindex!");
         jl_value_t* d = 0; JL_GC_PUSH1(&d);
-        d = jl_call0(dict_f);
+        d = jl_call0(julia_eltype<std::map<std::string, M> >::get());
         if (!d) { JL_GC_POP(); return 0; }
         for (typename std::map<std::string, M>::const_iterator it = a->begin(); it != a->end(); ++it) {
           GUESTOBJECT* e = 0; jl_value_t* k = 0;
@@ -2199,6 +2275,11 @@ namespace std {
         mxArray *p_second = mxGetCell(p, 1);
         return to_val(p_first, m ? &(**m).first : 0)
           && to_val(p_second, m ? &(**m).second : 0);
+      }
+#elif defined(SWIGJULIA)
+      if (jl_is_tuple(p) && jl_nfields(p)==2) {
+        return to_val(jl_fieldref(p, 0), m ? &(**m).first : 0)
+          && to_val(jl_fieldref(p, 1), m ? &(**m).second : 0);
       }
 #endif
       // No match
@@ -2713,6 +2794,13 @@ namespace std {
  //           no translation layer.  Use TS syntax (e.g. "bigint",
  //           "string", "MX[]", "Record<string, GenericType>").
 #ifdef SWIGJULIA
+%define %julia_value_return(xType...)
+%typemap(ctype, out="jl_value_t*", fragment="casadi_all") xType, const xType& "jl_value_t*"
+%typemap(out, noblock=1) xType %{ if(!($result = casadi::from_ref($1))) SWIG_exception_fail(SWIG_TypeError,"Failed to convert output."); %}
+%typemap(out, noblock=1) const xType& %{ if(!($result = casadi::from_ptr($1))) SWIG_exception_fail(SWIG_TypeError,"Failed to convert output."); %}
+%typemap(jltype, out="Any") xType, const xType& "Any"
+%typemap(jlout) xType, const xType& "_check($call)"
+%enddef
 %define %julia_convention_repair()
 // Convention repair: %casadi_output_typemaps applied the class-return
 // convention (owned copy behind void*) to casadi-typemapped PRIMITIVES
@@ -2760,6 +2848,29 @@ namespace std {
 %typemap(out, noblock=1) const casadi::Dict& %{ if(!($result = casadi::from_ptr($1))) SWIG_exception_fail(SWIG_TypeError,"Failed to convert output to Dict."); %}
 %typemap(jltype, out="Any") casadi::Dict, const casadi::Dict& "Any"
 %typemap(jlout) casadi::Dict, const casadi::Dict& "_check($call)::AbstractDict"
+// Dicts and nested vectors: return the Julia value built by from_ptr
+%julia_value_return(std::map<std::string, casadi::Matrix<double> >)
+%julia_value_return(std::map<std::string, casadi::Matrix<casadi::SXElem> >)
+%julia_value_return(std::map<std::string, casadi::MX>)
+%julia_value_return(std::map<std::string, casadi::Sparsity>)
+%julia_value_return(std::vector<std::vector<casadi::Matrix<double> > >)
+%julia_value_return(std::vector<std::vector<casadi::Matrix<casadi::SXElem> > >)
+%julia_value_return(std::vector<std::vector<casadi::MX> >)
+%julia_value_return(std::vector<std::vector<casadi::Sparsity> >)
+%julia_value_return(std::vector<std::vector<casadi_int> >)
+%julia_value_return(std::vector<std::vector<double> >)
+%julia_value_return(casadi::GenericType)
+%julia_value_return(std::vector<casadi::GenericType>)
+// std::size_t (hashes) like size_t
+%typemap(ctype, out="long long") std::size_t "jl_value_t*"
+%typemap(out) std::size_t %{ $result = (long long)$1; %}
+%typemap(jltype, out="Clonglong") std::size_t "Any"
+%typemap(jlout) std::size_t "Int(_check($call))"
+// Matrix<casadi_int> as a Julia Matrix{Int}
+%typemap(ctype, out="void *") casadi::Matrix<casadi_int> "jl_value_t*"
+%typemap(out) casadi::Matrix<casadi_int> %{ $result = (void*) new casadi::Matrix<double>($1); %}
+%typemap(jltype, out="Ptr{Cvoid}") casadi::Matrix<casadi_int> "Any"
+%typemap(jlout) casadi::Matrix<casadi_int> "Base.round.(Int, Base.Matrix{Float64}(DM(_check($call))))"
 %enddef
 #else
 %define %julia_convention_repair() %enddef
@@ -3459,6 +3570,8 @@ class ArrayInterfaceMX(ArrayInterface[MX]):
 
 #ifdef MATLABSTYLE
 #define LABEL "[int,int]"
+#elif defined(SWIGJULIA)
+#define LABEL LPAIR(L_INT, L_INT)
 #else
 #define LABEL LPAIR("int","int")
 #endif
@@ -3507,15 +3620,35 @@ class ArrayInterfaceMX(ArrayInterface[MX]):
 %julia_convention_repair()
 
 #ifdef SWIGJULIA
+// an option value is any Julia value GenericType converts from
+%typemap(jlparam) const casadi::GenericType& option_value "Any"
+// director returns convert as Base.convert does (true for 1, 2 for 2.0), not as the strict input typemaps
+%typemap(directorout) bool, casadi_int, double %{ $result = Swig::swig_director_as< $1_ltype >($input); %}
+#endif // SWIGJULIA
+
+#ifdef SWIGJULIA
 // Julia argument annotations for the matrix types: a DM parameter takes
 // everything to_ptr(DM) converts from (numbers, Julia arrays, ranges), and SX/MX
 // parameters additionally take DM, as in Python.  The unions nest (DM-like is a
 // subset of SX-like and MX-like), so Julia's most-specific-method rule picks the
 // overload Python's typecheck precedence picks: fmax(x::MX, 0) -> MX,
 // fmax(DM, 0) -> DM, fmax(0, 0) -> double.
-%typemap(jlparam) casadi::Matrix<double>, const casadi::Matrix<double>& "Union{DM,Real,AbstractArray{<:Real}}"
-%typemap(jlparam) casadi::Matrix<casadi::SXElem>, const casadi::Matrix<casadi::SXElem>& "Union{SX,DM,Real,AbstractArray{<:Real}}"
-%typemap(jlparam) casadi::MX, const casadi::MX& "Union{MX,DM,Real,AbstractArray{<:Real}}"
+%typemap(jlparam) casadi::Matrix<double>, const casadi::Matrix<double>& "Union{DM,Real,AbstractArray{<:Real},Vector{Any}}"
+%typemap(jlparam) casadi::Matrix<casadi::SXElem>, const casadi::Matrix<casadi::SXElem>& "Union{SX,DM,Real,AbstractArray{<:Real},Vector{Any}}"
+%typemap(jlparam) casadi::MX, const casadi::MX& "Union{MX,DM,Real,AbstractArray{<:Real},Vector{Any}}"
+// a Callback is a Function, as in C++
+%typemap(jlparam) casadi::Function, const casadi::Function& "Union{Function,CallbackFunction}"
+// Containers of matrices: the common element types; other values (Vector{Any}) reach the runtime dispatcher
+%define %julia_partial_containers(T, V, D)
+%typemap(jlparam, partial="1") std::vector< T >, const std::vector< T >&
+  "Union{" V "Vector{DM},Vector{Float64},Vector{Int64}}"
+%typemap(jlparam, partial="1") std::map<std::string, T >, const std::map<std::string, T >&
+  "Union{" D "Dict{String,DM},Dict{String,Float64},Dict{String,Int64}}"
+%enddef
+%julia_partial_containers(casadi::Matrix<double>, "", "")
+%julia_partial_containers(casadi::Matrix<casadi::SXElem>, "Vector{SX},", "Dict{String,SX},")
+%julia_partial_containers(casadi::MX, "Vector{MX},", "Dict{String,MX},")
+%typemap(jlparam, partial="1") std::vector<casadi::Sparsity>, const std::vector<casadi::Sparsity>& "Vector{Sparsity}"
 #endif // SWIGJULIA
 
 #ifdef SWIGWASMJS
@@ -4006,6 +4139,12 @@ inf: float
 // ergonomics layer); the builders stay reachable for it as _horzcat/_vertcat.
 %rename(_vertcat) casadi_vertcat;
 %rename(_horzcat) casadi_horzcat;
+// Python's names; Julia's own spelling is & | ! (and .& .| .!)
+%rename(logic_and) casadi_and;
+%rename(logic_or) casadi_or;
+%rename(logic_not) casadi_not;
+%rename(logic_all) casadi_all;
+%rename(logic_any) casadi_any;
 #endif // SWIGJULIA
 
 #ifdef SWIGPYTHON
@@ -4140,6 +4279,11 @@ def dcat(args):
 %feature("python:maybecall") casadi_copysign;
 %feature("python:maybecall") casadi_constpow;
 #endif // SWIGPYTHON
+
+#ifdef SWIGJULIA
+// inv is the matrix inverse in Julia; elementwise inverse is 1 ./ x
+%ignore casadi::MX::inv() const;
+#endif // SWIGJULIA
 
 #ifdef SWIGMATLAB
 %rename(uminus) operator-;
@@ -6529,6 +6673,35 @@ namespace casadi {
 #endif
 
 %include <casadi/core/importer.hpp>
+#ifdef SWIGJULIA
+// users subtype the abstract Callback, as Python subclasses Callback; the proxy is CallbackFunction
+%rename(CallbackFunction) casadi::Callback;
+%feature("julia:director", "Callback") casadi::Callback;
+// a Callback cannot be copied (as in C++); CallbackFunction(obj) takes a Julia Callback
+%ignore casadi::Callback::Callback(const Callback&);
+// eval_buffer: arg and res reach Julia as vectors of Vector{Float64} views (nothing for a null)
+%{
+namespace casadi {
+  jl_value_t* julia_buffers(double** p, const std::vector<casadi_int>& sz) {
+    jl_value_t* vt = jl_apply_array_type((jl_value_t*)jl_float64_type, 1);
+    jl_array_t* a = jl_alloc_array_1d(jl_apply_array_type((jl_value_t*)jl_any_type, 1), sz.size());
+    JL_GC_PUSH2(&vt, &a);
+    for (size_t i = 0; i < sz.size(); ++i) {
+      jl_value_t* e = p[i] ? (jl_value_t*)jl_ptr_to_array_1d(vt, p[i], sz[i], 0) : jl_nothing;
+      jl_array_ptr_set(a, i, e);
+    }
+    JL_GC_POP();
+    return (jl_value_t*)a;
+  }
+} // namespace casadi
+%}
+%typemap(directorin, noblock=1) (const double** arg, const std::vector<casadi_int>& sizes_arg) {
+  $input = casadi::julia_buffers(const_cast<double**>($1), $2);
+}
+%typemap(directorin, noblock=1) (double** res, const std::vector<casadi_int>& sizes_res) {
+  $input = casadi::julia_buffers($1, $2);
+}
+#endif // SWIGJULIA
 %include <casadi/core/callback.hpp>
 
 #ifdef SWIGPYTHON
@@ -6671,6 +6844,12 @@ class global_unpickle_context:
 #endif // SWIGWASMJS
 
 %feature("director") casadi::OptiCallback;
+#ifdef SWIGJULIA
+// internal: opti.callback takes any Julia callable
+%rename(_OptiCallback) casadi::OptiCallback;
+%rename(_callback_class) casadi::Opti::callback_class;
+%rename(_call) casadi::OptiCallback::call;
+#endif
 
 // Return-by-value
 #ifdef SWIGWASMJS
@@ -6747,8 +6926,11 @@ make_property_opti(g_linear_scale, DM)
 make_property_opti(f_linear_scale, float)
 
 #ifdef SWIGPYTHON
-// (not for Julia: casadi_solver is renamed to solver there, the solver(...) method)
 make_property(casadi::Opti, casadi_solver, Function);
+#else
+// keep the casadi_ prefix: solver(...) is the setter
+%rename(casadi_solver) casadi::OptiAdvanced::casadi_solver;
+make_property(casadi::OptiAdvanced, casadi_solver, Function);
 #endif
 #endif // SWIGPYTHON || SWIGJULIA
 
@@ -6904,18 +7086,16 @@ opti_metadata_modifiers(casadi::Opti)
 }
 #endif
 #ifdef SWIGJULIA
-// opti.callback(fh): fh(i) runs every iteration; opti.callback() clears it.
-// The director is never freed: the node holds a raw pointer that other proxies share.
-%{
-casadi::OptiCallback* julia_opti_callback(jl_value_t* fh);
-%}
-%wrapper %{
-casadi::OptiCallback* julia_opti_callback(jl_value_t* fh) { return new SwigDirector_OptiCallback(fh); }
-%}
-%extend casadi::Opti {
-  void callback(jl_value_t* fh) { $self->callback_class(julia_opti_callback(fh)); }
-  void callback() { $self->callback_class(); }
-}
+// variable/parameter/subject_to record the call site; the Julia layer wraps these
+%rename(_variable) casadi::Opti::variable;
+%rename(_parameter) casadi::Opti::parameter;
+%rename(_subject_to) casadi::Opti::subject_to;
+#endif
+#ifdef SWIGJULIA
+// the Opti proxy keeps the OptiCallback it registers, as Python's self._cb
+%feature("julia:keep") casadi::Opti::callback_class;
+// copy(::Opti) is an independent problem; the copy constructor shares it
+%feature("julia:copy", "copy") casadi::Opti;
 #endif
 
 %julia_convention_repair()

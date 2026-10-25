@@ -25,3 +25,10 @@
         @test C.stats(S)["iter_count"] == 5
     end
 end
+
+@testset "change_option takes a plain Julia value" begin
+    f = C.Function("f_chopt", [sym(SX, "x")], [SX(0)])
+    C.change_option(f, "verbose", false)
+    C.change_option(f, "verbose", 0)
+    @test Float64(f(1)) == 0
+end

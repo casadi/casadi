@@ -12,3 +12,9 @@
     gq = C.Function("gq", [q], [2 * q], Dict{String,Any}())
     @test Vector{Float64}(gq(3.0)) == [6.0]
 end
+
+@testset "join_primitives keeps DM pieces DM" begin
+    x = sym(MX, "x", 2); y = sym(MX, "y", 3)
+    r = C.join_primitives([x; y], [DM([1, 2]), DM([3, 4, 5])])
+    @test r isa DM && Vector(r) == [1, 2, 3, 4, 5]
+end

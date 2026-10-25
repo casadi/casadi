@@ -23,10 +23,7 @@
 # The python reference cvodes integrator is dropped (no sundials here); the
 # block-extraction uses 1-based slicing instead of vertsplit (which the Julia
 # binding does not yet marshal).
-const _jl_dir = get(ENV, "CASADI_JL",
-    joinpath(@__DIR__, "..", "..", "..", "julia-proto", "casadi-contact"))
-include(joinpath(_jl_dir, "CasADiNative.jl"))
-import .CasADiNative as ca
+import CasADiNative as ca
 
 # End time
 tf = 10.0

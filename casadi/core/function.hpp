@@ -100,6 +100,23 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> x = ca.SX.sym("x"); y = ca.SX.sym("y", 2);
+      julia> f = ca.Function("f", [x, y], [x*y, sin(x)], ["x", "y"], ["r", "s"])
+      Function(f:(x,y[2])->(r[2],s) SXFunction)
+      julia> r, s = f(2, [3, 4])
+      ([6, 8], 0.909297)
+      julia> f(x=2, y=[3, 4])
+      Dict{String, DM} with 2 entries:
+        "r" => [6, 8]
+        "s" => 0.909297
+      julia> z = ca.MX.sym("z");
+      julia> f(z, [3, 4])
+      (f(z, [3, 4]){0}, f(z, [3, 4]){1})
+      \enddoctest
+      \endlang
+
       \author Joel Andersson
       \date 2010-2017
 
@@ -124,6 +141,13 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> ca.Function.type_name()
+        "Function"
+        \enddoctest
+        \endlang
+
         \identifier{1ux} */
     static std::string type_name() {return "Function";}
 
@@ -145,6 +169,14 @@ namespace casadi {
         >> f = Function(); disp(f.is_null()), disp(f.name())
         1
         null
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> f = ca.Function();
+        julia> ca.is_null(f), ca.name(f)
+        (true, "null")
         \enddoctest
         \endlang
 
@@ -246,6 +278,38 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> x = ca.SX.sym("x"); y = ca.SX.sym("y", 2);
+        julia> f = ca.Function("f", [x, y], [x*y, sin(x)])
+        Function(f:(i0,i1[2])->(o0[2],o1) SXFunction)
+        julia> f = ca.Function("f", [x, y], [x*y, sin(x)], ["x", "y"], ["r", "s"]);
+        julia> ca.name_in(f), ca.name_out(f)
+        (["x", "y"], ["r", "s"])
+        julia> g = ca.Function("g", Dict("x" => x, "y" => y, "r" => x*y), ["x", "y"], ["r"])
+        Function(g:(x,y[2])->(r[2]) SXFunction)
+        julia> p = ca.SX.sym("p");
+        julia> try
+                   ca.Function("h", [x], [x*p])
+               catch e
+                   msg = sprint(showerror, e)
+                   println(occursin("Initialization failed", msg), " ",
+                           occursin("[p] are free", msg))
+               end
+        true true
+        julia> h = ca.Function("h", [x], [x*p], Dict("allow_free" => true));
+        julia> ca.get_free(h)
+        1-element Vector{String}:
+         "p"
+        julia> try
+                   ca.Function("my func", [x], [x])
+               catch e
+                   println(occursin("Function name is not valid", sprint(showerror, e)))
+               end
+        true
+        \enddoctest
+        \endlang
+
         \sa expand, check_name, has_free
 
         \identifier{1v0} */
@@ -312,6 +376,21 @@ namespace casadi {
         f:(A[2x2],x[2])->(Ax[2],nrm) SXFunction
         >> g = Function('g', {x}, {x}, struct('post_expand', true)); disp(g.class_name())
         SXFunction
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> x = ca.MX.sym("x", 2); A = ca.MX.sym("A", 2, 2);
+        julia> f = ca.Function("f", [A, x], [A * x, ca.norm_2(x)], ["A", "x"], ["Ax", "nrm"])
+        Function(f:(A[2x2],x[2])->(Ax[2],nrm) MXFunction)
+        julia> ca.class_name(f), ca.n_instructions(f)
+        ("MXFunction", 7)
+        julia> ca.expand(f)
+        Function(f:(A[2x2],x[2])->(Ax[2],nrm) SXFunction)
+        julia> g = ca.Function("g", [x], [x], Dict("post_expand" => true));
+        julia> ca.class_name(g)
+        "SXFunction"
         \enddoctest
         \endlang
 
@@ -494,6 +573,34 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> x = ca.MX.sym("x", 2);
+        julia> f = ca.Function("f", [x], [x' * x, 2x], ["x"], ["q", "y"]);
+        julia> println(f); ca.n_instructions(f)
+        f:(x[2])->(q,y[2]) MXFunction
+        7
+        julia> g = ca.expand(f);
+        julia> println(g); ca.n_instructions(g)
+        f:(x[2])->(q,y[2]) SXFunction
+        10
+        julia> f([1, 2]), g([1, 2])
+        ((5, [2, 4]), (5, [2, 4]))
+        julia> ca.expand(f, "f_sx", Dict("live_variables" => false))
+        Function(f_sx:(x[2])->(q,y[2]) SXFunction)
+        julia> A = ca.MX.sym("A", 2, 2);
+        julia> h = ca.Function("h", [A, x], [A \ x]);
+        julia> try
+                   ca.expand(h)
+               catch e
+                   println(occursin("eval_sx not defined", sprint(showerror, e)))
+               end
+        true
+        julia> ca.class_name(ca.expand(ca.Function("h", [A, x], [ca.solve(A, x, "symbolicqr")])))
+        "SXFunction"
+        \enddoctest
+        \endlang
+
         \sa Function::Function, transform
 
         \identifier{1v5} */
@@ -575,6 +682,30 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> z = ca.MX.sym("z"); w = ca.MX.sym("w");
+        julia> f = ca.Function("f", [z, w], [sin(z)*cos(z) + sin(z)*cos(z)], ["z", "w"], ["r"]);
+        julia> println(f); ca.n_instructions(f)
+        f:(z,w)->(r) MXFunction
+        9
+        julia> g = ca.transform(f);
+        julia> println(g); ca.n_instructions(g)
+        f:(z,w[1x1,0nz])->(r) MXFunction
+        6
+        julia> ca.n_instructions(ca.transform(f, [["simplify", "cse"]]))
+        6
+        julia> ca.transform(f, "fe", [["expand"]])
+        Function(fe:(z,w)->(r) SXFunction)
+        julia> try
+                   ca.transform(f, [["nope"]])
+               catch e
+                   println(occursin("unknown pass verb", sprint(showerror, e)))
+               end
+        true
+        \enddoctest
+        \endlang
+
         \sa expand
 
         \identifier{2ig} */
@@ -626,6 +757,17 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> x = ca.SX.sym("x"); y = ca.SX.sym("y");
+        julia> f = ca.Function("f", [x, y], [x + y, x - y, x*y]);
+        julia> ca.n_in(f), ca.n_out(f)
+        (2, 3)
+        julia> ca.n_in(ca.Function("g", [], [ca.DM(1)]))
+        0
+        \enddoctest
+        \endlang
+
         \sa n_out, name_in, size_in
 
         \identifier{1v8} */
@@ -645,6 +787,14 @@ namespace casadi {
         \doctest
         >> x = SX.sym('x');
         >> Function('f', {x}, {x, 2*x}).n_out()
+        2
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> x = ca.SX.sym("x");
+        julia> ca.n_out(ca.Function("f", [x], [x, 2x]))
         2
         \enddoctest
         \endlang
@@ -690,6 +840,23 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> A = ca.SX.sym("A", 2, 3); b = ca.SX.sym("b", 2);
+        julia> f = ca.Function("f", [A, b], [ca.SX(0)], ["A", "b"], ["c"]);
+        julia> ca.size_in(f, 0), ca.size1_in(f, "A"), ca.size2_in(f, "A")
+        ((2, 3), 2, 3)
+        julia> ca.size_in(f, "b")
+        (2, 1)
+        julia> try
+                   ca.size_in(f, "nope")
+               catch e
+                   println(occursin("Available names are: [A, b]", sprint(showerror, e)))
+               end
+        true
+        \enddoctest
+        \endlang
+
         \sa size_out, sparsity_in, nnz_in, numel_in
 
         \identifier{1va} */
@@ -726,6 +893,15 @@ namespace casadi {
         2 2
         >> fprintf('%d %d\n', f.size1_out(0), f.size2_out(1))
         1 2
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> x = ca.SX.sym("x", 3);
+        julia> f = ca.Function("f", [x], [x', ca.SX(2, 2)]);
+        julia> ca.size_out(f, 0), ca.size_out(f, "o1"), ca.size1_out(f, 0), ca.size2_out(f, 1)
+        ((1, 3), (2, 2), 1, 2)
         \enddoctest
         \endlang
 
@@ -768,6 +944,17 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> D = ca.SX.sym("D", ca.Sparsity.diag(3));
+        julia> f = ca.Function("f", [ca.SX.sym("x", 2), D], [ca.SX(1)]);
+        julia> ca.nnz_in(f, 0), ca.nnz_in(f, 1), ca.nnz_in(f)
+        (2, 3, 5)
+        julia> ca.numel_in(f, 0), ca.numel_in(f, 1), ca.numel_in(f)
+        (2, 9, 11)
+        \enddoctest
+        \endlang
+
         \sa nnz_out, numel_in, sparsity_in
 
         \identifier{1vc} */
@@ -796,6 +983,15 @@ namespace casadi {
         >> f = Function('f', {x}, {x, diag(x), SX(1, 1)});
         >> fprintf('%d %d %d %d\n', f.nnz_out(0), f.nnz_out(1), f.nnz_out(2), f.nnz_out())
         2 2 0 4
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> x = ca.SX.sym("x", 2);
+        julia> f = ca.Function("f", [x], [x, ca.diag(x), ca.SX(1, 1)]);
+        julia> ca.nnz_out(f, 0), ca.nnz_out(f, 1), ca.nnz_out(f, 2), ca.nnz_out(f)
+        (2, 2, 0, 4)
         \enddoctest
         \endlang
 
@@ -840,6 +1036,14 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> f = ca.Function("f", [ca.SX.sym("D", ca.Sparsity.diag(3))], [ca.SX(1)]);
+        julia> ca.numel_in(f, 0), ca.nnz_in(f, 0), ca.numel_in(f, "i0")
+        (9, 3, 9)
+        \enddoctest
+        \endlang
+
         \sa nnz_in, numel_out
 
         \identifier{1ve} */
@@ -866,6 +1070,15 @@ namespace casadi {
         >> f = Function('f', {x}, {SX(2, 2), x});
         >> fprintf('%d %d %d\n', f.numel_out(0), f.numel_out(1), f.numel_out())
         4 2 6
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> x = ca.SX.sym("x", 2);
+        julia> f = ca.Function("f", [x], [ca.SX(2, 2), x]);
+        julia> ca.numel_out(f, 0), ca.numel_out(f, 1), ca.numel_out(f)
+        (4, 2, 6)
         \enddoctest
         \endlang
 
@@ -909,6 +1122,19 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> x = ca.SX.sym("x"); y = ca.SX.sym("y");
+        julia> ca.name_in(ca.Function("f", [x, y], [x + y]))
+        2-element Vector{String}:
+         "i0"
+         "i1"
+        julia> f = ca.Function("f", [x, y], [x + y], ["x", "y"], ["r"]);
+        julia> ca.name_in(f), ca.name_in(f, 1), ca.name_out(f)
+        (["x", "y"], "y", ["r"])
+        \enddoctest
+        \endlang
+
         \sa name_out, index_in, has_in
 
         \identifier{1vg} */
@@ -932,6 +1158,16 @@ namespace casadi {
         >> Function('f', {x}, {x, 2*x}).name_out()
         o0
         o1
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> x = ca.SX.sym("x");
+        julia> ca.name_out(ca.Function("f", [x], [x, 2x]))
+        2-element Vector{String}:
+         "o0"
+         "o1"
         \enddoctest
         \endlang
 
@@ -978,6 +1214,22 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> x = ca.SX.sym("x"); y = ca.SX.sym("y");
+        julia> f = ca.Function("f", [x, y], [ca.SX(0)], ["x", "y"], ["r"]);
+        julia> ca.index_in(f, "y"), ca.index_out(f, "r")
+        (1, 0)
+        julia> try
+                   ca.index_in(f, "z")
+               catch e
+                   msg = sprint(showerror, e)
+                   println(occursin("could not find entry \"z\". Available names are: [x, y]", msg))
+               end
+        true
+        \enddoctest
+        \endlang
+
         \sa index_out, has_in, name_in
 
         \identifier{1vk} */
@@ -1005,6 +1257,14 @@ namespace casadi {
         >> f = Function('f', {SX.sym('x')}, {SX(0)}, {'x'}, {'r'});
         >> fprintf('%d %d %d %d\n', f.has_in('x'), f.has_in('r'), f.has_out('r'), f.has_out('x'))
         1 0 1 0
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> f = ca.Function("f", [ca.SX.sym("x")], [ca.SX(0)], ["x"], ["r"]);
+        julia> ca.has_in(f, "x"), ca.has_in(f, "r"), ca.has_out(f, "r"), ca.has_out(f, "x")
+        (true, false, true, false)
         \enddoctest
         \endlang
 
@@ -1055,6 +1315,19 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> x = ca.SX.sym("x"); y = ca.SX.sym("y", 2);
+        julia> f = ca.Function("f", [x, y], [x + y], ["x", "y"], ["r"]);
+        julia> ca.default_in(f, 0), f(x=3)["r"]
+        (0.0, [3, 3])
+        julia> opts = Dict("default_in" => [1, 2]);
+        julia> g = ca.Function("g", [x, y], [x + y], ["x", "y"], ["r"], opts);
+        julia> ca.default_in(g, 1), g(x=3)["r"], g(y=[0, 1])["r"]
+        (2.0, [5, 5], [1, 2])
+        \enddoctest
+        \endlang
+
         \sa max_in, min_in, nominal_in, convert_in
 
         \identifier{1vm} */
@@ -1077,6 +1350,14 @@ namespace casadi {
         >> f = Function('f', {SX.sym('x')}, {SX(0)});
         >> fprintf('%g %g\n', f.max_in(0), f.min_in(0))
         Inf -Inf
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> f = ca.Function("f", [ca.SX.sym("x")], [ca.SX(0)]);
+        julia> ca.max_in(f, 0), ca.min_in(f, 0)
+        (Inf, -Inf)
         \enddoctest
         \endlang
 
@@ -1114,6 +1395,15 @@ namespace casadi {
         >> f.nominal_in(0), f.nominal_out(0)
         1 1
         1 1 1
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> x = ca.SX.sym("x", 2);
+        julia> f = ca.Function("f", [x], [[x; 1]]);
+        julia> ca.nominal_in(f, 0), ca.nominal_out(f, 0)
+        ([1.0, 1.0], [1.0, 1.0, 1.0])
         \enddoctest
         \endlang
 
@@ -1156,6 +1446,19 @@ namespace casadi {
         1
         >> f.sparsity_out(0)
         1x1
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> D = ca.SX.sym("D", ca.Sparsity.diag(2));
+        julia> f = ca.Function("f", [D], [ca.SX(0)], ["D"], ["r"]);
+        julia> ca.sparsity_in(f, 0)
+        Sparsity(2x2,2nz)
+        julia> ca.is_diag(ca.sparsity_in(f, "D"))
+        true
+        julia> ca.sparsity_out(f, 0)
+        Sparsity(1x1)
         \enddoctest
         \endlang
 
@@ -1212,6 +1515,20 @@ namespace casadi {
         1
         >> f.jacobian()
         jac_f:(x,#n,out_r[1x1,0nz])->(jac_r_x,#jac_r_n[1x1,0nz]) SXFunction
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> x = ca.SX.sym("x"); n = ca.SX.sym("n");
+        julia> opts = Dict("is_diff_in" => [true, false]);
+        julia> f = ca.Function("f", [x, n], [x*n], ["x", "n"], ["r"], opts);
+        julia> f
+        Function(f:(x,#n)->(r) SXFunction)
+        julia> ca.is_diff_in(f), ca.is_diff_in(f, 1), ca.is_diff_out(f)
+        (Bool[1, 0], false, Bool[1])
+        julia> ca.jacobian(f)
+        Function(jac_f:(x,#n,out_r[1x1,0nz])->(jac_r_x,#jac_r_n[1x1,0nz]) SXFunction)
         \enddoctest
         \endlang
 
@@ -1309,6 +1626,41 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> x = ca.SX.sym("x", 2); p = ca.SX.sym("p");
+        julia> f = ca.Function("f", [x, p], [p * ca.dot(x, x), x[1] * x[2]],
+                               ["x", "p"], ["f", "g"]);
+        julia> g = ca.factory(f, "g", ["x", "p"], ["jac:f:x", "hess:f:x:x", "jac:g:x"]);
+        julia> g
+        Function(g:(x[2],p)->(jac_f_x[1x2],hess_f_x_x[2x2,2nz],jac_g_x[1x2]) SXFunction)
+        julia> jac_f_x, hess_f_x_x, jac_g_x = g([1, 2], 3);
+        julia> jac_f_x
+        DM([[6, 12]])
+        julia> hess_f_x_x
+        DM(
+        [[6, 00],
+         [00, 6]])
+        julia> jac_g_x
+        DM([[2, 1]])
+        julia> L = ca.factory(f, "L", ["x", "p", "lam:f", "lam:g"], ["grad:gamma:x"],
+                             Dict("gamma" => ["f", "g"]));
+        julia> println(L); L([1, 2], 3, 1, 2)
+        L:(x[2],p,lam_f,lam_g)->(grad_gamma_x[2]) SXFunction
+        DM([10, 14])
+        julia> h = ca.factory(f, "h", ["x", "p", "fwd:x", "fwd:p"], ["fwd:f"]);
+        julia> h([1, 2], 3, [1, 0], 0)
+        DM(6)
+        julia> try
+                   ca.factory(f, "bad", ["x"], ["jac:q:x"])
+               catch e
+                   msg = sprint(showerror, e)
+                   println(occursin("Cannot process \"q\" as output. Available: f,g.", msg))
+               end
+        true
+        \enddoctest
+        \endlang
+
         \sa jacobian, forward, reverse, which_depends
 
         \identifier{2mi} */
@@ -1352,6 +1704,23 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> x = ca.SX.sym("x");
+        julia> opts = Dict("qpsol" => "qrqp", "print_header" => false, "print_iteration" => false,
+                           "print_time" => false, "qpsol_options" => Dict("print_header" => false));
+        julia> S = ca.nlpsol("S", "sqpmethod", Dict("x" => x, "f" => x^2), opts);
+        julia> ca.oracle(S)
+        Function(nlp:(x,p[])->(f,g[0]) SXFunction)
+        julia> try
+                   ca.oracle(ca.oracle(S))
+               catch e
+                   println(occursin("'oracle' not defined for SXFunction", sprint(showerror, e)))
+               end
+        true
+        \enddoctest
+        \endlang
+
         \sa get_function, find_functions
 
         \identifier{1vu} */
@@ -1391,6 +1760,19 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> x = ca.SX.sym("x");
+        julia> f = ca.Function("f", [x], [sin(x)], ["x"], ["y"]);
+        julia> w = ca.wrap(f);
+        julia> println(w); ca.n_instructions(w), ca.get_function(w)
+        wrap_f:(x)->(y) MXFunction
+        (3, ["f"])
+        julia> ca.name(ca.wrap(f, "g"))
+        "g"
+        \enddoctest
+        \endlang
+
         \sa wrap_as_needed, expand
 
         \identifier{1vv} */
@@ -1427,6 +1809,19 @@ namespace casadi {
         MXFunction
         >> f.wrap_as_needed('g', struct('ad_weight', 1)).name()
         g
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> x = ca.SX.sym("x");
+        julia> f = ca.Function("f", [x], [sin(x)]);
+        julia> ca.class_name(ca.wrap_as_needed(f, "f", Dict()))
+        "SXFunction"
+        julia> ca.class_name(ca.wrap_as_needed(f, Dict()))
+        "MXFunction"
+        julia> ca.name(ca.wrap_as_needed(f, "g", Dict("ad_weight" => 1)))
+        "g"
         \enddoctest
         \endlang
 
@@ -1481,6 +1876,29 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> x = ca.SX.sym("x"); y = ca.SX.sym("y", 2);
+        julia> f = ca.Function("f", [x, y], [x*y[1], y[2]^2 + x, 3], ["x", "y"], ["a", "b", "c"]);
+        julia> ca.which_depends(f, "y", ["a", "b"])
+        2-element Vector{Bool}:
+         1
+         1
+        julia> ca.which_depends(f, "y", ["a", "b"], 2)
+        2-element Vector{Bool}:
+         0
+         1
+        julia> ca.which_depends(f, "y", ["a", "b", "c"], 1, true)
+        3-element Vector{Bool}:
+         1
+         1
+         0
+        julia> ca.which_depends(f, "x", ["a"], 2)
+        1-element Vector{Bool}:
+         0
+        \enddoctest
+        \endlang
+
         \sa factory, jac_sparsity
 
         \identifier{1vx} */
@@ -1511,6 +1929,19 @@ namespace casadi {
         Input 1 ("p"): 1x1
         Number of outputs: 1
         Output 0 ("r"): 1x3
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> x = ca.SX.sym("x", 2); p = ca.SX.sym("p");
+        julia> f = ca.Function("f", [x, p], [ca.SX(1, 3)], ["x", "p"], ["r"]);
+        julia> ca.print_dimensions(f)
+         Number of inputs: 2
+          Input 0 ("x"): 2x1
+          Input 1 ("p"): 1x1
+         Number of outputs: 1
+          Output 0 ("r"): 1x3
         \enddoctest
         \endlang
 
@@ -1550,6 +1981,14 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> f = ca.Function("f", [ca.SX.sym("x")], [ca.SX(0)]);
+        julia> ca.print_option(f, "verbose")
+        > "verbose"          [OT_BOOL]      "Verbose evaluation -- for debugging"
+        \enddoctest
+        \endlang
+
         \sa print_options, has_option
 
         \identifier{1w0} */
@@ -1570,6 +2009,14 @@ namespace casadi {
         >> f = Function('f', {SX.sym('x')}, {SX(0)});
         >> fprintf('%d %d\n', f.has_option('live_variables'), f.has_option('ipopt'))
         1 0
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> f = ca.Function("f", [ca.SX.sym("x")], [ca.SX(0)]);
+        julia> ca.has_option(f, "live_variables"), ca.has_option(f, "ipopt")
+        (true, false)
         \enddoctest
         \endlang
 
@@ -1608,6 +2055,19 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> f = ca.Function("f", [ca.SX.sym("x")], [ca.SX(0)]);
+        julia> ca.change_option(f, "verbose", false)
+        julia> try
+                   ca.change_option(f, "cse", true)
+               catch e
+                   println(occursin("Option 'cse' cannot be changed", sprint(showerror, e)))
+               end
+        true
+        \enddoctest
+        \endlang
+
         \sa has_option
 
         \identifier{1w2} */
@@ -1640,6 +2100,14 @@ namespace casadi {
         >> f = Function('f', {SX.sym('x')}, {SX(0)});
         >> f.uses_output()
         0
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> f = ca.Function("f", [ca.SX.sym("x")], [ca.SX(0)]);
+        julia> ca.uses_output(f)
+        false
         \enddoctest
         \endlang
 
@@ -1734,6 +2202,29 @@ namespace casadi {
       jac_r_y
       jac_s_x
       jac_s_y
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> x = ca.SX.sym("x"); y = ca.SX.sym("y", 2);
+      julia> f = ca.Function("f", [x, y], [x*y, sin(x)], ["x", "y"], ["r", "s"]);
+      julia> J = ca.jacobian(f);
+      julia> ca.name(J), ca.n_in(J), ca.n_out(J)
+      ("jac_f", 4, 4)
+      julia> jac_r_x, jac_r_y, jac_s_x, jac_s_y = J(1, [2, 3], 0, 0);
+      julia> jac_r_x, jac_s_x, jac_s_y
+      ([2, 3], 0.540302, [[00, 00]])
+      julia> jac_r_y
+      DM(
+      [[1, 00],
+       [00, 1]])
+      julia> ca.name_out(J)
+      4-element Vector{String}:
+       "jac_r_x"
+       "jac_r_y"
+       "jac_s_x"
+       "jac_s_y"
       \enddoctest
       \endlang
 
@@ -1852,6 +2343,64 @@ namespace casadi {
         1
         >> try, f(1, [1; 2; 3]); catch e, disp(contains(e.message, 'Got 3-by-1')); end
         1
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> x = ca.SX.sym("x"); y = ca.SX.sym("y", 2);
+        julia> f = ca.Function("f", [x, y], [x*y, sin(x)], ["x", "y"], ["r", "s"]);
+        julia> ca.call(f, [2, [3, 4]])
+        2-element Vector{DM}:
+         DM([6, 8])
+         DM(0.909297)
+        julia> ca.call(f, Dict("x" => 2))
+        Dict{String, DM} with 2 entries:
+          "r" => [0, 0]
+          "s" => 0.909297
+        julia> f(2, [3, 4])
+        ([6, 8], 0.909297)
+        julia> f(x=2, y=[3, 4])
+        Dict{String, DM} with 2 entries:
+          "r" => [6, 8]
+          "s" => 0.909297
+        julia> r, s = f(2, [3 5; 4 6]);
+        julia> r
+        DM(
+        [[6, 10],
+         [8, 12]])
+        julia> s
+        DM([[0.909297, 0.909297]])
+        julia> f(ca.DM(0, 0), 3)
+        ([0, 0], 0)
+        julia> z = ca.MX.sym("z"); w = ca.MX.sym("w", 2);
+        julia> ca.call(f, [z, w])
+        2-element Vector{MX}:
+         MX(f(z, w){0})
+         MX(f(z, w){1})
+        julia> ca.call(f, [z, w], true)
+        2-element Vector{MX}:
+         MX(vertcat((z*w[0]), (z*w[1])))
+         MX(sin(z))
+        julia> a = ca.SX.sym("a");
+        julia> ca.call(f, [a, [1, 2]])
+        2-element Vector{SX}:
+         SX([a, (2.*a)])
+         SX(sin(a))
+        julia> try
+                   f(1)
+               catch e
+                   msg = sprint(showerror, e)
+                   println(occursin("Incorrect number of inputs: Expected 2, got 1", msg))
+               end
+        true
+        julia> try
+                   f(1, [1, 2, 3])
+               catch e
+                   msg = sprint(showerror, e)
+                   println(occursin("Input 1 (y) has mismatching shape. Got 3-by-1", msg))
+               end
+        true
         \enddoctest
         \endlang
 
@@ -2026,6 +2575,22 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> x = ca.SX.sym("x"); y = ca.SX.sym("y");
+        julia> f = ca.Function("f", [x, y], [x*y, x - y], ["x", "y"], ["p", "d"]);
+        julia> p, d = ca.mapsum(f, [ca.MX.sym("a"), ca.MX.sym("b", 1, 3)]);
+        julia> p
+        MX(mapsum(a, b){0})
+        julia> ca.mapsum(f, [2, ca.DM([1 2 3])])
+        2-element Vector{MX}:
+         MX(mapsum(2, [[1, 2, 3]]){0})
+         MX(mapsum(2, [[1, 2, 3]]){1})
+        julia> ca.evalf(ca.mapsum(f, [2, ca.DM([1 2 3])])[1])
+        DM(12)
+        \enddoctest
+        \endlang
+
         \sa map, call
 
         \identifier{1wh} */
@@ -2107,6 +2672,30 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> x = ca.SX.sym("x"); u = ca.SX.sym("u");
+        julia> step = ca.Function("step", [x, u], [x + u, x*u], ["x", "u"], ["x_next", "y"]);
+        julia> F = ca.mapaccum(step, 3);
+        julia> F
+        Function(mapaccum_step:(x,u[1x3])->(x_next[1x3],y[1x3]) MXFunction)
+        julia> F(1, [1 2 3])
+        ([[2, 4, 7]], [[1, 4, 12]])
+        julia> ca.mapaccum(step, "F", 3, ["x"], ["x_next"])
+        Function(F:(x,u[1x3])->(x_next[1x3],y[1x3]) MXFunction)
+        julia> ca.fold(step, 3)
+        Function(fold_step:(x,u[1x3])->(x_next,y[1x3]) MXFunction)
+        julia> ca.fold(step, 3)(1, [1 2 3])
+        (7, [[1, 4, 12]])
+        julia> try
+                   ca.mapaccum(step, 0)
+               catch e
+                   println(occursin("mapaccum: N must be positive", sprint(showerror, e)))
+               end
+        true
+        \enddoctest
+        \endlang
+
         \sa map, fold
 
         \identifier{1wi} */
@@ -2179,6 +2768,24 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> x = ca.SX.sym("x"); p = ca.SX.sym("p");
+        julia> f = ca.Function("f", [x, p], [p*x^2], ["x", "p"], ["y"]);
+        julia> F = f.map(3);
+        julia> F
+        Function(map3_f:(x[1x3],p[1x3])->(y[1x3]) Map)
+        julia> F([1 2 3], 2)
+        DM([[2, 8, 18]])
+        julia> f.map(4, "thread", 2)
+        Function(threadmap2_map2_f:(x[1x4],p[1x4])->(y[1x4]) ThreadMap)
+        julia> f.map(3, "unroll")
+        Function(f_3:(x[1x3],p[1x3])->(y[1x3]) MXFunction)
+        julia> f.map(1) === f, ca.name(f.map(1))
+        (false, "f")
+        \enddoctest
+        \endlang
+
         \sa mapaccum, mapsum, call
 
         \identifier{1wj} */
@@ -2224,6 +2831,20 @@ namespace casadi {
         >> [y, z] = G(DM([1, 2, 3]), 2); disp(y), disp(z)
         12
         [[1, 2, 3]]
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> x = ca.SX.sym("x"); p = ca.SX.sym("p");
+        julia> f = ca.Function("f", [x, p], [p*x, x], ["x", "p"], ["y", "z"]);
+        julia> F = f.map("F", "serial", 3, ["p"], ["y"]);
+        julia> F
+        Function(F:(x[1x3],p)->(y,z[1x3]) MXFunction)
+        julia> F([1 2 3], 2)
+        (12, [[1, 2, 3]])
+        julia> f.map(3, [false, true], [true, false])([1 2 3], 2)
+        (12, [[1, 2, 3]])
         \enddoctest
         \endlang
 
@@ -2283,6 +2904,19 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> x = ca.SX.sym("x"); y = ca.SX.sym("y");
+        julia> f = ca.Function("f", [x, y], [x + y, x - y, 2x], ["x", "y"], ["a", "b", "c"]);
+        julia> g = ca.slice(f, "g", [1, 0], [2, 0]);
+        julia> println(g); g(1, 2)
+        g:(y,x)->(c,a) SXFunction
+        (4, 3)
+        julia> ca.slice(f, "h", [0], [2])
+        Function(h:(x)->(c) SXFunction)
+        \enddoctest
+        \endlang
+
         \sa factory
 
         \identifier{1wl} */
@@ -2334,6 +2968,21 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> x = ca.SX.sym("x");
+        julia> f0 = ca.Function("f0", [x], [x]); f1 = ca.Function("f1", [x], [x^2]);
+        julia> fdef = ca.Function("fdef", [x], [-x]);
+        julia> sw = ca.Function.conditional("sw", [f0, f1], fdef);
+        julia> sw
+        Function(sw:(i0,i1)->(o0) Switch)
+        julia> sw(0, 3), sw(1, 3), sw(1.9, 3), sw(2, 3), sw(-1, 3)
+        (3, 9, 9, -3, -3)
+        julia> sw(ca.MX.sym("k"), ca.MX.sym("v"))
+        MX(sw(k, v){0})
+        \enddoctest
+        \endlang
+
         \sa if_else
 
         \identifier{1wm} */
@@ -2365,6 +3014,17 @@ namespace casadi {
         c:(i0,i1)->(o0) Switch
         >> [c(0, 3), c(1, 3)]
         [[0, 9]]
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> x = ca.SX.sym("x");
+        julia> f = ca.Function("f", [x], [x^2]);
+        julia> c = ca.Function.conditional("c", f);
+        julia> println(c); c(0, 3), c(1, 3)
+        c:(i0,i1)->(o0) Switch
+        (0, 9)
         \enddoctest
         \endlang
 
@@ -2425,6 +3085,25 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> f = ca.Function.bspline("f", [[0, 0, 0, 1, 2, 2, 2]], [0, 1, 2, 3], [2]);
+        julia> f
+        Function(f:(i0)->(o0) MXFunction)
+        julia> f(0), f(0.5), f(2)
+        (0, 0.875, 3)
+        julia> g = ca.Function.bspline("g", [[0, 0, 1, 1], [0, 0, 1, 1]], [0, 1, 2, 3], [1, 1]);
+        julia> g([0.5, 0.5])
+        DM(1.5)
+        julia> try
+                   ca.Function.bspline("f", [[0, 0, 0, 1, 2, 2, 2]], [0, 1, 2, 3], [2, 2])
+               catch e
+                   println(occursin("must match knot list length", sprint(showerror, e)))
+               end
+        true
+        \enddoctest
+        \endlang
+
         \sa interpolant, MX::bspline
 
         \identifier{1wo} */
@@ -2460,6 +3139,18 @@ namespace casadi {
         f:(i0,i1)->(o0) Switch
         >> [f(1, 3), f(0, 3), f(5, 3)]
         [[9, 3, 9]]
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> x = ca.SX.sym("x");
+        julia> f_true = ca.Function("t", [x], [x^2]); f_false = ca.Function("e", [x], [x]);
+        julia> f = ca.Function.if_else("f", f_true, f_false);
+        julia> f
+        Function(f:(i0,i1)->(o0) Switch)
+        julia> f(1, 3), f(0, 3), f(5, 3)
+        (9, 3, 9)
         \enddoctest
         \endlang
 
@@ -2508,6 +3199,21 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> x = ca.SX.sym("x"); y = ca.SX.sym("y", 2);
+        julia> f = ca.Function("f", [x, y], [x*y, sin(x)], ["x", "y"], ["r", "s"]);
+        julia> F = ca.forward(f, 1);
+        julia> F
+        Function(fwd1_f:(x,y[2],out_r[2x1,0nz],out_s[1x1,0nz],fwd_x,fwd_y[2])->(fwd_r[2],fwd_s) SXFunction)
+        julia> F(1, [2, 3], 0, 0, 1, [0, 0])
+        ([2, 3], 0.540302)
+        julia> F2 = ca.forward(f, 2);
+        julia> ca.name(F2), ca.size_in(F2, 4), ca.size_in(F2, 5)
+        ("fwd2_f", (1, 2), (2, 2))
+        \enddoctest
+        \endlang
+
         \sa reverse, jacobian, factory
 
         \identifier{1wq} */
@@ -2544,6 +3250,18 @@ namespace casadi {
         >> [adj_x, adj_y] = R(1, [2; 3], 0, 0, [1; 1], 0); disp(adj_x), disp(adj_y)
         5
         [1, 1]
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> x = ca.SX.sym("x"); y = ca.SX.sym("y", 2);
+        julia> f = ca.Function("f", [x, y], [x*y, sin(x)], ["x", "y"], ["r", "s"]);
+        julia> R = f.reverse(1);
+        julia> R
+        Function(adj1_f:(x,y[2],out_r[2x1,0nz],out_s[1x1,0nz],adj_r[2],adj_s)->(adj_x,adj_y[2]) SXFunction)
+        julia> R(1, [2, 3], 0, 0, [1, 1], 0)
+        (5, [1, 1])
         \enddoctest
         \endlang
 
@@ -2589,6 +3307,25 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> x = ca.SX.sym("x"); D = ca.SX.sym("D", ca.Sparsity.diag(2));
+        julia> f = ca.Function("f", [x, D], [x*D, sin(x)]);
+        julia> ca.jac_sparsity(f)
+        4-element Vector{Sparsity}:
+         Sparsity(4x1,2nz)
+         Sparsity(4x4,2nz)
+         Sparsity(1x1)
+         Sparsity(1x4,0nz)
+        julia> ca.jac_sparsity(f, true)
+        4-element Vector{Sparsity}:
+         Sparsity(2x1)
+         Sparsity(2x2,2nz)
+         Sparsity(1x1)
+         Sparsity(1x2,0nz)
+        \enddoctest
+        \endlang
+
         \sa jacobian, which_depends
 
         \identifier{1ws} */
@@ -2615,6 +3352,15 @@ namespace casadi {
         4x4,2nz
         2x2,2nz
         1x4,0nz
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> x = ca.SX.sym("x"); D = ca.SX.sym("D", ca.Sparsity.diag(2));
+        julia> f = ca.Function("f", [x, D], [x*D, sin(x)]);
+        julia> ca.jac_sparsity(f, 0, 1), ca.jac_sparsity(f, 0, 1, true), ca.jac_sparsity(f, 1, 1)
+        (4x4,2nz, 2x2,2nz, 1x4,0nz)
         \enddoctest
         \endlang
 
@@ -2684,6 +3430,26 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> x = ca.SX.sym("x"); y = ca.SX.sym("y", 2);
+        julia> f = ca.Function("f", [x, y], [x*y, sin(x)], ["x", "y"], ["r", "s"]);
+        julia> fname = ca.generate(f, "f.c")
+        "f.c"
+        julia> isfile("f.c")
+        true
+        julia> src = read("f.c", String);
+        julia> occursin("int f(const casadi_real** arg, casadi_real** res", src)
+        true
+        julia> occursin("f_n_in", src)
+        true
+        julia> rm("f.c")
+        julia> ca.generate(f, "g", Dict("with_header" => true)), isfile("g.h")
+        ("g.c", true)
+        julia> rm("g.c"); rm("g.h")
+        \enddoctest
+        \endlang
+
         \sa CodeGenerator, generate_in, generate_out, jit, external
 
         \identifier{1wu} */
@@ -2746,6 +3512,23 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> f = ca.Function("f", [ca.SX.sym("x"), ca.SX.sym("y", 2)], [ca.SX(0)]);
+        julia> ca.generate_in(f, "f_in.txt", [1, [2, 3]])
+        julia> split(read("f_in.txt", String))
+        3-element Vector{SubString{String}}:
+         "1.0000000000000000e+00"
+         "2.0000000000000000e+00"
+         "3.0000000000000000e+00"
+        julia> ca.generate_in(f, "f_in.txt")
+        2-element Vector{DM}:
+         DM(1)
+         DM([2, 3])
+        julia> rm("f_in.txt")
+        \enddoctest
+        \endlang
+
         \sa generate_out, nz_from_in, nz_to_in, generate
 
         \identifier{1wx} */
@@ -2780,6 +3563,19 @@ namespace casadi {
         1.5
         3
         >> delete('f_out.txt');
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> x = ca.SX.sym("x");
+        julia> f = ca.Function("f", [x], [x, 2x]);
+        julia> ca.generate_out(f, "f_out.txt", ca.call(f, [1.5]))
+        julia> ca.generate_out(f, "f_out.txt")
+        2-element Vector{DM}:
+         DM(1.5)
+         DM(3)
+        julia> rm("f_out.txt")
         \enddoctest
         \endlang
 
@@ -2824,6 +3620,21 @@ namespace casadi {
         function [varargout] = f(varargin)
         >> try, f.export_code('python'); catch e, disp(contains(e.message, 'Only matlab')); end
         1
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> x = ca.SX.sym("x");
+        julia> f = ca.Function("f", [x], [sin(x)]);
+        julia> first(split(ca.export_code(f, "matlab"), "\n"))
+        "function [varargout] = f(varargin)"
+        julia> try
+                   ca.export_code(f, "python")
+               catch e
+                   println(occursin("Only matlab language supported", sprint(showerror, e)))
+               end
+        true
         \enddoctest
         \endlang
 
@@ -2873,6 +3684,18 @@ namespace casadi {
         >> s = f.serialize(); g = Function.deserialize(s); disp(g), disp(g(1))
         f:(x)->(y) SXFunction
         0.841471
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> x = ca.SX.sym("x");
+        julia> f = ca.Function("f", [x], [sin(x)], ["x"], ["y"]);
+        julia> s = ca.serialize(f);
+        julia> g = ca.Function.deserialize(s);
+        julia> println(g); g(1)
+        f:(x)->(y) SXFunction
+        DM(0.841471)
         \enddoctest
         \endlang
 
@@ -2936,6 +3759,19 @@ namespace casadi {
         f:(i0)->(o0) SXFunction
         9
         >> delete('f.casadi');
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> x = ca.SX.sym("x");
+        julia> f = ca.Function("f", [x], [x^2]);
+        julia> ca.save(f, "f.casadi")
+        julia> g = ca.Function.load("f.casadi");
+        julia> println(g); g(3)
+        f:(i0)->(o0) SXFunction
+        DM(9)
+        julia> rm("f.casadi")
         \enddoctest
         \endlang
 
@@ -3009,6 +3845,25 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> x = ca.SX.sym("x");
+        julia> f = ca.Function("f", [x], [x^2], Dict("record_time" => true));
+        julia> try
+                   ca.stats(f)
+               catch e
+                   println(occursin("first evaluate it numerically", sprint(showerror, e)))
+               end
+        true
+        julia> r = f(2);
+        julia> sort(collect(keys(ca.stats(f))))
+        3-element Vector{String}:
+         "n_call_total"
+         "t_proc_total"
+         "t_wall_total"
+        \enddoctest
+        \endlang
+
         \sa checkout
 
         \identifier{2mj} */
@@ -3051,6 +3906,24 @@ namespace casadi {
         >> out = f.sx_out(); disp(out{1}), disp(f.mx_out(0))
         r
         r
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> a = ca.SX.sym("a"); B = ca.SX.sym("B", ca.Sparsity.diag(2));
+        julia> f = ca.Function("f", [a, B], [ca.SX(0)], ["a", "B"], ["r"]);
+        julia> a_in, B_in = ca.sx_in(f);
+        julia> a_in
+        SX(a)
+        julia> B_in
+        SX(
+        [[B_0, 00],
+         [00, B_1]])
+        julia> ca.mx_in(f, 1), size(ca.mx_in(f, "a"))
+        (B, (1, 1))
+        julia> ca.sx_out(f), ca.mx_out(f, 0)
+        (SX[r], r)
         \enddoctest
         \endlang
 
@@ -3138,6 +4011,31 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> D = ca.SX.sym("D", ca.Sparsity.diag(2));
+        julia> f = ca.Function("f", [ca.SX.sym("x"), D], [ca.SX(0)]);
+        julia> ca.nz_from_in(f, [1, ca.DM([2 0; 0 3])])
+        3-element Vector{Float64}:
+         1.0
+         2.0
+         3.0
+        julia> x_in, D_in = ca.nz_to_in(f, [1, 2, 3]);
+        julia> x_in
+        DM(1)
+        julia> D_in
+        DM(
+        [[2, 00],
+         [00, 3]])
+        julia> try
+                   ca.nz_to_in(f, [1, 2])
+               catch e
+                   println(occursin("Dimension mismatch. Expecting 3, got 2", sprint(showerror, e)))
+               end
+        true
+        \enddoctest
+        \endlang
+
         \sa convert_in, generate_in, FunctionBuffer
 
         \identifier{1x6} */
@@ -3189,6 +4087,27 @@ namespace casadi {
         >> try, f.convert_in(struct('z', 1)); catch e, msg = e.message; end
         >> contains(msg, 'could not find entry "z"')
         1
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> f = ca.Function("f", [ca.SX.sym("x"), ca.SX.sym("y")], [ca.SX(0), ca.SX(1)],
+                               ["x", "y"], ["a", "b"]);
+        julia> ca.convert_in(f, Dict("y" => 2))
+        2-element Vector{DM}:
+         DM(0)
+         DM(2)
+        julia> ca.convert_out(f, Dict("b" => 5))
+        2-element Vector{DM}:
+         DM(nan)
+         DM(5)
+        julia> try
+                   ca.convert_in(f, Dict("z" => 1))
+               catch e
+                   println(occursin("could not find entry \"z\"", sprint(showerror, e)))
+               end
+        true
         \enddoctest
         \endlang
 
@@ -3251,6 +4170,25 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> x = ca.SX.sym("x"); p = ca.SX.sym("p");
+        julia> f = ca.Function("f", [x], [x*p], Dict("allow_free" => true));
+        julia> ca.has_free(f), ca.get_free(f), ca.free_sx(f)
+        (true, ["p"], SX[p])
+        julia> try
+                   f(1)
+               catch e
+                   println(occursin("since variables [p] are free", sprint(showerror, e)))
+               end
+        true
+        julia> f(ca.SX.sym("q"))
+        SX((q*p))
+        julia> ca.has_free(ca.Function("g", [x], [x]))
+        false
+        \enddoctest
+        \endlang
+
         \sa get_free, free_sx, free_mx
 
         \identifier{1x8} */
@@ -3290,6 +4228,16 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> x = ca.MX.sym("x"); p = ca.MX.sym("p");
+        julia> f = ca.Function("f", [x], [x*p], Dict("allow_free" => true));
+        julia> ca.free_mx(f)
+        1-element Vector{MX}:
+         MX(p)
+        \enddoctest
+        \endlang
+
         \sa has_free, free_sx
 
         \identifier{1xb} */
@@ -3321,6 +4269,14 @@ namespace casadi {
         \doctest
         >> x = MX.sym('x');
         >> Function('f', {x}, {sin(x) + sin(x)}).n_nodes()
+        4
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> x = ca.MX.sym("x");
+        julia> ca.n_nodes(ca.Function("f", [x], [sin(x) + sin(x)]))
         4
         \enddoctest
         \endlang
@@ -3370,6 +4326,27 @@ namespace casadi {
         >> f.instruction_id(3) == OP_CONST, f.instruction_constant(3)
         1
         1
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> x = ca.SX.sym("x"); y = ca.SX.sym("y");
+        julia> f = ca.Function("f", [x, y], [x*y + 1]);
+        julia> ca.n_instructions(f)
+        6
+        julia> for k in 0:ca.n_instructions(f)-1
+                   println(ca.instruction_id(f, k), " ", ca.instruction_input(f, k), " ",
+                           ca.instruction_output(f, k))
+               end
+        45 [0, 0] [0]
+        45 [1, 0] [1]
+        3 [0, 1] [0]
+        44 Int64[] [1]
+        1 [0, 1] [0]
+        46 [0] [0, 0]
+        julia> ca.instruction_id(f, 3) == ca.OP_CONST, ca.instruction_constant(f, 3)
+        (true, 1.0)
         \enddoctest
         \endlang
 
@@ -3442,6 +4419,19 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> x = ca.MX.sym("x");
+        julia> f = ca.Function("f", [x], [2sin(x)]);
+        julia> [string(ca.instruction_MX(f, k)) for k in 0:ca.n_instructions(f)-1]
+        4-element Vector{String}:
+         "input[0][0]"
+         "sin(x)"
+         "(2.*sin(x))"
+         "output[0][0]"
+        \enddoctest
+        \endlang
+
         \sa n_instructions, instructions_sx
 
         \identifier{1xj} */
@@ -3467,6 +4457,15 @@ namespace casadi {
         >> f = Function('f', {x}, {2*sin(x)});
         >> f.instructions_sx()
         @1=nan, @2=sin(x), [@1, @2, (2.*@2), @1]
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> x = ca.SX.sym("x");
+        julia> f = ca.Function("f", [x], [2sin(x)]);
+        julia> ca.instructions_sx(f)
+        SX(@1=nan, @2=sin(x), [@1, @2, (2.*@2), @1])
         \enddoctest
         \endlang
 
@@ -3499,6 +4498,14 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> f = ca.Function("f", [ca.SX.sym("x")], [ca.SX(0)]);
+        julia> ca.has_spfwd(f), ca.has_sprev(f)
+        (true, true)
+        \enddoctest
+        \endlang
+
         \sa jac_sparsity
 
         \identifier{1xl} */
@@ -3524,6 +4531,14 @@ namespace casadi {
         >> f = Function('f', {SX.sym('x'), SX.sym('y')}, {SX(0)});
         >> fprintf('%d %d %d %d\n', f.sz_arg(), f.sz_res(), f.sz_iw(), f.sz_w())
         2 1 0 1
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> f = ca.Function("f", [ca.SX.sym("x"), ca.SX.sym("y")], [ca.SX(0)]);
+        julia> ca.sz_arg(f), ca.sz_res(f), ca.sz_iw(f), ca.sz_w(f)
+        (2, 1, 0, 1)
         \enddoctest
         \endlang
 
@@ -3603,6 +4618,13 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> ca.name(ca.Function("f", [ca.SX.sym("x")], [ca.SX(0)]))
+        "f"
+        \enddoctest
+        \endlang
+
         \sa check_name
 
         \identifier{1xv} */
@@ -3633,6 +4655,17 @@ namespace casadi {
         1 0 SXFunction
         >> F = f.map(2, 'thread'); fprintf('%d %d\n', F.is_a('Map'), F.is_a('Map', false))
         1 0
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> f = ca.Function("f", [ca.SX.sym("x")], [ca.SX(0)]);
+        julia> ca.is_a(f, "SXFunction"), ca.is_a(f, "MXFunction"), ca.class_name(f)
+        (true, false, "SXFunction")
+        julia> F = f.map(2, "thread");
+        julia> ca.is_a(F, "Map"), ca.is_a(F, "Map", false)
+        (true, false)
         \enddoctest
         \endlang
 
@@ -3668,6 +4701,16 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> F = ca.Function;
+        julia> F.check_name("f_1"), F.check_name("1f")
+        (true, false)
+        julia> F.check_name("a__b"), F.check_name("jac"), F.check_name("")
+        (false, false, false)
+        \enddoctest
+        \endlang
+
         \sa fix_name
 
         \identifier{1xx} */
@@ -3698,6 +4741,16 @@ namespace casadi {
         jac1
         >> Function.fix_name('ok')
         ok
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> F = ca.Function;
+        julia> F.fix_name("my func!"), F.fix_name("1f"), F.fix_name("")
+        ("my_func_", "a1f", "unnamed")
+        julia> F.fix_name("jac"), F.fix_name("ok")
+        ("jac1", "ok")
         \enddoctest
         \endlang
 
@@ -3739,6 +4792,21 @@ namespace casadi {
         >> try, Function.deserialize('not a function'); catch e, msg = e.message; end
         >> contains(msg, 'sanity check failed')
         1
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> x = ca.SX.sym("x");
+        julia> f = ca.Function.deserialize(ca.serialize(ca.Function("f", [x], [2x])));
+        julia> f(3)
+        DM(6)
+        julia> try
+                   ca.Function.deserialize("not a function")
+               catch e
+                   println(occursin("sanity check failed", sprint(showerror, e)))
+               end
+        true
         \enddoctest
         \endlang
 
@@ -3787,6 +4855,19 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> f = ca.Function("f", [ca.SX.sym("x", 2)], [ca.SX(1, 3)]);
+        julia> ca.assert_size_in(f, 0, 2, 1)
+        julia> try
+                   ca.assert_size_out(f, 0, 2, 1)
+               catch e
+                   println(occursin("Expected 2-by-1 but got 1-by-3", sprint(showerror, e)))
+               end
+        true
+        \enddoctest
+        \endlang
+
         \sa assert_size_out, size_in
 
         \identifier{2mk} */
@@ -3829,6 +4910,15 @@ namespace casadi {
         >> m = f.checkout(); disp(m)
         1
         >> f.release(m)
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> f = ca.Function("f", [ca.SX.sym("x")], [ca.SX(0)]);
+        julia> m = ca.checkout(f)
+        1
+        julia> ca.release(f, m)
         \enddoctest
         \endlang
 
@@ -3878,6 +4968,19 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> x = ca.SX.sym("x");
+        julia> f = ca.Function("f", [x], [sin(x)]);
+        julia> ca.cache(f)
+        Dict{String, Any}()
+        julia> J = ca.jacobian(f);
+        julia> collect(keys(ca.cache(f)))
+        1-element Vector{String}:
+         "jac_f"
+        \enddoctest
+        \endlang
+
         \sa jacobian, forward, reverse
 
         \identifier{26i} */
@@ -3922,6 +5025,24 @@ namespace casadi {
         f:(i0)->(o0) SXFunction
         >> try, g.get_function('h'); catch e, disp(contains(e.message, 'No such function')); end
         1
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> x = ca.MX.sym("x");
+        julia> f = ca.expand(ca.Function("f", [x], [sin(x)]));
+        julia> g = ca.Function("g", [x], [f(x) + 1]);
+        julia> ca.get_function(g), ca.has_function(g, "f")
+        (["f"], true)
+        julia> ca.get_function(g, "f")
+        Function(f:(i0)->(o0) SXFunction)
+        julia> try
+                   ca.get_function(g, "h")
+               catch e
+                   println(occursin("No such function 'h'", sprint(showerror, e)))
+               end
+        true
         \enddoctest
         \endlang
 
@@ -3990,6 +5111,27 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> x = ca.MX.sym("x");
+        julia> inner = ca.expand(ca.Function("inner", [x], [sin(x)]));
+        julia> middle = ca.Function("middle", [x], [inner(x) + 1]);
+        julia> outer = ca.Function("outer", [x], [ca.call(middle, [x], false, true)[1] * 2]);
+        julia> [ca.name(g) for g in ca.find_functions(outer)]
+        2-element Vector{String}:
+         "middle"
+         "inner"
+        julia> [ca.name(g) for g in ca.find_functions(outer, 0)]
+        1-element Vector{String}:
+         "middle"
+        julia> ca.find_function(outer, "inner")
+        Function(inner:(i0)->(o0) SXFunction)
+        julia> ca.get_function(ca.Function("o2", [x], [middle(x) * 2]))
+        1-element Vector{String}:
+         "inner"
+        \enddoctest
+        \endlang
+
         \sa find_function, get_function
 
         \identifier{1y6} */
@@ -4023,6 +5165,14 @@ namespace casadi {
         >> x = SX.sym('x');
         >> isempty(fieldnames(Function('f', {x}, {x}).info()))
         1
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> x = ca.SX.sym("x");
+        julia> ca.info(ca.Function("f", [x], [x]))
+        Dict{String, Any}()
         \enddoctest
         \endlang
 

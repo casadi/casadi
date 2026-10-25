@@ -19,10 +19,7 @@
 # Solve a small NLP:
 #   minimize     x0^2 + x1^2
 #   subject to   x0 + x1 - 10 >= 0
-const _jl_dir = get(ENV, "CASADI_JL",
-    joinpath(@__DIR__, "..", "..", "..", "julia-proto", "casadi-contact"))
-include(joinpath(_jl_dir, "CasADiNative.jl"))
-import .CasADiNative as ca
+import CasADiNative as ca
 
 # Declare variables
 x = ca.SX.sym("x", 2)

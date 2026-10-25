@@ -1,13 +1,11 @@
 # test/julia/runtests.jl -- thin runner for the SWIG-generated Julia bindings.
 # Mirrors the wasm-js multi-file layout: this file just loads CasADiNative and
-# includes the per-area test files. Needs CASADI_JL pointing at the dir holding
-# CasADi.jl/casadi.jl/libcasadi_wrap.so, and casadi plugins on the search path.
+# includes the per-area test files. Needs CasADiNative importable (the environment
+# test/julia/package/make_package.jl builds from a build tree) and casadi plugins on
+# the search path.
 using Test
-
-const _jl_dir = get(ENV, "CASADI_JL",
-    joinpath(@__DIR__, "..", "..", "julia-proto", "casadi-contact"))
-include(joinpath(_jl_dir, "CasADiNative.jl"))
-using .CasADiNative
+using CasADiNative
+import Serialization
 const C = CasADiNative.C
 
 const HAS_IPOPT = try

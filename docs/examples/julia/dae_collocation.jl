@@ -21,10 +21,7 @@
 # ipopt. No integrator plugin is used -- the collocation equations are assembled
 # by hand -- so this ports directly. The original ipopt option
 # linear_solver='ma27' is dropped (default mumps is used).
-const _jl_dir = get(ENV, "CASADI_JL",
-    joinpath(@__DIR__, "..", "..", "..", "julia-proto", "casadi-contact"))
-include(joinpath(_jl_dir, "CasADiNative.jl"))
-import .CasADiNative as ca
+import CasADiNative as ca
 
 function main()
     # -------- Collocation setup --------

@@ -23,10 +23,7 @@
 # expression graph, so you can embed it in an NLP/integrator and let AD flow
 # through it. This example builds a 1-D bspline LUT and a 2-D linear LUT, then
 # differentiates both symbolically.
-const _jl_dir = get(ENV, "CASADI_JL",
-    joinpath(@__DIR__, "..", "..", "..", "julia-proto", "casadi-contact"))
-include(joinpath(_jl_dir, "CasADiNative.jl"))
-import .CasADiNative as ca
+import CasADiNative as ca
 
 function main()
     # ---- 1-D smooth lookup table: a bspline through samples of f(x) = x^2 ----

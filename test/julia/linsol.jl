@@ -34,6 +34,8 @@ for (plugin, req) in LIN_SOLVERS
         x = C.solve(ls, A, b, false)
         ref = _solve2(_Arow2(req.sym), [1.0, 0.5])
         @test maximum(abs.(Vector{Float64}(x) .- ref)) < req.tol
+        @test maximum(abs.(Vector{Float64}(C.solve(ls, A, b)) .- ref)) < req.tol
+        @test maximum(abs.(Vector{Float64}(ls.solve(A, b)) .- ref)) < req.tol
 
         # --- transpose solve A' x = b ---
         xt = C.solve(ls, A, b, true)
@@ -98,4 +100,12 @@ for (plugin, req) in LIN_SOLVERS
             @test_throws Exception C.nfact(lss, Asing)
         end
     end
+end
+
+@testset "ldl / qr_sparse permutations feed ldl_solve / qr_solve" begin
+    D, LT, p = C.ldl(DM([4 2; 2 3]))
+    @test Vector{Float64}(C.ldl_solve(DM([1, 2]), D, LT, p)) ≈ [-0.125, 0.75]
+    A = DM([4 2; 2 3])
+    V, R, beta, prinv, pc = C.qr_sparse(A)
+    @test Vector{Float64}(C.qr_solve(DM([1, 2]), V, R, beta, prinv, pc)) ≈ [-0.125, 0.75]
 end

@@ -19,6 +19,7 @@ Example:
      - Python
      - C++
      - MATLAB/Octave
+     - Julia
    * - Starting |casadi|
      - .. code-block:: python
 
@@ -30,6 +31,11 @@ Example:
      - .. code-block:: octave
 
             import casadi.*
+     - .. code-block:: julia
+
+            using CasADiNative
+            # or
+            import CasADiNative as ca
    * - Printing object
      - .. code-block:: python
 
@@ -40,6 +46,9 @@ Example:
      - .. code-block:: octave
 
             disp(A)
+     - .. code-block:: julia
+
+            println(A)
 
    * - Printing with type information
      - ``A <ENTER>`` (interactive), ``print(repr(A))``
@@ -47,11 +56,13 @@ Example:
 
             std::cout << repr(A);
      - ``A <ENTER>`` (interactive), ``disp(repr(A))``
+     - ``A <ENTER>`` (interactive), ``display(A)``
 
    * - Get (extended) representation, ``more=false`` by default
      - ``A.str(more)``
      - ``str(A, more)``
      - ``str(A, more)``
+     - ``ca.str(A, more)``
 
    * - Calling a class function
      - .. code-block:: python
@@ -63,6 +74,9 @@ Example:
      - .. code-block:: octave
 
             SX.zeros(3,4)
+     - .. code-block:: julia
+
+            ca.SX.zeros(3,4)
 
    * - Creating a dictionary (e.g. for options) 
      - .. code-block:: python
@@ -83,6 +97,9 @@ Example:
             
             #or
             a = struct('opt1',opt1);
+     - .. code-block:: julia
+
+            d = Dict("opt1" => opt1)
 
    * - Creating a symbol
      - .. code-block:: python
@@ -94,6 +111,9 @@ Example:
      - .. code-block:: octave
 
             MX.sym('x',2,2)
+     - .. code-block:: julia
+
+            ca.MX.sym("x",2,2)
 
    * - Creating a function
      - .. code-block:: python
@@ -105,6 +125,9 @@ Example:
      - .. code-block:: octave
 
             Function('f',{x,y},{x+y})
+     - .. code-block:: julia
+
+            ca.Function("f",[x,y],[x+y])
 
 
    * - Calling a function (form 1)
@@ -117,6 +140,9 @@ Example:
      - .. code-block:: octave
 
             z=f(x,y)
+     - .. code-block:: julia
+
+            z = f(x,y)
 
    * - Calling a function (form 2)
      - .. code-block:: python
@@ -132,6 +158,10 @@ Example:
 
             res=f('x',x,'y',y)
             res.z
+     - .. code-block:: julia
+
+            res = f(x=x,y=y)
+            res["z"]
 
    * - Create an NLP solver
      - .. code-block:: python
@@ -147,6 +177,10 @@ Example:
 
             nlp=struct('x',x,'f',f);
             nlpsol('S','ipopt',nlp);
+     - .. code-block:: julia
+
+            nlp = Dict("x"=>x,"f"=>f)
+            ca.nlpsol("S","ipopt",nlp)
  
 
 
@@ -166,6 +200,7 @@ each operation. Further information is available in the API documentation.
      - Python
      - C++
      - MATLAB/Octave
+     - Julia
    * - Addition, subtraction
      - .. code-block:: python
 
@@ -174,6 +209,9 @@ each operation. Further information is available in the API documentation.
 
             x+y, x-y, -x
      - .. code-block:: octave
+
+            x+y, x-y, -x
+     - .. code-block:: julia
 
             x+y, x-y, -x
    * - Elementwise multiplication, division
@@ -186,6 +224,9 @@ each operation. Further information is available in the API documentation.
      - .. code-block:: octave
 
             x.*y, x./y
+     - .. code-block:: julia
+
+            x.*y, x./y
    * -  Matrix multiplication
      - .. code-block:: python3
 
@@ -194,6 +235,9 @@ each operation. Further information is available in the API documentation.
 
             mtimes(x,y)
      - .. code-block:: octave
+
+            x*y
+     - .. code-block:: julia
 
             x*y
    * - Linear system solve
@@ -206,6 +250,9 @@ each operation. Further information is available in the API documentation.
      - .. code-block:: octave
 
             A\b
+     - .. code-block:: julia
+
+            A\b
    * - Natural exponential function and logarithm
      - .. code-block:: python
 
@@ -216,6 +263,9 @@ each operation. Further information is available in the API documentation.
      - .. code-block:: octave
 
             exp(x), log(x)
+     - .. code-block:: julia
+
+            exp.(x), log.(x)
    * - Exponentiation
      - .. code-block:: python
 
@@ -224,6 +274,9 @@ each operation. Further information is available in the API documentation.
 
             pow(x,y)
      - .. code-block:: octave
+
+            x^y, x.^y
+     - .. code-block:: julia
 
             x^y, x.^y
 
@@ -237,6 +290,9 @@ each operation. Further information is available in the API documentation.
      - .. code-block:: octave
 
             sqrt(x)
+     - .. code-block:: julia
+
+            sqrt.(x)
    * -  Trigonometric functions
      - .. code-block:: python
 
@@ -247,6 +303,9 @@ each operation. Further information is available in the API documentation.
      - .. code-block:: octave
 
             sin(x), cos(x), tan(x)
+     - .. code-block:: julia
+
+            sin.(x), cos.(x), tan.(x)
    * - Inverse trigonometric
      - .. code-block:: python
 
@@ -257,6 +316,9 @@ each operation. Further information is available in the API documentation.
      - .. code-block:: octave
 
             asin(x), acos(x)
+     - .. code-block:: julia
+
+            asin.(x), acos.(x)
    * - Two argument arctangent
      - .. code-block:: python
 
@@ -267,6 +329,9 @@ each operation. Further information is available in the API documentation.
      - .. code-block:: octave
 
             atan2(y, x)
+     - .. code-block:: julia
+
+            atan.(y, x)
    * - Hyperbolic functions
      - .. code-block:: python
 
@@ -277,6 +342,9 @@ each operation. Further information is available in the API documentation.
      - .. code-block:: octave
 
             sinh(x), cosh(x), tanh(x)
+     - .. code-block:: julia
+
+            sinh.(x), cosh.(x), tanh.(x)
    * - Inverse hyperbolic
      - .. code-block:: python
 
@@ -287,6 +355,9 @@ each operation. Further information is available in the API documentation.
      - .. code-block:: octave
 
             asinh(x), acosh(x)
+     - .. code-block:: julia
+
+            asinh.(x), acosh.(x)
 
    * - Inequalities
      - .. code-block:: python
@@ -296,6 +367,9 @@ each operation. Further information is available in the API documentation.
 
             a<b, a<=b, a>b, a>=b
      - .. code-block:: octave
+
+            a<b, a<=b, a>b, a>=b
+     - .. code-block:: julia
 
             a<b, a<=b, a>b, a>=b
    * - (*Not*) equal to
@@ -308,6 +382,9 @@ each operation. Further information is available in the API documentation.
      - .. code-block:: octave
 
             a==b, a~=b
+     - .. code-block:: julia
+
+            a==b, a!=b
    * - Logical and
      - .. code-block:: python
 
@@ -318,6 +395,9 @@ each operation. Further information is available in the API documentation.
      - .. code-block:: octave
 
             a & b
+     - .. code-block:: julia
+
+            a .& b
    * - Logical or
      - .. code-block:: python
 
@@ -328,6 +408,9 @@ each operation. Further information is available in the API documentation.
      - .. code-block:: octave
 
             a | b
+     - .. code-block:: julia
+
+            a .| b
    * - Logical not
      - .. code-block:: python
 
@@ -338,6 +421,9 @@ each operation. Further information is available in the API documentation.
      - .. code-block:: octave
 
             ~a
+     - .. code-block:: julia
+
+            .!a
    * - Round to integer
      - .. code-block:: python
 
@@ -348,6 +434,9 @@ each operation. Further information is available in the API documentation.
      - .. code-block:: octave
 
             floor(x), ceil(x)
+     - .. code-block:: julia
+
+            floor.(x), ceil.(x)
    * - Modulus after division
      - .. code-block:: python
 
@@ -358,6 +447,9 @@ each operation. Further information is available in the API documentation.
      - .. code-block:: octave
 
             rem(x, y), remainder(x,y)
+     - .. code-block:: julia
+
+            rem.(x, y), ca.remainder(x,y)
    * - Absolute value
      - .. code-block:: python
 
@@ -368,6 +460,9 @@ each operation. Further information is available in the API documentation.
      - .. code-block:: octave
 
             abs(x)
+     - .. code-block:: julia
+
+            abs.(x)
    * - Norm
      - .. code-block:: python
 
@@ -378,6 +473,9 @@ each operation. Further information is available in the API documentation.
      - .. code-block:: octave
 
             norm(x,1)
+     - .. code-block:: julia
+
+            ca.norm(x,1)
    * - Sign function
      - .. code-block:: python
 
@@ -388,6 +486,9 @@ each operation. Further information is available in the API documentation.
      - .. code-block:: octave
 
             sign(x)
+     - .. code-block:: julia
+
+            sign.(x)
    * - (Inverse) error function
      - .. code-block:: python
 
@@ -398,6 +499,9 @@ each operation. Further information is available in the API documentation.
      - .. code-block:: octave
 
             erf(x), erfinv(x)
+     - .. code-block:: julia
+
+            ca.erf(x), ca.erfinv(x)
    * - Elementwise min and max
      - .. code-block:: python
 
@@ -408,6 +512,9 @@ each operation. Further information is available in the API documentation.
      - .. code-block:: octave
 
             min(x, y), max(x, y)
+     - .. code-block:: julia
+
+            min.(x, y), max.(x, y)
    * - Global min and max
      - .. code-block:: python
 
@@ -418,6 +525,9 @@ each operation. Further information is available in the API documentation.
      - .. code-block:: octave
 
             mmin(x), mmax(x)
+     - .. code-block:: julia
+
+            minimum(x), maximum(x)
    * - Index of first nonzero
      - .. code-block:: python
 
@@ -428,6 +538,9 @@ each operation. Further information is available in the API documentation.
      - .. code-block:: octave
 
             find(x)
+     - .. code-block:: julia
+
+            ca.find(x)
    * -  If-then-else
      - .. code-block:: python
 
@@ -438,6 +551,9 @@ each operation. Further information is available in the API documentation.
      - .. code-block:: octave
 
             if_else(c, x, y)
+     - .. code-block:: julia
+
+            ifelse(c, x, y)
    * - Transpose
      - .. code-block:: python
 
@@ -448,6 +564,9 @@ each operation. Further information is available in the API documentation.
      - .. code-block:: octave
 
             A',A.'
+     - .. code-block:: julia
+
+            A', transpose(A)
    * - Inner product
      - .. code-block:: python
 
@@ -458,6 +577,9 @@ each operation. Further information is available in the API documentation.
      - .. code-block:: octave
 
             dot(x, y)
+     - .. code-block:: julia
+
+            ca.dot(x, y)
    * - Horizontal/vertical concatenation
      - .. code-block:: python
 
@@ -478,6 +600,13 @@ each operation. Further information is available in the API documentation.
             c = {x,y};
             [c{:}]
             vertcat(c{:})
+     - .. code-block:: julia
+
+            [x y]
+            [x; y]
+            c = [x, y]
+            hcat(c...)
+            vcat(c...)
    * - Horizontal/vertical split (inverse of concatenation)
      - .. code-block:: python
 
@@ -491,6 +620,10 @@ each operation. Further information is available in the API documentation.
 
             vertsplit(x)
             horzsplit(x)
+     - .. code-block:: julia
+
+            ca.vertsplit(x)
+            ca.horzsplit(x)
    * - Element access
      - .. code-block:: python
 
@@ -507,6 +640,11 @@ each operation. Further information is available in the API documentation.
             %  1-based
             A(i,j)
             A(i)
+     - .. code-block:: julia
+
+            #  1-based
+            A[i,j]
+            A[i]
 
    * - Element assignment
      - .. code-block:: python
@@ -524,6 +662,11 @@ each operation. Further information is available in the API documentation.
             %  1-based
             A(i,j) = b
             A(i) = b
+     - .. code-block:: julia
+
+            #  1-based
+            A[i,j] = b
+            A[i] = b
    * - Nonzero access
      - .. code-block:: python
 
@@ -536,6 +679,10 @@ each operation. Further information is available in the API documentation.
      - .. code-block:: octave
 
             (currently unsupported)
+     - .. code-block:: julia
+
+            #  1-based
+            A.nz[k]
    * - Nonzero assignment
      - .. code-block:: python
 
@@ -548,6 +695,10 @@ each operation. Further information is available in the API documentation.
      - .. code-block:: octave
 
             (currently unsupported)
+     - .. code-block:: julia
+
+            #  1-based
+            A.nz[k] = b
    * - Project to a different sparsity
      - .. code-block:: python
 
@@ -558,4 +709,7 @@ each operation. Further information is available in the API documentation.
      - .. code-block:: octave
 
             project(x, s)
+     - .. code-block:: julia
+
+            ca.project(x, s)
 

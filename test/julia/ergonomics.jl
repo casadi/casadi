@@ -63,7 +63,7 @@ end
     @test t isa SX
     j = jacobian([x^2; y], z)
     @test Base.size(j) == (2, 2)
-    H = hessian(x^2 + y^2, z)
+    H, = hessian(x^2 + y^2, z)
     @test Base.size(H) == (2, 2)
 end
 
@@ -115,8 +115,8 @@ HAS_IPOPT && @testset "method-style on OptiSol (R3-3)" begin
     o = C.Opti()
     xx = variable(o)
     minimize(o, (xx - 3.0)^2)
-    solver!(o, "ipopt", Dict("print_time" => false, "ipopt" => Dict("print_level" => 0, "sb" => "yes")))
-    sol = solve!(o)
+    solver(o, "ipopt", Dict("print_time" => false, "ipopt" => Dict("print_level" => 0, "sb" => "yes")))
+    sol = solve(o)
     @test sol isa C.OptiSol
     # sol.value(xx) method-style mirrors C.value(sol, xx, ...)
     @test Base.abs(Float64(sol.value(xx, MX[])) - 3.0) < 1e-6
@@ -190,7 +190,7 @@ end
     @test occursin("nlpsol(String name, String solver, Dict{String,SX} nlp", string(@doc C.nlpsol))
     @test occursin("computing all Jacobian blocks", string(@doc C.jacobian))
     @test occursin("Opti(String problem_type)", string(@doc C.Opti))
-    @test occursin("cb_get_jacobian", string(@doc CasadiCallback))
+    @test occursin("get_jacobian", string(@doc Callback))
 end
 
 @testset "no method ambiguities introduced (R3)" begin

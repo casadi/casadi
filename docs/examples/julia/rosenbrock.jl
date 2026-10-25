@@ -20,10 +20,7 @@
 #   minimize     x^2 + 100*z^2
 #   subject to   z + (1-x)^2 - y == 0
 
-const _jl_dir = get(ENV, "CASADI_JL",
-    joinpath(@__DIR__, "..", "..", "..", "julia-proto", "casadi-contact"))
-include(joinpath(_jl_dir, "CasADiNative.jl"))
-import .CasADiNative as ca
+import CasADiNative as ca
 
 # Declare variables
 x = ca.SX.sym("x")

@@ -20,7 +20,7 @@ end
     @test Base.size(J) == (2, 2)
     # J = [[x1, x0], [1, 1]]; at x=[3,5] column-major nonzeros [5,1,3,1]
     f = C.Function("J", [x], [J])
-    @test Vector{Float64}(f(DM([3.0, 5.0]))) == [5.0, 1.0, 3.0, 1.0]
+    @test vec(Matrix(f(DM([3.0, 5.0])))) == [5.0, 1.0, 3.0, 1.0]
     # Diagonal Jacobian has a sparse pattern (3 nnz on a 3x3).
     y = sym(SX, "y", 3)
     Jd = jacobian(C.times(y, y), y)
@@ -40,14 +40,15 @@ end
 @testset "hessian: 2nd derivatives" begin
     x = sym(SX, "x", 2)
     f = C.times(x[1], x[1]) + C.times(C.times(x[1], x[2]), x[2])  # x0^2 + x0*x1^2
-    H = hessian(f, x)
+    H, g = hessian(f, x)
+    @test Base.size(g) == (2, 1)
     @test Base.size(H) == (2, 2)
     hf = C.Function("H", [x], [H])
     # H = [[2, 2*x1], [2*x1, 2*x0]]; at x=[3,5] -> [[2,10],[10,6]]
     @test Matrix{Float64}(hf(DM([3.0, 5.0]))) == [2.0 10.0; 10.0 6.0]
     # x^4 -> d2/dx2 = 12 x^2 ; at 2 -> 48
     s = sym(SX, "s")
-    h2 = C.Function("h2", [s], [hessian(s^4, s)])
+    h2 = C.Function("h2", [s], [hessian(s^4, s)[1]])
     @test abs(Float64(h2(DM(2.0))) - 48.0) < 1e-9
 end
 
@@ -98,5 +99,12 @@ end
     # jacobians agree too
     Js = C.Function("Js", [xs], [jacobian(build(xs), xs)])
     Jm = C.Function("Jm", [xm], [jacobian(build(xm), xm)])
-    @test maximum(abs.(Vector{Float64}(Js(inp)) .- Vector{Float64}(Jm(inp)))) < 1e-12
+    @test maximum(abs.(Matrix(Js(inp)) .- Matrix(Jm(inp)))) < 1e-12
+end
+
+@testset "substitute_inplace returns the updated expressions" begin
+    x = sym(SX, "x"); y = sym(SX, "y")
+    vd, ex = C.substitute_inplace([x, y], [y + 1, SX(3)], [x * y], false)
+    @test Float64(C.evalf(vd[1])) == 4 && Float64(C.evalf(vd[2])) == 3
+    @test Float64(C.evalf(ex[1])) == 12
 end

@@ -20,10 +20,7 @@
 # problem. The Python original is pure numpy (no CasADi symbolics); this port
 # keeps it as plain Julia array math. matplotlib output is dropped; we log the
 # optimal cost and trajectory.
-const _jl_dir = get(ENV, "CASADI_JL",
-    joinpath(@__DIR__, "..", "..", "..", "julia-proto", "casadi-contact"))
-include(joinpath(_jl_dir, "CasADiNative.jl"))
-import .CasADiNative as ca
+import CasADiNative as ca
 
 function main()
     T = 10.0     # End time

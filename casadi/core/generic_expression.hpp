@@ -128,6 +128,35 @@ class GenericExpression : public GenericExpressionCommon {
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> ca.plus(ca.DM([1, 2]), ca.DM([10, 20]))
+      DM([11, 22])
+      julia> ca.DM([1, 2]) + 1
+      DM([2, 3])
+      julia> ca.DM.eye(2) + ca.DM.eye(2)
+      DM(
+      [[2, 00],
+       [00, 2]])
+      julia> ca.DM.eye(2) + 1
+      DM(
+      [[2, 1],
+       [1, 2]])
+      julia> ca.SX.sym("x", 2, 2) + ca.SX.sym("y", 2)
+      SX(
+      [[(x_0+y_0), (x_2+y_0)],
+       [(x_1+y_1), (x_3+y_1)]])
+      julia> size(ca.MX.sym("x", 2, 0) + 1)
+      (2, 0)
+      julia> try
+                 ca.DM.ones(2, 2) + ca.DM.ones(1, 2)
+             catch e
+                 println(occursin("Dimension mismatch", sprint(showerror, e)))
+             end
+      true
+      \enddoctest
+      \endlang
+
       \identifier{on} */
   static ExType plus(const ExType &x, const ExType &y) {
     return ExType::binary(OP_ADD, x, y);
@@ -171,6 +200,20 @@ class GenericExpression : public GenericExpressionCommon {
       >> x = SX.sym('x');
       >> x - x
       0
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> ca.minus(ca.DM([5, 6]), ca.DM([1, 2]))
+      DM([4, 4])
+      julia> ca.DM.eye(2) - 1
+      DM(
+      [[0, -1],
+       [-1, 0]])
+      julia> x = ca.SX.sym("x");
+      julia> x - x
+      SX(0)
       \enddoctest
       \endlang
 
@@ -222,6 +265,21 @@ class GenericExpression : public GenericExpressionCommon {
       >> DM.eye(2) .* DM.ones(2, 2)
       [[1, 00],
        [00, 1]]
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> ca.times(ca.DM([1, 2]), ca.DM([3, 4]))
+      DM([3, 8])
+      julia> ca.DM([1 2; 3 4]) .* ca.DM([1 2; 3 4])
+      DM(
+      [[1, 4],
+       [9, 16]])
+      julia> ca.DM.eye(2) .* ca.DM.ones(2, 2)
+      DM(
+      [[1, 00],
+       [00, 1]])
       \enddoctest
       \endlang
 
@@ -279,6 +337,23 @@ class GenericExpression : public GenericExpressionCommon {
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> ca.rdivide(ca.DM([1, 2]), 4)
+      DM([0.25, 0.5])
+      julia> ca.DM([1, 2]) ./ ca.DM([4, 8])
+      DM([0.25, 0.25])
+      julia> 1 ./ ca.DM.eye(2)
+      DM(
+      [[1, inf],
+       [inf, 1]])
+      julia> ca.DM.eye(2) / 2
+      DM(
+      [[0.5, 00],
+       [00, 0.5]])
+      \enddoctest
+      \endlang
+
       \sa mldivide, mrdivide, solve
 
       \identifier{oq} */
@@ -332,6 +407,21 @@ class GenericExpression : public GenericExpressionCommon {
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> ca.lt(ca.DM([1, 2, 3]), 2)
+      DM([1, 0, 0])
+      julia> ca.DM([1, 2, 3]) < ca.DM([3, 2, 1])
+      DM([1, 0, 0])
+      julia> ca.SX.sym("x", 2) < ca.SX.sym("y", 2)
+      SX([(x_0<y_0), (x_1<y_1)])
+      julia> ca.DM.eye(2) < 1
+      DM(
+      [[0, 1],
+       [1, 0]])
+      \enddoctest
+      \endlang
+
       \sa le, gt, ge, eq, ne, if_else
 
       \identifier{or} */
@@ -369,6 +459,16 @@ class GenericExpression : public GenericExpressionCommon {
       >> x = SX.sym('x');
       >> x <= x
       1
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> ca.le(ca.DM([1, 2, 3]), 2)
+      DM([1, 1, 0])
+      julia> x = ca.SX.sym("x");
+      julia> x <= x
+      SX(1)
       \enddoctest
       \endlang
 
@@ -410,6 +510,15 @@ class GenericExpression : public GenericExpressionCommon {
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> ca.gt(ca.DM([1, 2, 3]), 2)
+      DM([0, 0, 1])
+      julia> ca.gt(ca.SX.sym("x"), ca.SX.sym("y"))
+      SX((y<x))
+      \enddoctest
+      \endlang
+
       \sa lt
 
       \identifier{ot} */
@@ -444,6 +553,15 @@ class GenericExpression : public GenericExpressionCommon {
       [0, 1, 1]
       >> MX.sym('x') >= MX.sym('y')
       (y<=x)
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> ca.ge(ca.DM([1, 2, 3]), 2)
+      DM([0, 1, 1])
+      julia> ca.ge(ca.MX.sym("x"), ca.MX.sym("y"))
+      MX((y<=x))
       \enddoctest
       \endlang
 
@@ -501,6 +619,22 @@ class GenericExpression : public GenericExpressionCommon {
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> ca.eq(ca.DM([1, 2, 3]), 2)
+      DM([0, 1, 0])
+      julia> ca.DM.eye(2) == ca.DM([1 0; 0 1])
+      DM(
+      [[1, 1],
+       [1, 1]])
+      julia> x = ca.SX.sym("x");
+      julia> x == x, x == ca.SX.sym("x")
+      (1, (x==x))
+      julia> ca.DM(NaN) == ca.DM(NaN)
+      DM(0)
+      \enddoctest
+      \endlang
+
       \sa ne, is_equal
 
       \identifier{ov} */
@@ -538,6 +672,16 @@ class GenericExpression : public GenericExpressionCommon {
       >> x = MX.sym('x');
       >> x ~= x
       0
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> ca.ne(ca.DM([1, 2, 3]), 2)
+      DM([1, 0, 1])
+      julia> x = ca.MX.sym("x");
+      julia> x != x
+      MX(0)
       \enddoctest
       \endlang
 
@@ -590,6 +734,19 @@ class GenericExpression : public GenericExpressionCommon {
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> ca.logic_and(ca.DM([1, 2, 0]), ca.DM([3, 0, 0]))
+      DM([1, 0, 0])
+      julia> ca.logic_and(ca.SX.sym("x"), ca.SX.sym("y"))
+      SX((x&&y))
+      julia> ca.logic_and(ca.DM.eye(2), ca.DM.ones(2, 2))
+      DM(
+      [[1, 00],
+       [00, 1]])
+      \enddoctest
+      \endlang
+
       \sa logic_or, logic_not
 
       \identifier{ox} */
@@ -627,6 +784,15 @@ class GenericExpression : public GenericExpressionCommon {
       [1, 0, 1]
       >> or(MX.sym('x'), MX.sym('y'))
       (x||y)
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> ca.logic_or(ca.DM([1, 0, 0]), ca.DM([0, 0, 2]))
+      DM([1, 0, 1])
+      julia> ca.logic_or(ca.MX.sym("x"), ca.MX.sym("y"))
+      MX((x||y))
       \enddoctest
       \endlang
 
@@ -675,6 +841,19 @@ class GenericExpression : public GenericExpressionCommon {
        [1, 0]]
       >> ~SX.sym('x')
       (!x)
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> ca.logic_not(ca.DM([1, 0, -1]))
+      DM([0, 1, 0])
+      julia> ca.logic_not(ca.DM.eye(2))
+      DM(
+      [[0, 1],
+       [1, 0]])
+      julia> ca.logic_not(ca.SX.sym("x"))
+      SX((!x))
       \enddoctest
       \endlang
 
@@ -727,6 +906,19 @@ class GenericExpression : public GenericExpressionCommon {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> abs.(ca.DM([-1, 0, 2]))
+        DM([1, 0, 2])
+        julia> abs(-ca.DM.eye(2))
+        DM(
+        [[1, 00],
+         [00, 1]])
+        julia> abs(ca.SX.sym("x"))
+        SX(fabs(x))
+        \enddoctest
+        \endlang
+
         \sa sign, copysign
 
         \identifier{p0} */
@@ -765,6 +957,15 @@ class GenericExpression : public GenericExpressionCommon {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> sqrt.(ca.DM([4, 9]))
+        DM([2, 3])
+        julia> ca.SX.sym("x")^0.5
+        SX(sqrt(x))
+        \enddoctest
+        \endlang
+
         \sa sq, pow
 
         \identifier{p1} */
@@ -793,6 +994,13 @@ class GenericExpression : public GenericExpressionCommon {
         \doctest
         >> SX.sym('x').^2
         sq(x)
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> ca.SX.sym("x")^2
+        SX(sq(x))
         \enddoctest
         \endlang
 
@@ -830,6 +1038,17 @@ class GenericExpression : public GenericExpressionCommon {
          [00, 0.841471]]
         >> sin(MX.sym('x', 2))
         sin(x)
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> sin.(ca.DM.eye(2))
+        DM(
+        [[0.841471, 00],
+         [00, 0.841471]])
+        julia> sin.(ca.MX.sym("x", 2))
+        MX(sin(x))
         \enddoctest
         \endlang
 
@@ -874,6 +1093,19 @@ class GenericExpression : public GenericExpressionCommon {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> cos.(ca.DM.eye(2))
+        DM(
+        [[0.540302, 1],
+         [1, 0.540302]])
+        julia> cos.(ca.SX.sym("s", ca.Sparsity.diag(2)))
+        SX(@1=1,
+        [[cos(s_0), @1],
+         [@1, cos(s_1)]])
+        \enddoctest
+        \endlang
+
         \sa sin, tan, acos
 
         \identifier{p4} */
@@ -901,6 +1133,13 @@ class GenericExpression : public GenericExpressionCommon {
         \doctest
         >> tan(DM([0; 1]))
         [0, 1.55741]
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> tan.(ca.DM([0, 1]))
+        DM([0, 1.55741])
         \enddoctest
         \endlang
 
@@ -935,6 +1174,13 @@ class GenericExpression : public GenericExpressionCommon {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> atan.(ca.DM([0, 1]))
+        DM([0, 0.785398])
+        \enddoctest
+        \endlang
+
         \sa atan2, tan
 
         \identifier{p6} */
@@ -962,6 +1208,13 @@ class GenericExpression : public GenericExpressionCommon {
         \doctest
         >> asin(DM([0; 1]))
         [0, 1.5708]
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> asin.(ca.DM([0, 1]))
+        DM([0, 1.5708])
         \enddoctest
         \endlang
 
@@ -995,6 +1248,13 @@ class GenericExpression : public GenericExpressionCommon {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> acos.(ca.DM([0, 1]))
+        DM([1.5708, 0])
+        \enddoctest
+        \endlang
+
         \sa cos, asin
 
         \identifier{p8} */
@@ -1022,6 +1282,13 @@ class GenericExpression : public GenericExpressionCommon {
         \doctest
         >> tanh(DM([0; 1]))
         [0, 0.761594]
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> tanh.(ca.DM([0, 1]))
+        DM([0, 0.761594])
         \enddoctest
         \endlang
 
@@ -1055,6 +1322,13 @@ class GenericExpression : public GenericExpressionCommon {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> sinh.(ca.DM([0, 1]))
+        DM([0, 1.1752])
+        \enddoctest
+        \endlang
+
         \sa asinh, cosh, tanh
 
         \identifier{pa} */
@@ -1082,6 +1356,13 @@ class GenericExpression : public GenericExpressionCommon {
         \doctest
         >> cosh(DM([0; 1]))
         [1, 1.54308]
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> cosh.(ca.DM([0, 1]))
+        DM([1, 1.54308])
         \enddoctest
         \endlang
 
@@ -1115,6 +1396,13 @@ class GenericExpression : public GenericExpressionCommon {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> atanh.(ca.DM([0, 0.5]))
+        DM([0, 0.549306])
+        \enddoctest
+        \endlang
+
         \sa tanh
 
         \identifier{pc} */
@@ -1145,6 +1433,13 @@ class GenericExpression : public GenericExpressionCommon {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> asinh.(ca.DM([-1, 1]))
+        DM([-0.881374, 0.881374])
+        \enddoctest
+        \endlang
+
         \sa sinh
 
         \identifier{pd} */
@@ -1172,6 +1467,13 @@ class GenericExpression : public GenericExpressionCommon {
         \doctest
         >> acosh(DM([1; 2]))
         [0, 1.31696]
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> acosh.(ca.DM([1, 2]))
+        DM([0, 1.31696])
         \enddoctest
         \endlang
 
@@ -1212,6 +1514,17 @@ class GenericExpression : public GenericExpressionCommon {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> exp.(ca.DM.eye(2))
+        DM(
+        [[2.71828, 1],
+         [1, 2.71828]])
+        julia> exp.(ca.MX.sym("m", ca.Sparsity.diag(2)))
+        MX(exp(dense(m)))
+        \enddoctest
+        \endlang
+
         \sa log, expm1
 
         \identifier{pf} */
@@ -1244,6 +1557,15 @@ class GenericExpression : public GenericExpressionCommon {
         [0, -inf]
         >> log(SX.sym('x'))
         log(x)
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> log.(ca.DM([1, 0]))
+        DM([0, -inf])
+        julia> log(ca.SX.sym("x"))
+        SX(log(x))
         \enddoctest
         \endlang
 
@@ -1282,6 +1604,15 @@ class GenericExpression : public GenericExpressionCommon {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> log10.(ca.DM([1, 10, 1000]))
+        DM([0, 1, 3])
+        julia> log10(ca.SX.sym("x"))
+        SX((0.434294*log(x)))
+        \enddoctest
+        \endlang
+
         \sa log
 
         \identifier{ph} */
@@ -1317,6 +1648,15 @@ class GenericExpression : public GenericExpressionCommon {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> log1p.(ca.DM([0, 1e-10]))
+        DM([0, 1e-10])
+        julia> log1p(ca.SX.sym("x"))
+        SX(log1p(x))
+        \enddoctest
+        \endlang
+
         \sa log, expm1
 
         \identifier{pi} */
@@ -1345,6 +1685,13 @@ class GenericExpression : public GenericExpressionCommon {
         \doctest
         >> expm1(DM([0; 1e-10]))
         [0, 1e-10]
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> expm1.(ca.DM([0, 1e-10]))
+        DM([0, 1e-10])
         \enddoctest
         \endlang
 
@@ -1387,6 +1734,17 @@ class GenericExpression : public GenericExpressionCommon {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> floor.(ca.DM([-1.5, 1.5]))
+        DM([-2, 1])
+        julia> fld.(ca.DM([7, -7]), 2)
+        DM([3, -4])
+        julia> floor(ca.SX.sym("x") / 2)
+        SX(floor((x/2)))
+        \enddoctest
+        \endlang
+
         \sa ceil, sign
 
         \identifier{pk} */
@@ -1415,6 +1773,13 @@ class GenericExpression : public GenericExpressionCommon {
         \doctest
         >> ceil(DM([-1.5; 1.5]))
         [-1, 2]
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> ceil.(ca.DM([-1.5, 1.5]))
+        DM([-1, 2])
         \enddoctest
         \endlang
 
@@ -1448,6 +1813,13 @@ class GenericExpression : public GenericExpressionCommon {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> ca.erf(ca.DM([0, 1]))
+        DM([0, 0.842701])
+        \enddoctest
+        \endlang
+
         \sa erfinv
 
         \identifier{pm} */
@@ -1476,6 +1848,13 @@ class GenericExpression : public GenericExpressionCommon {
         \doctest
         >> erfinv(DM([0; 0.5; 1]))
         [0, 0.476936, inf]
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> ca.erfinv(ca.DM([0, 0.5, 1]))
+        DM([0, 0.476936, inf])
         \enddoctest
         \endlang
 
@@ -1515,6 +1894,15 @@ class GenericExpression : public GenericExpressionCommon {
         [-1, 0, 1]
         >> sign(SX.sym('x'))
         sign(x)
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> sign.(ca.DM([-2, 0, 3]))
+        DM([-1, 0, 1])
+        julia> sign(ca.SX.sym("x"))
+        SX(sign(x))
         \enddoctest
         \endlang
 
@@ -1570,6 +1958,20 @@ class GenericExpression : public GenericExpressionCommon {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> ca.power(ca.DM([1, 2, 3]), 2)
+        DM([1, 4, 9])
+        julia> ca.DM([1, 2, 3]) .^ ca.DM([3, 2, 1]), 2 .^ ca.DM([1, 2, 3])
+        ([1, 4, 3], [2, 4, 8])
+        julia> x = ca.SX.sym("x");
+        julia> x^2, x^3, x^-1, x^x
+        (sq(x), (x*sq(x)), (1./x), pow(x,x))
+        julia> x^2.5
+        SX(pow(x,2.5))
+        \enddoctest
+        \endlang
+
         \sa sq, sqrt, constpow, mpower
 
         \identifier{pp} */
@@ -1614,6 +2016,17 @@ class GenericExpression : public GenericExpressionCommon {
     [2, -1, 1, -2]
     >> rem(SX.sym('x'), 2)
     fmod(x,2)
+    \enddoctest
+    \endlang
+
+    \lang{julia}
+    \doctest
+    julia> ca.fmod(ca.DM([5, 5, -5, -5]), ca.DM([3, -3, 3, -3]))
+    DM([2, 2, -2, -2])
+    julia> mod.(ca.DM([5, 5, -5, -5]), ca.DM([3, -3, 3, -3]))
+    DM([2, -1, 1, -2])
+    julia> ca.fmod(ca.SX.sym("x"), 2)
+    SX(fmod(x,2))
     \enddoctest
     \endlang
 
@@ -1669,6 +2082,17 @@ class GenericExpression : public GenericExpressionCommon {
     \enddoctest
     \endlang
 
+    \lang{julia}
+    \doctest
+    julia> ca.remainder(ca.DM([5, 5, -5, -5]), ca.DM([3, -3, 3, -3]))
+    DM([-1, -1, 1, 1])
+    julia> ca.remainder(ca.DM([2.5, 3.5]), 2)
+    DM([0.5, -0.5])
+    julia> ca.remainder(ca.MX.sym("x"), 2)
+    MX(remainder(x,2))
+    \enddoctest
+    \endlang
+
     \sa fmod
 
         \identifier{24x} */
@@ -1704,6 +2128,15 @@ class GenericExpression : public GenericExpressionCommon {
         [2.35619, -2.35619, 0]
         >> atan2(SX.sym('y'), SX.sym('x'))
         atan2(y,x)
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> atan.(ca.DM([1, -1, 0]), ca.DM([-1, -1, 1]))
+        DM([2.35619, -2.35619, 0])
+        julia> atan(ca.SX.sym("y"), ca.SX.sym("x"))
+        SX(atan2(y,x))
         \enddoctest
         \endlang
 
@@ -1778,6 +2211,21 @@ class GenericExpression : public GenericExpressionCommon {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> min.(ca.DM([1, 5]), ca.DM([3, 2]))
+        DM([1, 2])
+        julia> min.(ca.DM([1, NaN]), ca.DM([NaN, 2]))
+        DM([1, 2])
+        julia> min.(ca.DM.eye(2), 1)
+        DM(
+        [[1, 00],
+         [00, 1]])
+        julia> min(ca.SX.sym("x"), ca.SX.sym("y"))
+        SX(fmin(x,y))
+        \enddoctest
+        \endlang
+
         \sa fmax, mmin
 
         \identifier{pt} */
@@ -1819,6 +2267,19 @@ class GenericExpression : public GenericExpressionCommon {
         [1, 2]
         >> max(MX.sym('x'), MX.sym('y'))
         fmax(x,y)
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> max.(ca.DM([1, 5]), ca.DM([3, 2]))
+        DM([3, 5])
+        julia> max.(ca.DM([1, 5]), 3)
+        DM([3, 5])
+        julia> max.(ca.DM([1, NaN]), ca.DM([NaN, 2]))
+        DM([1, 2])
+        julia> max(ca.MX.sym("x"), ca.MX.sym("y"))
+        MX(fmax(x,y))
         \enddoctest
         \endlang
 
@@ -1887,6 +2348,21 @@ class GenericExpression : public GenericExpressionCommon {
         \enddoctest
         \endlang
 
+        \lang{julia}
+        \doctest
+        julia> x = ca.SX.sym("x");
+        julia> ca.is_equal(x, x), ca.is_equal(x, ca.SX.sym("x"))
+        (true, false)
+        julia> ca.is_equal(x*x, x*x), ca.is_equal(x*x, x*x, 1)
+        (false, true)
+        julia> ca.is_equal(ca.DM([1, 2]), ca.DM([1, 2])), ca.is_equal(ca.DM([1, 2]), ca.DM([1, 3]))
+        (true, false)
+        julia> y = ca.MX.sym("y");
+        julia> ca.is_equal(y * y, y * y), ca.is_equal(y * y, y * y, 1)
+        (false, true)
+        \enddoctest
+        \endlang
+
         \sa eq
 
         \identifier{pv} */
@@ -1921,6 +2397,17 @@ class GenericExpression : public GenericExpressionCommon {
          -3
          >> copysign(SX.sym('x'), SX.sym('y'))
          copysign(x,y)
+         \enddoctest
+         \endlang
+
+         \lang{julia}
+         \doctest
+         julia> copysign.(ca.DM([1, -2]), ca.DM([-1, 1]))
+         DM([-1, 2])
+         julia> copysign.(ca.DM(3), ca.DM(-0.0))
+         DM(-3)
+         julia> ca.copysign(ca.SX.sym("x"), ca.SX.sym("y"))
+         SX(copysign(x,y))
          \enddoctest
          \endlang
 
@@ -1964,6 +2451,16 @@ class GenericExpression : public GenericExpressionCommon {
          \enddoctest
          \endlang
 
+         \lang{julia}
+         \doctest
+         julia> ca.constpow(ca.DM(2), 3)
+         DM(8)
+         julia> x = ca.MX.sym("x");
+         julia> ca.constpow(x, 2.5), ca.jacobian(ca.constpow(x, 2.5), x)
+         (pow(x,2.5), (2.5*pow(x,1.5)))
+         \enddoctest
+         \endlang
+
          \sa pow
 
          \identifier{2om} */
@@ -2004,6 +2501,16 @@ class GenericExpression : public GenericExpressionCommon {
          \enddoctest
          \endlang
 
+         \lang{julia}
+         \doctest
+         julia> x = ca.MX.sym("x");
+         julia> f = ca.Function("f", [x], [ca.printme(x, 7) * 2]);
+         julia> f(3)
+         |> 7 : 3.0000000000000000e+00
+         DM(6)
+         \enddoctest
+         \endlang
+
          \identifier{2on} */
      static ExType printme(const ExType& x, const ExType& y) {
        return ExType::binary(OP_PRINTME, x, y);
@@ -2038,6 +2545,17 @@ class GenericExpression : public GenericExpressionCommon {
         1.41421e+200
         >> hypot(SX.sym('x'), SX.sym('y'))
         hypot(x,y)
+        \enddoctest
+        \endlang
+
+        \lang{julia}
+        \doctest
+        julia> hypot(ca.DM(3), ca.DM(4))
+        DM(5)
+        julia> hypot(ca.DM(1e200), ca.DM(1e200))
+        DM(1.41421e+200)
+        julia> hypot(ca.SX.sym("x"), ca.SX.sym("y"))
+        SX(hypot(x,y))
         \enddoctest
         \endlang
 

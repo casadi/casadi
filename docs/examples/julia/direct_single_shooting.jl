@@ -18,10 +18,7 @@
 #
 # Direct single shooting of the Van der Pol OCP, with a fixed-step RK4
 # integrator built by hand.
-const _jl_dir = get(ENV, "CASADI_JL",
-    joinpath(@__DIR__, "..", "..", "..", "julia-proto", "casadi-contact"))
-include(joinpath(_jl_dir, "CasADiNative.jl"))
-import .CasADiNative as ca
+import CasADiNative as ca
 
 T = 10.0    # Time horizon
 N = 20      # number of control intervals

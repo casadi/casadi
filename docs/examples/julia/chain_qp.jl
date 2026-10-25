@@ -22,10 +22,7 @@
 #
 #   minimize{y,z} Vchain(y, z)
 #   subject to    z_i - 0.1*y_i >= 0.5
-const _jl_dir = get(ENV, "CASADI_JL",
-    joinpath(@__DIR__, "..", "..", "..", "julia-proto", "casadi-contact"))
-include(joinpath(_jl_dir, "CasADiNative.jl"))
-import .CasADiNative as ca
+import CasADiNative as ca
 
 function main()
     # Constants

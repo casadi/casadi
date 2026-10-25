@@ -149,6 +149,31 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> x = ca.SX.sym("x"); y = ca.SX.sym("y"); p = ca.SX.sym("p");
+      julia> nlp = Dict("x" => [x; y], "p" => p, "f" => (1 - x)^2 + p*(y - x^2)^2, "g" => x + y);
+      julia> opts = Dict("ipopt.print_level" => 0, "ipopt.sb" => "yes", "print_time" => false);
+      julia> S = ca.nlpsol("S", "ipopt", nlp, opts);
+      julia> print(ca.name_in(S))
+      ["x0", "p", "lbx", "ubx", "lbg", "ubg", "lam_x0", "lam_g0"]
+      julia> print(ca.name_out(S))
+      ["x", "f", "g", "lam_x", "lam_g", "lam_p"]
+      julia> sol = S(x0=[2.5, 3.0], p=100, lbg=-1, ubg=1);
+      julia> sol["f"]
+      DM(0.1456)
+      julia> sol["x"]
+      DM([0.6188, 0.3812])
+      julia> ca.stats(S)["success"], ca.stats(S)["return_status"]
+      (true, "Solve_Succeeded")
+      julia> x_opt, f_opt, g_opt, lam_x, lam_g, lam_p = S([2.5, 3.0], 100, -Inf, Inf, -1, 1, 0, 0);
+      julia> f_opt, lam_g
+      (0.1456, 0.3407)
+      julia> S(p=100)["x"]
+      DM([1, 1])
+      \enddoctest
+      \endlang
+
       \lang{python}
       \doctest
       >>> x = SX.sym("x"); p = SX.sym("p")
@@ -183,6 +208,26 @@ namespace casadi {
       >> pm = MX.sym('p'); sol = S('p', pm);
       >> dxdp = Function('dxdp', {pm}, {jacobian(sol.x, pm)}); disp(dxdp(5))
       1
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> x = ca.SX.sym("x"); p = ca.SX.sym("p");
+      julia> opts = Dict("ipopt.print_level" => 0, "ipopt.sb" => "yes", "print_time" => false);
+      julia> nlp = Dict("x" => x, "p" => p, "f" => (x - p)^2 + 3*p, "g" => 2*x);
+      julia> S = ca.nlpsol("S", "ipopt", nlp, opts);
+      julia> sol = S(p=1, lbg=4);
+      julia> sol["x"], sol["lam_g"]
+      (2, -1)
+      julia> sol["lam_p"]
+      DM(-1)
+      julia> S(p=1, ubx=0)["lam_x"]
+      DM(2)
+      julia> pm = ca.MX.sym("p");
+      julia> dxdp = ca.Function("dxdp", [pm], [ca.jacobian(S(p=pm)["x"], pm)]);
+      julia> dxdp(5)
+      DM(1)
       \enddoctest
       \endlang
 
@@ -234,6 +279,37 @@ namespace casadi {
       >> try, nlpsol('S', 'ipopt', nlp, opts); catch e, msg = e.message; end
       >> contains(msg, 'No such field: h')
       1
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> x = ca.SX.sym("x");
+      julia> opts = Dict("ipopt.print_level" => 0, "ipopt.sb" => "yes", "print_time" => false);
+      julia> S = ca.nlpsol("S", "ipopt", Dict("x" => x, "f" => x, "g" => x), opts);
+      julia> sol = S(lbx=0, ubx=1, lbg=2, ubg=3);
+      julia> ca.stats(S)["success"], ca.stats(S)["return_status"]
+      (false, "Infeasible_Problem_Detected")
+      julia> S = ca.nlpsol("S", "ipopt", Dict("x" => x, "f" => x, "g" => x),
+                           merge(opts, Dict("error_on_fail" => true)));
+      julia> try
+                 S(lbx=0, ubx=1, lbg=2, ubg=3)
+             catch e
+                 println(occursin("nlpsol process failed", sprint(showerror, e)))
+             end
+      true
+      julia> try
+                 S(lbx=1, ubx=0)
+             catch e
+                 println(last(split(sprint(showerror, e), "\n")))
+             end
+      Ill-posed problem detected: LBX[0] <= UBX[0] was violated. Got LBX[0]=1 and UBX[0] = 0.
+      julia> try
+                 ca.nlpsol("S", "ipopt", Dict("x" => x, "f" => x, "h" => x), opts)
+             catch e
+                 println(occursin("No such field: h", sprint(showerror, e)))
+             end
+      true
       \enddoctest
       \endlang
 
@@ -299,6 +375,21 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> ca.nlpsol_in()
+      8-element Vector{String}:
+       "x0"
+       "p"
+       "lbx"
+       "ubx"
+       "lbg"
+       "ubg"
+       "lam_x0"
+       "lam_g0"
+      \enddoctest
+      \endlang
+
       \sa nlpsol_out, nlpsol_n_in, nlpsol_default_in
 
       \identifier{1sy} */
@@ -332,6 +423,19 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> ca.nlpsol_out()
+      6-element Vector{String}:
+       "x"
+       "f"
+       "g"
+       "lam_x"
+       "lam_g"
+       "lam_p"
+      \enddoctest
+      \endlang
+
       \sa nlpsol_in, nlpsol_n_out
 
       \identifier{1sz} */
@@ -358,6 +462,13 @@ namespace casadi {
       x0
       lam_g0
       1
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> ca.nlpsol_in(0), ca.nlpsol_in(7), ca.nlpsol_in(8)
+      ("x0", "lam_g0", "")
       \enddoctest
       \endlang
 
@@ -388,6 +499,13 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> ca.nlpsol_out(0), ca.nlpsol_out(5), ca.nlpsol_out(6)
+      ("x", "lam_p", "")
+      \enddoctest
+      \endlang
+
       \identifier{1t1} */
   CASADI_EXPORT std::string nlpsol_out(casadi_int ind);
 
@@ -407,6 +525,13 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> ca.nlpsol_n_in(), length(ca.nlpsol_in())
+      (8, 8)
+      \enddoctest
+      \endlang
+
       \identifier{1t2} */
   CASADI_EXPORT casadi_int nlpsol_n_in();
 
@@ -423,6 +548,13 @@ namespace casadi {
       \doctest
       >> fprintf('%d %d\n', nlpsol_n_out(), numel(cellstr(nlpsol_out())))
       6 6
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> ca.nlpsol_n_out(), length(ca.nlpsol_out())
+      (6, 6)
       \enddoctest
       \endlang
 
@@ -455,6 +587,23 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> ca.nlpsol_default_in()
+      8-element Vector{Float64}:
+         0.0
+         0.0
+       -Inf
+        Inf
+       -Inf
+        Inf
+         0.0
+         0.0
+      julia> ca.nlpsol_default_in(3)
+      Inf
+      \enddoctest
+      \endlang
+
       \identifier{1t4} */
   CASADI_EXPORT double nlpsol_default_in(casadi_int ind);
   CASADI_EXPORT std::vector<double> nlpsol_default_in();
@@ -478,6 +627,14 @@ namespace casadi {
       >> opts = cellstr(nlpsol_options('sqpmethod'));
       >> ismember({'max_iter', 'qpsol', 'print_time'}, opts)
       1 1 0
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> opts = ca.nlpsol_options("sqpmethod");
+      julia> "max_iter" in opts, "qpsol" in opts, "print_time" in opts
+      (true, true, false)
       \enddoctest
       \endlang
 
@@ -508,6 +665,13 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> ca.nlpsol_option_type("sqpmethod", "max_iter"), ca.nlpsol_option_type("ipopt", "ipopt")
+      ("OT_INT", "OT_DICT")
+      \enddoctest
+      \endlang
+
       \identifier{1t6} */
   CASADI_EXPORT std::string nlpsol_option_type(const std::string& name, const std::string& op);
 
@@ -530,6 +694,13 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> ca.nlpsol_option_info("sqpmethod", "max_iter")
+      "Maximum number of SQP iterations"
+      \enddoctest
+      \endlang
+
       \identifier{1t7} */
   CASADI_EXPORT std::string nlpsol_option_info(const std::string& name, const std::string& op);
 
@@ -549,6 +720,13 @@ namespace casadi {
       >> has_nlpsol('ipopt'), has_nlpsol('no_such_plugin')
       1
       0
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> ca.has_nlpsol("ipopt"), ca.has_nlpsol("no_such_plugin")
+      (true, false)
       \enddoctest
       \endlang
 
@@ -578,6 +756,17 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{julia}
+      \doctest
+      julia> try
+                 ca.load_nlpsol("no_such_plugin")
+             catch e
+                 println(occursin("no_such_plugin", sprint(showerror, e)))
+             end
+      true
+      \enddoctest
+      \endlang
+
       \identifier{2pc} */
   CASADI_EXPORT void load_nlpsol(const std::string& name);
 
@@ -596,6 +785,13 @@ namespace casadi {
       \doctest
       >> contains(doc_nlpsol('sqpmethod'), 'max_iter')
       1
+      \enddoctest
+      \endlang
+
+      \lang{julia}
+      \doctest
+      julia> occursin("max_iter", ca.doc_nlpsol("sqpmethod"))
+      true
       \enddoctest
       \endlang
 

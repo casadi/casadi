@@ -81,8 +81,8 @@ HAS_IPOPT && @testset "native inputs: Opti" begin
     opti.set_initial(y, range(-1, 1; length = 3))
     opti.subject_to(y[1:2] == [1, 2])
     minimize(opti, C.sumsqr(y - p))
-    solver!(opti, "ipopt", Dict("print_time" => false, "ipopt" => Dict("print_level" => 0)))
-    sol = solve!(opti)
+    solver(opti, "ipopt", Dict("print_time" => false, "ipopt" => Dict("print_level" => 0)))
+    sol = solve(opti)
     @test sol.value(y) isa Vector{Float64}
     @test sol.value(y) ≈ [1.0, 2.0, 2.0] atol = 1e-6
     @test sol.value(y[3]) isa Float64
@@ -96,4 +96,13 @@ HAS_IPOPT && @testset "native inputs: Opti" begin
     @test sol.opti isa C.Opti
     @test sol.value(C.gradient(opti.f + opti.lam_g' * opti.g, opti.x)) ≈ zeros(3) atol = 1e-6
     @test opti.to_function("G", [p], [y]) isa C.Function    # real methods stay methods
+end
+
+@testset "tuple dims, untyped empty vectors, typemax(Int)" begin
+    @test size(C.dense(Sparsity, (2, 3))) == (2, 3)
+    @test size(C.nan(DM, (2, 1))) == (2, 1)
+    @test Matrix(C.repmat(DM(7), (1, 3))) == [7 7 7]
+    @test C.nnz(C.rowcol(Sparsity, [], [1], 3, 4)) == 0
+    @test size(C.triplet(DM, [], [], [], 2, 2)) == (2, 2)
+    @test C.uni_coloring(C.diag(Sparsity, 3), Sparsity(), typemax(Int)) isa Sparsity
 end
