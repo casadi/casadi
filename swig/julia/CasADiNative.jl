@@ -32,21 +32,6 @@ const CodeGenerator = C.CodeGenerator
 
 const CasadiFunction = casadi.Function
 
-# ---- 2-D / vector construction from native Julia arrays (P0-1) ----
-# The SWIG ctor wants a vector-of-rows ([[float]]); a 2-D Julia Matrix reaches a
-# flattening typemap, so repack rows explicitly to get a correct 2-D matrix.
-_rows(m::AbstractMatrix{<:Real}) = [collect(Float64, @view m[i, :]) for i in 1:size(m, 1)]
-# A 0-row matrix has no rows to carry the column count, so a vector-of-rows would
-# collapse to 0×1; build the empty 0×n pattern directly instead. (P1-1)
-_emptycols(::Type{DM}, n) = C.DM(C.Sparsity(0, n))
-_emptycols(::Type{SX}, n) = C.SX(C.Sparsity(0, n))
-_emptycols(::Type{MX}, n) = C.MX(C.DM(C.Sparsity(0, n)))
-C.DM(m::AbstractMatrix{<:Real}) = size(m, 1) == 0 ? _emptycols(DM, size(m, 2)) : C.DM(_rows(m))
-C.SX(m::AbstractMatrix{<:Real}) = size(m, 1) == 0 ? _emptycols(SX, size(m, 2)) : C.SX(_rows(m))
-C.MX(m::AbstractMatrix{<:Real}) = size(m, 1) == 0 ? _emptycols(MX, size(m, 2)) : C.MX(C.DM(_rows(m)))
-# AbstractVector{<:Real} -> a column (generated ctor already does this for DM/SX)
-C.MX(v::AbstractVector{<:Real}) = C.MX(C.DM(collect(Float64, v)))
-
 # ---- conversion (promotion by DM < SX < MX rank); generated ctors handle reals ----
 # Julia numbers and arrays promote exactly like DM (`_Num`).
 const _Num = Union{Real,DM,AbstractArray{<:Real}}
