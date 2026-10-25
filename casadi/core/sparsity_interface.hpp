@@ -964,13 +964,10 @@ namespace casadi {
         takes effect on numeric DM / MX dense * dense; symbolic types (Sparsity, SX) and the
         sparse fallback path ignore it.
 
-        \verbatim
-        mtimes(A, B)               // default: built-in reference kernel (triple loop)
-        mtimes(A, B, "reference")  // same -- explicit
-        mtimes(A, B, "classic")    // whatever BLAS was built into casadi via
-                                   //   WITH_LAPACK (typically OpenBLAS)
-        mtimes(A, B, "blasfeo")    // BLASFEO
-        \endverbatim
+        Values of \p blas:
+        - `reference` (default): built-in reference kernel (triple loop)
+        - `classic`: whatever BLAS was built into casadi via WITH_LAPACK (typically OpenBLAS)
+        - `blasfeo`: BLASFEO
 
         Plugins (`classic`, `blasfeo`) are loaded lazily on first use; if the corresponding
         plugin DLL isn't present in the build, calling them raises an error.
