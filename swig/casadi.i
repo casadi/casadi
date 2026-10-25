@@ -3578,6 +3578,8 @@ class ArrayInterfaceMX(ArrayInterface[MX]):
 %typemap(jlparam) casadi::Matrix<double>, const casadi::Matrix<double>& "Union{DM,Real,AbstractArray{<:Real},Vector{Any}}"
 %typemap(jlparam) casadi::Matrix<casadi::SXElem>, const casadi::Matrix<casadi::SXElem>& "Union{SX,DM,Real,AbstractArray{<:Real},Vector{Any}}"
 %typemap(jlparam) casadi::MX, const casadi::MX& "Union{MX,DM,Real,AbstractArray{<:Real},Vector{Any}}"
+// a Callback is a Function, as in C++
+%typemap(jlparam) casadi::Function, const casadi::Function& "Union{Function,CallbackFunction}"
 #endif // SWIGJULIA
 
 #ifdef SWIGWASMJS

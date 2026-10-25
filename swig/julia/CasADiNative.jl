@@ -661,10 +661,6 @@ function callback(obj::C.Callback, name::AbstractString, opts::AbstractDict = Di
     proxy
 end
 
-# Let a Callback be used wherever a casadi Function is expected (nlpsol, graphs).
-# The Function copy-ctor accepts the Callback proxy via the SWIG cast chain.
-Function(cb::C.CallbackFunction) = C.Function(C._check(ccall((:_swig_Function_new_Function__SWIG_7,
-        C._lib), Ptr{Cvoid}, (Any,), cb)))
 Base.convert(::Type{Function}, cb::C.CallbackFunction) = Function(cb)
 # A constructed CallbackFunction is a casadi Function; call it like one (numeric or symbolic).
 (cb::C.CallbackFunction)(args...; kwargs...) = Function(cb)(args...; kwargs...)
