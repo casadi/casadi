@@ -139,10 +139,10 @@ namespace casadi {
       \lang{matlab}
       \doctest
       >> sp = Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3]);
-      >> full(DM(sp, 1))
-      1 0 0 1
-      0 0 1 0
-      1 0 0 0
+      >> DM(sp, 1)
+      [[1, 00, 00, 1],
+       [00, 00, 1, 00],
+       [1, 00, 00, 00]]
       >> sp
       3x4,4nz
       >> fprintf('%d %d %d %d\n', sp.size1(), sp.size2(), sp.nnz(), sp.numel())
@@ -236,9 +236,9 @@ namespace casadi {
         >> Sparsity(0, 0), Sparsity(0, 0).is_dense()
         0x0
         1
-        >> full(DM(Sparsity(2, 2), 1))
-        0 0
-        0 0
+        >> DM(Sparsity(2, 2), 1)
+        [[00, 00],
+         [00, 00]]
         \enddoctest
         \endlang
 
@@ -281,10 +281,10 @@ namespace casadi {
         \lang{matlab}
         \doctest
         >> sp = Sparsity(3, 2, [0, 2, 3], [0, 2, 1]);
-        >> full(DM(sp, 1))
-        1 0
-        0 1
-        1 0
+        >> DM(sp, 1)
+        [[1, 00],
+         [00, 1],
+         [1, 00]]
         >> Sparsity(2, 2, [0, 2, 4], [0, 1, 0, 1]).is_dense()
         1
         >> try, Sparsity(3, 2, [0, 2, 3], [2, 0, 1]); catch e, disp('not sorted'); end
@@ -434,11 +434,8 @@ namespace casadi {
 
         \lang{matlab}
         \doctest
-        >> full(DM(Sparsity.unit(4, 1), 1))
-        0
-        1
-        0
-        0
+        >> DM(Sparsity.unit(4, 1), 1)
+        [00, 1, 00, 00]
         >> Sparsity.unit(4, 1).row()
         1
         \enddoctest
@@ -472,10 +469,10 @@ namespace casadi {
 
         \lang{matlab}
         \doctest
-        >> full(DM(Sparsity.upper(3), 1))
-        1 1 1
-        0 1 1
-        0 0 1
+        >> DM(Sparsity.upper(3), 1)
+        [[1, 1, 1],
+         [00, 1, 1],
+         [00, 00, 1]]
         >> Sparsity.upper(3).nnz(), Sparsity.upper(3).is_triu()
         6
         1
@@ -510,10 +507,10 @@ namespace casadi {
 
         \lang{matlab}
         \doctest
-        >> full(DM(Sparsity.lower(3), 1))
-        1 0 0
-        1 1 0
-        1 1 1
+        >> DM(Sparsity.lower(3), 1)
+        [[1, 00, 00],
+         [1, 1, 00],
+         [1, 1, 1]]
         >> SX.sym('x', Sparsity.lower(2))
         [[x_0, 00],
          [x_1, x_2]]
@@ -549,13 +546,13 @@ namespace casadi {
 
         \lang{matlab}
         \doctest
-        >> full(DM(Sparsity.diag(3), 1))
-        1 0 0
-        0 1 0
-        0 0 1
-        >> full(DM(Sparsity.diag(2, 4), 1))
-        1 0 0 0
-        0 1 0 0
+        >> DM(Sparsity.diag(3), 1)
+        [[1, 00, 00],
+         [00, 1, 00],
+         [00, 00, 1]]
+        >> DM(Sparsity.diag(2, 4), 1)
+        [[1, 00, 00, 00],
+         [00, 1, 00, 00]]
         >> Sparsity.diag([4, 2]).nnz(), Sparsity.diag(0).nnz()
         2
         0
@@ -603,16 +600,16 @@ namespace casadi {
 
         \lang{matlab}
         \doctest
-        >> full(DM(Sparsity.band(4, 1), 1))
-        0 0 0 0
-        1 0 0 0
-        0 1 0 0
-        0 0 1 0
-        >> full(DM(Sparsity.band(4, -2), 1))
-        0 0 1 0
-        0 0 0 1
-        0 0 0 0
-        0 0 0 0
+        >> DM(Sparsity.band(4, 1), 1)
+        [[00, 00, 00, 00],
+         [1, 00, 00, 00],
+         [00, 1, 00, 00],
+         [00, 00, 1, 00]]
+        >> DM(Sparsity.band(4, -2), 1)
+        [[00, 00, 1, 00],
+         [00, 00, 00, 1],
+         [00, 00, 00, 00],
+         [00, 00, 00, 00]]
         >> Sparsity.band(4, 0) == Sparsity.diag(4)
         1
         \enddoctest
@@ -647,11 +644,11 @@ namespace casadi {
 
         \lang{matlab}
         \doctest
-        >> full(DM(Sparsity.banded(4, 1), 1))
-        1 1 0 0
-        1 1 1 0
-        0 1 1 1
-        0 0 1 1
+        >> DM(Sparsity.banded(4, 1), 1)
+        [[1, 1, 00, 00],
+         [1, 1, 1, 00],
+         [00, 1, 1, 1],
+         [00, 00, 1, 1]]
         >> [Sparsity.banded(4, 1).bw_upper(), Sparsity.banded(4, 1).bw_lower()]
         1 1
         \enddoctest
@@ -686,10 +683,10 @@ namespace casadi {
 
         \lang{matlab}
         \doctest
-        >> full(DM(Sparsity.rowcol([0, 2], [1, 2], 3, 4), 1))
-        0 1 1 0
-        0 0 0 0
-        0 1 1 0
+        >> DM(Sparsity.rowcol([0, 2], [1, 2], 3, 4), 1)
+        [[00, 1, 1, 00],
+         [00, 00, 00, 00],
+         [00, 1, 1, 00]]
         >> Sparsity.rowcol([], [1], 3, 4).nnz()
         0
         \enddoctest
@@ -743,10 +740,10 @@ namespace casadi {
 
         \lang{matlab}
         \doctest
-        >> full(DM(Sparsity.triplet(3, 3, [0, 2, 1], [0, 0, 2]), 1))
-        1 0 0
-        0 0 1
-        1 0 0
+        >> DM(Sparsity.triplet(3, 3, [0, 2, 1], [0, 0, 2]), 1)
+        [[1, 00, 00],
+         [00, 00, 1],
+         [1, 00, 00]]
         >> Sparsity.triplet(2, 2, [0, 0, 1], [0, 0, 1]).nnz()
         2
         >> [sp, mapping] = Sparsity.triplet(3, 3, [2, 0, 1], [1, 0, 0], false); disp(mapping)
@@ -795,10 +792,10 @@ namespace casadi {
 
         \lang{matlab}
         \doctest
-        >> full(DM(Sparsity.nonzeros(3, 2, [1, 5]), 1))
-        1 0
-        0 1
-        0 0
+        >> DM(Sparsity.nonzeros(3, 2, [1, 5]), 1)
+        [[1, 00],
+         [00, 1],
+         [00, 00]]
         >> sp = Sparsity.banded(3, 1);
         >> Sparsity.nonzeros(3, 3, sp.find()) == sp
         1
@@ -842,10 +839,10 @@ namespace casadi {
         \lang{matlab}
         \doctest
         >> sp = Sparsity.compressed([3, 2, 0, 1, 2, 0, 2]);
-        >> full(DM(sp, 1))
-        1 0
-        0 0
-        0 1
+        >> DM(sp, 1)
+        [[1, 00],
+         [00, 00],
+         [00, 1]]
         >> Sparsity.compressed(sp.compress()) == sp
         1
         >> Sparsity.compressed([2, 2, 0, 2, 4])
@@ -897,10 +894,10 @@ namespace casadi {
         \lang{matlab}
         \doctest
         >> P = Sparsity.permutation([2, 0, 1]);
-        >> full(DM(P, 1))
-        0 0 1
-        1 0 0
-        0 1 0
+        >> DM(P, 1)
+        [[00, 00, 1],
+         [1, 00, 00],
+         [00, 1, 00]]
         >> DM(P, 1) * DM([10; 20; 30])
         [30, 10, 20]
         >> DM(Sparsity.permutation([2, 0, 1], true), 1) * DM([10; 20; 30])
@@ -984,10 +981,10 @@ namespace casadi {
         >> [sp, mapping] = Sparsity.banded(3, 1).get_diag(); disp(sp), disp(mapping)
         3x1
         0 3 6
-        >> [sp, mapping] = Sparsity.unit(3, 1).get_diag(); disp(full(DM(sp, 1))), disp(mapping)
-        0 0 0
-        0 1 0
-        0 0 0
+        >> [sp, mapping] = Sparsity.unit(3, 1).get_diag(); disp(DM(sp, 1)), disp(mapping)
+        [[00, 00, 00],
+         [00, 1, 00],
+         [00, 00, 00]]
         0
         >> [sp, mapping] = Sparsity(2, 3).get_diag(); disp(sp), disp(isempty(mapping))
         2x1,0nz
@@ -1641,10 +1638,10 @@ namespace casadi {
         \lang{matlab}
         \doctest
         >> sp = Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3]);
-        >> full(DM(sp, 1))
-        1 0 0 1
-        0 0 1 0
-        1 0 0 0
+        >> DM(sp, 1)
+        [[1, 00, 00, 1],
+         [00, 00, 1, 00],
+         [1, 00, 00, 00]]
         >> sp.row(), sp.colind(), sp.get_col()
         0 2 1 0
         0 2 2 3 4
@@ -1752,11 +1749,11 @@ namespace casadi {
         \doctest
         >> sp = Sparsity.dense(3, 3); sp.resize(2, 2); disp(sp)
         2x2
-        >> sp.resize(4, 4); disp(full(DM(sp, 1)))
-        1 1 0 0
-        1 1 0 0
-        0 0 0 0
-        0 0 0 0
+        >> sp.resize(4, 4); disp(DM(sp, 1))
+        [[1, 1, 00, 00],
+         [1, 1, 00, 00],
+         [00, 00, 00, 00],
+         [00, 00, 00, 00]]
         >> sp.resize(0, 2); disp(sp)
         0x2
         \enddoctest
@@ -1796,10 +1793,10 @@ namespace casadi {
         >> [sp.add_nz(1, 1), sp.add_nz(0, 0), sp.add_nz(1, 1)], sp
         0 0 1
         3x3,2nz
-        >> full(DM(sp, 1))
-        1 0 0
-        0 1 0
-        0 0 0
+        >> DM(sp, 1)
+        [[1, 00, 00],
+         [00, 1, 00],
+         [00, 00, 00]]
         >> try, sp.add_nz(3, 0); catch e, disp('out of bounds'); end
         out of bounds
         \enddoctest
@@ -2082,9 +2079,9 @@ namespace casadi {
         \lang{matlab}
         \doctest
         >> sp = Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3]);
-        >> [sub, mapping] = sp.sub([0, 2], [0, 3]); disp(full(DM(sub, 1))), disp(mapping)
-        1 1
-        1 0
+        >> [sub, mapping] = sp.sub([0, 2], [0, 3]); disp(DM(sub, 1)), disp(mapping)
+        [[1, 1],
+         [1, 00]]
         0 1 3
         >> [sub, mapping] = sp.sub(-1, 0); disp(sub), disp(mapping)
         1x1
@@ -2142,9 +2139,9 @@ namespace casadi {
         3x1
         0 1 3
         >> [sub, mapping] = sp.sub([0, 1, 2, 3], Sparsity.dense(2, 2));
-        >> full(DM(sub, 1)), mapping
-        1 1
-        0 0
+        >> DM(sub, 1), mapping
+        [[1, 1],
+         [00, 00]]
         0 1
         >> try, sp.sub([0, 2], Sparsity.dense(3, 1)); catch e, disp('length mismatch'); end
         length mismatch
@@ -2181,11 +2178,11 @@ namespace casadi {
         \lang{matlab}
         \doctest
         >> sp = Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3]);
-        >> full(DM(sp.T, 1))
-        1 0 1
-        0 0 0
-        0 1 0
-        1 0 0
+        >> DM(sp.T, 1)
+        [[1, 00, 1],
+         [00, 00, 00],
+         [00, 1, 00],
+         [1, 00, 00]]
         >> sp.T.colind(), sp.T.row()
         0 2 3 4
         0 3 2 0
@@ -2376,12 +2373,12 @@ namespace casadi {
         >> a.combine(b, false, false) == a + b, a.combine(b, true, true) == a .* b
         1
         1
-        >> full(DM(a.combine(b, true, false), 1))
-        1 0
-        0 1
-        >> full(DM(a.combine(b, false, true), 1))
-        0 1
-        0 1
+        >> DM(a.combine(b, true, false), 1)
+        [[1, 00],
+         [00, 1]]
+        >> DM(a.combine(b, false, true), 1)
+        [[00, 1],
+         [00, 1]]
         \enddoctest
         \endlang
 
@@ -2421,9 +2418,9 @@ namespace casadi {
         \doctest
         >> a = Sparsity.diag(2);
         >> b = Sparsity.triplet(2, 2, [0, 1], [1, 1]);
-        >> full(DM(a.unite(b), 1))
-        1 1
-        0 1
+        >> DM(a.unite(b), 1)
+        [[1, 1],
+         [00, 1]]
         >> a + b == a.unite(b), a .* b == a.intersect(b)
         1
         1
@@ -2464,9 +2461,9 @@ namespace casadi {
         \doctest
         >> a = Sparsity.diag(2);
         >> b = Sparsity.triplet(2, 2, [0, 1], [1, 1]);
-        >> full(DM(a.intersect(b), 1))
-        0 0
-        0 1
+        >> DM(a.intersect(b), 1)
+        [[00, 00],
+         [00, 1]]
         \enddoctest
         \endlang
 
@@ -2541,9 +2538,9 @@ namespace casadi {
         >> X = Sparsity.diag(4);
         >> Y = Sparsity.dense(2, 2);
         >> x = Sparsity.nonzeros(4, 4, [1, 11, 16]);
-        >> full(DM(x.sparsity_cast_mod(X, Y), 1))
-        1 1
-        0 1
+        >> DM(x.sparsity_cast_mod(X, Y), 1)
+        [[1, 1],
+         [00, 1]]
         \enddoctest
         \endlang
 
@@ -2570,9 +2567,9 @@ namespace casadi {
 
         \lang{matlab}
         \doctest
-        >> full(DM(Sparsity.diag(2).pattern_inverse(), 1))
-        0 1
-        1 0
+        >> DM(Sparsity.diag(2).pattern_inverse(), 1)
+        [[00, 1],
+         [1, 00]]
         >> Sparsity.dense(2, 2).pattern_inverse(), Sparsity(2, 2).pattern_inverse()
         2x2,0nz
         2x2
@@ -2709,11 +2706,11 @@ namespace casadi {
         \doctest
         >> sp = Sparsity.dense(2, 2);
         >> sp.enlarge(4, 3, [0, 3], [1, 2]);
-        >> full(DM(sp, 1))
-        0 1 1
-        0 0 0
-        0 0 0
-        0 1 1
+        >> DM(sp, 1)
+        [[00, 1, 1],
+         [00, 00, 00],
+         [00, 00, 00],
+         [00, 1, 1]]
         >> try, Sparsity.dense(2, 2).enlarge(4, 3, 0, [1, 2]); catch e, disp('wrong length'); end
         wrong length
         \enddoctest
@@ -2745,10 +2742,10 @@ namespace casadi {
 
         \lang{matlab}
         \doctest
-        >> sp = Sparsity.dense(2, 2); sp.enlargeRows(3, [0, 2]); disp(full(DM(sp, 1)))
-        1 1
-        0 0
-        1 1
+        >> sp = Sparsity.dense(2, 2); sp.enlargeRows(3, [0, 2]); disp(DM(sp, 1))
+        [[1, 1],
+         [00, 00],
+         [1, 1]]
         \enddoctest
         \endlang
 
@@ -2775,9 +2772,9 @@ namespace casadi {
 
         \lang{matlab}
         \doctest
-        >> sp = Sparsity.dense(2, 2); sp.enlargeColumns(3, [0, 2]); disp(full(DM(sp, 1)))
-        1 0 1
-        1 0 1
+        >> sp = Sparsity.dense(2, 2); sp.enlargeColumns(3, [0, 2]); disp(DM(sp, 1))
+        [[1, 00, 1],
+         [1, 00, 1]]
         \enddoctest
         \endlang
 
@@ -2843,10 +2840,10 @@ namespace casadi {
         \doctest
         >> sp = Sparsity.dense(3, 3);
         >> mapping = sp.erase([0, 2], 1);
-        >> full(DM(sp, 1)), mapping
-        1 0 1
-        1 1 1
-        1 0 1
+        >> DM(sp, 1), mapping
+        [[1, 00, 1],
+         [1, 1, 1],
+         [1, 00, 1]]
         0 1 2 4 6 7 8
         \enddoctest
         \endlang
@@ -2889,10 +2886,10 @@ namespace casadi {
         >> sp.erase([0, 4, 8]), sp
         1 2 3 5 6 7
         3x3,6nz
-        >> full(DM(sp, 1))
-        0 1 1
-        1 0 1
-        1 1 0
+        >> DM(sp, 1)
+        [[00, 1, 1],
+         [1, 00, 1],
+         [1, 1, 00]]
         >> try, Sparsity.dense(3, 3).erase(9); catch e, disp('out of range'); end
         out of range
         \enddoctest
@@ -2926,11 +2923,11 @@ namespace casadi {
 
         \lang{matlab}
         \doctest
-        >> sp = Sparsity.dense(2, 2); sp.append(Sparsity.diag(2)); disp(full(DM(sp, 1)))
-        1 1
-        1 1
-        1 0
-        0 1
+        >> sp = Sparsity.dense(2, 2); sp.append(Sparsity.diag(2)); disp(DM(sp, 1))
+        [[1, 1],
+         [1, 1],
+         [1, 00],
+         [00, 1]]
         >> sp = Sparsity(0, 0); sp.append(Sparsity.diag(2)); disp(sp)
         2x2,2nz
         >> try, sp.append(Sparsity.dense(2, 3)); catch e, disp('column mismatch'); end
@@ -2961,9 +2958,9 @@ namespace casadi {
 
         \lang{matlab}
         \doctest
-        >> sp = Sparsity.dense(2, 2); sp.appendColumns(Sparsity.diag(2)); disp(full(DM(sp, 1)))
-        1 1 1 0
-        1 1 0 1
+        >> sp = Sparsity.dense(2, 2); sp.appendColumns(Sparsity.diag(2)); disp(DM(sp, 1))
+        [[1, 1, 1, 00],
+         [1, 1, 00, 1]]
         >> try, sp.appendColumns(Sparsity.dense(3, 2)); catch e, disp('row mismatch'); end
         row mismatch
         \enddoctest
@@ -3614,11 +3611,11 @@ namespace casadi {
         \lang{matlab}
         \doctest
         >> [Lt, p] = Sparsity.banded(4, 1).ldl(false);
-        >> full(DM(Lt, 1)), p
-        0 1 0 0
-        0 0 1 0
-        0 0 0 1
-        0 0 0 0
+        >> DM(Lt, 1), p
+        [[00, 1, 00, 00],
+         [00, 00, 1, 00],
+         [00, 00, 00, 1],
+         [00, 00, 00, 00]]
         0 1 2 3
         >> A = Sparsity.nonzeros(4, 4, [1, 4, 6, 11, 13, 16]);
         >> [Lt, p] = A.ldl(); disp(Lt.nnz()), disp(p)
@@ -3774,20 +3771,20 @@ namespace casadi {
         \lang{matlab}
         \doctest
         >> A = Sparsity.nonzeros(4, 4, [1, 3, 6, 8, 11, 14, 16]);
-        >> full(DM(A, 1))
-        1 0 0 0
-        0 1 0 1
-        1 0 1 0
-        0 1 0 1
+        >> DM(A, 1)
+        [[1, 00, 00, 00],
+         [00, 1, 00, 1],
+         [1, 00, 1, 00],
+         [00, 1, 00, 1]]
         >> [n, index, offset] = A.scc(); disp(n), disp(index), disp(offset)
         3
         2 0 1 3
         0 1 2 4
-        >> Af = full(DM(A, 1)); disp(Af(index + 1, index + 1))
-        1 1 0 0
-        0 1 0 0
-        0 0 1 1
-        0 0 1 1
+        >> Af = DM(A, 1); disp(Af(index + 1, index + 1))
+        [[1, 1, 00, 00],
+         [00, 1, 00, 00],
+         [00, 00, 1, 1],
+         [00, 00, 1, 1]]
         >> [n, index, offset] = Sparsity.diag(3).scc(); disp(n), disp(index), disp(offset)
         3
         0 1 2
@@ -3861,10 +3858,10 @@ namespace casadi {
         \lang{matlab}
         \doctest
         >> B = Sparsity.triplet(3, 3, [0, 0, 1, 2], [0, 2, 1, 2]);
-        >> full(DM(B, 1))
-        1 0 1
-        0 1 0
-        0 0 1
+        >> DM(B, 1)
+        [[1, 00, 1],
+         [00, 1, 00],
+         [00, 00, 1]]
         >> [nb, rowperm, colperm, rowblock, colblock, crb, ccb] = B.btf();
         >> nb, rowperm, colperm, rowblock, colblock
         3
@@ -3875,10 +3872,10 @@ namespace casadi {
         >> crb, ccb
         0 0 0 3 3
         0 0 3 3 3
-        >> Bf = full(DM(B, 1)); disp(Bf(rowperm + 1, colperm + 1))
-        1 0 0
-        1 1 0
-        0 0 1
+        >> Bf = DM(B, 1); disp(Bf(rowperm + 1, colperm + 1))
+        [[1, 00, 00],
+         [1, 1, 00],
+         [00, 00, 1]]
         >> [sprank(Sparsity.nonzeros(3, 3, [1, 2, 3])), sprank(Sparsity.diag(3))]
         1 3
         \enddoctest
@@ -4023,16 +4020,16 @@ namespace casadi {
         \lang{matlab}
         \doctest
         >> A = Sparsity.triplet(3, 4, [0, 1, 2, 0], [0, 1, 2, 3]);
-        >> full(DM(A, 1))
-        1 0 0 1
-        0 1 0 0
-        0 0 1 0
+        >> DM(A, 1)
+        [[1, 00, 00, 1],
+         [00, 1, 00, 00],
+         [00, 00, 1, 00]]
         >> c = A.uni_coloring();
-        >> full(DM(c, 1))
-        1 0
-        1 0
-        1 0
-        0 1
+        >> DM(c, 1)
+        [[1, 00],
+         [1, 00],
+         [1, 00],
+         [00, 1]]
         >> disp(c.size2()), ci = c.colind(); r = c.row();
         2
         >> for j = 1:c.size2(), disp(r(ci(j) + 1:ci(j + 1))), end
@@ -4097,11 +4094,11 @@ namespace casadi {
         \doctest
         >> H = Sparsity.banded(4, 1);
         >> [coloring, which_color] = H.star_coloring_new();
-        >> full(DM(coloring, 1))
-        0 1 0
-        1 0 0
-        0 1 0
-        0 0 1
+        >> DM(coloring, 1)
+        [[00, 1, 00],
+         [1, 00, 00],
+         [00, 1, 00],
+         [00, 00, 1]]
         >> [H.row(); H.get_col(); which_color]'
         0 0 1
         1 0 -1
@@ -4156,11 +4153,11 @@ namespace casadi {
         \lang{matlab}
         \doctest
         >> H = Sparsity.banded(4, 1);
-        >> full(DM(H.star_coloring(), 1))
-        0 1 0
-        1 0 0
-        0 1 0
-        0 0 1
+        >> DM(H.star_coloring(), 1)
+        [[00, 1, 00],
+         [1, 00, 00],
+         [00, 1, 00],
+         [00, 00, 1]]
         >> Sparsity.diag(5).star_coloring()
         5x1
         >> Sparsity.dense(4, 4).star_coloring(1, 2).is_null()
@@ -4195,11 +4192,11 @@ namespace casadi {
         \lang{matlab}
         \doctest
         >> H = Sparsity.banded(4, 1);
-        >> full(DM(H.star_coloring2(), 1))
-        0 1 0
-        1 0 0
-        0 1 0
-        0 0 1
+        >> DM(H.star_coloring2(), 1)
+        [[00, 1, 00],
+         [1, 00, 00],
+         [00, 1, 00],
+         [00, 00, 1]]
         \enddoctest
         \endlang
 
@@ -4280,24 +4277,24 @@ namespace casadi {
         \lang{matlab}
         \doctest
         >> A = Sparsity.triplet(3, 3, [0, 1, 2, 0], [1, 2, 0, 0]);
-        >> full(DM(A, 1))
-        1 1 0
-        0 0 1
-        1 0 0
+        >> DM(A, 1)
+        [[1, 1, 00],
+         [00, 00, 1],
+         [1, 00, 00]]
         >> p = [2, 0, 1];
-        >> full(DM(A.pmult(p), 1))
-        0 1 0
-        0 0 1
-        1 0 1
+        >> DM(A.pmult(p), 1)
+        [[00, 1, 00],
+         [00, 00, 1],
+         [1, 00, 1]]
         >> P = DM(Sparsity.permutation(p), 1);
         >> A.pmult(p) == sparsity(P' * DM(A, 1) * P)
         1
         >> [sub, mapping] = A.sub(p, p); disp(A.pmult(p, true, true, true) == sub)
         1
-        >> full(DM(A.pmult(p, true, false), 1))
-        0 0 1
-        1 0 0
-        1 1 0
+        >> DM(A.pmult(p, true, false), 1)
+        [[00, 00, 1],
+         [1, 00, 00],
+         [1, 1, 00]]
         \enddoctest
         \endlang
 
@@ -4610,14 +4607,14 @@ namespace casadi {
 
         \lang{matlab}
         \doctest
-        >> full(DM(Sparsity.kkt(Sparsity.diag(2), Sparsity.dense(1, 2)), 1))
-        1 0 1
-        0 1 1
-        1 1 1
-        >> full(DM(Sparsity.kkt(Sparsity(2, 2), Sparsity.dense(1, 2), false, false), 1))
-        0 0 1
-        0 0 1
-        1 1 0
+        >> DM(Sparsity.kkt(Sparsity.diag(2), Sparsity.dense(1, 2)), 1)
+        [[1, 00, 1],
+         [00, 1, 1],
+         [1, 1, 1]]
+        >> DM(Sparsity.kkt(Sparsity(2, 2), Sparsity.dense(1, 2), false, false), 1)
+        [[00, 00, 1],
+         [00, 00, 1],
+         [1, 1, 00]]
         >> J = Sparsity.dense(1, 3);
         >> try, Sparsity.kkt(Sparsity.diag(2), J); catch e, disp('dimension mismatch'); end
         dimension mismatch

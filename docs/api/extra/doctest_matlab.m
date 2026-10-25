@@ -38,7 +38,7 @@ function nfail = doctest_matlab(varargin)
 
   octave = exist('OCTAVE_VERSION', 'builtin') > 0;
   skip = {};
-  if octave                                                   % contains(), round(x, n); skip list
+  if octave                                                   % contains(); skip list
     shims = fullfile(fileparts(mfilename('fullpath')), 'doctest_octave');
     addpath(shims);
     skiplines = regexp(fileread(fullfile(shims, 'skip.txt')), '\r?\n', 'split');

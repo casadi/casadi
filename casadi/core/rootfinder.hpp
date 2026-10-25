@@ -75,8 +75,8 @@ namespace casadi {
    * >>> G = rootfinder("G", "newton", {"x": x, "p": p, "g": x**2 - p})
    * >>> G
    * Function(G:(x0,p)->(x) Newton)
-   * >>> round(float(G(x0=1, p=2)["x"]), 4), round(float(G(1, 2)), 4)
-   * (1.4142, 1.4142)
+   * >>> G(x0=1, p=2)["x"], G(1, 2)
+   * (DM(1.4142), DM(1.4142))
    * >>> G.stats()["success"], G.stats()["return_status"]
    * (True, 'success')
    * >>> pm = MX.sym("p")
@@ -101,8 +101,9 @@ namespace casadi {
    * >> x = SX.sym('x'); p = SX.sym('p');
    * >> G = rootfinder('G', 'newton', struct('x', x, 'p', p, 'g', x^2 - p)); disp(G)
    * G:(x0,p)->(x) Newton
-   * >> r = G('x0', 1, 'p', 2); fprintf('%.4f %.4f\n', full(r.x), full(G(1, 2)))
-   * 1.4142 1.4142
+   * >> r = G('x0', 1, 'p', 2); r.x, G(1, 2)
+   * 1.4142
+   * 1.4142
    * >> st = G.stats(); disp(st.success), disp(st.return_status)
    * 1
    * success
@@ -132,8 +133,8 @@ namespace casadi {
    * True
    * >>> opts = {"max_iter": 2, "error_on_fail": False, "print_iteration": False}
    * >>> G = rootfinder("G", "newton", {"x": x, "p": p, "g": x**2 - p}, opts)
-   * >>> round(float(G(x0=1, p=2)["x"]), 4), G.stats()["return_status"]
-   * (1.4167, 'max_iteration_reached')
+   * >>> G(x0=1, p=2)["x"], G.stats()["return_status"]
+   * (DM(1.4167), 'max_iteration_reached')
    * >>> X = SX.sym("x", 2)
    * >>> try:
    * ...     rootfinder("G", "newton", {"x": X, "g": vertcat(X[0] - 1, 1)})
@@ -157,8 +158,9 @@ namespace casadi {
    * 1
    * >> opts = struct('max_iter', 2, 'error_on_fail', false, 'print_iteration', false);
    * >> G = rootfinder('G', 'newton', rfp, opts);
-   * >> r = G('x0', 1, 'p', 2); st = G.stats(); fprintf('%.4f %s\n', full(r.x), st.return_status)
-   * 1.4167 max_iteration_reached
+   * >> r = G('x0', 1, 'p', 2); st = G.stats(); r.x, st.return_status
+   * 1.4167
+   * max_iteration_reached
    * >> X = SX.sym('x', 2);
    * >> rfp = struct('x', X, 'g', [X(1) - 1; 1]);
    * >> try, rootfinder('G', 'newton', rfp); catch e, msg = e.message; end
