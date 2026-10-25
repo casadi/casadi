@@ -49,7 +49,27 @@ function parse_examples(text)
     out
 end
 
-norm(s) = join(filter(!isempty, [strip(l) for l in split(strip(s), "\n")]), "\n")
+# Dict iteration order differs between Julia versions: compare a Dict's entry lines sorted
+function sortdicts(s)
+    lines = split(s, "\n")
+    out, i = String[], 1
+    while i <= length(lines)
+        push!(out, lines[i])
+        if occursin(r"Dict\{.*\} with \d+ entr(y|ies):$", lines[i])
+            j = i + 1
+            while j <= length(lines) && startswith(lines[j], "  ")
+                j += 1
+            end
+            append!(out, sort(lines[i+1:j-1]))
+            i = j
+        else
+            i += 1
+        end
+    end
+    join(out, "\n")
+end
+
+norm(s) = join(filter(!isempty, [strip(l) for l in split(sortdicts(strip(s)), "\n")]), "\n")
 
 # Numbers as in doctest_headers.py: half a unit in the last written digit, at least 1e-9 relative
 const NUMBER = r"(?<![\w.@])[-+]?(?:\d+\.\d*|\.\d+|\d+)(?:[eE][-+]?\d+)?(?![\w.])"

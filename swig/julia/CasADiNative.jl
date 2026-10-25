@@ -4,7 +4,7 @@
 module CasADiNative
 
 include(joinpath(@__DIR__, "casadi.jl"))
-using .casadi
+using .casadi: SX, MX, DM, Sparsity, Opti, Callback, CodeGenerator, StringSerializer, StringDeserializer
 
 const C = casadi
 import LinearAlgebra: dot, cross, norm, det, tr
@@ -669,18 +669,21 @@ det(a::Union{_Cat,C.Linsol}, args...) = C.det(a, args...)
 # the CasADiNative.jl package's own module.
 # A casadi method named like a Base function (map, copy, get, min, ...) gets its own
 # `ca.` function: casadi's for a casadi object first argument, Base's otherwise.
-for _n in names(casadi; all=true)
-    _s = Base.string(_n)
-    (Base.isempty(_s) || _s[1] == '_' || _s[1] == '#' || _s[1] == '@') && continue
-    Base.isdefined(casadi, _n) || continue
-    if !Base.isdefined(@__MODULE__, _n)
-        @eval const $_n = casadi.$_n
-    elseif _n in (:eval, :include) || _n in Base.names(@__MODULE__; all=true)
-        continue
-    elseif (_f = Base.getfield(@__MODULE__, _n)) !== Base.getfield(casadi, _n) && _f isa Base.Function
-        @eval begin
-            $_n(a::_Proxy, args...; kw...) = casadi.$_n(a, args...; kw...)
-            $_n(args...; kw...) = $_f(args...; kw...)
+# Bindings are only inspected via names(), so none resolves to Base before it is defined.
+let mine = Base.Set(Base.names(@__MODULE__; all=true, imported=true)), exported = Base.Set(Base.names(casadi))
+    for _n in Base.names(casadi; all=true)
+        _s = Base.string(_n)
+        (Base.isempty(_s) || _s[1] == '_' || _s[1] == '#' || _s[1] == '@') && continue
+        (Base.isdefined(casadi, _n) && !(_n in (:eval, :include))) || continue
+        _n in mine && Base.isdefined(@__MODULE__, _n) && continue
+        _c = Base.getfield(casadi, _n)
+        if _n in exported || !(Base.isexported(Base, _n) || Base.isexported(Core, _n))
+            @eval const $_n = $_c
+        elseif (_f = Base.getfield(Base, _n)) !== _c && _f isa Base.Function && _c isa Base.Function
+            @eval begin
+                $_n(a::_Proxy, args...; kw...) = $_c(a, args...; kw...)
+                $_n(args...; kw...) = $_f(args...; kw...)
+            end
         end
     end
 end
