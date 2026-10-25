@@ -115,7 +115,7 @@ namespace casadi {
    \enddoctest
    \endlang
 
-   The Python object must outlive every use of the Function:
+   The callback object must outlive every use of the Function:
 
    \lang{python}
    \doctest

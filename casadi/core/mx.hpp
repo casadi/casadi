@@ -374,7 +374,7 @@ namespace casadi {
 
     /** \brief  Create a constant from a DM (also used for implicit conversion)
 
-        The sparsity pattern of \p x is kept. Lists and numpy arrays are accepted through
+        The sparsity pattern of \p x is kept. Numbers and numeric arrays are accepted through
         the DM conversion. SX cannot be converted to MX this way.
 
         \lang{python}

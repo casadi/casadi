@@ -942,10 +942,12 @@ public:
              SX expressions are not supported: a NaN matrix of the same sparsity is returned.
       \param values Optional list of assignments var==value (e.g. opti.initial()) that
              overrule the stored values for this evaluation only
-      \return The numerical value. In Python a scalar becomes a float, a dense matrix a
-              numpy array and a sparse matrix a scipy sparse matrix.
+      \return The numerical value
 
       \lang{python}
+      A scalar becomes a float, a dense matrix a numpy array and a sparse matrix a
+      scipy sparse matrix.
+
       \doctest
       >>> opti = Opti()
       >>> x = opti.variable()
@@ -971,6 +973,8 @@ public:
       \endlang
 
       \lang{matlab}
+      The value is a double matrix, sparse when the expression is sparse.
+
       \doctest
       >> opti = Opti(); x = opti.variable(); p = opti.parameter();
       >> opti.minimize((x-p)^2); opti.set_value(p, 3);
@@ -2566,13 +2570,15 @@ class CASADI_EXPORT OptiSol : public SWIG_IF_ELSE(PrintableCommon, Printable<Opt
         Same as Opti::value on the snapshot: variables take their optimal values, parameters
         the values used for the solve, dual variables the multipliers. \p values overrules
         individual symbols for this evaluation only, e.g. opti.initial() to evaluate at the
-        initial guess. In Python a scalar result is a float, a dense matrix a numpy array and
-        a sparse matrix a scipy sparse matrix.
+        initial guess.
 
         \param x Expression (MX) in the symbols of the Opti; a DM is returned as is
         \param values Optional list of assignments var==value
 
         \lang{python}
+        A scalar becomes a float, a dense matrix a numpy array and a sparse matrix a
+        scipy sparse matrix.
+
         \doctest
         >>> opti = Opti()
         >>> x = opti.variable()
@@ -2594,6 +2600,8 @@ class CASADI_EXPORT OptiSol : public SWIG_IF_ELSE(PrintableCommon, Printable<Opt
         \endlang
 
         \lang{matlab}
+        The value is a double matrix, sparse when the expression is sparse.
+
         \doctest
         >> opti = Opti(); x = opti.variable(); y = opti.variable();
         >> opti.minimize((y-x^2)^2); opti.subject_to(x^2+y^2==1); opti.subject_to(x+y>=1);

@@ -1842,10 +1842,11 @@ namespace casadi {
     /** \brief Sum all elements
 
         Returns a 1-by-1 matrix with the sum of all elements, combining sum1 and sum2. An empty
-        matrix sums to a structural zero. The Python function also accepts an axis argument:
-        sum(x, 0) is sum1(x) and sum(x, 1) is sum2(x).
+        matrix sums to a structural zero.
 
         \lang{python}
+        sum also accepts an axis argument: sum(x, 0) is sum1(x) and sum(x, 1) is sum2(x).
+
         \doctest
         >>> sum(DM([[1, 2, 3], [4, 5, 6]]))
         DM(21)

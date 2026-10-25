@@ -130,17 +130,22 @@ namespace casadi {
       static void setTempWorkDir(const std::string& dir);
       static std::string getTempWorkDir() { return temp_work_dir; }
 
-      /** \brief Set the numpy interop mode (issue #2959): 1 = casadi-aware
+      /** \brief Set the numpy interop mode (issue #2959)
 
-       *  numpy support, 0 (default) = legacy + FutureWarning, -1 = legacy
-       *  but silent.  See the numpy_mode field.  Affects only Python
-       *  bindings; ignored elsewhere.  Probe with
+       *  Affects only the Python bindings; ignored elsewhere.
+       *
+       *  \lang{python}
+       *  1 = casadi-aware numpy support, 0 (default) = legacy + FutureWarning,
+       *  -1 = legacy but silent.  Probe with
        *  hasattr(casadi.GlobalOptions, "setNumpyMode").
+       *  \endlang
 
           \identifier{2i1} */
       static void setNumpyMode(int mode) { numpy_mode = mode; }
 
-      /** \brief Get the current numpy interop mode.  See setNumpyMode.
+      /** \brief Get the current numpy interop mode
+
+       *  Affects only the Python bindings; see setNumpyMode.
 
           \identifier{2i2} */
       static int getNumpyMode() { return numpy_mode; }
