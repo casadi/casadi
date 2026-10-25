@@ -3707,6 +3707,12 @@ namespace casadi {
         {}
         \enddoctest
 
+        \doctest{matlab}
+        >> x = SX.sym('x');
+        >> isempty(fieldnames(Function('f', {x}, {x}).info()))
+        1
+        \enddoctest
+
         \identifier{2mn} */
     Dict info() const;
 
@@ -3785,12 +3791,6 @@ namespace casadi {
     ...   print("Buffer is not large enough" in str(e))
     True
     \enddoctest
-
-        \doctest{matlab}
-        >> x = SX.sym('x');
-        >> isempty(fieldnames(Function('f', {x}, {x}).info()))
-        1
-        \enddoctest
 
     \sa Function::nz_from_in, Function::checkout, Function::sz_w
 
