@@ -3566,6 +3566,8 @@ class ArrayInterfaceMX(ArrayInterface[MX]):
 #ifdef SWIGJULIA
 // an option value is any Julia value GenericType converts from
 %typemap(jlparam) const casadi::GenericType& option_value "Any"
+// director returns convert as Base.convert does (true for 1, 2 for 2.0), not as the strict input typemaps
+%typemap(directorout) bool, casadi_int, double %{ $result = Swig::swig_director_as< $1_ltype >($input); %}
 #endif // SWIGJULIA
 
 #ifdef SWIGJULIA

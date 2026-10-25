@@ -108,6 +108,33 @@ CN.uses_output(::CbBuffer) = true
     @test_throws MethodError C.CallbackFunction(callback(CbSquare(), "nocopy"))
 end
 
+# hook returns of any Julia number type convert losslessly; others raise
+struct CbTyped <: Callback end
+CN.get_n_in(::CbTyped) = Int32(2)
+CN.get_n_out(::CbTyped) = true
+CN.uses_output(::CbTyped) = 1
+CN.get_sparsity_in(::CbTyped, i) = C.dense(Sparsity, 2, 1)
+CN.get_sparsity_out(::CbTyped, i) = C.dense(Sparsity, 2, 1)
+CN.has_eval_buffer(::CbTyped) = true
+CN.eval_buffer(::CbTyped, arg, res) = (res[1] .= arg[1] .+ arg[2]; UInt8(0))
+struct CbBadN <: Callback end
+CN.get_n_in(::CbBadN) = 1.5
+CN.eval_(::CbBadN, a) = [a[1]]
+struct CbBadRet <: Callback end
+CN.has_eval_buffer(::CbBadRet) = true
+CN.eval_buffer(::CbBadRet, arg, res) = "zero"
+
+@testset "Callback: hook return types" begin
+    cb = callback(CbTyped(), "typed")
+    f = C.Function(cb)
+    @test (C.n_in(f), C.n_out(f)) == (2, 1)
+    @test GC.@preserve(cb, Vector(f([1, 2], [3, 4]))) == [4, 6]
+    @test C.uses_output(f)
+    @test_throws CN.SwigError callback(CbBadN(), "badn")
+    g = callback(CbBadRet(), "badret")
+    @test_throws CN.SwigError g(1)
+end
+
 @testset "Callback: derivative hooks" begin
     J = C.Function(callback(CbSquareJac(), "sqj")).jacobian()
     @test Float64(J(3, 9)) == 6.0
