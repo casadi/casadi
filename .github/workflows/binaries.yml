@@ -65,27 +65,27 @@ jobs:
           
     - name: generate Python 3
       run: >
-        docker run --rm -v`pwd`:/local ghcr.io/casadi/ci-swig:latest /bin/bash -c
+        docker run --rm -v`pwd`:/local ghcr.io/casadi/ci-swig:v3 /bin/bash -c
         "mkdir build && cd build && cmake -DWITH_SELFCONTAINED=ON -DWITH_PYTHON=ON -DSWIG_EXPORT=ON -DWITH_COMMON=OFF -DWITH_PYTHON_GIL_RELEASE=OFF .. && make python_source && cd .. && rm -rf build"
 
     - name: generate Python 3
       run: >
-        docker run --rm -v`pwd`:/local ghcr.io/casadi/ci-swig:latest /bin/bash -c
+        docker run --rm -v`pwd`:/local ghcr.io/casadi/ci-swig:v3 /bin/bash -c
         "mkdir build && cd build && cmake -DWITH_SELFCONTAINED=ON -DWITH_PYTHON=ON -DSWIG_EXPORT=ON -DWITH_COMMON=OFF -DWITH_PYTHON_GIL_RELEASE=ON .. && make python_source && cd .. && rm -rf build"
   
     - name: generate Matlab
       run: >
-        docker run --rm -v`pwd`:/local ghcr.io/casadi/ci-swig:latest /bin/bash -c
+        docker run --rm -v`pwd`:/local ghcr.io/casadi/ci-swig:v3 /bin/bash -c
         "mkdir build && cd build && cmake -DWITH_SELFCONTAINED=ON -DWITH_MATLAB=ON -DSWIG_EXPORT=ON -DWITH_COMMON=OFF .. && make matlab_source && cd .. && rm -rf build"
     
     - name: generate wasm-js
       run: >
-        docker run --rm -v`pwd`:/local ghcr.io/casadi/ci-swig:latest /bin/bash -c
+        docker run --rm -v`pwd`:/local ghcr.io/casadi/ci-swig:v3 /bin/bash -c
         "mkdir build && cd build && cmake -DWITH_WASM_JS=ON -DSWIG_EXPORT=ON -DWITH_COMMON=OFF .. && make wasm_source && cd .. && rm -rf build"
 
     - name: generate julia
       run: >
-        docker run --rm -v`pwd`:/local ghcr.io/casadi/ci-swig:latest /bin/bash -c
+        docker run --rm -v`pwd`:/local ghcr.io/casadi/ci-swig:v3 /bin/bash -c
         "mkdir build && cd build && cmake -DWITH_JULIA=ON -DSWIG_EXPORT=ON -DWITH_COMMON=OFF .. && make julia_source && cd .. && rm -rf build"
 
     - name: set CMAKE default options
