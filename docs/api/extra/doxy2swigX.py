@@ -285,6 +285,9 @@ class Doxy2SWIG_X(Doxy2SWIG):
     
   def do_verbatim(self, node):
     text = node.firstChild.data
+    lines = text.split("\n")
+    if all(re.match(r"\s*\*( |$)", l) for l in lines if l.strip()):  # doxygen keeps '* ' comment prefixes
+      text = "\n".join(re.sub(r"^\s*\* ?", "", l) for l in lines)
     text = "\n".join(["  " +i for i in text.split("\n")])
     text = text.replace("\n","%%newline%%").replace('\\', r'\\\\').replace('"', r'\"')
     self.add_text("\n\n::\n\n")
