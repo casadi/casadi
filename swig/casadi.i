@@ -6189,6 +6189,8 @@ def _array_priority_yield(x, y):
 %}
 namespace casadi {
   %extend GenericExpressionCommon {
+// Upstream SWIG raises TypeError on a failed overload dispatch, the fork NotImplementedError
+#ifdef SWIG_STUBS_ENABLED
     %pythoncode %{
       def __hash__(self):
         try:
@@ -6212,6 +6214,31 @@ namespace casadi {
         except NotImplementedError:
           return NotImplemented
     %}
+#else
+    %pythoncode %{
+      def __hash__(self):
+        try:
+          return self.element_hash()
+        except:
+          return SharedObject.__hash__(self)
+      def __matmul__(x, y):
+        if _array_priority_yield(x, y): return NotImplemented
+        try:
+          return _casadi.mtimes(x, y)
+        except (NotImplementedError, TypeError):
+          return NotImplemented
+      def __rmatmul__(x, y):
+        try:
+          return _casadi.mtimes(y, x)
+        except (NotImplementedError, TypeError):
+          return NotImplemented
+      def __imatmul__(x, y):
+        try:
+          return _casadi.mtimes(x, y)
+        except (NotImplementedError, TypeError):
+          return NotImplemented
+    %}
+#endif
     %stub_method0(__hash__, int)
     %stub_CasadiMatrix_binop(__matmul__)
     %stub_CasadiMatrix_binop(__rmatmul__)
