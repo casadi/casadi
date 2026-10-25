@@ -31,7 +31,12 @@
 // return values swallows any output that is itself a list (swig/swig#1933).
 // Collect in a tuple instead; works with vanilla SWIG, no patched Lib needed.
 #undef SWIG_AppendOutput
+#if SWIG_VERSION >= 0x040300
 #define SWIG_AppendOutput(result, obj)  SWIG_Python_AppendOutput_Tuple(result, obj, $isvoid)
+#else
+// $isvoid is SWIG >= 4.3; 1 reproduces the older SWIG_Python_AppendOutput
+#define SWIG_AppendOutput(result, obj)  SWIG_Python_AppendOutput_Tuple(result, obj, 1)
+#endif
 
 %{
 SWIGINTERN PyObject*
