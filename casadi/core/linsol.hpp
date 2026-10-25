@@ -90,7 +90,7 @@ namespace casadi {
       >> L.solve(A, DM([4 1; 3 0]))
       [[1, 0.4],
        [1, -0.2]]
-      >> round(L.det(A))
+      >> L.det(A)
       5
       >> try, L.solve(DM([1 1; 1 1]), b); catch e, msg = e.message; end
       >> contains(msg, '''nfact'' failed')
@@ -412,7 +412,7 @@ namespace casadi {
 
         \lang{matlab}
         \doctest
-        >> A = DM([3 1; 1 2]); L = Linsol('L', 'qr', A.sparsity()); disp(round(L.det(A)))
+        >> A = DM([3 1; 1 2]); L = Linsol('L', 'qr', A.sparsity()); disp(L.det(A))
         5
         >> L = Linsol('L', 'ldl', A.sparsity());
         >> try, L.det(A); catch e, disp(contains(e.message, '''det'' not defined')); end

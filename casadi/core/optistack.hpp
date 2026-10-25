@@ -72,10 +72,10 @@ class OptiCallback;
     >>> opti.subject_to(x+y>=1)
     >>> opti.solver("ipopt", {"print_time": False}, {"print_level": 0, "sb": "yes"})
     >>> sol = opti.solve()
-    >>> round(sol.value(x), 4), round(sol.value(y), 4)
-    (0.7862, 0.618)
-    >>> round(sol.value(opti.f), 6)
-    0.0
+    >>> sol.value(x), sol.value(y)
+    (0.7862, 0.6180)
+    >>> sol.value(opti.f)
+    0
     \enddoctest
     \endlang
 
@@ -88,9 +88,10 @@ class OptiCallback;
     >> opti.subject_to(x+y>=1);
     >> opti.solver('ipopt', struct('print_time', false), struct('print_level', 0, 'sb', 'yes'));
     >> sol = opti.solve();
-    >> fprintf('%.4f %.4f\n', sol.value(x), sol.value(y))
-    0.7862 0.6180
-    >> round(sol.value(opti.f), 6)
+    >> sol.value(x), sol.value(y)
+    0.7862
+    0.6180
+    >> sol.value(opti.f)
     0
     \enddoctest
     \endlang
@@ -107,11 +108,11 @@ class OptiCallback;
     >>> opti.solver("ipopt", {"print_time": False}, {"print_level": 0, "sb": "yes"})
     >>> opti.set_value(p, 3)
     >>> sol = opti.solve()
-    >>> round(sol.value(sum1(x)), 4)
+    >>> sol.value(sum1(x))
     2.0
     >>> opti.set_value(p, 0)
     >>> sol = opti.solve()
-    >>> round(sol.value(sum1(x)), 4)
+    >>> sol.value(sum1(x))
     1.0
     \enddoctest
     \endlang
@@ -124,10 +125,10 @@ class OptiCallback;
     >> opti.subject_to(1 <= sum1(x) <= 2);
     >> opti.solver('ipopt', struct('print_time', false), struct('print_level', 0, 'sb', 'yes'));
     >> opti.set_value(p, 3); sol = opti.solve();
-    >> round(sol.value(sum1(x)), 4)
+    >> sol.value(sum1(x))
     2
     >> opti.set_value(p, 0); sol = opti.solve();
-    >> round(sol.value(sum1(x)), 4)
+    >> sol.value(sum1(x))
     1
     \enddoctest
     \endlang
@@ -141,7 +142,7 @@ class OptiCallback;
     >>> opti.minimize((x-1)**2)
     >>> opti.solver("ipopt", {"print_time": False}, {"print_level": 0, "sb": "yes"})
     >>> history = []
-    >>> opti.callback(lambda i: history.append((i, round(opti.debug.value(x), 3))))
+    >>> opti.callback(lambda i: history.append((i, opti.debug.value(x))))
     >>> sol = opti.solve()
     >>> history
     [(0, 0.0), (1, 1.0)]
@@ -311,7 +312,7 @@ public:
       ...   print(str(e).splitlines()[-2])
       You have forgotten to assign a value to a parameter ('set_value'), or have set it to NaN/Inf:
       >>> opti.set_value(p, [1, 3])
-      >>> round(opti.solve().value(x), 4)
+      >>> opti.solve().value(x)
       2.0
       \enddoctest
       \endlang
@@ -323,7 +324,7 @@ public:
       >> opti.solver('ipopt', struct('print_time', false), struct('print_level', 0, 'sb', 'yes'));
       >> try, opti.solve(); catch e, disp(contains(e.message, 'forgotten to assign a value')); end
       1
-      >> opti.set_value(p, [1; 3]); sol = opti.solve(); disp(round(sol.value(x), 4))
+      >> opti.set_value(p, [1; 3]); sol = opti.solve(); disp(sol.value(x))
       2
       \enddoctest
       \endlang
@@ -578,12 +579,12 @@ public:
       ...   print("You must call 'solver' on the Opti stack" in str(e))
       True
       >>> opti.solver("ipopt", {"print_time": False}, {"print_level": 0, "sb": "yes"})
-      >>> round(opti.solve().value(x), 4)
+      >>> opti.solve().value(x)
       2.0
       >>> opti.solver("sqpmethod", {"print_time": False, "print_header": False,
       ...   "print_iteration": False, "print_status": False, "qpsol": "qrqp",
       ...   "qpsol_options": {"print_iter": False, "print_header": False, "print_info": False}})
-      >>> round(opti.solve().value(x), 4)
+      >>> opti.solve().value(x)
       2.0
       \enddoctest
       \endlang
@@ -594,12 +595,12 @@ public:
       >> try, opti.solve(); catch e, disp(contains(e.message, 'You must call ''solver''')); end
       1
       >> opti.solver('ipopt', struct('print_time', false), struct('print_level', 0, 'sb', 'yes'));
-      >> sol = opti.solve(); disp(round(sol.value(x), 4))
+      >> sol = opti.solve(); disp(sol.value(x))
       2
       >> qp = struct('print_iter', false, 'print_header', false, 'print_info', false);
       >> opts = struct('print_time', false, 'print_header', false, 'print_iteration', false);
       >> opts.print_status = false; opts.qpsol = 'qrqp'; opts.qpsol_options = qp;
-      >> opti.solver('sqpmethod', opts); sol = opti.solve(); disp(round(sol.value(x), 4))
+      >> opti.solver('sqpmethod', opts); sol = opti.solve(); disp(sol.value(x))
       2
       \enddoctest
       \endlang
@@ -813,10 +814,10 @@ public:
       >>> opti.minimize((T-300)**2)
       >>> opti.solver("ipopt", {"print_time": False}, {"print_level": 0, "sb": "yes"})
       >>> sol = opti.solve()
-      >>> round(sol.value(T), 3), opti.x_linear_scale, opti.x_linear_scale_offset
+      >>> sol.value(T), opti.x_linear_scale, opti.x_linear_scale_offset
       (300.0, DM(20), DM(273.15))
-      >>> round(float(opti.debug.arg()["x0"]), 4)
-      -13.6575
+      >>> opti.debug.arg()["x0"]
+      DM(-13.6575)
       \enddoctest
       \endlang
 
@@ -826,11 +827,11 @@ public:
       >> opti.set_linear_scale(T, 20, 273.15); opti.minimize((T-300)^2);
       >> opti.solver('ipopt', struct('print_time', false), struct('print_level', 0, 'sb', 'yes'));
       >> sol = opti.solve();
-      >> round(sol.value(T), 3), opti.x_linear_scale, opti.x_linear_scale_offset
+      >> sol.value(T), opti.x_linear_scale, opti.x_linear_scale_offset
       300
       20
       273.15
-      >> a = opti.debug.arg(); disp(round(full(a.x0), 4))
+      >> a = opti.debug.arg(); disp(a.x0)
       -13.6575
       \enddoctest
       \endlang
@@ -863,11 +864,11 @@ public:
       ... except Exception as e:
       ...   print("Solver failed" in str(e), "'Maximum_Iterations_Exceeded'" in str(e))
       True True
-      >>> round(opti.debug.value(x), 2), opti.return_status()
+      >>> opti.debug.value(x), opti.return_status()
       (0.36, 'Maximum_Iterations_Exceeded')
       >>> opti.solver("ipopt", {"print_time": False}, {"print_level": 0, "sb": "yes"})
       >>> sol = opti.solve()
-      >>> round(sol.value(x), 1), sol.stats()["success"]
+      >>> sol.value(x), sol.stats()["success"]
       (1.0, True)
       \enddoctest
       \endlang
@@ -879,12 +880,12 @@ public:
       >> opti.solver('ipopt', struct('print_time', false), ipopt);
       >> try, opti.solve(); catch e, disp(contains(e.message, 'Maximum_Iterations_Exceeded')); end
       1
-      >> round(opti.debug.value(x), 2), opti.return_status()
-      0.3600
+      >> opti.debug.value(x), opti.return_status()
+      0.36
       Maximum_Iterations_Exceeded
       >> opti.solver('ipopt', struct('print_time', false), struct('print_level', 0, 'sb', 'yes'));
-      >> sol = opti.solve(); s = sol.stats(); disp(round(sol.value(x), 1)), disp(s.success)
-      1
+      >> sol = opti.solve(); s = sol.stats(); disp(sol.value(x)), disp(s.success)
+      1.0
       1
       \enddoctest
       \endlang
@@ -908,7 +909,7 @@ public:
       >>> opti.solver("ipopt", {"print_time": False},
       ...             {"print_level": 0, "max_iter": 2, "sb": "yes"})
       >>> sol = opti.solve_limited()
-      >>> sol.stats()["unified_return_status"], round(sol.value(x), 2)
+      >>> sol.stats()["unified_return_status"], sol.value(x)
       ('SOLVER_RET_LIMITED', 0.36)
       \enddoctest
       \endlang
@@ -919,9 +920,9 @@ public:
       >> ipopt = struct('print_level', 0, 'max_iter', 2, 'sb', 'yes');
       >> opti.solver('ipopt', struct('print_time', false), ipopt);
       >> sol = opti.solve_limited(); s = sol.stats();
-      >> s.unified_return_status, round(sol.value(x), 2)
+      >> s.unified_return_status, sol.value(x)
       SOLVER_RET_LIMITED
-      0.3600
+      0.36
       \enddoctest
       \endlang
 
@@ -965,7 +966,7 @@ public:
       (4.0, 0.0)
       >>> opti.solver("ipopt", {"print_time": False}, {"print_level": 0, "sb": "yes"})
       >>> sol = opti.solve()
-      >>> round(opti.value(x), 4), round(sol.value(x), 4), sol.value(x+p, [p==10])
+      >>> opti.value(x), sol.value(x), sol.value(x+p, [p==10])
       (3.0, 3.0, 13.0)
       >>> type(sol.value(vertcat(x, p))).__name__, sol.value(DM([1, 2]))
       ('ndarray', array([1., 2.]))
@@ -987,8 +988,10 @@ public:
       0
       >> opti.solver('ipopt', struct('print_time', false), struct('print_level', 0, 'sb', 'yes'));
       >> sol = opti.solve();
-      >> fprintf('%.4f %.4f %.4f\n', opti.value(x), sol.value(x), sol.value(x+p, {p==10}))
-      3.0000 3.0000 13.0000
+      >> opti.value(x), sol.value(x), sol.value(x+p, {p==10})
+      3
+      3
+      13
       >> v = sol.value(vertcat(x, p)); disp(class(v)), disp(size(v)), disp(sol.value(DM([1; 2]))')
       double
       2 1
@@ -1208,13 +1211,13 @@ public:
       >>> opti.subject_to(con)
       >>> opti.solver("ipopt", {"print_time": False}, {"print_level": 0, "sb": "yes"})
       >>> sol = opti.solve()
-      >>> round(sol.value(opti.dual(con)), 4), round(sol.value(opti.lam_g), 4)
+      >>> sol.value(opti.dual(con)), sol.value(opti.lam_g)
       (4.0, 4.0)
       >>> opti.subject_to()
       >>> con = x >= 4
       >>> opti.subject_to(con)
       >>> sol = opti.solve()
-      >>> round(sol.value(opti.dual(con)), 4), round(sol.value(opti.lam_g), 4)
+      >>> sol.value(opti.dual(con)), sol.value(opti.lam_g)
       (2.0, -2.0)
       >>> try:
       ...   opti.dual(x >= 4)
@@ -1230,11 +1233,13 @@ public:
       >> con = x <= 1; opti.subject_to(con);
       >> opti.solver('ipopt', struct('print_time', false), struct('print_level', 0, 'sb', 'yes'));
       >> sol = opti.solve();
-      >> fprintf('%.4f %.4f\n', sol.value(opti.dual(con)), sol.value(opti.lam_g))
-      4.0000 4.0000
+      >> sol.value(opti.dual(con)), sol.value(opti.lam_g)
+      4
+      4
       >> opti.subject_to(); con = x >= 4; opti.subject_to(con); sol = opti.solve();
-      >> fprintf('%.4f %.4f\n', sol.value(opti.dual(con)), sol.value(opti.lam_g))
-      2.0000 -2.0000
+      >> sol.value(opti.dual(con)), sol.value(opti.lam_g)
+      2
+      -2
       >> try, opti.dual(x >= 4); catch e, disp(contains(e.message, 'Constraint not present')); end
       1
       \enddoctest
@@ -1506,7 +1511,7 @@ public:
       >>> opti.set_value(p, 1)
       >>> opti.solver("ipopt", {"print_time": False}, {"print_level": 0, "sb": "yes"})
       >>> sol = opti.solve()
-      >>> round(sol.value(opti.lam_g), 4)
+      >>> sol.value(opti.lam_g)
       -2.0
       >>> sol.value(hessian(opti.f + dot(opti.lam_g, opti.g), opti.x)[0])
       2.0
@@ -1518,7 +1523,7 @@ public:
       >> opti = Opti(); x = opti.variable(); p = opti.parameter();
       >> opti.minimize(x^2); opti.subject_to(x >= p); opti.set_value(p, 1);
       >> opti.solver('ipopt', struct('print_time', false), struct('print_level', 0, 'sb', 'yes'));
-      >> sol = opti.solve(); disp(round(sol.value(opti.lam_g), 4))
+      >> sol = opti.solve(); disp(sol.value(opti.lam_g))
       -2
       >> H = hessian(opti.f + dot(opti.lam_g, opti.g), opti.x); disp(sol.value(H))
       2
@@ -1567,8 +1572,8 @@ public:
       >>> F
       Function(F:(p,x0)->(xy[2],lam) MXFunction)
       >>> r = F(p=2, x0=1)
-      >>> r["xy"], round(abs(float(r["lam"])), 4)
-      (DM([2, 2]), 0.0)
+      >>> r["xy"], r["lam"]
+      (DM([2, 2]), DM(0.0000))
       >>> F.stats()["success"]
       True
       >>> F = opti.to_function("F", {"p": p, "x": x}, ["p"], ["x"])
@@ -1590,9 +1595,9 @@ public:
       >> F = opti.to_function('F', {p, x}, {vertcat(x, y), opti.lam_g}, {'p', 'x0'}, {'xy', 'lam'});
       >> F
       F:(p,x0)->(xy[2],lam) MXFunction
-      >> r = F('p', 2, 'x0', 1); disp(r.xy), disp(round(abs(full(r.lam)), 4))
+      >> r = F('p', 2, 'x0', 1); disp(r.xy), disp(r.lam)
       [2, 2]
-      0
+      0.0000
       >> s = F.stats(); disp(s.success)
       1
       >> F = opti.to_function('F', struct('p', p, 'x', x), {'p'}, {'x'}); disp(F(3))
@@ -1666,7 +1671,7 @@ public:
       ...   opti.solve()
       ... except Exception as e:
       ...   pass
-      >>> round(opti.debug.value(x), 2)
+      >>> opti.debug.value(x)
       0.36
       >>> print(opti.debug.x_describe(0))
       Opti decision variable 'opti..._x_1' of shape 1x1, called from ...
@@ -1679,8 +1684,8 @@ public:
       >> ipopt = struct('print_level', 0, 'max_iter', 2, 'sb', 'yes');
       >> opti.solver('ipopt', struct('print_time', false), ipopt);
       >> try, opti.solve(); catch e, end
-      >> round(opti.debug.value(x), 2)
-      0.3600
+      >> opti.debug.value(x)
+      0.36
       >> opti.debug.x_describe(1)
       Opti decision variable 'opti..._x_1' of shape 1x1, called from ...
       \enddoctest
@@ -2411,7 +2416,7 @@ public:
       {'lam_g0': DM(0), 'lbg': DM(-inf), 'p': DM(3), 'ubg': DM(1), 'x0': DM(0)}
       >>> r = d.solve_actual(d.arg())
       >>> d.res(r)
-      >>> round(d.value(x), 4), sorted(d.res().keys())
+      >>> d.value(x), sorted(d.res().keys())
       (1.0, ['f', 'g', 'lam_g', 'lam_p', 'lam_x', 'x'])
       \enddoctest
       \endlang
@@ -2428,7 +2433,7 @@ public:
       1
       0
       >> r = d.solve_actual(d.arg()); d.res(r);
-      >> round(d.value(x), 4), sort(fieldnames(d.res()))'
+      >> d.value(x), sort(fieldnames(d.res()))'
       1
       {'f'} {'g'} {'lam_g'} {'lam_p'} {'lam_x'} {'x'}
       \enddoctest
@@ -2537,7 +2542,7 @@ protected:
     >>> sol1 = opti.solve()
     >>> opti.set_value(p, 2)
     >>> sol2 = opti.solve()
-    >>> round(sol1.value(x), 4), round(sol2.value(x), 4)
+    >>> sol1.value(x), sol2.value(x)
     (1.0, 2.0)
     \enddoctest
     \endlang
@@ -2549,8 +2554,9 @@ protected:
     >> opti.solver('ipopt', struct('print_time', false), struct('print_level', 0, 'sb', 'yes'));
     >> opti.set_value(p, 1); sol1 = opti.solve();
     >> opti.set_value(p, 2); sol2 = opti.solve();
-    >> fprintf('%.4f %.4f\n', sol1.value(x), sol2.value(x))
-    1.0000 2.0000
+    >> sol1.value(x), sol2.value(x)
+    1
+    2
     \enddoctest
     \endlang
 
@@ -2588,9 +2594,9 @@ class CASADI_EXPORT OptiSol : public SWIG_IF_ELSE(PrintableCommon, Printable<Opt
         >>> opti.subject_to(x+y>=1)
         >>> opti.solver("ipopt", {"print_time": False}, {"print_level": 0, "sb": "yes"})
         >>> sol = opti.solve()
-        >>> round(sol.value(x), 4), sol.value(vertcat(x, y)).shape
+        >>> sol.value(x), sol.value(vertcat(x, y)).shape
         (0.7862, (2,))
-        >>> round(sol.value(opti.f, [y==2]), 4)
+        >>> sol.value(opti.f, [y==2])
         1.9098
         >>> sol.value(x**2+y, opti.initial())
         0.0
@@ -2607,10 +2613,10 @@ class CASADI_EXPORT OptiSol : public SWIG_IF_ELSE(PrintableCommon, Printable<Opt
         >> opti.minimize((y-x^2)^2); opti.subject_to(x^2+y^2==1); opti.subject_to(x+y>=1);
         >> opti.solver('ipopt', struct('print_time', false), struct('print_level', 0, 'sb', 'yes'));
         >> sol = opti.solve();
-        >> round(sol.value(x), 4), size(sol.value(vertcat(x, y)))
+        >> sol.value(x), size(sol.value(vertcat(x, y)))
         0.7862
         2 1
-        >> round(sol.value(opti.f, {y==2}), 4)
+        >> sol.value(opti.f, {y==2})
         1.9098
         >> sol.value(x^2+y, opti.initial())
         0
@@ -2709,7 +2715,7 @@ class CASADI_EXPORT OptiSol : public SWIG_IF_ELSE(PrintableCommon, Printable<Opt
         >>> opti.minimize((x-1)**2)
         >>> opti.solver("ipopt", {"print_time": False}, {"print_level": 0, "sb": "yes"})
         >>> sol = opti.solve()
-        >>> sol.opti.return_status(), round(sol.opti.debug.value(x), 4)
+        >>> sol.opti.return_status(), sol.opti.debug.value(x)
         ('Solve_Succeeded', 1.0)
         \enddoctest
         \endlang
@@ -2719,7 +2725,7 @@ class CASADI_EXPORT OptiSol : public SWIG_IF_ELSE(PrintableCommon, Printable<Opt
         >> opti = Opti(); x = opti.variable(); opti.minimize((x-1)^2);
         >> opti.solver('ipopt', struct('print_time', false), struct('print_level', 0, 'sb', 'yes'));
         >> sol = opti.solve(); o = sol.opti;
-        >> o.return_status(), round(o.debug.value(x), 4)
+        >> o.return_status(), o.debug.value(x)
         Solve_Succeeded
         1
         \enddoctest

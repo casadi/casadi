@@ -112,10 +112,10 @@ namespace casadi {
       >>> S.name_out()
       ['x', 'f', 'g', 'lam_x', 'lam_g', 'lam_p']
       >>> sol = S(lbg=1, ubg=1, lbx=0)
-      >>> np.round(sol["x"].full().ravel(), 4), round(float(sol["f"]), 4)
-      (array([1., 0.]), -2.0)
-      >>> round(float(sol["lam_g"]), 4), np.round(sol["lam_x"].full().ravel(), 4)
-      (1.0, array([ 0., -2.]))
+      >>> sol["x"], sol["f"]
+      (DM([1, 0]), DM(-2))
+      >>> sol["lam_g"], sol["lam_x"]
+      (DM(1), DM([0, -2]))
       >>> sol["g"], sol["lam_p"].shape
       (DM(1), (0, 0))
       >>> S.stats()["success"], S.stats()["return_status"]
@@ -146,8 +146,8 @@ namespace casadi {
       lam_g
       lam_p
       >> sol = S('lbg', 1, 'ubg', 1, 'lbx', 0);
-      >> fprintf('%.4f %.4f\n', full(sol.x)), disp(sol.f)
-      1.0000 0.0000
+      >> sol.x, sol.f
+      [1, 0]
       -2
       >> sol.lam_g, sol.lam_x
       1
@@ -169,10 +169,10 @@ namespace casadi {
       >>> print(C)
       C:(h[2x2],g[2],a[1x2],lba,uba,lbx[2],ubx[2],x0[2],...)->(x[2],cost,lam_a,lam_x[2]) Qrqp
       >>> sol = C(h=H, g=g, a=A, lba=1, uba=1, lbx=0)
-      >>> np.round(sol["x"].full().ravel(), 4), round(float(sol["cost"]), 4)
-      (array([1., 0.]), -2.0)
-      >>> round(float(sol["lam_a"]), 4), np.round(sol["lam_x"].full().ravel(), 4)
-      (1.0, array([ 0., -2.]))
+      >>> sol["x"], sol["cost"]
+      (DM([1, 0]), DM(-2))
+      >>> sol["lam_a"], sol["lam_x"]
+      (DM(1), DM([0, -2]))
       >>> LP = conic("LP", "qrqp", {"a": A.sparsity()}, opts)
       >>> LP(g=g, a=A, lba=1, uba=1, lbx=0, ubx=1)["x"]
       DM([1, 0])
@@ -191,8 +191,8 @@ namespace casadi {
       >> C = conic('C', 'qrqp', struct('h', H.sparsity(), 'a', A.sparsity()), opts); disp(C)
       C:(h[2x2],g[2],a[1x2],lba,uba,lbx[2],ubx[2],x0[2],...)->(x[2],cost,lam_a,lam_x[2]) Qrqp
       >> sol = C('h', H, 'g', g, 'a', A, 'lba', 1, 'uba', 1, 'lbx', 0);
-      >> fprintf('%.4f %.4f\n', full(sol.x)), disp(sol.cost)
-      1.0000 0.0000
+      >> sol.x, sol.cost
+      [1, 0]
       -2
       >> sol.lam_a, sol.lam_x
       1

@@ -1770,8 +1770,8 @@ namespace casadi {
         \doctest
         >>> A = DM([[1, 2, 3], [4, 5, 6]])
         >>> Z = nullspace(A)
-        >>> Z.dim(), float(norm_1(mtimes(A, Z))) < 1e-12
-        ('3x1', True)
+        >>> Z.dim(), norm_1(mtimes(A, Z))
+        ('3x1', DM(0))
         \enddoctest
         \endlang
 
@@ -1779,8 +1779,9 @@ namespace casadi {
         \doctest
         >> A = DM([1 2 3; 4 5 6]);
         >> Z = nullspace(A);
-        >> fprintf('%s %d\n', Z.dim(), full(norm_1(A*Z)) < 1e-12)
-        3x1 1
+        >> Z.dim(), norm_1(A*Z)
+        3x1
+        0
         \enddoctest
         \endlang
 

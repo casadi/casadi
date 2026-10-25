@@ -3459,8 +3459,8 @@ namespace casadi {
         \doctest
         >>> DM.rng(1); a = DM.rand(2, 2)
         >>> DM.rng(1); b = DM.rand(2, 2)
-        >>> float(norm_inf(a - b))
-        0.0
+        >>> norm_inf(a - b)
+        DM(0)
         \enddoctest
         \endlang
 

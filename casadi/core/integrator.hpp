@@ -115,11 +115,11 @@ namespace casadi {
       >>> print(F)
       F:(x0,z0[0],p,u[0],adj_xf[],adj_zf[],adj_qf[])->(xf,zf[0],qf,adj_x0[],...,adj_u[]) ...
       >>> r = F(x0=1, p=1)
-      >>> round(float(r["xf"]), 4), round(float(r["qf"]), 4)
-      (0.3679, 0.6321)
+      >>> r["xf"], r["qf"]
+      (DM(0.3679), DM(0.6321))
       >>> F = integrator("F", "rk", dae, 0, [1, 2, 3])
-      >>> np.round(F(x0=1, p=1)["xf"].full(), 4)
-      array([[0.3679, 0.1353, 0.0498]])
+      >>> F(x0=1, p=1)["xf"]
+      DM([[0.3679, 0.1353, 0.0498]])
       >>> xf, zf, qf, adj_x0, adj_z0, adj_p, adj_u = F(1, 0, 1, 0, 0, 0, 0)
       >>> xf.shape, zf.shape, adj_x0.shape
       ((1, 3), (0, 3), (0, 0))
@@ -132,11 +132,12 @@ namespace casadi {
       >> dae = struct('x', x, 'p', p, 'ode', -p*x, 'quad', x);
       >> F = integrator('F', 'cvodes', dae); disp(F)
       F:(x0,z0[0],p,u[0],adj_xf[],adj_zf[],adj_qf[])->(xf,zf[0],qf,adj_x0[],...,adj_u[]) ...
-      >> r = F('x0', 1, 'p', 1); fprintf('%.4f %.4f\n', full(r.xf), full(r.qf))
-      0.3679 0.6321
+      >> r = F('x0', 1, 'p', 1); r.xf, r.qf
+      0.3679
+      0.6321
       >> F = integrator('F', 'rk', dae, 0, [1, 2, 3]);
-      >> r = F('x0', 1, 'p', 1); fprintf('%.4f %.4f %.4f\n', full(r.xf))
-      0.3679 0.1353 0.0498
+      >> r = F('x0', 1, 'p', 1); r.xf
+      [[0.3679, 0.1353, 0.0498]]
       >> [xf, zf, qf, adj_x0, adj_z0, adj_p, adj_u] = F(1, 0, 1, 0, 0, 0, 0);
       >> size(xf), size(zf), size(adj_x0)
       1 3
@@ -150,10 +151,10 @@ namespace casadi {
       >>> x = SX.sym("x"); z = SX.sym("z"); u = SX.sym("u")
       >>> F = integrator("F", "idas", {"x": x, "z": z, "ode": -z, "alg": z**2 - x})
       >>> r = F(x0=1, z0=1)
-      >>> round(float(r["xf"]), 3), round(float(r["zf"]), 3)
-      (0.25, 0.5)
-      >>> round(float(F(x0=1, z0=-1)["zf"]), 3)
-      -1.5
+      >>> r["xf"], r["zf"]
+      (DM(0.25), DM(0.5))
+      >>> F(x0=1, z0=-1)["zf"]
+      DM(-1.5)
       >>> F = integrator("F", "rk", {"x": x, "u": u, "ode": u}, 0, [1, 2, 3])
       >>> F(x0=0, u=[1, 2, 3])["xf"], F(x0=0, u=1)["xf"]
       (DM([[1, 3, 6]]), DM([[1, 2, 3]]))
@@ -174,10 +175,11 @@ namespace casadi {
       \doctest
       >> x = SX.sym('x'); z = SX.sym('z'); u = SX.sym('u');
       >> F = integrator('F', 'idas', struct('x', x, 'z', z, 'ode', -z, 'alg', z^2 - x));
-      >> r = F('x0', 1, 'z0', 1); fprintf('%.3f %.3f\n', full(r.xf), full(r.zf))
-      0.250 0.500
-      >> r = F('x0', 1, 'z0', -1); fprintf('%.3f\n', full(r.zf))
-      -1.500
+      >> r = F('x0', 1, 'z0', 1); r.xf, r.zf
+      0.25
+      0.5
+      >> r = F('x0', 1, 'z0', -1); r.zf
+      -1.5
       >> F = integrator('F', 'rk', struct('x', x, 'u', u, 'ode', u), 0, [1, 2, 3]);
       >> r = F('x0', 0, 'u', [1 2 3]); disp(r.xf)
       [[1, 3, 6]]
@@ -202,13 +204,13 @@ namespace casadi {
       >>> print(F)
       F:(x0,z0[0],p,u[0],adj_xf,adj_zf[0],adj_qf)->(xf,zf[0],qf,adj_x0,...,adj_p,adj_u[0]) ...
       >>> r = F(x0=1, p=1, adj_xf=1)
-      >>> round(float(r["adj_x0"]), 4), round(float(r["adj_p"]), 4)
-      (0.3679, -0.3679)
+      >>> r["adj_x0"], r["adj_p"]
+      (DM(0.3679), DM(-0.3679))
       >>> F = integrator("F", "cvodes", dae)
       >>> pm = MX.sym("p")
       >>> J = Function("J", [pm], [jacobian(F(x0=1, p=pm)["xf"], pm)])
-      >>> round(float(J(1)), 4)
-      -0.3679
+      >>> J(1)
+      DM(-0.3679)
       \enddoctest
       \endlang
 
@@ -218,10 +220,11 @@ namespace casadi {
       >> dae = struct('x', x, 'p', p, 'ode', -p*x, 'quad', x);
       >> F = integrator('F', 'cvodes', dae, struct('nadj', 1)); disp(F)
       F:(x0,z0[0],p,u[0],adj_xf,adj_zf[0],adj_qf)->(xf,zf[0],qf,adj_x0,...,adj_p,adj_u[0]) ...
-      >> r = F('x0', 1, 'p', 1, 'adj_xf', 1); fprintf('%.4f %.4f\n', full(r.adj_x0), full(r.adj_p))
-      0.3679 -0.3679
+      >> r = F('x0', 1, 'p', 1, 'adj_xf', 1); r.adj_x0, r.adj_p
+      0.3679
+      -0.3679
       >> F = integrator('F', 'cvodes', dae); pm = MX.sym('p'); r = F('x0', 1, 'p', pm);
-      >> J = Function('J', {pm}, {jacobian(r.xf, pm)}); fprintf('%.4f\n', full(J(1)))
+      >> J = Function('J', {pm}, {jacobian(r.xf, pm)}); J(1)
       -0.3679
       \enddoctest
       \endlang
@@ -517,8 +520,8 @@ namespace casadi {
       ['ode', 'alg', 'quad', 'zero']
       >>> x = SX.sym("x"); t = SX.sym("t"); e = SX(0, 1)
       >>> dae = Function("dae", [t, x, e, e, e], [-x, e, x, e], dyn_in(), dyn_out())
-      >>> round(float(integrator("F", "rk", dae)(x0=1)["xf"]), 4)
-      0.3679
+      >>> integrator("F", "rk", dae)(x0=1)["xf"]
+      DM(0.3679)
       \enddoctest
       \endlang
 
@@ -531,7 +534,7 @@ namespace casadi {
       zero
       >> x = SX.sym('x'); t = SX.sym('t'); e = SX(0, 1);
       >> dae = Function('dae', {t, x, e, e, e}, {-x, e, x, e}, dyn_in(), dyn_out());
-      >> F = integrator('F', 'rk', dae); r = F('x0', 1); fprintf('%.4f\n', full(r.xf))
+      >> F = integrator('F', 'rk', dae); r = F('x0', 1); r.xf
       0.3679
       \enddoctest
       \endlang

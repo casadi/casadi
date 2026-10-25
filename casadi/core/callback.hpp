@@ -73,8 +73,8 @@ namespace casadi {
    >>> f = MyCallback("f", 0.5)
    >>> f
    Callback(f:(i0)->(o0) CallbackInternal)
-   >>> round(float(f(2)), 4)
-   0.8415
+   >>> f(2)
+   DM(0.8415)
    >>> x = MX.sym("x")
    >>> f(x)
    MX(f(x){0})
@@ -85,8 +85,8 @@ namespace casadi {
    True
    >>> f = MyCallback("f", 0.5, {"enable_fd": True})
    >>> J = Function("J", [x], [jacobian(f(x), x)])
-   >>> round(float(J(2)), 4)
-   0.2702
+   >>> J(2)
+   DM(0.2702)
    \enddoctest
    \endlang
 
@@ -102,14 +102,14 @@ namespace casadi {
    >> fprintf(fid, '%s\n', c{:}); fclose(fid);
    >> f = MyCallback('f', 0.5); disp(f)
    f:(i0)->(o0) CallbackInternal
-   >> round(full(f(2)), 4)
+   >> f(2)
    0.8415
    >> x = MX.sym('x'); disp(f(x))
    f(x){0}
    >> try, jacobian(f(x), x); catch e, disp(contains(e.message, 'Derivatives cannot be')); end
    1
    >> f = MyCallback('f', 0.5, struct('enable_fd', true));
-   >> J = Function('J', {x}, {jacobian(f(x), x)}); disp(round(full(J(2)), 4))
+   >> J = Function('J', {x}, {jacobian(f(x), x)}); J(2)
    0.2702
    >> rmpath(d); rmdir(d, 's');
    \enddoctest
@@ -172,7 +172,7 @@ namespace casadi {
    >>> v = opti.variable()
    >>> opti.minimize(f(v-1))
    >>> opti.solver("ipopt", {"print_time": False}, {"print_level": 0, "sb": "yes"})
-   >>> round(opti.solve().value(v), 3)
+   >>> opti.solve().value(v)
    1.0
    \enddoctest
    \endlang
@@ -188,8 +188,8 @@ namespace casadi {
    >> f = SqFd('f', struct('enable_fd', true));
    >> opti = Opti(); v = opti.variable(); opti.minimize(f(v-1));
    >> opti.solver('ipopt', struct('print_time', false), struct('print_level', 0, 'sb', 'yes'));
-   >> sol = opti.solve(); disp(round(sol.value(v), 3))
-   1
+   >> sol = opti.solve(); disp(sol.value(v))
+   1.0000
    >> rmpath(d); rmdir(d, 's');
    \enddoctest
    \endlang

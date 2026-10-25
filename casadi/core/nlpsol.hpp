@@ -114,13 +114,13 @@ namespace casadi {
       >>> print(S)
       S:(x0[2],p,lbx[2],ubx[2],lbg,ubg,lam_x0[2],lam_g0)->(x[2],f,g,lam_x[2],lam_g,lam_p) ...
       >>> sol = S(x0=[2.5, 3.0], p=100, lbg=-1, ubg=1)
-      >>> round(float(sol["f"]), 4), np.round(sol["x"].full().ravel(), 4)
-      (0.1456, array([0.6188, 0.3812]))
+      >>> sol["f"], sol["x"]
+      (DM(0.1456), DM([0.6188, 0.3812]))
       >>> S.stats()["success"], S.stats()["return_status"]
       (True, 'Solve_Succeeded')
       >>> x_opt, f_opt, g_opt, lam_x, lam_g, lam_p = S([2.5, 3.0], 100, -inf, inf, -1, 1, 0, 0)
-      >>> round(float(f_opt), 4), round(float(lam_g), 4)
-      (0.1456, 0.3407)
+      >>> f_opt, lam_g
+      (DM(0.1456), DM(0.3407))
       >>> S(p=100)["x"]
       DM([1, 1])
       \enddoctest
@@ -134,14 +134,16 @@ namespace casadi {
       >> S = nlpsol('S', 'ipopt', nlp, opts); disp(S)
       S:(x0[2],p,lbx[2],ubx[2],lbg,ubg,lam_x0[2],lam_g0)->(x[2],f,g,lam_x[2],lam_g,lam_p) ...
       >> sol = S('x0', [2.5; 3.0], 'p', 100, 'lbg', -1, 'ubg', 1);
-      >> fprintf('%.4f %.4f %.4f\n', full(sol.f), full(sol.x))
-      0.1456 0.6188 0.3812
+      >> sol.f, sol.x
+      0.1456
+      [0.6188, 0.3812]
       >> st = S.stats(); disp(st.success), disp(st.return_status)
       1
       Solve_Succeeded
       >> [x_opt, f_opt, g_opt, lam_x, lam_g, lam_p] = S([2.5; 3.0], 100, -inf, inf, -1, 1, 0, 0);
-      >> fprintf('%.4f %.4f\n', full(f_opt), full(lam_g))
-      0.1456 0.3407
+      >> f_opt, lam_g
+      0.1456
+      0.3407
       >> sol = S('p', 100); disp(sol.x)
       [1, 1]
       \enddoctest
@@ -153,12 +155,12 @@ namespace casadi {
       >>> opts = {"ipopt.print_level": 0, "ipopt.sb": "yes", "print_time": False}
       >>> S = nlpsol("S", "ipopt", {"x": x, "p": p, "f": (x - p)**2 + 3*p, "g": 2*x}, opts)
       >>> sol = S(p=1, lbg=4)
-      >>> round(float(sol["x"]), 4), round(float(sol["lam_g"]), 4)
-      (2.0, -1.0)
-      >>> round(float(sol["lam_p"]), 4)
-      -1.0
-      >>> round(float(S(p=1, ubx=0)["lam_x"]), 4)
-      2.0
+      >>> sol["x"], sol["lam_g"]
+      (DM(2), DM(-1))
+      >>> sol["lam_p"]
+      DM(-1)
+      >>> S(p=1, ubx=0)["lam_x"]
+      DM(2)
       >>> pm = MX.sym("p")
       >>> dxdp = Function("dxdp", [pm], [jacobian(S(p=pm)["x"], pm)])
       >>> dxdp(5)
@@ -171,12 +173,13 @@ namespace casadi {
       >> x = SX.sym('x'); p = SX.sym('p');
       >> opts = struct('print_time', false, 'ipopt', struct('print_level', 0, 'sb', 'yes'));
       >> S = nlpsol('S', 'ipopt', struct('x', x, 'p', p, 'f', (x - p)^2 + 3*p, 'g', 2*x), opts);
-      >> sol = S('p', 1, 'lbg', 4); fprintf('%.4f %.4f\n', full(sol.x), full(sol.lam_g))
-      2.0000 -1.0000
-      >> fprintf('%.4f\n', full(sol.lam_p))
-      -1.0000
-      >> sol = S('p', 1, 'ubx', 0); fprintf('%.4f\n', full(sol.lam_x))
-      2.0000
+      >> sol = S('p', 1, 'lbg', 4); sol.x, sol.lam_g
+      2
+      -1
+      >> sol.lam_p
+      -1
+      >> sol = S('p', 1, 'ubx', 0); sol.lam_x
+      2
       >> pm = MX.sym('p'); sol = S('p', pm);
       >> dxdp = Function('dxdp', {pm}, {jacobian(sol.x, pm)}); disp(dxdp(5))
       1
