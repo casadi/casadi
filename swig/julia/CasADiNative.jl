@@ -678,42 +678,6 @@ Base.firstindex(x::Union{SX,MX,DM}) = 1
 # High-level names are casadi_*-prefixed to avoid Base/stdlib Serialization piracy.
 export StringSerializer, StringDeserializer, pack, unpack, encode,
     casadi_serialize, casadi_deserialize
-const StringSerializer = C.StringSerializer
-const StringDeserializer = C.StringDeserializer
-const encode = C.encode
-
-# SWIG-Julia generates no struct inheritance, so methods are keyed on each
-# concrete (de)serializer struct. Treat the base + string + file variants alike.
-const _Serializer = Union{C.SerializerBase,C.StringSerializer,C.FileSerializer}
-const _Deserializer = Union{C.DeserializerBase,C.StringDeserializer,C.FileDeserializer}
-
-# pin the correct pack slot for casadi vector types: the generated `pack(::Any)`
-# probes overloads in order and mis-routes Vector{DM} to the MX-vector slot (the
-# can-pack typecheck is ambiguous across DM/SX/MX). Force the matching SWIG slot.
-for (T, slot) in ((:Sparsity, 10), (:MX, 11), (:DM, 12), (:SX, 13),
-                  (:Linsol, 14), (:Function, 15), (:GenericType, 16))
-    sym = QuoteNode(Symbol("_swig_SerializerBase_SerializerBase_pack__SWIG_$slot"))
-    @eval pack(s::_Serializer, e::AbstractVector{<:C.$T}) =
-        GC.@preserve s begin
-            ccall(($sym, C._lib), Cvoid, (Ptr{Cvoid}, Any), s.ptr, e); C._check(nothing)
-        end
-end
-# scalars and primitive vectors already dispatch correctly in the generated module
-pack(s::_Serializer, e) = C.pack(s, e)
-
-# Map each SerializationType tag (0..23) to its blind_unpack_* reconstructor,
-# mirroring Python/JS `blind_unpack_<type_to_string(tag)>`. Built once from the
-# enum so it survives a regen; skips tags whose unpacker the module lacks.
-function _build_unpack_table()
-    t = Dict{Int,Base.Function}()
-    for tag in 0:23
-        name = C.type_to_string(C.SerializerBase, tag)   # e.g. "sx", "dm_vector"
-        fn = Symbol("blind_unpack_", name)
-        Base.isdefined(C, fn) && (t[tag] = Base.getfield(C, fn))
-    end
-    t
-end
-const _UNPACK_TABLE = _build_unpack_table()
 
 """
     unpack(d) -> reconstructed object
@@ -721,11 +685,11 @@ const _UNPACK_TABLE = _build_unpack_table()
 Read the next type tag from a deserializer and route to the matching
 `blind_unpack_*`, returning the reconstructed casadi object (or Vector thereof).
 """
-function unpack(d::_Deserializer)
+function unpack(d::Union{C.DeserializerBase,C.StringDeserializer,C.FileDeserializer})
     tag = C.pop_type(d)
-    fn = Base.get(_UNPACK_TABLE, tag, nothing)
-    fn === nothing && Base.error("unpack: no handler for serialization tag $tag")
-    fn(d)
+    fn = Symbol("blind_unpack_", C.type_to_string(C.SerializerBase, tag))
+    Base.isdefined(C, fn) || Base.error("unpack: no handler for serialization tag $tag")
+    Base.getfield(C, fn)(d)
 end
 
 # One-shot string round-trip, mirroring Python's StringSerializer/StringDeserializer.
