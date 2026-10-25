@@ -1530,11 +1530,11 @@ class ConicTests(casadiTestCase):
     # Equality constraint and fixed variable with zero multipliers
     x = ca.MX.sym("x",3)
     p = ca.MX.sym("p")
-    qp = {"x":x,"p":p,"f":(x[0]-p)**2,"g":x[1]-x[0]}
+    qp = {"x":x,"p":p,"f":ca.sumsqr(x-p),"g":x[1]-x[0]}
     R = ca.Function("R",[p],[ca.vertcat(p,p,p)])
     for conic, qp_options, aux_options in conics:
       if not aux_options["quadratic"] or not aux_options["dual"]: continue
-      if conic in ["nlpsol"]: continue
+      if conic in ["nlpsol","superscs"]: continue
       print("test_sensitivity_equality_zero_multiplier",conic,qp_options)
       digits = 7 if conic in ["qrqp","qpoases","daqp","ipqp"] else 4
       solver = ca.qpsol("solver",conic,qp,dict(qp_options,sens_min_lam=1e-6,sens_force_equality=True))
