@@ -30,9 +30,9 @@ const _Cat = Union{SX,MX,DM}
 const _Native = Union{Real,AbstractArray{<:Real}}
 const _Num = Union{_Native,DM}
 const _Proxy = Union{(t for (_, t) in casadi._proxy_types)...}
-Base.convert(::Type{SX}, v::_Num) = C.SX(v isa Real ? Float64(v) : v)
-Base.convert(::Type{MX}, v::_Num) = C.MX(v isa Real ? Float64(v) : v)
-Base.convert(::Type{DM}, v::_Native) = C.DM(v isa Real ? Float64(v) : v)
+Base.convert(::Type{SX}, v::_Num) = C.SX(v)
+Base.convert(::Type{MX}, v::_Num) = C.MX(v)
+Base.convert(::Type{DM}, v::_Native) = C.DM(v)
 
 # ---- operators and comparisons: the generated overloads promote numbers, arrays and DM ----
 # Comparisons are elementwise, in the casadi type (SX/MX constraints, DM 0/1 values).
@@ -84,17 +84,6 @@ Base.BroadcastStyle(s::CasadiStyle, ::Base.Broadcast.BroadcastStyle) = s
 Base.BroadcastStyle(s::CasadiStyle, ::CasadiStyle) = s
 Base.BroadcastStyle(s::CasadiStyle, ::Base.Broadcast.Unknown) = s  # disambiguate
 
-# rank of the casadi operands present, to coerce scalars/DM/arrays to that type
-_rank(::Type{DM}) = 1; _rank(::Type{SX}) = 2; _rank(::Type{MX}) = 3
-_castype() = DM
-_castype(a, rest...) = _castype(rest...)
-_castype(a::_Cat, rest...) =
-    (T = _castype(rest...); _rank(typeof(a)) >= _rank(T) ? typeof(a) : T)
-_coerce(::Type{T}, a::_Cat) where {T} = convert(T, a)
-_coerce(::Type{T}, a::Real) where {T} = convert(T, a)
-_coerce(::Type{T}, a::AbstractArray{<:Real}) where {T} = T(a)   # native array -> casadi matrix
-_coerce(::Type{T}, a) where {T} = a   # ops, Refs, Val: pass through untouched
-
 # the applied op: unwrap literal_pow (x.^2) into a plain casadi power
 _apply(f, args...) = f(args...)
 _apply(::typeof(Base.literal_pow), ::Base.RefValue{typeof(^)}, x, ::Base.RefValue{Val{n}}) where {n} =
@@ -137,9 +126,7 @@ function _bceval(bc::Base.Broadcast.Broadcasted{CasadiStyle})
         return bc.f.(Base.collect(args[1]))
     end
     op = _bcop(bc.f)
-    op === nothing && return _bcelem(bc.f, args)
-    T = _castype(args...)
-    op(map(a -> _coerce(T, a), args)...)
+    op === nothing ? _bcelem(bc.f, args) : op(args...)
 end
 # any other f is applied to each element, with Julia's broadcast shape rules
 function _bcelem(f, args)
@@ -424,21 +411,12 @@ Base.reshape(x::_Cat, sp::Sparsity) = C.reshape(x, sp)
 
 # ---- functor: f(args...) like Python ----
 # Julia arrays pass through as-is: the wrapper converts them like DM (`[]` -> empty).
-function (f::Function)(args::Vararg{Union{Real,DM,SX,MX,AbstractArray}})
-    ins = Any[a isa Real ? C.DM(Float64(a)) : a for a in args]
-    r = C.call(f, ins)
-    Base.length(r) == 1 ? r[1] : Base.Tuple(r)
-end
+_outs(r) = Base.length(r) == 1 ? r[1] : Base.Tuple(r)
+(f::Function)(args::Vararg{Union{Real,DM,SX,MX,AbstractArray}}) = _outs(C.call(f, Any[args...]))
 (f::Function)(d::Dict{String,<:Any}) = C.call(f, Dict{String,Any}(d))
-function (f::Function)(; kwargs...)
-    # f() (no args) is the positional zero-input call, not an empty dict-call (P2-2)
-    if Base.isempty(kwargs)
-        r = C.call(f, Any[])
-        return Base.length(r) == 1 ? r[1] : Base.Tuple(r)
-    end
-    C.call(f, Dict{String,Any}(Base.string(k) => (v isa Real ? C.DM(Float64(v)) : v)
-                               for (k, v) in kwargs))
-end
+# f() (no args) is the positional zero-input call, not an empty dict-call
+(f::Function)(; kwargs...) = Base.isempty(kwargs) ? _outs(C.call(f, Any[])) :
+    C.call(f, Dict{String,Any}(Base.string(k) => v for (k, v) in kwargs))
 
 _optdict(opts) = Dict{String,Any}(Base.string(k) => v for (k, v) in opts)
 const codegen = C.CodeGenerator   # short alias; CodeGenerator(name[, opts]) opts-defaulted
