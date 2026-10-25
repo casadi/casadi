@@ -1,6 +1,9 @@
 # CasADiNative.jl -- handwritten ergonomics layer over the SWIG-generated module.
 # Prototype of what ships as the package's src/CasADi.jl; the generated
 # casadi.jl stays untouched underneath.
+# Also spliced as a module body (CasADiSWIG_jll's casadi_native_body.jl): top-level
+# code before the splice must qualify Base calls (Base.get(Base.ENV, ...), Base.read)
+# or run after it; Julia < 1.12 binds a bare name on first use. __init__ bodies are fine.
 module CasADiNative
 
 include(joinpath(@__DIR__, "casadi.jl"))
@@ -676,6 +679,8 @@ let mine = Base.Set(Base.names(@__MODULE__; all=true, imported=true)), exported 
         (Base.isempty(_s) || _s[1] == '_' || _s[1] == '#' || _s[1] == '@') && continue
         (Base.isdefined(casadi, _n) && !(_n in (:eval, :include))) || continue
         _n in mine && Base.isdefined(@__MODULE__, _n) && continue
+        Base.VERSION < v"1.12" && Base.isbindingresolved(@__MODULE__, _n) && Base.error(
+            "`$_n` was used unqualified before the CasADiNative layer was spliced; write Base.$_n")
         _c = Base.getfield(casadi, _n)
         if _n in exported || !(Base.isexported(Base, _n) || Base.isexported(Core, _n))
             @eval const $_n = $_c
