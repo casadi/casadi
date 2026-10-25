@@ -13,6 +13,10 @@ Block syntax in a header comment:
                         in MATLAB (install-matlab/matlab or CASADI_MATLAB_PATH; MATLAB_CMD=octave for Octave)
   \\enddoctest
   \\endlang
+Numbers: an expected number matches the actual one at the same place when they differ by at most
+half a unit in its last written digit (0 for an integer) or 1e-9 relative (absolute for 0),
+whichever is larger: 0.3679 matches 0.367879, 0 matches 1e-17. Applies when both outputs hold
+equally many numbers; 00 (structural zero) is text. Same rule in every runner.
 Needs an importable casadi on PYTHONPATH (python), build/swig/julia/CasADiNative or CASADI_JL (julia),
 build-wasm/swig/wasm-js/casadi.js or CASADI_WASM_JS (javascript).
 """
@@ -79,6 +83,37 @@ def collect(path):
     return [(p[1], g["lang"], p[2]) for g in parse(path) for p in g["parts"] if p[0] == "doctest"]
 
 
+NUMBER = re.compile(r"(?<![\w.@])[-+]?(?:\d+\.\d*|\.\d+|\d+)(?:[eE][-+]?\d+)?(?![\w.])")
+
+
+def numbers(s):
+    return [m for m in NUMBER.finditer(s) if not re.match(r"[-+]?0\d", m.group())]
+
+
+def tolerance(lit):
+    m = re.match(r"[-+]?\d*(?:\.(\d*))?(?:[eE]([-+]?\d+))?$", lit)
+    tol = 0.5 * 10.0 ** (int(m.group(2) or 0) - len(m.group(1) or "")) if m.group(1) is not None or m.group(2) else 0.0
+    return max(tol, 1e-9 * (abs(float(lit)) or 1.0))
+
+
+def as_expected(want, got):
+    """got with each number that matches its expected counterpart written as expected"""
+    w, g = numbers(want), numbers(got)
+    if len(w) != len(g):
+        return got
+    out, pos = [], 0
+    for a, b in zip(w, g):
+        if abs(float(a.group()) - float(b.group())) <= tolerance(a.group()) * (1 + 1e-9):
+            out += [got[pos:b.start()], a.group()]
+            pos = b.end()
+    return "".join(out) + got[pos:]
+
+
+class Checker(doctest.OutputChecker):
+    def check_output(self, want, got, optionflags):
+        return super().check_output(want, as_expected(want, got), optionflags)
+
+
 def make_globs():
     import casadi
     import numpy as np
@@ -90,7 +125,7 @@ def make_globs():
 def run_python(blocks, verbose):
     parser = doctest.DocTestParser()
     flags = doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE
-    runner = doctest.DocTestRunner(verbose=verbose, optionflags=flags)
+    runner = doctest.DocTestRunner(Checker(), verbose=verbose, optionflags=flags)
     for name, text in blocks:
         path, lineno = name.rsplit(":", 1)
         runner.run(parser.get_doctest(text, make_globs(), name, path, int(lineno)))
