@@ -287,7 +287,7 @@ jobs:
           # runner can't supply MATLAB/SPRAL, hence build_flags_julia_off.
           cmake -Bbuild -DCMAKE_BUILD_TYPE=Release -DWITH_JULIA=ON -DSWIG_IMPORT=ON ${{ env.build_flags }} ${{ env.build_flags_julia_off }} -H.
           cmake --build build -j$(nproc)
-      - name: Julia checks (precompiled package, method overwrites, examples, doctests)
+      - name: Julia checks (precompiled package, method overwrites, Aqua, examples, doctests)
         run: |
           # casadi finds plugins via CASADI_PLUGIN_SEARCH_PATH (NOT LD_LIBRARY_PATH)
           export CASADI_PLUGIN_SEARCH_PATH=$PWD/build/lib LD_LIBRARY_PATH=$PWD/build/lib

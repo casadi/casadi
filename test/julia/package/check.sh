@@ -10,8 +10,8 @@
 # Fails on any "Method definition ... overwritten" warning. Always: a script-mode load of the
 # layer file (as source builds may include it), the strict package precompile, the package's
 # Pkg.test runner (package.jl, runtests.jl, docs/examples/julia) with the plugin path left to
-# __init__ (no casadi runtime env); with `full` also the header doctests. Locally, point
-# JULIA_DEPOT_PATH at a scratch depot.
+# __init__ (no casadi runtime env), and Aqua; with `full` also the header doctests. Locally, point
+# JULIA_DEPOT_PATH at a scratch depot: Aqua is installed from the General registry.
 set -e -o pipefail
 root=$(cd "$(dirname "$0")/../../.." && pwd)
 J=${JULIA:-julia}
@@ -28,10 +28,12 @@ run() {  # run a command, fail on its exit code or on a method overwrite warning
 echo "== load the layer file as a script"
 run "$J" --warn-overwrite=yes -e "include(\"$mod/CasADiNative.jl\")"
 echo "== build + precompile the package"
-run "$J" --warn-overwrite=yes "$root/test/julia/package/make_package.jl" "$mod" "$env"
+run "$J" --warn-overwrite=yes "$root/test/julia/package/make_package.jl" "$mod" "$env" Aqua
 export JULIA_PROJECT=$env
 echo "== package runtests.jl (binaries found via __init__ and RUNPATH, as from the JLLs)"
 run env -u CASADI_PLUGIN_SEARCH_PATH -u LD_LIBRARY_PATH "$J" --warn-overwrite=yes "$root/test/julia/package/runtests.jl"
+echo "== Aqua"
+run "$J" "$root/test/julia/package/aqua.jl"
 [ "$3" = full ] || exit 0
 echo "== header doctests"
 cd "$root" && JULIA=$J python3 docs/api/extra/doctest_headers.py --lang julia
