@@ -3593,6 +3593,17 @@ class ArrayInterfaceMX(ArrayInterface[MX]):
 %typemap(jlparam) casadi::MX, const casadi::MX& "Union{MX,DM,Real,AbstractArray{<:Real},Vector{Any}}"
 // a Callback is a Function, as in C++
 %typemap(jlparam) casadi::Function, const casadi::Function& "Union{Function,CallbackFunction}"
+// Containers of matrices: the common element types; other values (Vector{Any}) reach the runtime dispatcher
+%define %julia_partial_containers(T, V, D)
+%typemap(jlparam, partial="1") std::vector< T >, const std::vector< T >&
+  "Union{" V "Vector{DM},Vector{Float64},Vector{Int64}}"
+%typemap(jlparam, partial="1") std::map<std::string, T >, const std::map<std::string, T >&
+  "Union{" D "Dict{String,DM},Dict{String,Float64},Dict{String,Int64}}"
+%enddef
+%julia_partial_containers(casadi::Matrix<double>, "", "")
+%julia_partial_containers(casadi::Matrix<casadi::SXElem>, "Vector{SX},", "Dict{String,SX},")
+%julia_partial_containers(casadi::MX, "Vector{MX},", "Dict{String,MX},")
+%typemap(jlparam, partial="1") std::vector<casadi::Sparsity>, const std::vector<casadi::Sparsity>& "Vector{Sparsity}"
 #endif // SWIGJULIA
 
 #ifdef SWIGWASMJS

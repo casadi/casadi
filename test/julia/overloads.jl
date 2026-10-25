@@ -24,6 +24,22 @@
     @test C.substitute(x, x, DM(3.0)) isa SX && C.substitute(y, y, DM(3.0)) isa MX
 end
 
+@testset "typed containers pick their overload by Julia dispatch" begin
+    x = sym(SX, "x"); y = sym(MX, "y")
+    sig(args...) = which(C.Function, typeof.(args)).sig.parameters
+    # Vector{SX} / Vector{MX} reach their own overload, not the runtime-dispatched method
+    @test Vector{SX} <: sig("f", [x], [x])[3] && !(Vector{MX} <: sig("f", [x], [x])[3])
+    @test Vector{MX} <: sig("f", [y], [y])[3] && !(Vector{SX} <: sig("f", [y], [y])[3])
+    @test sig("f", Any[x], Any[x])[3] === Any
+    # DM and number vectors fit SX and MX alike: the SX overload, as SWIG's precedence orders them
+    @test C.is_a(C.Function("f", DM[], [DM(1)]), "SXFunction")
+    @test C.is_a(C.Function("f", [x], [1.0]), "SXFunction")
+    @test C.is_a(C.Function("f", [y], [1.0]), "MXFunction")
+    # Vector{Any} still resolves on its contents
+    @test C.is_a(C.Function("f", Any[y], Any[y]), "MXFunction")
+    @test C.is_a(C.Function("f", Any[], Any[]), "SXFunction")
+end
+
 @testset "overloads sharing a signature: the C++ overload order" begin
     # Slice(int, int) before Slice(casadi_int, casadi_int) only while the values fit an int
     @test (C.Slice(1, 5).start, C.Slice(1, 5).stop) == (1, 5)
