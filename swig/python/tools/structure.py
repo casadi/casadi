@@ -116,7 +116,7 @@ def applyCallableIndex(p,r):
   # Apply a callable powerIndex entry to the sub-result it indexes
   try:
     return p(r)
-  except NotImplementedError:
+  except (NotImplementedError, TypeError): # upstream SWIG raises TypeError
     if not isinstance(r,list): raise
     return p(*r) # casadi's concatenations (vertcat, ...) are variadic, not list-taking
 
