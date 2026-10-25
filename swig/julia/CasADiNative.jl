@@ -369,25 +369,18 @@ for T in (:SX, :MX, :DM)
 end
 
 # ---- Float64 of a CONSTANT scalar SX/MX (DM already has Float64 above) ----
-function _const_scalar_float(x::Union{SX,MX})
-    (C.is_constant(x) && C.numel(x) == 1) ||
-        Base.error("Float64 requires a constant scalar; got $(C.size1(x))×$(C.size2(x)) non-constant")
-    Float64(C.evalf(x))   # evalf -> DM -> Float64
-end
-Base.Float64(x::SX) = _const_scalar_float(x)
-Base.Float64(x::MX) = _const_scalar_float(x)
+Base.Float64(x::Union{SX,MX}) = C.is_constant(x) && C.numel(x) == 1 ? Float64(C.evalf(x)) :
+    Base.error("Float64 requires a constant scalar; got $(_shape(x)) non-constant")
 
 # ---- collect / Array: dense Matrix of scalar SX/MX elements (NOT iterable, so
 # broadcasting's scalar-leaf treatment via broadcastable(x)=x is preserved) ----
 _to_matrix(x::Union{SX,MX}) =
     [x[i, j] for i in 1:C.size1(x), j in 1:C.size2(x)]
-Base.collect(x::SX) = _to_matrix(x)
-Base.collect(x::MX) = _to_matrix(x)
-Base.Array(x::SX) = _to_matrix(x)
-Base.Array(x::MX) = _to_matrix(x)
+Base.collect(x::Union{SX,MX}) = _to_matrix(x)
+Base.Array(x::Union{SX,MX}) = _to_matrix(x)
 # a row or column -> Vector of scalar elements
 Base.Vector(x::Union{SX,MX}) = C.size1(x) == 1 || C.size2(x) == 1 ? Base.vec(_to_matrix(x)) :
-    Base.throw(DimensionMismatch("Vector of a $(C.size1(x))×$(C.size2(x)) matrix; use vec(x) or collect(x)"))
+    Base.throw(DimensionMismatch("Vector of a $(_shape(x)) matrix; use vec(x) or collect(x)"))
 
 # ---- Base bridges to casadi free functions (typed: preserve DM/SX/MX) ----
 Base.vec(x::_Cat) = C.vec(x)
@@ -493,7 +486,7 @@ end
 for f in (:variable, :parameter, :subject_to)
     @eval C._swig_getproperty(o::Opti, ::Val{$(QuoteNode(f))}) = C._SwigBound($f, o)
 end
-bounded(lb, ex::MX, ub) = C.bounded(C.Opti, convert(MX, lb), ex, convert(MX, ub))
+bounded(lb, ex::MX, ub) = C.bounded(C.Opti, lb, ex, ub)
 # value() comes back as native Julia (native_DM typemap): scalar Float64, row or
 # column -> Vector, else Matrix -- also via `sol.value(x)`.
 export set_initial
