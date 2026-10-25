@@ -16,7 +16,8 @@ function nfail = doctest_matlab(varargin)
 % Each '>> ' line is one statement (several separated by ';' or ',' are fine). A piece without
 % semicolon shows its value like disp() does (no 'ans =' / 'x =' header, strings unquoted). The lines up to the
 % next '>> ' are its expected output; blank lines and runs of blanks are ignored and a line '...'
-% matches anything. Blocks run in a fresh workspace with 'import casadi.*'.
+% matches anything; numbers compare to their written precision (rule in doctest_headers.py).
+% Blocks run in a fresh workspace with 'import casadi.*'.
 % Returns the number of failing blocks; raises an error at the end when called with no output
 % argument and something failed (so CI steps fail).
 
@@ -244,7 +245,7 @@ end
 
 function ok = doctest__match(want, got)
   w = doctest__norm(want);
-  g = doctest__norm(got);
+  g = doctest__as_expected(w, doctest__norm(got));
   if strcmp(w, g)
     ok = true;
     return
@@ -258,6 +259,39 @@ function ok = doctest__match(want, got)
     parts{k} = regexptranslate('escape', parts{k});
   end
   ok = ~isempty(regexp(g, ['^' strjoin(parts, '.*') '$'], 'once'));
+end
+
+function g = doctest__as_expected(w, g)
+  % Numbers as in doctest_headers.py: half a unit in the last written digit, at least 1e-9 relative.
+  pat = '(?<![\w.@])[-+]?(\d+\.\d*|\.\d+|\d+)([eE][-+]?\d+)?(?![\w.])';
+  wm = regexp(w, pat, 'match');
+  wm = wm(cellfun(@isempty, regexp(wm, '^[-+]?0\d', 'once')));
+  [gs, ge, gm] = regexp(g, pat, 'start', 'end', 'match');
+  keep = cellfun(@isempty, regexp(gm, '^[-+]?0\d', 'once'));
+  gs = gs(keep); ge = ge(keep); gm = gm(keep);
+  if numel(wm) ~= numel(gm)
+    return
+  end
+  for k = numel(gm):-1:1
+    if abs(str2double(wm{k}) - str2double(gm{k})) <= doctest__tolerance(wm{k}) * (1 + 1e-9)
+      g = [g(1:gs(k)-1) wm{k} g(ge(k)+1:end)];
+    end
+  end
+end
+
+function t = doctest__tolerance(lit)
+  t = 0;
+  if any(lit == '.') || any(lit == 'e') || any(lit == 'E')
+    d = regexp(lit, '\.(\d*)', 'tokens', 'once');
+    x = regexp(lit, '[eE]([-+]?\d+)', 'tokens', 'once');
+    nd = 0; ne = 0;
+    if ~isempty(d), nd = numel(d{1}); end
+    if ~isempty(x), ne = str2double(x{1}); end
+    t = 0.5 * 10^(ne - nd);
+  end
+  x = abs(str2double(lit));
+  if x == 0, x = 1; end
+  t = max(t, 1e-9 * x);
 end
 
 function s = doctest__norm(s)

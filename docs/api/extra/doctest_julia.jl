@@ -50,8 +50,33 @@ end
 
 norm(s) = join(filter(!isempty, [strip(l) for l in split(strip(s), "\n")]), "\n")
 
+# Numbers as in doctest_headers.py: half a unit in the last written digit, at least 1e-9 relative
+const NUMBER = r"(?<![\w.@])[-+]?(?:\d+\.\d*|\.\d+|\d+)(?:[eE][-+]?\d+)?(?![\w.])"
+numbers(s) = [m for m in eachmatch(NUMBER, s) if !occursin(r"^[-+]?0\d", m.match)]
+function tolerance(lit)
+    m = match(r"^[-+]?\d*(?:\.(\d*))?(?:[eE]([-+]?\d+))?$", lit)
+    tol = m[1] === nothing && m[2] === nothing ? 0.0 :
+        0.5 * 10.0^(parse(Int, something(m[2], "0")) - length(something(m[1], "")))
+    x = abs(parse(Float64, lit))
+    max(tol, 1e-9 * (x == 0 ? 1.0 : x))
+end
+function as_expected(expected, got)
+    w, g = numbers(expected), numbers(got)
+    length(w) == length(g) || return got
+    out, pos = IOBuffer(), 1
+    for (a, b) in zip(w, g)
+        if abs(parse(Float64, a.match) - parse(Float64, b.match)) <= tolerance(a.match) * (1 + 1e-9)
+            print(out, got[pos:prevind(got, b.offset)], a.match)
+            pos = b.offset + ncodeunits(b.match)
+        end
+    end
+    print(out, got[pos:end])
+    String(take!(out))
+end
+
 function matches(expected, got)
-    e, g = norm(expected), norm(got)
+    e = norm(expected)
+    g = as_expected(e, norm(got))
     e == g && return true
     occursin("...", e) || return false
     pat = join(map(x -> replace(x, r"[.*+?^\${}()|\[\]\\]" => s -> "\\" * s), split(e, "...")), ".*")

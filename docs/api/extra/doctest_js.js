@@ -48,8 +48,32 @@ function parseExamples(text) {
 
 const norm = s => s.split("\n").map(l => l.trim()).filter(l => l).join("\n");
 
+// Numbers as in doctest_headers.py: half a unit in the last written digit, at least 1e-9 relative
+const NUMBER = /(?<![\w.@])[-+]?(?:\d+\.\d*|\.\d+|\d+)(?:[eE][-+]?\d+)?(?![\w.])/g;
+const numbers = s => [...s.matchAll(NUMBER)].filter(m => !/^[-+]?0\d/.test(m[0]));
+
+function tolerance(lit) {
+  const m = lit.match(/^[-+]?\d*(?:\.(\d*))?(?:[eE]([-+]?\d+))?$/);
+  const tol = m[1] === undefined && m[2] === undefined ? 0 : 0.5 * 10 ** (Number(m[2] || 0) - (m[1] || "").length);
+  return Math.max(tol, 1e-9 * (Math.abs(Number(lit)) || 1));
+}
+
+function asExpected(expected, got) {
+  const w = numbers(expected), g = numbers(got);
+  if (w.length !== g.length) return got;
+  let out = "", pos = 0;
+  w.forEach((a, k) => {
+    const b = g[k];
+    if (Math.abs(Number(a[0]) - Number(b[0])) <= tolerance(a[0]) * (1 + 1e-9)) {
+      out += got.slice(pos, b.index) + a[0];
+      pos = b.index + b[0].length;
+    }
+  });
+  return out + got.slice(pos);
+}
+
 function matches(expected, got) {
-  const e = norm(expected), g = norm(got);
+  const e = norm(expected), g = asExpected(e, norm(got));
   if (e === g) return true;
   if (!e.includes("...")) return false;
   const pat = e.split("...").map(x => x.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("[\\s\\S]*");
