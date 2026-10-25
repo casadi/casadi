@@ -185,19 +185,52 @@ namespace casadi {
      * This class is intended for advanced users that want to circumvent the restrictions
      * of standard pickling/matlab save load, ie no raw SX/MX symbols allowed.
      * 
-     * \verbatim
-     x = SX.sym('x');
-     s = StringSerializer();
-     s.pack(x);
-     s.pack(sin(x));
-      
-     data = s.encode();
-     
-     s = StringDeserializer(data);
-     a = s.unpack();
-     b = s.unpack();
-     \endverbatim
-     * 
+     * \lang{python}
+     * \doctest
+     * >>> x = SX.sym('x')
+     * >>> s = StringSerializer()
+     * >>> s.pack(x)
+     * >>> s.pack(sin(x))
+     * >>> data = s.encode()
+     * >>> s = StringDeserializer(data)
+     * >>> a = s.unpack()
+     * >>> b = s.unpack()
+     * >>> a, b
+     * (SX(x), SX(sin(x)))
+     * \enddoctest
+     * \endlang
+     *
+     * \lang{matlab}
+     * \doctest
+     * >> x = SX.sym('x');
+     * >> s = StringSerializer();
+     * >> s.pack(x);
+     * >> s.pack(sin(x));
+     * >> data = s.encode();
+     * >> s = StringDeserializer(data);
+     * >> a = s.unpack();
+     * >> b = s.unpack();
+     * >> a, b
+     * x
+     * sin(x)
+     * \enddoctest
+     * \endlang
+     *
+     * \lang{julia}
+     * \doctest
+     * julia> x = ca.SX.sym("x");
+     * julia> s = ca.StringSerializer();
+     * julia> ca.pack(s, x)
+     * julia> ca.pack(s, sin(x))
+     * julia> data = ca.encode(s);
+     * julia> s = ca.StringDeserializer(data);
+     * julia> a = ca.unpack(s);
+     * julia> b = ca.unpack(s);
+     * julia> a, b
+     * (x, sin(x))
+     * \enddoctest
+     * \endlang
+     *
      * Note:
      *  Saving SX/MX objects individually has a substantial overhead
      *  (both time and length of encoded string).
