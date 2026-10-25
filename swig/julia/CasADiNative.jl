@@ -34,22 +34,18 @@ Base.convert(::Type{SX}, v::_Num) = C.SX(v isa Real ? Float64(v) : v)
 Base.convert(::Type{MX}, v::_Num) = C.MX(v isa Real ? Float64(v) : v)
 Base.convert(::Type{DM}, v::_Native) = C.DM(v isa Real ? Float64(v) : v)
 
-# ---- operators ----
-for (op, fn) in ((:+, :plus), (:-, :minus), (:*, :mtimes))
+# ---- operators and comparisons: the generated overloads promote numbers, arrays and DM ----
+# Comparisons are elementwise, in the casadi type (SX/MX constraints, DM 0/1 values).
+for (op, fn) in ((:+, :plus), (:-, :minus), (:*, :mtimes),
+                 (:<, :lt), (:<=, :le), (:>=, :ge), (:(==), :eq), (:(!=), :ne))
     @eval begin
-        Base.$op(a::SX, b::SX) = C.$fn(a, b)
-        Base.$op(a::MX, b::MX) = C.$fn(a, b)
-        Base.$op(a::DM, b::DM) = C.$fn(a, b)
-        # promotion: numbers, Julia arrays and DM promote to the symbolic side
-        Base.$op(a::SX, b::_Num) = C.$fn(a, convert(SX, b))
-        Base.$op(a::_Num, b::SX) = C.$fn(convert(SX, a), b)
-        Base.$op(a::MX, b::_Num) = C.$fn(a, convert(MX, b))
-        Base.$op(a::_Num, b::MX) = C.$fn(convert(MX, a), b)
-        Base.$op(a::DM, b::_Native) = C.$fn(a, convert(DM, b))
-        Base.$op(a::_Native, b::DM) = C.$fn(convert(DM, a), b)
+        Base.$op(a::T, b::Union{T,_Num}) where {T<:Union{SX,MX}} = C.$fn(a, b)
+        Base.$op(a::_Num, b::Union{SX,MX}) = C.$fn(a, b)
+        Base.$op(a::DM, b::_Num) = C.$fn(a, b)
+        Base.$op(a::_Native, b::DM) = C.$fn(a, b)
     end
 end
-Base.:-(a::_Cat) = C.times(a, typeof(a) === DM ? C.DM(-1.0) : convert(typeof(a), -1))
+Base.:-(a::_Cat) = C.times(a, -1)
 
 # Where Julia gives an array operation a meaning (A/B, A^n, matrix functions, max of
 # arrays), a casadi matrix does the same or throws; never an elementwise surprise.
@@ -475,17 +471,6 @@ _optdict(opts) = Dict{String,Any}(Base.string(k) => v for (k, v) in opts)
 const codegen = C.CodeGenerator   # short alias; CodeGenerator(name[, opts]) opts-defaulted
 export interpolant, generate_dependencies
 
-# ---- comparisons: elementwise, in the casadi type (SX/MX constraints, DM 0/1 values) ----
-for (op, fn) in ((:<, :lt), (:<=, :le), (:>=, :ge), (:(==), :eq), (:(!=), :ne))
-    @eval begin
-        Base.$op(a::T, b::T) where {T<:Union{SX,MX}} = C.$fn(a, b)
-        Base.$op(a::T, b::_Num) where {T<:Union{SX,MX}} = C.$fn(a, convert(T, b))
-        Base.$op(a::_Num, b::T) where {T<:Union{SX,MX}} = C.$fn(convert(T, a), b)
-        Base.$op(a::DM, b::DM) = C.$fn(a, b)
-        Base.$op(a::DM, b::_Native) = C.$fn(a, convert(DM, b))
-        Base.$op(a::_Native, b::DM) = C.$fn(convert(DM, a), b)
-    end
-end
 # isequal/hash/iszero stay Bool (Dict keys): structural identity, casadi's is_equal at depth 0
 Base.isequal(a::T, b::T) where {T<:Union{SX,MX}} = C.is_equal(a, b)
 Base.hash(x::MX, h::UInt) = Base.hash(C.__hash__(x), h)
