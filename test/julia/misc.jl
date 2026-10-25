@@ -200,3 +200,35 @@ end
     dae.add("v", Dict("dimension" => [2], "start" => 3))
     @test dae.get(["x", "v"]) == [1.0, [3.0, 3.0]]
 end
+
+@testset "display is casadi's repr, print its str, as Python" begin
+    x = sym(MX, "x")
+    @test repr("text/plain", x + 1) == "MX((1+x))"
+    @test repr("text/plain", x) == "MX(x)"
+    @test !occursin("casadi", repr("text/plain", sym(MX, "y", 2, 3)'))
+    @test repr("text/plain", DM([1.17708, 1e-7])) == "DM([1.17708, 1e-07])"
+    @test repr("text/plain", DM([3 1.5])) == "DM([[3, 1.5]])"
+    @test repr("text/plain", C.inf(DM)) == "DM(inf)"
+    @test repr("text/plain", DM(3.5)) == "DM(3.5)"
+    @test repr("text/plain", DM(2, 0)) == "DM(2x0)"
+    @test repr("text/plain", sum(DM(3, 0))) == "DM(00)"
+    @test repr("text/plain", DM(C.diag(Sparsity, 2), [1, 2])) == "DM(\n[[1, 00], \n [00, 2]])"
+    @test repr("text/plain", sym(SX, "x", C.dense(Sparsity, 2, 2))) == "SX(\n[[x_0, x_2], \n [x_1, x_3]])"
+    @test repr(sym(SX, "x", C.dense(Sparsity, 2, 2))) == "\n[[x_0, x_2], \n [x_1, x_3]]"
+    @test repr(DM([1 2; 3 4])) == "\n[[1, 2], \n [3, 4]]"
+    @test "$(DM([1, 2]))" == "[1, 2]"
+end
+
+@testset "Function display is casadi's summary" begin
+    x = sym(MX, "x"); f = C.Function("f", [x], [x])
+    @test repr("text/plain", f) == "Function(f:(i0)->(o0) MXFunction)"
+    @test repr("text/plain", C.expand(f)) == "Function(f:(i0)->(o0) SXFunction)"
+end
+
+@testset "display of the other casadi objects" begin
+    @test repr("text/plain", C.Linsol("L", "ldl", C.dense(Sparsity, 2, 2))) == "Linsol(Linear solver LinsolLdl)"
+    @test startswith(repr("text/plain", C.DaeBuilder("m")), "DaeBuilder(nt = 0")
+    @test startswith(repr("text/plain", Opti().debug), "Opti(Opti {")
+    @test repr("text/plain", C.Slice(0, 3)) == "Slice(:3)"
+    @test !occursin("Ptr", repr(C.Linsol("L", "ldl", C.dense(Sparsity, 2, 2))))
+end

@@ -165,3 +165,8 @@ end
     @test C.size2(C.star_coloring2(C.diag(_S, 5))) == 1
     @test C.uni_coloring(C.diag(_S, 3), Sparsity()) == C.uni_coloring(C.diag(_S, 3))
 end
+
+@testset "null Sparsity displays" begin
+    @test repr("text/plain", Sparsity()) == "Sparsity(NULL)"
+    @test repr(Sparsity()) == "NULL"
+end

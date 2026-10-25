@@ -369,83 +369,14 @@ Base.ifelse(c::_Cat, a, b) = C.if_else(c, a, b)
 Base.transpose(x::Union{SX,MX,DM}) = C.transpose(x)
 Base.adjoint(x::Union{SX,MX,DM}) = C.transpose(x)   # real/symbolic: adjoint == transpose
 
-# ---- show (compact 2-arg: used by string interpolation; KEEP) ----
-Base.show(io::IO, x::SX) = print(io, C.str(x))
-Base.show(io::IO, x::MX) = print(io, C.str(x))
-Base.show(io::IO, x::DM) = print(io, C.str(x))
-Base.show(io::IO, f::CasadiFunction) = print(io, C.str(f))
-Base.show(io::IO, s::Sparsity) = print(io, C.str(s))
-Base.show(io::IO, o::C.Opti) = print(io, C.str(o))
-
-# ---- rich REPL display (3-arg MIME: header + body) ----
+# ---- show: casadi's own str for print/interpolation, its repr TypeName(str) for display, as Python ----
 const _MIME = MIME"text/plain"
-
-# Format a column-major Float64 matrix as right-justified aligned rows.
-function _fmt_matrix(io::IO, M::AbstractMatrix{Float64})
-    cells = map(x -> isinteger(x) ? string(Int(x)) : string(round(x; digits=4)), M)
-    w = Base.maximum(Base.length, cells; init=0)
-    for i in 1:size(cells, 1)
-        print(io, " ")
-        for j in 1:size(cells, 2)
-            print(io, Base.lpad(cells[i, j], w), j == size(cells, 2) ? "" : "  ")
-        end
-        i == size(cells, 1) || println(io)
-    end
-end
-
-function Base.show(io::IO, ::_MIME, d::DM)
-    m, n = C.size1(d), C.size2(d)
-    if m == 1 && n == 1
-        return print(io, C.str(d))   # scalar: just the value
-    end
-    nz = C.nnz(d)
-    print(io, m, "×", n, " DM", C.is_dense(d) ? "" : " ($(nz) nnz)", ":\n")
-    _fmt_matrix(io, Base.Matrix{Float64}(d))
-end
-
-function Base.show(io::IO, ::_MIME, x::SX)
-    print(io, C.size1(x), "×", C.size2(x), " SX:\n", C.str(x))
-end
-
-function Base.show(io::IO, ::_MIME, x::MX)
-    desc = C.is_symbolic(x) ? "symbolic" : C.is_constant(x) ? "constant" : C.class_name(x)
-    print(io, C.size1(x), "×", C.size2(x), " MX (", desc, "):\n", C.str(x))
-end
-
-function Base.show(io::IO, ::_MIME, s::Sparsity)
-    m, n = C.size1(s), C.size2(s)
-    print(io, m, "×", n, " Sparsity (", C.nnz(s), " nnz)")
-    (m == 0 || n == 0) && return
-    if m <= 20 && n <= 20
-        grid = Base.fill('.', m, n)         # spy pattern: '*' stored, '.' zero
-        rows, cols = C.get_triplet(s)
-        for k in eachindex(rows)
-            grid[rows[k] + 1, cols[k] + 1] = '*'
-        end
-        print(io, ":\n")
-        for i in 1:m
-            print(io, " ", Base.String(grid[i, :]))
-            i == m || println(io)
-        end
-    end
-end
-
-# One in/out slot rendered as `name[rows]` (drop trailing `x1` for column vectors).
-function _slot(name, sz)
-    r, c = sz[1], sz[2]
-    c == 1 ? "$(name)[$(r)]" : "$(name)[$(r)×$(c)]"
-end
-function Base.show(io::IO, ::_MIME, f::CasadiFunction)
-    ins = join((_slot(C.name_in(f, i - 1), C.size_in(f, i - 1)) for i in 1:C.n_in(f)), ", ")
-    outs = join((_slot(C.name_out(f, i - 1), C.size_out(f, i - 1)) for i in 1:C.n_out(f)), ", ")
-    print(io, "Function ", C.name(f), "(", ins, ") -> (", outs, ")")
-end
-
-function Base.show(io::IO, ::_MIME, o::C.Opti)
-    print(io, "Opti(", C.nx(o), " vars, ", C.ng(o), " constraints, ", C.np(o), " params)")
-end
-function Base.show(io::IO, ::_MIME, s::C.OptiSol)
-    print(io, "OptiSol of ", Base.repr(_MIME(), C.opti(s)))
+_type_name(x::T) where {T} = Base.applicable(C.type_name, x) ? C.type_name(x) :
+    Base.applicable(C.type_name, T) ? C.type_name(T) : Base.string(nameof(T))
+for (_, T) in casadi._proxy_types
+    Base.hasmethod(C.str, Tuple{T}) || continue
+    @eval Base.show(io::IO, x::$T) = print(io, C.str(x))
+    @eval Base.show(io::IO, ::_MIME, x::$T) = print(io, _type_name(x), "(", C.str(x), ")")
 end
 
 # ---- size / conversion ----
