@@ -190,7 +190,7 @@ end
     @test occursin("nlpsol(String name, String solver, Dict{String,SX} nlp", string(@doc C.nlpsol))
     @test occursin("computing all Jacobian blocks", string(@doc C.jacobian))
     @test occursin("Opti(String problem_type)", string(@doc C.Opti))
-    @test occursin("cb_get_jacobian", string(@doc CasadiCallback))
+    @test occursin("get_jacobian", string(@doc Callback))
 end
 
 @testset "no method ambiguities introduced (R3)" begin

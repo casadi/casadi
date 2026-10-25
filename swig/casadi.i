@@ -6602,6 +6602,11 @@ namespace casadi {
 #endif
 
 %include <casadi/core/importer.hpp>
+#ifdef SWIGJULIA
+// users subtype the abstract Callback, as Python subclasses Callback; the proxy is CallbackFunction
+%rename(CallbackFunction) casadi::Callback;
+%feature("julia:director", "Callback") casadi::Callback;
+#endif // SWIGJULIA
 %include <casadi/core/callback.hpp>
 
 #ifdef SWIGPYTHON
@@ -6744,6 +6749,12 @@ class global_unpickle_context:
 #endif // SWIGWASMJS
 
 %feature("director") casadi::OptiCallback;
+#ifdef SWIGJULIA
+// internal: opti.callback takes any Julia callable
+%rename(_OptiCallback) casadi::OptiCallback;
+%rename(_callback_class) casadi::Opti::callback_class;
+%rename(_call) casadi::OptiCallback::call;
+#endif
 
 // Return-by-value
 #ifdef SWIGWASMJS
@@ -6986,18 +6997,8 @@ opti_metadata_modifiers(casadi::Opti)
 %rename(_subject_to) casadi::Opti::subject_to;
 #endif
 #ifdef SWIGJULIA
-// opti.callback(fh): fh(i) runs every iteration; opti.callback() clears it.
-// The director is never freed: the node holds a raw pointer that other proxies share.
-%{
-casadi::OptiCallback* julia_opti_callback(jl_value_t* fh);
-%}
-%wrapper %{
-casadi::OptiCallback* julia_opti_callback(jl_value_t* fh) { return new SwigDirector_OptiCallback(fh); }
-%}
-%extend casadi::Opti {
-  void callback(jl_value_t* fh) { $self->callback_class(julia_opti_callback(fh)); }
-  void callback() { $self->callback_class(); }
-}
+// the Opti proxy keeps the OptiCallback it registers, as Python's self._cb
+%feature("julia:keep") casadi::Opti::callback_class;
 // copy(::Opti) is an independent problem; the copy constructor shares it
 %feature("julia:copy", "copy") casadi::Opti;
 #endif

@@ -811,100 +811,56 @@ Reconstruct the object packed by [`casadi_serialize`](@ref).
 """
 casadi_deserialize(str::AbstractString) = unpack(StringDeserializer(str))
 
-# ---- Callback subclassing (R5) -------------------------------------------
-# Subtype `CasadiCallback`, give your type a `cb_eval` (and optionally the
-# `cb_n_in`/`cb_n_out`/`cb_sparsity_*` methods below), then wrap it with
-# `callback(obj; name=...)` to get a normal casadi `Function` whose evaluation
-# dispatches into your Julia `cb_eval`.
-export CasadiCallback, callback, cb_eval, cb_n_in, cb_n_out,
-    cb_sparsity_in, cb_sparsity_out, cb_name_in, cb_name_out,
-    cb_init, cb_finalize, cb_has_jacobian, cb_get_jacobian,
-    cb_has_forward, cb_get_forward, cb_has_reverse, cb_get_reverse,
-    cb_has_jac_sparsity, cb_get_jac_sparsity
-"""
-    CasadiCallback
+# ---- Callback subclassing ----
+export Callback, callback
+@doc """
+    Callback
 
-Supertype of a Julia-defined casadi Callback; `callback(obj; name, opts...)` makes it a Function.
-Define `cb_eval(obj, args::Vector{DM})` returning a vector of outputs, and optionally
-`cb_n_in`, `cb_n_out`, `cb_sparsity_in`, `cb_sparsity_out`, `cb_name_in`, `cb_name_out`
-(1-based indices), `cb_init`, `cb_finalize`, and the derivative hooks
-`cb_has_jacobian`/`cb_get_jacobian(obj, name, inames, onames, opts)`,
-`cb_has_forward`/`cb_get_forward(obj, nfwd, name, inames, onames, opts)`,
-`cb_has_reverse`/`cb_get_reverse(obj, nadj, name, inames, onames, opts)` and
-`cb_has_jac_sparsity`/`cb_get_jac_sparsity(obj, oind, iind, symmetric)`.
-"""
-abstract type CasadiCallback end
+Abstract supertype of a Julia-defined casadi Callback; `callback(obj, name[, opts])` makes it a Function.
+Define `ca.eval_(obj, arg::Vector{DM})` returning a vector of outputs, and optionally any other
+virtual of casadi's Callback, with its C++ name and 0-based indices: `ca.get_n_in`, `ca.get_n_out`,
+`ca.get_sparsity_in(obj, i)`, `ca.get_sparsity_out`, `ca.get_name_in`, `ca.get_name_out`,
+`ca.init`, `ca.finalize`, `ca.uses_output`, `ca.has_eval_buffer`/`ca.eval_buffer(obj, arg, res)`,
+`ca.get_factory`, and the derivative hooks
+`ca.has_jacobian`/`ca.get_jacobian(obj, name, inames, onames, opts)`,
+`ca.has_forward`/`ca.get_forward(obj, nfwd, name, inames, onames, opts)`,
+`ca.has_reverse`/`ca.get_reverse(obj, nadj, name, inames, onames, opts)` and
+`ca.has_jac_sparsity`/`ca.get_jac_sparsity(obj, oind, iind, symmetric)`.
+A method you do not define runs casadi's default.
+""" C.Callback
+# casadi's finalize hook, not Base's
+const finalize = C.finalize
 
-# Defaults mirroring casadi's Callback base: scalar dense I/O, override as needed.
-cb_n_in(::CasadiCallback)  = 1
-cb_n_out(::CasadiCallback) = 1
-cb_sparsity_in(::CasadiCallback, i)  = C.dense(C.Sparsity, 1, 1)
-cb_sparsity_out(::CasadiCallback, i) = C.dense(C.Sparsity, 1, 1)
-cb_name_in(::CasadiCallback, i)  = "i$(i)"
-cb_name_out(::CasadiCallback, i) = "o$(i)"
-# cb_eval has no default: a callback must compute something.
-function cb_eval end
-# Optional hooks, as in casadi's Callback; unimplemented ones fall back to the C++ base.
-const _NO = C._swig_director_no_override
-for f in (:cb_init, :cb_finalize, :cb_has_jacobian, :cb_get_jacobian, :cb_has_forward,
-          :cb_get_forward, :cb_has_reverse, :cb_get_reverse, :cb_has_jac_sparsity, :cb_get_jac_sparsity)
-    @eval $f(::CasadiCallback, args...) = _NO
+# opti.callback(f): any callable f(i) runs every iteration; the Opti proxy keeps it alive
+struct _OptiFunction <: C._OptiCallbackDirector
+    f::Any
 end
-
-# Route the SWIG director generic functions (invoked from C++) to the user's
-# CasadiCallback methods.  Defined once on the abstract type; no ambiguity.
-# casadi indices are 0-based; expose 1-based to Julia.
-C.Callback_get_n_in(self::CasadiCallback, args...)   = Int64(cb_n_in(self))
-C.Callback_get_n_out(self::CasadiCallback, args...)  = Int64(cb_n_out(self))
-C.Callback_get_sparsity_in(self::CasadiCallback, i)  = cb_sparsity_in(self, Int(i) + 1)
-C.Callback_get_sparsity_out(self::CasadiCallback, i) = cb_sparsity_out(self, Int(i) + 1)
-C.Callback_get_name_in(self::CasadiCallback, i)      = cb_name_in(self, Int(i) + 1)
-C.Callback_get_name_out(self::CasadiCallback, i)     = cb_name_out(self, Int(i) + 1)
-C.Callback_eval(self::CasadiCallback, arg)           = collect(DM, cb_eval(self, collect(DM, arg)))
-C.Callback_init(self::CasadiCallback)     = cb_init(self)
-C.Callback_finalize(self::CasadiCallback) = cb_finalize(self)
-C.Callback_has_jacobian(self::CasadiCallback) = cb_has_jacobian(self)
-C.Callback_get_jacobian(self::CasadiCallback, name, inames, onames, opts) =
-    _asfunction(cb_get_jacobian(self, name, inames, onames, opts))
-C.Callback_has_forward(self::CasadiCallback, nfwd) = cb_has_forward(self, Int(nfwd))
-C.Callback_get_forward(self::CasadiCallback, nfwd, name, inames, onames, opts) =
-    _asfunction(cb_get_forward(self, Int(nfwd), name, inames, onames, opts))
-C.Callback_has_reverse(self::CasadiCallback, nadj) = cb_has_reverse(self, Int(nadj))
-C.Callback_get_reverse(self::CasadiCallback, nadj, name, inames, onames, opts) =
-    _asfunction(cb_get_reverse(self, Int(nadj), name, inames, onames, opts))
-C.Callback_has_jac_sparsity(self::CasadiCallback, oind, iind) =
-    cb_has_jac_sparsity(self, Int(oind) + 1, Int(iind) + 1)
-C.Callback_get_jac_sparsity(self::CasadiCallback, oind, iind, symmetric) =
-    cb_get_jac_sparsity(self, Int(oind) + 1, Int(iind) + 1, symmetric)
-# A Callback handed back to casadi (e.g. a Jacobian) must outlive its Julia proxy.
-const _kept_callbacks = Base.IdSet{Any}()
-_asfunction(r) = r
-_asfunction(r::C.Callback) = (Base.push!(_kept_callbacks, r); CasadiFunction(r))
-
-# opti.callback(f): the director calls back with the iteration index.
-C.OptiCallback_call(f::Base.Function, i) = (f(Int(i)); nothing)
-callback(o::Opti, args...) = C.callback(o, args...)
+C._call(o::_OptiFunction, i) = o.f(i)
+callback(o::Union{Opti,C.OptiAdvanced}, f) = C._callback_class(o, C._OptiCallback(_OptiFunction(f)))
+callback(o::Union{Opti,C.OptiAdvanced}) = C._callback_class(o)
+C._swig_getproperty(o::Union{Opti,C.OptiAdvanced}, ::Val{:callback}) = C._SwigBound(callback, o)
 
 """
-    callback(obj::CasadiCallback; name="callback", opts...) -> Function
+    callback(obj::Callback, name[, opts::Dict]) -> CallbackFunction
 
-Wrap a `CasadiCallback` into a casadi `Function`.  The returned object calls
-back into `cb_eval(obj, args)` (and the `cb_n_in`/`cb_sparsity_*` methods)
-whenever the function is evaluated, differentiated or embedded in a graph.
+Wrap `obj` into a casadi `CallbackFunction`, usable as a `Function`.  It calls
+back into `eval_(obj, arg)` (and the other methods defined for `obj`) whenever the
+function is evaluated, differentiated or embedded in a graph.  Keep it alive while
+any Function uses it.
 """
-function callback(obj::CasadiCallback; name::AbstractString="callback", opts...)
-    proxy = C.Callback(obj)                      # director proxy over `obj`
+function callback(obj::C.Callback, name::AbstractString, opts::AbstractDict = Dict{String,Any}())
+    proxy = C.CallbackFunction(obj)              # director proxy over `obj`
     C.construct(proxy, name, _optdict(opts))     # builds the internal function
     proxy
 end
 
 # Let a Callback be used wherever a casadi Function is expected (nlpsol, graphs).
 # The Function copy-ctor accepts the Callback proxy via the SWIG cast chain.
-CasadiFunction(cb::C.Callback) = C.Function(C._check(ccall((:_swig_Function_new_Function__SWIG_7,
+CasadiFunction(cb::C.CallbackFunction) = C.Function(C._check(ccall((:_swig_Function_new_Function__SWIG_7,
         C._lib), Ptr{Cvoid}, (Any,), cb)))
-Base.convert(::Type{CasadiFunction}, cb::C.Callback) = CasadiFunction(cb)
-# A constructed Callback proxy is a casadi Function; call it like one (numeric or symbolic).
-(cb::C.Callback)(args...; kwargs...) = CasadiFunction(cb)(args...; kwargs...)
+Base.convert(::Type{CasadiFunction}, cb::C.CallbackFunction) = CasadiFunction(cb)
+# A constructed CallbackFunction is a casadi Function; call it like one (numeric or symbolic).
+(cb::C.CallbackFunction)(args...; kwargs...) = CasadiFunction(cb)(args...; kwargs...)
 
 det(a::Union{_Cat,C.Linsol}, args...) = C.det(a, args...)
 
