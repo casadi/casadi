@@ -18,10 +18,7 @@
 #
 # Direct multiple shooting for the same DAE optimal control problem as
 # dae_single_shooting. "collocation" stands in for the python "idas" integrator.
-const _jl_dir = get(ENV, "CASADI_JL",
-    joinpath(@__DIR__, "..", "..", "..", "julia-proto", "casadi-contact"))
-include(joinpath(_jl_dir, "CasADiNative.jl"))
-import .CasADiNative as ca
+import CasADiNative as ca
 
 # Declare variables
 x0 = ca.SX.sym("x0")

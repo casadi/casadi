@@ -23,10 +23,7 @@
 #   subject to  x + 2y <= 14
 #               3x -  y >= 0
 #                x -  y <= 2
-const _jl_dir = get(ENV, "CASADI_JL",
-    joinpath(@__DIR__, "..", "..", "..", "julia-proto", "casadi-contact"))
-include(joinpath(_jl_dir, "CasADiNative.jl"))
-import .CasADiNative as ca
+import CasADiNative as ca
 
 # Sparsity of the LP linear term (3 constraints x 2 variables)
 A = ca.dense(ca.Sparsity, 3, 2)

@@ -22,10 +22,7 @@
 #   - high-level: factory for the Hessian of f w.r.t. p,
 #   - low-level forward AD (solver.forward) vs finite differences,
 #   - low-level reverse AD (solver.reverse).
-const _jl_dir = get(ENV, "CASADI_JL",
-    joinpath(@__DIR__, "..", "..", "..", "julia-proto", "casadi-contact"))
-include(joinpath(_jl_dir, "CasADiNative.jl"))
-import .CasADiNative as ca
+import CasADiNative as ca
 
 # Degree of interpolating polynomial
 d = 3

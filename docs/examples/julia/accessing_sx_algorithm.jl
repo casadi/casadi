@@ -18,10 +18,7 @@
 #
 # Demonstration of how the algorithm of an SX function can be accessed and its
 # operations traversed.
-const _jl_dir = get(ENV, "CASADI_JL",
-    joinpath(@__DIR__, "..", "..", "..", "julia-proto", "casadi-contact"))
-include(joinpath(_jl_dir, "CasADiNative.jl"))
-import .CasADiNative as ca
+import CasADiNative as ca
 
 # Create a function
 a = ca.SX.sym("a")

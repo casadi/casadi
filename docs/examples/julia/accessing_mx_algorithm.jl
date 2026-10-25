@@ -19,10 +19,7 @@
 # Demonstration of how the algorithm of an MX function can be accessed and its
 # operations traversed. Unlike the scalar SX walk, the MX work vector holds
 # whole matrices, so the elementary ops are matrix operations.
-const _jl_dir = get(ENV, "CASADI_JL",
-    joinpath(@__DIR__, "..", "..", "..", "julia-proto", "casadi-contact"))
-include(joinpath(_jl_dir, "CasADiNative.jl"))
-import .CasADiNative as ca
+import CasADiNative as ca
 
 # Create a function
 a = ca.MX.sym("a")

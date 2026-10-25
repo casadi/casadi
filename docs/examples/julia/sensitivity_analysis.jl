@@ -19,10 +19,7 @@
 # Forward, adjoint and finite-difference sensitivity analysis of an ODE
 # integrated over a fixed interval. As in the JS port, the sundials cvodes/idas
 # variants are dropped and only rk/collocation are exercised.
-const _jl_dir = get(ENV, "CASADI_JL",
-    joinpath(@__DIR__, "..", "..", "..", "julia-proto", "casadi-contact"))
-include(joinpath(_jl_dir, "CasADiNative.jl"))
-import .CasADiNative as ca
+import CasADiNative as ca
 
 println("Testing sensitivity analysis in CasADi")
 println("******")

@@ -22,10 +22,7 @@
 # Note: the Python example also tries f.map(N, "openmp"); we use the default
 # (serial) map and note it. The expensive function uses 2000 nested sin()
 # here (vs 100000) to keep the run snappy.
-const _jl_dir = get(ENV, "CASADI_JL",
-    joinpath(@__DIR__, "..", "..", "..", "julia-proto", "casadi-contact"))
-include(joinpath(_jl_dir, "CasADiNative.jl"))
-import .CasADiNative as ca
+import CasADiNative as ca
 
 function main()
     # Number of inputs to evaluate

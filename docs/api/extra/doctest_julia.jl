@@ -2,12 +2,11 @@
 #
 # Usage: julia docs/api/extra/doctest_julia.jl <blocks.txt>
 # The file holds blocks separated by lines `#### <name>`; each block is the text between
-# \doctest and \enddoctest of a \lang{julia} group. Needs CASADI_JL pointing at a dir holding CasADiNative.jl
-# (default: the worktree build dir swig/julia/CasADiNative). Exit code = number of failing blocks.
+# \doctest and \enddoctest of a \lang{julia} group. Needs CasADiNative importable (the environment
+# test/julia/package/make_package.jl builds from a build tree). Exit code = number of failing blocks.
 # Each block runs in a fresh module where `ca` is CasADiNative (`import CasADiNative as ca`).
 
-const _jl_dir = get(ENV, "CASADI_JL", joinpath(@__DIR__, "..", "..", "..", "build", "swig", "julia", "CasADiNative"))
-include(joinpath(_jl_dir, "CasADiNative.jl"))
+import CasADiNative
 
 function parse_blocks(path)
     blocks = Tuple{String,String}[]
@@ -107,7 +106,7 @@ end
 # A fresh module per block, with CasADiNative imported as `ca`
 function block_module(name)
     mod = Module(Symbol("Doctest_", replace(name, r"\W" => "_")))
-    Core.eval(mod, :(import $(nameof(@__MODULE__)).CasADiNative as ca))
+    Core.eval(mod, :(import CasADiNative as ca))
     Core.eval(mod, :(const CasADiNative = $(CasADiNative)))
     mod
 end

@@ -20,10 +20,7 @@
 # collocation coefficients by hand (no integrator plugin) -> fully portable.
 # numpy poly1d/polyder/polyint are replaced by small array-based helpers
 # (coefficients highest-degree-first, like numpy.poly1d).
-const _jl_dir = get(ENV, "CASADI_JL",
-    joinpath(@__DIR__, "..", "..", "..", "julia-proto", "casadi-contact"))
-include(joinpath(_jl_dir, "CasADiNative.jl"))
-import .CasADiNative as ca
+import CasADiNative as ca
 
 # Polynomial helpers (coeffs highest-degree-first, like numpy.poly1d)
 function polymul(a, b)

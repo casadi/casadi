@@ -287,27 +287,11 @@ jobs:
           # runner can't supply MATLAB/SPRAL, hence build_flags_julia_off.
           cmake -Bbuild -DCMAKE_BUILD_TYPE=Release -DWITH_JULIA=ON -DSWIG_IMPORT=ON ${{ env.build_flags }} ${{ env.build_flags_julia_off }} -H.
           cmake --build build -j$(nproc)
-      - name: Run Julia test suite
+      - name: Julia checks (precompiled package, method overwrites, examples, doctests)
         run: |
-          export CASADI_JL=$PWD/build/swig/julia/CasADiNative
           # casadi finds plugins via CASADI_PLUGIN_SEARCH_PATH (NOT LD_LIBRARY_PATH)
-          export CASADI_PLUGIN_SEARCH_PATH=$PWD/build/lib
-          LD_LIBRARY_PATH=$PWD/build/lib julia test/julia/runtests.jl
-      - name: Run docs/examples/julia
-        run: |
-          export CASADI_JL=$PWD/build/swig/julia/CasADiNative
-          export CASADI_PLUGIN_SEARCH_PATH=$PWD/build/lib
-          export LD_LIBRARY_PATH=$PWD/build/lib
-          for f in docs/examples/julia/*.jl; do
-            echo "== julia $f =="
-            julia "$f"
-          done
-      - name: Run Julia doctests of the C++ headers
-        run: |
-          export CASADI_JL=$PWD/build/swig/julia/CasADiNative
-          export CASADI_PLUGIN_SEARCH_PATH=$PWD/build/lib
-          export LD_LIBRARY_PATH=$PWD/build/lib
-          python3 docs/api/extra/doctest_headers.py --lang julia
+          export CASADI_PLUGIN_SEARCH_PATH=$PWD/build/lib LD_LIBRARY_PATH=$PWD/build/lib
+          test/julia/package/check.sh build/swig/julia/CasADiNative $RUNNER_TEMP/jl-current full
       - name: Assemble CasADiNative artifact (Artifacts.toml-ready tarball)
         run: |
           cp LICENSE.txt build/swig/julia/CasADiNative/
@@ -316,6 +300,18 @@ jobs:
         with:
           name: casadi-julia-linux64
           path: casadi-julia-linux64.tar.gz
+      - name: Julia checks on older supported versions (wrapper rebuilt per version)
+        run: |
+          # same core build; only the wrapper is recompiled against each Julia's headers
+          export CASADI_PLUGIN_SEARCH_PATH=$PWD/build/lib LD_LIBRARY_PATH=$PWD/build/lib
+          for v in 1.10 1.11 1.12; do
+            jl=$RUNNER_TEMP/julia-$v && mkdir -p $jl
+            curl -fsSL https://julialang-s3.julialang.org/bin/linux/x64/$v/julia-$v-latest-linux-x86_64.tar.gz | tar -xz -C $jl --strip-components=1
+            cmake -Bbuild -DJULIA_INCLUDE_DIR=$jl/include/julia
+            cmake --build build --target casadi_julia -j$(nproc)
+            # header doctests on the oldest only
+            JULIA=$jl/bin/julia test/julia/package/check.sh build/swig/julia/CasADiNative $RUNNER_TEMP/jl-$v $([ $v = 1.10 ] && echo full)
+          done
 
   publish-npm:
     needs: [version, javascript]

@@ -23,10 +23,7 @@
 # Unlike the JavaScript port (which only dumps the C text -- the wasm runtime
 # has no compiler), the native Julia binding runs the full codegen loop:
 # generate -> gcc -> external -> call.
-const _jl_dir = get(ENV, "CASADI_JL",
-    joinpath(@__DIR__, "..", "..", "..", "julia-proto", "casadi-contact"))
-include(joinpath(_jl_dir, "CasADiNative.jl"))
-import .CasADiNative as ca
+import CasADiNative as ca
 
 function main()
     # Form an expression for the gradient of the determinant

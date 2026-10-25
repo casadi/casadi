@@ -20,10 +20,7 @@
 # eliminate the control by its analytic minimizer, integrate the augmented
 # state/costate DAE, and solve the two-point boundary value problem with a
 # multiple-shooting rootfinder (nlpsol/ipopt). "rk" stands in for "cvodes".
-const _jl_dir = get(ENV, "CASADI_JL",
-    joinpath(@__DIR__, "..", "..", "..", "julia-proto", "casadi-contact"))
-include(joinpath(_jl_dir, "CasADiNative.jl"))
-import .CasADiNative as ca
+import CasADiNative as ca
 
 grad(e, a) = ca.gradient(e, a)
 

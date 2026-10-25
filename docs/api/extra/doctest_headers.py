@@ -17,7 +17,8 @@ Numbers: an expected number matches the actual one at the same place when they d
 half a unit in its last written digit (0 for an integer) or 1e-9 relative (absolute for 0),
 whichever is larger: 0.3679 matches 0.367879, 0 matches 1e-17. Applies when both outputs hold
 equally many numbers; 00 (structural zero) is text. Same rule in every runner.
-Needs an importable casadi on PYTHONPATH (python), build/swig/julia/CasADiNative or CASADI_JL (julia),
+Needs an importable casadi on PYTHONPATH (python), an importable CasADiNative (julia; see
+test/julia/package/make_package.jl),
 build-wasm/swig/wasm-js/casadi.js or CASADI_WASM_JS (javascript).
 """
 import doctest
