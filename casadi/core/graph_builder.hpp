@@ -37,11 +37,13 @@ namespace casadi {
       Two-stage workflow: explore and configure a model (introspection, dynamic-dimension
       binding) with GraphBuilder, then freeze it into an immutable, evaluable Function.
 
+      \lang{cpp}
       \verbatim
       GraphBuilder b("model.onnx");
       b.bind_dim("batch", 4);
       Function f = b.create("net");
       \endverbatim
+      \endlang
 
       \date 2026
 

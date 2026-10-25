@@ -36,12 +36,14 @@ namespace casadi {
       Black-box numerical evaluation of an ONNX model.
 
       A model is evaluated by a runtime backend (e.g. ONNX Runtime) selected by name; the
-      graph internals are opaque to CasADi. Construct one through the GraphBuilder facade:
+      graph internals are opaque to CasADi. Construct one through the GraphBuilder facade.
 
+      \lang{cpp}
       \verbatim
       Function f = GraphBuilder("model.onnx").create("net");
       std::vector<DM> res = f(DM(...));
       \endverbatim
+      \endlang
 
       Unless is_diff_in is supplied, forward seed inputs or adjoint outputs determine
       differentiability. Embedded signatures take precedence over sibling files.
