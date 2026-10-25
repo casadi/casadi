@@ -57,16 +57,14 @@ _shape(x) = "$(C.size1(x))×$(C.size2(x))"
 Base.:/(a::_Cat, b::Union{_Cat,_Native}) = _div(a, b)
 Base.:/(a::_Native, b::_Cat) = _div(a, b)
 function _div(a, b)
-    T = _catpromote((a, b))
-    _scal(b) && return C.rdivide(_ascat(T, a), _ascat(T, b))
+    _scal(b) && return C.rdivide(a, b)
     _scal(a) && Base.throw(ArgumentError("x / A with a matrix A has no meaning in Julia; use x ./ A"))
-    C.mrdivide(_ascat(T, a), _ascat(T, b))
+    C.mrdivide(a, b)
 end
 Base.:^(a::_Cat, b::Union{_Cat,Real}) = _pow(a, b)
 Base.:^(a::Real, b::_Cat) = _pow(a, b)
 function _pow(a, b)
-    T = _catpromote((a, b))
-    _scal(a) && _scal(b) && return C.power(_ascat(T, a), _ascat(T, b))
+    _scal(a) && _scal(b) && return C.power(a, b)
     p = b isa DM && _scal(b) ? Float64(b) : b
     if a isa _Cat && p isa Real && Base.isinteger(p)                  # A^n: casadi's mpower
         C.size1(a) == C.size2(a) || Base.throw(DimensionMismatch("matrix is not square: dimensions are $(_shape(a))"))
@@ -147,25 +145,17 @@ end
 function _bcelem(f, args)
     r = Base.broadcast(f, Base.map(a -> a isa _Cat ? Base.collect(a) : a, args)...)
     r isa AbstractArray || return r
-    T = _catpromote(Base.vec(r))
-    _restore(T, C.reshape(C._vertcat(_cvec(Base.vec(r))), Base.size(r, 1), Base.size(r, 2)))
+    Base.isempty(r) && return DM(Base.size(r, 1), Base.size(r, 2))
+    C.reshape(C._vertcat(Base.vec(r)), Base.size(r, 1), Base.size(r, 2))
 end
 Base.copy(bc::Base.Broadcast.Broadcasted{CasadiStyle}) = _bceval(bc)
 
 # ---- concatenation: [a b], [a;b], [a b;c d] (P0-3) ----
-_catpromote(xs) = Base.any(x -> x isa MX, xs) ? MX : Base.any(x -> x isa SX, xs) ? SX : DM
-_ascat(::Type{T}, x::T) where {T<:_Cat} = x                 # same type: identity
-_ascat(::Type{T}, x::_Cat) where {T} = convert(T, x)        # promote DM->SX/MX etc.
-_ascat(T, x::Number) = convert(T, x)
-_ascat(T, x::AbstractArray) = T(x)
-_cvec(xs) = (T = _catpromote(xs); [_ascat(T, x) for x in xs])
-# generated _vertcat/_horzcat always return MX; restore the DM type for numeric cats
-_restore(::Type{DM}, r) = C.evalf(r)
-_restore(::Type{T}, r) where {T} = r
-_cat(builder, xs) = _restore(_catpromote(xs), builder(_catcheck(_cvec(xs), builder === C._horzcat ? 1 : 2)))
+# The generated builders take numbers, Julia arrays and casadi values and pick DM, SX or MX.
+_cat(builder, xs) = builder(_catcheck(xs, builder === C._horzcat ? 1 : 2))
 # Julia's DimensionMismatch for pieces that do not line up (empty pieces are skipped, as in casadi)
 function _catcheck(cv, d)
-    n = [d == 1 ? C.size1(x) : C.size2(x) for x in cv if C.numel(x) > 0]
+    n = [Base.size(x, d) for x in cv if Base.length(x) > 0]
     Base.all(==(Base.first(n, 1)...), n) || Base.throw(DimensionMismatch(
         "number of $(d == 1 ? "rows" : "columns") of each array must match (got $(Base.Tuple(n)))"))
     cv
@@ -191,20 +181,16 @@ Base.reduce(::typeof(vcat), v::AbstractVector{<:_Cat}) = _cat(C._vertcat, v)
 Base.reduce(::typeof(hcat), v::AbstractVector{<:_Cat}) = _cat(C._horzcat, v)
 # [a b; c d] -> rows of horzcat, then vertcat
 function _hvcat(rows, xs)
-    T = _catpromote(xs)
-    cv = [_ascat(T, x) for x in xs]
     blocks = Any[]
     k = 0
     for ncol in rows
-        Base.push!(blocks, C._horzcat(_catcheck(cv[(k + 1):(k + ncol)], 1)))
+        Base.push!(blocks, C._horzcat(_catcheck(xs[(k + 1):(k + ncol)], 1)))
         k += ncol
     end
-    _restore(T, C._vertcat(_catcheck(blocks, 2)))
+    C._vertcat(_catcheck(blocks, 2))
 end
 
-# ---- typed function-form cat/dot (R3): preserve DM/SX, MX otherwise ----
-# The generated builders promote everything to MX; restore DM (evalf-collapse)
-# when all args are DM/Real and SX when all are SX/Real.
+# ---- function-form cat ----
 _catargs(xs::Tuple{AbstractVector}) = Base.collect(xs[1])  # single-vector call form
 _catargs(xs::Tuple) = Base.collect(xs)                     # varargs call form
 # no pieces: an empty matrix of the vector's element type (DM by default)
@@ -212,8 +198,7 @@ _emptycat(xs, n) = (Base.eltype(xs) !== Union{} && Base.eltype(xs) <: _Cat ? Bas
 function _typedcat(builder, args...)
     xs = _catargs(args)
     Base.isempty(xs) && return _emptycat(args isa Tuple{AbstractVector} ? args[1] : xs, builder === C.veccat ? 1 : 0)
-    T = _catpromote(xs)
-    _restore(T, builder([_ascat(T, x) for x in xs]))
+    builder(xs)
 end
 # Varargs may mix casadi values, numbers and Julia arrays; a single Julia vector
 # is the list form (its elements are the pieces), as in Python.
@@ -223,25 +208,16 @@ veccat(args::_CatArg...) = _typedcat(C.veccat, args...)
 veccat(v::AbstractVector) = _typedcat(C.veccat, v)
 # blockcat takes a 2-D matrix-of-blocks; lower it to vertcat-of-horzcats
 function blockcat(rows::AbstractVector{<:AbstractVector})
-    xs = Base.collect(Base.Iterators.flatten(rows))
-    T = _catpromote(xs)
-    _restore(T, C._vertcat([C._horzcat([_ascat(T, x) for x in r]) for r in rows]))
+    C._vertcat([C._horzcat(Base.collect(Any, r)) for r in rows])
 end
 blockcat(A::_CatArg, B::_CatArg, C_::_CatArg, D::_CatArg) =
     blockcat([[A, B], [C_, D]])
-# dot: promote both sides to a common type, then the matching generated method
-function dot(a::_Cat, b::_CatArg)
-    T = _catpromote((a, b))
-    _restore(T, C.dot(_ascat(T, a), _ascat(T, b)))
-end
-dot(a::_Native, b::_Cat) = dot(b, a)
+dot(a::_Cat, b::Union{_Cat,_Native}) = C.dot(a, b)
+dot(a::_Native, b::_Cat) = C.dot(a, b)
 cross(a::T, b::T, dim::Integer...) where {T<:_Cat} = C.cross(a, b, dim...)
 # MATLAB-style backslash solve `A \ b` (linear solve), distinct from elementwise
-function Base.:\(a::_Cat, b::_CatArg)
-    T = _catpromote((a, b))
-    _restore(T, C.solve(_ascat(T, a), _ascat(T, b)))
-end
-Base.:\(a::AbstractMatrix{<:Real}, b::_Cat) = convert(typeof(b), a) \ b
+Base.:\(a::_Cat, b::Union{_Cat,_Native}) = C.solve(a, b)
+Base.:\(a::AbstractMatrix{<:Real}, b::_Cat) = C.solve(a, b)
 
 # ---- Base math extensions (no shadowing: extend Base methods) ----
 # Julia's sin(A), exp(A), ... of a square matrix are matrix functions, which casadi does
@@ -313,8 +289,7 @@ for (op, cfn) in ((:&, :logic_and), (:|, :logic_or))
 end
 function _logic(op, cf, a, b)
     _scal(a) && _scal(b) || Base.throw(ArgumentError("a $op b of arrays has no meaning in Julia; use a .$op b"))
-    T = _catpromote((a, b))
-    cf(_ascat(T, a), _ascat(T, b))
+    cf(a, b)
 end
 Base.:!(a::_Cat) = _scal(a) ? C.logic_not(a) :
     Base.throw(ArgumentError("!A of a $(_shape(a)) $(typeof(a)) has no meaning in Julia; use .!A"))
@@ -323,8 +298,7 @@ Base.:!(a::_Cat) = _scal(a) ? C.logic_not(a) :
 # elementwise is rem.(A, B) etc., as for Julia arrays.
 function _scalar2(f, a, b)
     _scal(a) && _scal(b) || Base.throw(ArgumentError("$f of arrays has no meaning in Julia; use $f.(A, B)"))
-    T = _catpromote((a, b))
-    _ascat(T, a), _ascat(T, b)
+    a, b
 end
 for f in (:rem, :mod, :fld, :cld, :div, :copysign)
     @eval begin
@@ -430,8 +404,7 @@ Base.Vector(x::Union{SX,MX}) = C.size1(x) == 1 || C.size2(x) == 1 ? Base.vec(_to
 
 # ---- Base bridges to casadi free functions (typed: preserve DM/SX/MX) ----
 Base.vec(x::_Cat) = C.vec(x)
-Base.kron(a::T, b::T) where {T<:_Cat} = C.kron(a, b)
-Base.kron(a::_Cat, b::_Cat) = (T = _catpromote((a, b)); C.kron(_ascat(T, a), _ascat(T, b)))
+Base.kron(a::_Cat, b::_Cat) = C.kron(a, b)
 Base.repeat(x::_Cat, m::Integer, n::Integer) = C.repmat(x, Int(m), Int(n))
 Base.repeat(x::_Cat, m::Integer) = C.repmat(x, Int(m), 1)
 # Base.reshape on our types -> C.reshape (coexists with the `reshape` const export,
