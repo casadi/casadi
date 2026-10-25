@@ -43,43 +43,60 @@ namespace casadi {
    * \param[in] values flattened vector of all values
    *            for all gridpoints
    *
-   * Syntax 1D
-   * \verbatim
-   * # Python
-   * xgrid = np.linspace(1,6,6)
-   * V = [-1,-1,-2,-3,0,2]
-   * LUT = casadi.interpolant("LUT","bspline",[xgrid],V)
-   * print(LUT(2.5))
-   * \endverbatim
-   * \verbatim
-   * % Matlab
-   * xgrid = 1:6;
-   * V = [-1 -1 -2 -3 0 2];
-   * LUT = casadi.interpolant('LUT','bspline',{xgrid},V);
-   * LUT(2.5)
-   * \endverbatim
+   * Examples in 1D and 2D; the values of a 2D grid are flattened in column-major order.
    *
-   * Syntax 2D
-   * \verbatim
-   * # Python
-   * xgrid = np.linspace(-5,5,11)
-   * ygrid = np.linspace(-4,4,9)
-   * X,Y = np.meshgrid(xgrid,ygrid,indexing='ij')
-   * R = np.sqrt(5*X**2 + Y**2)+ 1
-   * data = np.sin(R)/R
-   * data_flat = data.ravel(order='F')
-   * LUT = casadi.interpolant('name','bspline',[xgrid,ygrid],data_flat)
-   * print(LUT([0.5,1]))
-   * \enverbatim
-   * \verbatim
-   * % Matlab
-   * xgrid = -5:1:5;
-   * ygrid = -4:1:4;
-   * R = sqrt(5*X.^2 + Y.^2)+ 1;
-   * V = sin(R)./(R);
-   * LUT = interpolant('LUT','bspline',{xgrid, ygrid},V(:));
-   * LUT([0.5 1])
-   * \endverbatim
+   * \lang{python}
+   * \doctest
+   * >>> xgrid = np.linspace(1, 6, 6)
+   * >>> V = [-1, -1, -2, -3, 0, 2]
+   * >>> LUT = interpolant("LUT", "bspline", [xgrid], V)
+   * >>> print(LUT(2.5))
+   * -1.35
+   * >>> xgrid = np.linspace(-5, 5, 11)
+   * >>> ygrid = np.linspace(-4, 4, 9)
+   * >>> X, Y = np.meshgrid(xgrid, ygrid, indexing="ij")
+   * >>> R = np.sqrt(5*X**2 + Y**2) + 1
+   * >>> V = np.sin(R)/R
+   * >>> LUT = interpolant("LUT", "bspline", [xgrid, ygrid], V.ravel(order="F"))
+   * >>> print(LUT([0.5, 1]))
+   * 0.245507
+   * \enddoctest
+   * \endlang
+   *
+   * \lang{matlab}
+   * \doctest
+   * >> xgrid = 1:6;
+   * >> V = [-1 -1 -2 -3 0 2];
+   * >> LUT = interpolant('LUT', 'bspline', {xgrid}, V);
+   * >> LUT(2.5)
+   * -1.35
+   * >> xgrid = -5:5;
+   * >> ygrid = -4:4;
+   * >> [X, Y] = ndgrid(xgrid, ygrid);
+   * >> R = sqrt(5*X.^2 + Y.^2) + 1;
+   * >> V = sin(R)./R;
+   * >> LUT = interpolant('LUT', 'bspline', {xgrid, ygrid}, V(:));
+   * >> LUT([0.5 1])
+   * 0.245507
+   * \enddoctest
+   * \endlang
+   *
+   * \lang{julia}
+   * \doctest
+   * julia> xgrid = collect(1.0:6.0);
+   * julia> V = [-1, -1, -2, -3, 0, 2];
+   * julia> LUT = ca.interpolant("LUT", "bspline", [xgrid], V);
+   * julia> LUT(2.5)
+   * DM(-1.35)
+   * julia> xgrid = collect(-5.0:5.0);
+   * julia> ygrid = collect(-4.0:4.0);
+   * julia> R = [sqrt(5x^2 + y^2) + 1 for x in xgrid, y in ygrid];
+   * julia> V = sin.(R) ./ R;
+   * julia> LUT = ca.interpolant("LUT", "bspline", [xgrid, ygrid], vec(V));
+   * julia> LUT([0.5, 1])
+   * DM(0.245507)
+   * \enddoctest
+   * \endlang
    *
    *  \generalsection{Interpolant}
    *  \pluginssection{Interpolant}
