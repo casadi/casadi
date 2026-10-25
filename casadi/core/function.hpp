@@ -1752,7 +1752,8 @@ namespace casadi {
         keyed by output name.
 
         The argument type selects the evaluation mode:
-        - DM (or numbers, lists, numpy arrays): numerical evaluation, returns DM
+        - DM (or anything convertible to DM, such as numbers and numeric arrays): numerical
+          evaluation, returns DM
         - SX: symbolic evaluation producing an SX expression; an MX function is
           expanded on the fly (fails if it contains non-expandable nodes)
         - MX: symbolic evaluation producing a call node f(args){k} in the MX graph,
@@ -4082,10 +4083,10 @@ namespace casadi {
     in the bound output buffers and ret() gives the return code (0 on success). The
     buffers must stay alive and unchanged in size while the FunctionBuffer is used.
 
-    In Python, Function.buffer() returns a pair (FunctionBuffer, callable): the callable
-    runs one evaluation; bind numpy arrays with memoryview.
-
     \lang{python}
+    Function.buffer() returns a pair (FunctionBuffer, callable): the callable runs one
+    evaluation; bind numpy arrays with memoryview.
+
     \doctest
     >>> x = SX.sym("x"); y = SX.sym("y", 2)
     >>> f = Function("f", [x, y], [x*y], ["x", "y"], ["r"])
@@ -4134,7 +4135,11 @@ public:
 
       \p size is the buffer size in bytes; it must be at least nnz_in(i)*sizeof(double)
       or an error is raised. The values are read in column-major (Fortran) order of the
-      input sparsity. In Python pass a memoryview of a numpy array: set_arg(0, memoryview(a)).
+      input sparsity.
+
+      \lang{python}
+      Pass a memoryview of a numpy array: set_arg(0, memoryview(a)).
+      \endlang
 
       \identifier{1yb} */
   void set_arg(casadi_int i, const double* a, casadi_int size);
@@ -4143,7 +4148,10 @@ public:
 
       \p size is the buffer size in bytes, at least nnz_out(i)*sizeof(double). Values are
       written in column-major order of the output sparsity.
-      In Python: set_res(0, memoryview(r)).
+
+      \lang{python}
+      Pass a memoryview of a numpy array: set_res(0, memoryview(r)).
+      \endlang
 
       \identifier{1yc} */
   void set_res(casadi_int i, double* a, casadi_int size);
