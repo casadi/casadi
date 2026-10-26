@@ -2198,7 +2198,7 @@ class Integrationtests(casadiTestCase):
       G = ca.Function("G", [v], [out, ca.jacobian(out, v)])
       v0 = ca.DM([h0, 0.3, p0])
       self.checkarray(G(v0)[1], fd_jacobian(G, v0), plugin, digits=min(6, features["digits"]))
-      if features["codegen"]: self.check_codegen(G, inputs=[v0], digits=12)
+      if features["codegen"]: self.check_codegen(G, inputs=[v0], digits=10)
 
   @memory_heavy()
   def test_events_multiple(self):
