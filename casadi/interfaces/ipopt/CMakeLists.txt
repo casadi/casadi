@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.16.3)
 set(NLPSOL_IPOPT_SRCS
   ipopt_interface.hpp
   ipopt_interface.cpp
+  ipopt_uout_journal.hpp
   ipopt_nlp.hpp
   ipopt_nlp.cpp
   ipopt_interface_meta.cpp
