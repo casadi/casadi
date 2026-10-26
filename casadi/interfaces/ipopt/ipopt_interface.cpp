@@ -26,6 +26,7 @@
 
 #include "ipopt_interface.hpp"
 #include "ipopt_nlp.hpp"
+#include "ipopt_uout_journal.hpp"
 #include "casadi/core/casadi_misc.hpp"
 #include "../../core/global_options.hpp"
 #include "../../core/casadi_interrupt.hpp"
@@ -274,8 +275,7 @@ namespace casadi {
     *app = new Ipopt::IpoptApplication(false);
 
     // Direct output through casadi::uout()
-    StreamJournal* jrnl_raw = new StreamJournal("console", J_ITERSUMMARY);
-    jrnl_raw->SetOutputStream(&casadi::uout());
+    UoutJournal* jrnl_raw = new UoutJournal("console", J_ITERSUMMARY);
     jrnl_raw->SetPrintLevel(J_DBG, J_NONE);
     SmartPtr<Journal> jrnl = jrnl_raw;
     (*app)->Jnlst()->AddJournal(jrnl);

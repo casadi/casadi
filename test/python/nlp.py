@@ -2856,6 +2856,26 @@ class NLPtests(casadiTestCase):
     self.assertTrue(spread<1e-4)
     """
 
+  def test_thread_map_reuses_solver_memory(self):
+    # The ipopt journal held a pointer to the thread_local casadi::uout() of the thread that
+    # created the solver memory. map(..., "thread") starts new threads on every call, so the
+    # second call wrote to a destroyed stream and crashed, even with printing off.
+    # (bonmin builds its journal per solve, so it was safe; it is covered as a guard.)
+    plugins = [plugin for plugin in ["ipopt", "bonmin"] if ca.has_nlpsol(plugin)]
+    if not plugins: self.skipTest("needs ipopt or bonmin")
+    for plugin in plugins:
+      for opts in [{}] + ([{"ipopt.print_level": 0, "ipopt.sb": "yes", "print_time": False}] if plugin == "ipopt" else []):
+        print("test_thread_map_reuses_solver_memory", plugin, opts)
+        x = ca.MX.sym("x", 2)
+        p = ca.MX.sym("p")
+        solver = ca.nlpsol("solver", plugin, {"x": x, "p": p, "f": ca.sumsqr(x - p)}, opts)
+        P = ca.MX.sym("P")
+        par = ca.Function("par", [P], [solver(x0=0, p=P)["x"][0]])
+        m = par.map(8, "thread", 4)
+        ps = ca.DM(list(range(8))).T
+        for k in range(5):
+          self.checkarray(m(ps), ps, digits=6)
+
 if __name__ == '__main__':
     unittest.main()
     print(solvers)
