@@ -204,7 +204,8 @@ def run_java(blocks, verbose):
             script += [src, mark]
     script.append("/exit")
     cmd = ["jshell", "-q", "-R-Dcasadi.library.path=" + path, "--class-path", os.path.join(path, "casadi.jar")]
-    p = subprocess.run(cmd, input="\n".join(script) + "\n", stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+    # stderr (casadi warnings) is not compared, as in Python's doctest
+    p = subprocess.run(cmd, input="\n".join(script) + "\n", stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     chunks = [re.sub(r"(?m)^\$\d+ ==> ", "", re.sub(r"^[A-Za-z_]\w* ==> ", "", c.replace("jshell> ", "").strip("\n")))
               for c in p.stdout.split(JAVA_MARK + "\n")]
     checker = Checker()

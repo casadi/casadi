@@ -6348,19 +6348,28 @@ MX_FUN(DECL, (FLAG | IS_MX), MX)
   M(Self, lt, lt) M(Self, le, le) M(Self, gt, gt) M(Self, ge, ge) M(Self, eq, eq) M(Self, ne, ne)
 %enddef
 %define %java_binop_dm2(Self, Op, F) %java_binop_dm(Op, F) %enddef
+// Operation codes as the Operation enum
+%define %java_ops(Self)
+  public boolean is_op(Operation op) { return is_op(op.swigValue()); }
+  public static Self binary(Operation op, Self x, Self y) { return binary(op.swigValue(), x, y); }
+  public static Self unary(Operation op, Self x) { return unary(op.swigValue(), x); }
+%enddef
 %extend casadi::Matrix<double> {
   %proxycode {
   %java_binops(%java_binop_dm2, DM)
+  %java_ops(DM)
   }
 }
 %extend casadi::Matrix<casadi::SXElem> {
   %proxycode {
   %java_binops(%java_binop_sym, SX)
+  %java_ops(SX)
   }
 }
 %extend casadi::MX {
   %proxycode {
   %java_binops(%java_binop_sym, MX)
+  %java_ops(MX)
   }
 }
 #endif // SWIGJAVA
@@ -6753,9 +6762,61 @@ def PyFunction(name, obj, inputs, outputs, opts={}):
 %}
 #endif
 
-#ifndef SWIGPYTHON
+#if !defined(SWIGPYTHON) && !defined(SWIGJAVA)
 %ignore FunctionBuffer;
 %ignore _function_buffer_eval;
+#endif
+#ifdef SWIGJAVA
+// FunctionBuffer reads and writes direct DoubleBuffers in place; the proxy keeps them alive
+%ignore _function_buffer_eval;
+%ignore casadi::FunctionBuffer::_self;
+%nocopyctor casadi::FunctionBuffer;
+%rename(eval) casadi::FunctionBuffer::_eval;
+%rename(swigSetArg) casadi::FunctionBuffer::set_arg;
+%rename(swigSetRes) casadi::FunctionBuffer::set_res;
+%javamethodmodifiers casadi::FunctionBuffer::set_arg "private";
+%javamethodmodifiers casadi::FunctionBuffer::set_res "private";
+%define %java_direct_buffer(PTR)
+%typemap(jni) (PTR, casadi_int size) "jobject"
+%typemap(jtype) (PTR, casadi_int size) "Object"
+%typemap(jstype) (PTR, casadi_int size) "java.nio.DoubleBuffer"
+%typemap(javain) (PTR, casadi_int size) "$javainput"
+%typemap(in, noblock=1) (PTR, casadi_int size) {
+  $1 = $input ? static_cast<double*>(jenv->GetDirectBufferAddress($input)) : 0;
+  if (!$1) SWIG_exception_fail(SWIG_TypeError, "Expected a direct DoubleBuffer");
+  $2 = static_cast<casadi_int>(jenv->GetDirectBufferCapacity($input) * sizeof(double));
+}
+%enddef
+%java_direct_buffer(const double* a)
+%java_direct_buffer(double* a)
+%typemap(javacode) casadi::FunctionBuffer %{
+  private final java.util.Map<Long, java.nio.DoubleBuffer> swigBuffers = new java.util.HashMap<>();
+
+  /** Binds a direct DoubleBuffer holding the nonzeros of input i */
+  public void set_arg(long i, java.nio.DoubleBuffer a) {
+    swigSetArg(i, a);
+    swigBuffers.put(i, a);
+  }
+
+  /** Binds a direct DoubleBuffer that receives the nonzeros of output i */
+  public void set_res(long i, java.nio.DoubleBuffer a) {
+    swigSetRes(i, a);
+    swigBuffers.put(-1 - i, a);
+  }
+
+  @Override
+  public String toString() {
+    return "FunctionBuffer";
+  }
+%}
+%extend casadi::Function {
+  %proxycode %{
+  /** A FunctionBuffer for evaluating with minimal overhead */
+  public FunctionBuffer buffer() {
+    return new FunctionBuffer(this);
+  }
+  %}
+}
 #endif
 
 %include <casadi/core/function.hpp>
