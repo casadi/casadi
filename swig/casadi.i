@@ -84,6 +84,8 @@
 }
 %rename(hash) __hash__;
 %rename(nonzero) __nonzero__;
+// DM truth value as Python's DM.__bool__ (an empty scalar is false)
+%ignore casadi::Matrix<double>::__nonzero__;
 // C++ streams and raw pointers have no Java form
 %ignore casadi::StreamStateGuard;
 %ignore casadi::normalized_setup;
@@ -924,6 +926,11 @@ SWIGINTERNINLINE mxArray* SWIG_From_dec(std::string)(const std::string& s) {
   public static <T> T horzcat(java.util.List<T> x) { return x.isEmpty() ? caJNI.swigCast(new DM(1, 0)) : swigHorzcat(x); }
   public static <T> T diagcat(java.util.List<T> x) { return x.isEmpty() ? caJNI.swigCast(new DM(0, 0)) : swigDiagcat(x); }
   public static <T> T veccat(java.util.List<T> x) { return x.isEmpty() ? caJNI.swigCast(new DM(0, 1)) : swigVeccat(x); }
+
+  public static DM vertcat() { return new DM(0, 1); }
+  public static DM horzcat() { return new DM(1, 0); }
+  public static DM diagcat() { return new DM(0, 0); }
+  public static DM veccat() { return new DM(0, 1); }
 
   // Varargs forms of the List concatenations, as Python's vertcat(a, b)
   public static DM vertcat(DM... x) { return vertcat(java.util.Arrays.asList(x)); }
@@ -4114,6 +4121,61 @@ class NZproxy:
     %java_index_pair(Type, casadi::Slice, casadi::Matrix<casadi_int>)
     %java_index_pair(Type, casadi::Matrix<casadi_int>, casadi::Slice)
     %java_index_pair(Type, casadi::Matrix<casadi_int>, casadi::Matrix<casadi_int>)
+    // An integer index is an integer, not a Slice, as in Python
+    Type get(casadi_int rr) const {
+      Type m;
+      $self->get(m, false, casadi::Matrix<casadi_int>(rr));
+      return m;
+    }
+    // long[] indices, as Python's x[[0, 5]]
+    Type get(const std::vector<casadi_int>& rr) const {
+      Type m;
+      $self->get(m, false, casadi::Matrix<casadi_int>(rr));
+      return m;
+    }
+    void set(const std::vector<casadi_int>& rr, const Type& m) { $self->set(m, false, casadi::Matrix<casadi_int>(rr)); }
+    Type get(const std::vector<casadi_int>& rr, const std::vector<casadi_int>& cc) const {
+      Type m;
+      $self->get(m, false, casadi::Matrix<casadi_int>(rr), casadi::Matrix<casadi_int>(cc));
+      return m;
+    }
+    void set(const std::vector<casadi_int>& rr, const std::vector<casadi_int>& cc, const Type& m) {
+      $self->set(m, false, casadi::Matrix<casadi_int>(rr), casadi::Matrix<casadi_int>(cc));
+    }
+    Type get(const std::vector<casadi_int>& rr, const casadi::Slice& cc) const {
+      Type m;
+      $self->get(m, false, casadi::Matrix<casadi_int>(rr), cc);
+      return m;
+    }
+    Type get(const casadi::Slice& rr, const std::vector<casadi_int>& cc) const {
+      Type m;
+      $self->get(m, false, rr, casadi::Matrix<casadi_int>(cc));
+      return m;
+    }
+    Type get_nz(const std::vector<casadi_int>& kk) const {
+      Type m;
+      $self->get_nz(m, false, casadi::Matrix<casadi_int>(kk));
+      return m;
+    }
+    void set_nz(const std::vector<casadi_int>& kk, const Type& m) { $self->set_nz(m, false, casadi::Matrix<casadi_int>(kk)); }
+    Type get_nz(const casadi::Slice& kk) const {
+      Type m;
+      $self->get_nz(m, false, kk);
+      return m;
+    }
+    Type get_nz(const casadi::Matrix<casadi_int>& kk) const {
+      Type m;
+      $self->get_nz(m, false, kk);
+      return m;
+    }
+    Type get_nz(casadi_int kk) const {
+      Type m;
+      $self->get_nz(m, false, casadi::Matrix<casadi_int>(kk));
+      return m;
+    }
+    void set_nz(const casadi::Slice& kk, const Type& m) { $self->set_nz(m, false, kk); }
+    void set_nz(const casadi::Matrix<casadi_int>& kk, const Type& m) { $self->set_nz(m, false, kk); }
+    void set_nz(casadi_int kk, const Type& m) { $self->set_nz(m, false, casadi::Matrix<casadi_int>(kk)); }
 #endif
 %enddef
 
@@ -4688,6 +4750,11 @@ namespace casadi{
     // double[] as a column, double[][] one array per row
     Matrix(const std::vector<double>& x) { return new casadi::Matrix<double>(x); }
     Matrix(const std::vector< std::vector<double> >& x) { return new casadi::Matrix<double>(x); }
+    Matrix(const casadi::Sparsity& sp, const std::vector<double>& nz) { return new casadi::Matrix<double>(sp, nz); }
+    bool nonzero() const {
+      casadi_assert($self->numel()==1, "Only a scalar can be cast to a float");
+      return $self->nnz()!=0 && $self->scalar()!=0;
+    }
     // Dense entries, one array per row
     std::vector< std::vector<double> > full() const {
       std::vector<double> d($self->numel());
