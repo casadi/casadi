@@ -1,0 +1,6 @@
+# Examples write generated files (C code, FMUs, libraries) here; track only sources
+*
+!*/
+!*.java
+!run_all.sh
+!.gitignore
