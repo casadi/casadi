@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """Run the \\doctest blocks of CasADi C++ headers directly, without regenerating doc.i.
 
-Usage: python docs/api/extra/doctest_headers.py [--verbose] [--lang python|matlab|julia|javascript|all] [header.hpp ...]
+Usage: python docs/api/extra/doctest_headers.py [--verbose] [--lang python|matlab|julia|javascript|java|all] [header.hpp ...]
 With no headers all headers under casadi/ are scanned. Default language: python.
 Block syntax in a header comment:
   \\lang{julia}          everything up to \\endlang (prose, lists, examples) is for this language only
@@ -11,6 +11,9 @@ Block syntax in a header comment:
                         javascript: node REPL format (> lines + expected output), run by doctest_js.js
                         matlab: command-window format (>> lines + expected output), run by doctest_matlab.m
                         in MATLAB (install-matlab/matlab or CASADI_MATLAB_PATH; MATLAB_CMD=octave for Octave)
+                        java: jshell format (jshell> lines, "...> " continuations, expected output
+                        without jshell's "$1 ==> " prefix), run in jshell with org.casadi.* and java.util.*
+                        imported; CASADI_JAVA_PATH is the directory of casadi.jar (default install/lib)
   \\enddoctest
   \\endlang
 Numbers: an expected number matches the actual one at the same place when they differ by at most
@@ -171,6 +174,57 @@ def run_matlab(files, verbose):
     return p.returncode == 0
 
 
+JAVA_MARK = "@@casadi-doctest@@"
+
+
+def java_examples(text):
+    """(source, expected) pairs of a jshell-format block"""
+    out = []
+    for line in text.split("\n"):
+        if line.startswith("jshell> "):
+            out.append([line[8:], []])
+        elif re.match(r"\s*\.\.\.> ", line) and out and not out[-1][1]:
+            out[-1][0] += "\n" + re.sub(r"^\s*\.\.\.> ", "", line)
+        elif line.strip() and out:
+            out[-1][1].append(line)
+    return [(src, "\n".join(want)) for src, want in out]
+
+
+def run_java(blocks, verbose):
+    """Run all blocks in one jshell session, /reset between blocks"""
+    path = os.environ.get("CASADI_JAVA_PATH", os.path.join(ROOT, "install", "lib"))
+    mark = 'System.out.println("%s")' % JAVA_MARK
+    script, examples = [], []
+    for name, text in blocks:
+        ex = java_examples(text)
+        examples.append((name, ex))
+        script += ["/reset", "import org.casadi.*;", "import java.util.*;", mark]
+        for src, _ in ex:
+            script += [src, mark]
+    script.append("/exit")
+    cmd = ["jshell", "-q", "-R-Dcasadi.library.path=" + path, "--class-path", os.path.join(path, "casadi.jar")]
+    p = subprocess.run(cmd, input="\n".join(script) + "\n", stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+    chunks = [re.sub(r"^(\$\d+|[A-Za-z_]\w*) ==> ", "", c.replace("jshell> ", "").strip("\n"))
+              for c in p.stdout.split(JAVA_MARK + "\n")]
+    checker = Checker()
+    flags = doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE
+    failed, attempted, k = 0, 0, 0
+    for name, ex in examples:
+        k += 1  # output of the block preamble
+        for src, want in ex:
+            got = chunks[k] if k < len(chunks) else "<jshell output ended>"
+            k += 1
+            attempted += 1
+            if not checker.check_output(want + "\n", got + "\n", flags):
+                failed += 1
+                print("%s\nFailed example:\n    %s\nExpected:\n    %s\nGot:\n    %s\n" % (
+                    name, src.replace("\n", "\n    "), want.replace("\n", "\n    "), got.replace("\n", "\n    ")))
+            elif verbose:
+                print("%s: ok: %s" % (name, src.split("\n")[0]))
+    print("java: %d blocks, %d examples, %d failures" % (len(blocks), attempted, failed))
+    return failed == 0
+
+
 def run(paths, langs, verbose=False):
     by_lang = {}
     for path in paths:
@@ -186,6 +240,8 @@ def run(paths, langs, verbose=False):
             ok &= run_python(by_lang[lang], verbose)
         elif lang in ("julia", "javascript"):
             ok &= run_external(lang, by_lang[lang], verbose)
+        elif lang == "java":
+            ok &= run_java(by_lang[lang], verbose)
         elif lang == "matlab":
             files = sorted({name.rsplit(":", 1)[0] for name, _ in by_lang[lang]})
             ok &= run_matlab([f if os.path.isabs(f) else os.path.join(ROOT, f) for f in files], verbose)
