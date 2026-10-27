@@ -32,6 +32,7 @@
 %}
 %include <javaguest.swg>
 %include <javacleaner.swg>
+%include <enums.swg>
 // Java has single inheritance: the empty mixin bases become interfaces, so each
 // class extends its first real base (DM extends GenDM, MX extends GenMX)
 %include <swiginterface.i>
@@ -53,7 +54,7 @@
 // f(a, b, ...) and f(map) as Python's __call__; Kotlin spells it f(a, b)
 %extend casadi::Function {
   %proxycode %{
-  /** One output is returned as is, several as a List; numbers and double arrays become DM. */
+  /** One output is returned as is, several as a List; numbers, numeric arrays and Lists of numbers become DM. */
   public Object invoke(Object... args) {
     java.util.List<GenericMatrix> in = new java.util.ArrayList<>();
     for (Object a : args) in.add(swigMatrix(a));
@@ -73,12 +74,24 @@
     if (x instanceof Number) return new DM(((Number) x).doubleValue());
     if (x instanceof double[]) return new DM((double[]) x);
     if (x instanceof double[][]) return new DM((double[][]) x);
+    if (x instanceof long[]) return new DM(java.util.Arrays.stream((long[]) x).asDoubleStream().toArray());
+    if (x instanceof int[]) return new DM(java.util.Arrays.stream((int[]) x).asDoubleStream().toArray());
+    if (x instanceof java.util.List && ((java.util.List<?>) x).stream().allMatch(e -> e instanceof Number))
+      return new DM(((java.util.List<?>) x).stream().mapToDouble(e -> ((Number) e).doubleValue()).toArray());
     throw new IllegalArgumentException("Cannot convert " + (x == null ? "null" : x.getClass().getName()) + " to a matrix");
   }
   %}
 }
-// MX and GenericType have str() from SharedObject, which Java does not inherit
-%extend casadi::MX { std::string toString() const { return $self->get_str(); } }
+%rename(hash) __hash__;
+%rename(nonzero) __nonzero__;
+// MX extends GenMX, so SharedObject's members are spelled out
+%warnfilter(813) casadi::MX;
+%extend casadi::MX {
+  std::string toString() const { return $self->get_str(); }
+  std::string class_name() const { return $self->class_name(); }
+  bool is_null() const { return $self->is_null(); }
+  casadi_int hash() const { return $self->__hash__(); }
+}
 %extend casadi::GenericType { std::string toString() const { return $self->get_str(); } }
 #endif // SWIGJAVA
 
@@ -833,19 +846,46 @@ SWIGINTERNINLINE mxArray* SWIG_From_dec(std::string)(const std::string& s) {
       e->DeleteLocalRef(stream);
       if (e->ExceptionCheck()) e->ExceptionClear();
     }
+    // Thread.interrupt() of the calling thread interrupts casadi
+    static bool javacheckinterrupted() {
+      JNIEnv* e = SWIG_JavaGuestEnv();
+      if (!e || e->ExceptionCheck()) return false;
+      static jclass th = java_class("java/lang/Thread");
+      static jmethodID cur = e->GetStaticMethodID(th, "currentThread", "()Ljava/lang/Thread;");
+      static jmethodID is = e->GetMethodID(th, "isInterrupted", "()Z");
+      jobject t = e->CallStaticObjectMethod(th, cur);
+      if (e->ExceptionCheck()) return false;
+      bool r = e->CallBooleanMethod(t, is);
+      e->DeleteLocalRef(t);
+      if (e->ExceptionCheck()) e->ExceptionClear();
+      return r;
+    }
+    static void javaclearinterrupted() {
+      JNIEnv* e = SWIG_JavaGuestEnv();
+      if (!e || e->ExceptionCheck()) return;
+      static jclass th = java_class("java/lang/Thread");
+      static jmethodID clear = e->GetStaticMethodID(th, "interrupted", "()Z");
+      e->CallStaticBooleanMethod(th, clear);
+      if (e->ExceptionCheck()) e->ExceptionClear();
+    }
   } // namespace casadi
 %}
 %init %{
   casadi::Logger::writeFun = casadi::javalogger;
   casadi::Logger::flush = casadi::javaflush;
-  // Plugins next to the casadi_java library that NativeLoader loaded
+  casadi::InterruptHandler::checkInterrupted = casadi::javacheckinterrupted;
+  casadi::InterruptHandler::clearInterrupted = casadi::javaclearinterrupted;
+  // Plugins and headers next to the casadi_java library that NativeLoader loaded
   {
     JNIEnv *env = SWIG_JavaGuestEnvChecked();
     jclass c = env->FindClass("org/casadi/NativeLoader");
     jfieldID f = c ? env->GetStaticFieldID(c, "directory", "Ljava/lang/String;") : 0;
     jobject d = f ? env->GetStaticObjectField(c, f) : 0;
+    jmethodID m = c ? env->GetStaticMethodID(c, "includeDirectory", "()Ljava/lang/String;") : 0;
+    jobject inc = m ? env->CallStaticObjectMethod(c, m) : 0;
     env->ExceptionClear();
     if (d) casadi::GlobalOptions::setCasadiPath(SWIG_JavaGuestString(d));
+    if (inc) casadi::GlobalOptions::setCasadiIncludePath(SWIG_JavaGuestString(inc));
   }
 %}
 %pragma(java) jniclasscode=%{
@@ -857,6 +897,32 @@ SWIGINTERNINLINE mxArray* SWIG_From_dec(std::string)(const std::string& s) {
 %pragma(java) moduleclassmodifiers="public final class"
 %pragma(java) modulecode=%{
   private ca() {}
+
+  public static final double inf = Double.POSITIVE_INFINITY;
+  public static final double nan = Double.NaN;
+  public static final double pi = Math.PI;
+
+  public static <T> T vertcat(java.util.List<T> x) { return x.isEmpty() ? caJNI.swigCast(new DM(0, 1)) : swigVertcat(x); }
+  public static <T> T horzcat(java.util.List<T> x) { return x.isEmpty() ? caJNI.swigCast(new DM(1, 0)) : swigHorzcat(x); }
+  public static <T> T diagcat(java.util.List<T> x) { return x.isEmpty() ? caJNI.swigCast(new DM(0, 0)) : swigDiagcat(x); }
+  public static <T> T veccat(java.util.List<T> x) { return x.isEmpty() ? caJNI.swigCast(new DM(0, 1)) : swigVeccat(x); }
+
+  // Varargs forms of the List concatenations, as Python's vertcat(a, b)
+  public static DM vertcat(DM... x) { return vertcat(java.util.Arrays.asList(x)); }
+  public static SX vertcat(SX... x) { return vertcat(java.util.Arrays.asList(x)); }
+  public static MX vertcat(MX... x) { return vertcat(java.util.Arrays.asList(x)); }
+  public static Sparsity vertcat(Sparsity... x) { return vertcat(java.util.Arrays.asList(x)); }
+  public static DM horzcat(DM... x) { return horzcat(java.util.Arrays.asList(x)); }
+  public static SX horzcat(SX... x) { return horzcat(java.util.Arrays.asList(x)); }
+  public static MX horzcat(MX... x) { return horzcat(java.util.Arrays.asList(x)); }
+  public static Sparsity horzcat(Sparsity... x) { return horzcat(java.util.Arrays.asList(x)); }
+  public static DM diagcat(DM... x) { return diagcat(java.util.Arrays.asList(x)); }
+  public static SX diagcat(SX... x) { return diagcat(java.util.Arrays.asList(x)); }
+  public static MX diagcat(MX... x) { return diagcat(java.util.Arrays.asList(x)); }
+  public static Sparsity diagcat(Sparsity... x) { return diagcat(java.util.Arrays.asList(x)); }
+  public static DM veccat(DM... x) { return veccat(java.util.Arrays.asList(x)); }
+  public static SX veccat(SX... x) { return veccat(java.util.Arrays.asList(x)); }
+  public static MX veccat(MX... x) { return veccat(java.util.Arrays.asList(x)); }
 %}
 // Merged overloads over the matrix types take <T extends GenericMatrix>
 %feature("java:typebound", "GenericMatrix");
@@ -3577,6 +3643,23 @@ inf: float
 %rename(logic_any) casadi_any;
 #endif // SWIGJULIA
 
+#ifdef SWIGJAVA
+// Concatenations of an empty List give a DM, as in Python (see the module code)
+%rename(swigVertcat) casadi_vertcat;
+%rename(swigHorzcat) casadi_horzcat;
+%rename(swigDiagcat) casadi_diagcat;
+%rename(swigVeccat) casadi_veccat;
+%javamethodmodifiers casadi_vertcat "private";
+%javamethodmodifiers casadi_horzcat "private";
+%javamethodmodifiers casadi_diagcat "private";
+%javamethodmodifiers casadi_veccat "private";
+%rename(logic_and) casadi_and;
+%rename(logic_or) casadi_or;
+%rename(logic_not) casadi_not;
+%rename(logic_all) casadi_all;
+%rename(logic_any) casadi_any;
+#endif // SWIGJAVA
+
 #ifdef SWIGPYTHON
 %ignore T;
 
@@ -4596,6 +4679,18 @@ namespace casadi{
         for (casadi_int j=0; j<$self->size2(); ++j) r[i][j] = d[i + j*$self->size1()];
       return r;
     }
+  }
+  %extend WeakRef {
+    WeakRef(const casadi::MX& x) { return new casadi::WeakRef(x); }
+  }
+  %extend MX {
+    MX(const std::vector<double>& x) { return new casadi::MX(casadi::DM(x)); }
+    MX(const std::vector< std::vector<double> >& x) { return new casadi::MX(casadi::DM(x)); }
+    // Parametric indexing (0-based)
+    MX get(const casadi::MX& rr) const { casadi::MX m; $self->get(m, false, rr); return m; }
+    MX get(const casadi::MX& rr, const casadi::Slice& cc) const { casadi::MX m; $self->get(m, false, rr, cc); return m; }
+    MX get(const casadi::Slice& rr, const casadi::MX& cc) const { casadi::MX m; $self->get(m, false, rr, cc); return m; }
+    MX get(const casadi::MX& rr, const casadi::MX& cc) const { casadi::MX m; $self->get(m, false, rr, cc); return m; }
   }
 } // namespace casadi
 #endif // SWIGJAVA
@@ -5643,6 +5738,24 @@ class global_unpickle_context:
   %}
 }
 #endif // SWIGWASMJS
+#ifdef SWIGJAVA
+%extend casadi::DeserializerBase {
+  %proxycode %{
+  /** Unpacks the next item, whatever its type */
+  public Object unpack() {
+    String name = SerializerBase.type_to_string(pop_type());
+    try {
+      return getClass().getMethod("blind_unpack_" + name).invoke(this);
+    } catch (java.lang.reflect.InvocationTargetException e) {
+      if (e.getCause() instanceof RuntimeException) throw (RuntimeException) e.getCause();
+      throw new RuntimeException(e.getCause());
+    } catch (ReflectiveOperationException e) {
+      throw new IllegalStateException("cannot unpack " + name, e);
+    }
+  }
+  %}
+}
+#endif // SWIGJAVA
 
 %feature("director") casadi::OptiCallback;
 #ifdef SWIGJULIA
@@ -5916,6 +6029,30 @@ make_property(casadi::OptiAdvanced, casadi_solver, Function);
   // Opti.callback (%pythoncode); fh gets the iteration index
   %stub_method(callback, None, %arg(fh: Callable[[int], Any] | None = ...))
 
+}
+#endif
+
+#ifdef SWIGJAVA
+%extend casadi::Opti {
+  %proxycode %{
+  private OptiCallback swigCallback;
+
+  /** Calls fh with the iteration number after each solver iteration; null removes it */
+  public void callback(java.util.function.LongConsumer fh) {
+    if (fh == null) {
+      callback_class();
+      swigCallback = null;
+      return;
+    }
+    swigCallback = new OptiCallback() {
+      @Override
+      public void call(long i) {
+        fh.accept(i);
+      }
+    };
+    callback_class(swigCallback);
+  }
+  %}
 }
 #endif
 
