@@ -1,0 +1,6 @@
+# Tests write generated files (C code, libraries, serialized data) here; track only sources
+*
+!*/
+!*.java
+!run.sh
+!.gitignore
