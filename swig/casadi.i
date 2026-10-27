@@ -26,6 +26,62 @@
 
 %module(package="casadi",directors=1) casadi
 
+#ifdef SWIGJAVA
+%begin %{
+#define SWIG_JAVA_GUEST_EXCEPTION "org/casadi/CasadiException"
+%}
+%include <javaguest.swg>
+%include <javacleaner.swg>
+// Java has single inheritance: the empty mixin bases become interfaces, so each
+// class extends its first real base (DM extends GenDM, MX extends GenMX)
+%include <swiginterface.i>
+%interface_impl(casadi::PrintableCommon);
+%interface_impl(casadi::GenericExpressionCommon);
+%interface_impl(casadi::GenericMatrixCommon);
+%interface_impl(casadi::SparsityInterfaceCommon);
+%interface_impl(casadi::MatrixCommon);
+// toString() is str(), as Python's __str__ (an interface cannot override Object methods)
+%typemap(javacode) casadi::Matrix<double>, casadi::Matrix<casadi::SXElem>, casadi::Sparsity,
+  casadi::Function, casadi::Slice, casadi::DaeBuilder, casadi::Importer, casadi::Linsol,
+  casadi::NlpBuilder, casadi::Opti, casadi::OptiSol, casadi::XmlFile, casadi::Resource, casadi::GraphBuilder,
+  casadi::ModelicaParser %{
+  @Override
+  public String toString() {
+    return str();
+  }
+%}
+// f(a, b, ...) and f(map) as Python's __call__; Kotlin spells it f(a, b)
+%extend casadi::Function {
+  %proxycode %{
+  /** One output is returned as is, several as a List; numbers and double arrays become DM. */
+  public Object invoke(Object... args) {
+    java.util.List<GenericMatrix> in = new java.util.ArrayList<>();
+    for (Object a : args) in.add(swigMatrix(a));
+    java.util.List<GenericMatrix> r = call(in);
+    return r.size() == 1 ? r.get(0) : r;
+  }
+
+  /** Call with inputs by name; returns the outputs by name. */
+  public java.util.Map<String, GenericMatrix> invoke(java.util.Map<String, ?> args) {
+    java.util.Map<String, GenericMatrix> in = new java.util.LinkedHashMap<>();
+    for (java.util.Map.Entry<String, ?> e : args.entrySet()) in.put(e.getKey(), swigMatrix(e.getValue()));
+    return call(in);
+  }
+
+  private static GenericMatrix swigMatrix(Object x) {
+    if (x instanceof GenericMatrix) return (GenericMatrix) x;
+    if (x instanceof Number) return new DM(((Number) x).doubleValue());
+    if (x instanceof double[]) return new DM((double[]) x);
+    if (x instanceof double[][]) return new DM((double[][]) x);
+    throw new IllegalArgumentException("Cannot convert " + (x == null ? "null" : x.getClass().getName()) + " to a matrix");
+  }
+  %}
+}
+// MX and GenericType have str() from SharedObject, which Java does not inherit
+%extend casadi::MX { std::string toString() const { return $self->get_str(); } }
+%extend casadi::GenericType { std::string toString() const { return $self->get_str(); } }
+#endif // SWIGJAVA
+
 #ifdef SWIGPYTHON
 // Collect multiple outputs in a tuple (swig/swig#1933)
 #undef SWIG_AppendOutput
@@ -113,6 +169,9 @@ SWIG_Python_AppendOutput_Tuple(PyObject* result, PyObject* obj, int is_void) {
 #elif defined(SWIGJULIA)
 #define GUESTOBJECT jl_value_t
 #define CASADI_NOT_NONE(p) !p || !jl_is_nothing(p)
+#elif defined(SWIGJAVA)
+#define GUESTOBJECT _jobject
+#define CASADI_NOT_NONE(p) p
 #else
 #define GUESTOBJECT void
 #endif
@@ -475,6 +534,8 @@ def DM_from_csc(m, check_only=True):
 %feature("docstring:lang", "julia");
 #elif defined(SWIGWASMJS)
 %feature("docstring:lang", "javascript");
+#elif defined(SWIGJAVA)
+%feature("docstring:lang", "java");
 #else
 %feature("docstring:lang", "python");
 #endif
@@ -538,7 +599,7 @@ def DM_from_csc(m, check_only=True):
 // Make sure that a copy constructor is created
 %copyctor;
 
-#ifndef SWIGXML
+#if !defined(SWIGXML) && !defined(SWIGJAVA)
 %feature("compactdefaultargs","1");
 #endif //SWIGXML
 
@@ -684,6 +745,11 @@ SWIGINTERNINLINE mxArray* SWIG_From_dec(std::string)(const std::string& s) {
     SWIG_exception(SWIG_RuntimeError, e.what());
   }
 }
+#elif defined(SWIGJAVA)
+// Every wrapper turns C++ exceptions into CasadiException (javaguest.swg)
+%exception {
+  $action
+}
 #else
 %exception {
   try {
@@ -717,11 +783,91 @@ SWIGINTERNINLINE mxArray* SWIG_From_dec(std::string)(const std::string& s) {
 	if ($error != NULL) casadi::handle_director_exception();
 }
 
+
 %{
 #define SWIG_FILE_WITH_INIT
 %}
 
 #endif // SWIGPYTHON
+
+#ifdef SWIGJAVA
+%fragment(SWIG_From_frag(bool));
+%fragment(SWIG_From_frag(long long));
+%fragment(SWIG_From_frag(double));
+%{
+  namespace casadi {
+    inline jclass java_class(const char* name) {
+      JNIEnv* e = SWIG_JavaGuestEnvChecked();
+      jclass c = e->FindClass(name);
+      SWIG_JavaGuestCheck(e);
+      jclass g = static_cast<jclass>(e->NewGlobalRef(c));
+      e->DeleteLocalRef(c);
+      return g;
+    }
+    // casadi printout through System.out and System.err
+    static void javalogger(const char* s, std::streamsize num, bool error) {
+      JNIEnv* e = SWIG_JavaGuestEnv();
+      if (!e || e->ExceptionCheck()) return Logger::writeDefault(s, num, error);
+      static jclass sys = java_class("java/lang/System");
+      static jclass ps = java_class("java/io/PrintStream");
+      static jfieldID out = e->GetStaticFieldID(sys, "out", "Ljava/io/PrintStream;");
+      static jfieldID err = e->GetStaticFieldID(sys, "err", "Ljava/io/PrintStream;");
+      static jmethodID print = e->GetMethodID(ps, "print", "(Ljava/lang/String;)V");
+      jobject stream = e->GetStaticObjectField(sys, error ? err : out);
+      jobject str = SWIG_JavaGuestNewString(std::string(s, num));
+      e->CallVoidMethod(stream, print, str);
+      e->DeleteLocalRef(str);
+      e->DeleteLocalRef(stream);
+      if (e->ExceptionCheck()) e->ExceptionClear();
+    }
+    static void javaflush(bool error) {
+      JNIEnv* e = SWIG_JavaGuestEnv();
+      if (!e || e->ExceptionCheck()) return Logger::flushDefault(error);
+      static jclass sys = java_class("java/lang/System");
+      static jclass ps = java_class("java/io/PrintStream");
+      static jfieldID out = e->GetStaticFieldID(sys, "out", "Ljava/io/PrintStream;");
+      static jfieldID err = e->GetStaticFieldID(sys, "err", "Ljava/io/PrintStream;");
+      static jmethodID flush = e->GetMethodID(ps, "flush", "()V");
+      jobject stream = e->GetStaticObjectField(sys, error ? err : out);
+      e->CallVoidMethod(stream, flush);
+      e->DeleteLocalRef(stream);
+      if (e->ExceptionCheck()) e->ExceptionClear();
+    }
+  } // namespace casadi
+%}
+#ifndef _WIN32
+%{
+#include <dlfcn.h>
+%}
+#endif
+%init %{
+  casadi::Logger::writeFun = casadi::javalogger;
+  casadi::Logger::flush = casadi::javaflush;
+#ifndef _WIN32
+  // Plugins next to the loaded libcasadi (a data symbol: function addresses may resolve to a PLT stub)
+  {
+    Dl_info info;
+    if (dladdr(reinterpret_cast<void*>(&casadi::Logger::writeFun), &info) && info.dli_fname) {
+      std::string p = info.dli_fname;
+      casadi::GlobalOptions::setCasadiPath(p.substr(0, p.find_last_of('/')));
+    }
+  }
+#endif
+%}
+%pragma(java) jniclasscode=%{
+  static {
+    System.loadLibrary("casadi_java");
+  }
+%}
+// Free functions live in the module class, like java.lang.Math
+%pragma(java) moduleclassmodifiers="public final class"
+%pragma(java) modulecode=%{
+  private ca() {}
+%}
+// Merged overloads over the matrix types take <T extends GenericMatrix>
+%feature("java:typebound", "GenericMatrix");
+%typemap(javainterfaces) casadi::Matrix<double>, casadi::Matrix<casadi::SXElem>, casadi::MX "AutoCloseable, GenericMatrix"
+#endif // SWIGJAVA
 
 #ifndef SWIGXML
 
@@ -1001,6 +1147,8 @@ SWIGINTERNINLINE mxArray* SWIG_From_dec(std::string)(const std::string& s) {
       return false;
 #elif defined(SWIGJULIA)
       return !p || jl_is_nothing(p);
+#elif defined(SWIGJAVA)
+      return !p;
 #else
       if (!p) return true;
       emscripten::val v = SWIG_WASMJS_Borrow(p);
@@ -1349,6 +1497,25 @@ SWIGINTERNINLINE mxArray* SWIG_From_dec(std::string)(const std::string& s) {
         return ret;
       }
     };
+#elif defined(SWIGJAVA)
+    // (casadi_int, casadi_int) is a long[2], or a Map.Entry
+    template<> struct traits_asptr<std::pair<casadi_int, casadi_int> > {
+      static int asptr(jobject p, std::pair<casadi_int, casadi_int>** m) {
+        if (!p || !SWIG_JavaGuestIsLongs(p)) return traits_asptr_stdpair<casadi_int, casadi_int>::asptr(p, m);
+        std::vector<long long> v = SWIG_JavaGuestLongs(p);
+        if (v.size()!=2) return SWIG_ERROR;
+        if (m) *m = new std::pair<casadi_int, casadi_int>(v[0], v[1]);
+        return m ? SWIG_NEWOBJ : SWIG_OK;
+      }
+    };
+    template<> struct traits_from<std::pair<casadi_int, casadi_int> > {
+      static jobject from(const std::pair<casadi_int, casadi_int>& v) {
+        std::vector<long long> r(2);
+        r[0] = v.first;
+        r[1] = v.second;
+        return SWIG_JavaGuestNewLongs(r);
+      }
+    };
 #elif defined(SWIGJULIA)
     // Other AbstractVectors (ranges, views, ...): collect, then convert the Array
     template<class T> struct traits_asptr<std::vector<T, std::allocator<T> > > {
@@ -1485,7 +1652,40 @@ SWIGINTERNINLINE mxArray* SWIG_From_dec(std::string)(const std::string& s) {
 // Linsol: only as the element of a std::vector in the serializer API
 %casadi_class_traits("Linsol", casadi::Linsol)
 #endif
-#ifndef SWIGPYTHON
+#ifdef SWIGJAVA
+// An integer i is the slice i:i+1
+%fragment(SWIG_Traits_frag(casadi::Slice), "header", fragment="casadi_aux", fragment=SWIG_Traits_frag(long long)) {
+  namespace swig {
+    template<> struct traits<casadi::Slice> {
+      typedef pointer_category category;
+      static const char* type_name() { return "Slice"; }
+    };
+    template<> struct traits_asptr<casadi::Slice> {
+      static bool conv(jobject p, casadi::Slice* m) {
+        long long i;
+        if (!SWIG_IsOK(swig::asval(p, &i))) return false;
+        if (m) {
+          m->start = i;
+          m->stop = m->start+1;
+          if (m->stop==0) m->stop = std::numeric_limits<casadi_int>::max();
+        }
+        return true;
+      }
+      static int asptr(jobject p, casadi::Slice** m) {
+        return casadi_asptr<casadi::Slice>(p, m, $descriptor(casadi::Slice*), conv);
+      }
+      static bool in_place(jobject p, casadi::Slice** m) {
+        return casadi_in_place<casadi::Slice>(p, m, $descriptor(casadi::Slice*), conv);
+      }
+    };
+    template<> struct traits_from<casadi::Slice> {
+      static jobject from(const casadi::Slice& a) {
+        return SWIG_NewPointerObj(new casadi::Slice(a), $descriptor(casadi::Slice *), SWIG_POINTER_OWN);
+      }
+    };
+  } // namespace swig
+}
+#elif !defined(SWIGPYTHON)
 %casadi_class_traits("Slice", casadi::Slice)
 #else
 %fragment(SWIG_Traits_frag(casadi::Slice), "header", fragment="casadi_aux") {
@@ -1663,6 +1863,23 @@ SWIGINTERNINLINE mxArray* SWIG_From_dec(std::string)(const std::string& s) {
         if (from_julia_array(p, m)) return true;
 
         // No match
+        return false;
+#elif defined(SWIGJAVA)
+        // double[] or List of numbers: column; double[][] or nested: one entry per row
+        {
+          std::vector<double> t;
+          if (swig::assign(p, m ? &t : 0)) {
+            if (m) *m = t.empty() ? casadi::Matrix<double>(0, 0) : casadi::Matrix<double>(t);
+            return true;
+          }
+        }
+        {
+          std::vector< std::vector<double> > t;
+          if (swig::assign(p, m ? &t : 0)) {
+            if (m) *m = casadi::Matrix<double>(t);
+            return true;
+          }
+        }
         return false;
 #else
         // JS Array of numbers -> column vector; nested [[a,b],[c,d]] -> dense matrix, row-major in JS
@@ -2061,8 +2278,31 @@ SWIGINTERNINLINE mxArray* SWIG_From_dec(std::string)(const std::string& s) {
       return true;
     }
 
+#ifdef SWIGJAVA
+    // An empty Java array of objects still has an element type
+    inline bool java_empty_generic(jobject p, casadi::GenericType* m) {
+      using casadi::GenericType;
+      using casadi::java_class;
+      JNIEnv* e = SWIG_JavaGuestEnvChecked();
+      static jclass s = java_class("[Ljava/lang/String;"), f = java_class("[Lorg/casadi/Function;"),
+        dd = java_class("[[D"), ll = java_class("[[J"), ss = java_class("[[Ljava/lang/String;");
+      GenericType g;
+      if (e->IsInstanceOf(p, s)) g = std::vector<std::string>();
+      else if (e->IsInstanceOf(p, f)) g = std::vector<casadi::Function>();
+      else if (e->IsInstanceOf(p, dd)) g = std::vector<std::vector<double> >();
+      else if (e->IsInstanceOf(p, ll)) g = std::vector<std::vector<casadi_int> >();
+      else if (e->IsInstanceOf(p, ss)) g = std::vector<std::vector<std::string> >();
+      else return false;
+      if (e->GetArrayLength(static_cast<jarray>(p)) != 0) return false;
+      if (m) *m = g;
+      return true;
+    }
+#endif
     bool traits_asptr<casadi::GenericType>::conv(GUESTOBJECT* p, casadi::GenericType* m) {
       using casadi::GenericType;
+#ifdef SWIGJAVA
+      if (java_empty_generic(p, m)) return true;
+#endif
       // Try to convert to different types
       return casadi_generic<bool>(p, m)
           || casadi_generic<casadi_int>(p, m)
@@ -2146,6 +2386,29 @@ SWIGINTERNINLINE mxArray* SWIG_From_dec(std::string)(const std::string& s) {
 #endif // SWIGXML
 
  // Input typemaps; xStubIn/xTsStub are the .pyi/.d.ts annotations
+#ifdef SWIGJAVA
+ // Director arguments with the JNI descriptor of their Java type
+%define %java_type_director(xDesc, xType...)
+%typemap(directorin, descriptor=xDesc, noblock=1, fragment="casadi_all") xType, const xType, const xType& { $input = swig::from< xType >($1); }
+%enddef
+ // Java type of a casadi-typemapped C++ type (parameters, returns, outputs, directors)
+%define %java_type(xJava, xDesc, xType...)
+%typemap(jstype) xType, const xType, const xType&, xType &OUTPUT, xType &INOUT xJava
+%java_type_director(xDesc, xType)
+%enddef
+ // ... whose parameters also take the Java types in xWiden
+%define %java_type_widen(xJava, xDesc, xWiden, xType...)
+%java_type(xJava, xDesc, xType)
+%typemap(jstype, widen=xWiden) const xType&, xType xJava
+%enddef
+ // java.util.Map<String, xValue> and java.util.Map.Entry<xKey, xValue>
+%define %java_type_map(xValue, xType...)
+%java_type("java.util.Map<String," xValue ">", "Ljava/util/Map;", xType)
+%enddef
+%define %java_type_entry(xKey, xValue, xType...)
+%java_type("java.util.Map.Entry<" xKey "," xValue ">", "Ljava/util/Map$Entry;", xType)
+%enddef
+#endif // SWIGJAVA
 %define %casadi_input_typemaps(xName, xStubIn, xTsStub, xPrec, xType...)
 #ifdef SWIGWASMJS
  // Wrapped types cross the wasm boundary as EM_VAL
@@ -2153,6 +2416,16 @@ SWIGINTERNINLINE mxArray* SWIG_From_dec(std::string)(const std::string& s) {
 #endif
 #ifdef SWIGJULIA
 %julia_value_type(xType)
+#endif
+#ifdef SWIGJAVA
+ // Values cross as Object and convert in C++; %java_type sets the Java type
+%typemap(jni) xType, const xType, const xType&, xType &INOUT "jobject"
+%typemap(jtype) xType, const xType, const xType&, xType &INOUT "Object"
+%typemap(jstype) xType, const xType, const xType&, xType &OUTPUT, xType &INOUT "Object"
+%typemap(javain) xType, const xType&, xType &INOUT "$javainput"
+%typemap(javaout) xType, const xType, const xType& { return $imclassname.swigCast($jnicall); }
+%typemap(javadirectorin) xType, const xType, const xType& "$imclassname.swigCast($jniinput)"
+%typemap(javadirectorout) xType, const xType "$javacall"
 #endif
  // Pass input by value, check if matches
 %typemap(typecheck, noblock=1, precedence=xPrec, fragment="casadi_all") xType {
@@ -2204,7 +2477,11 @@ SWIGINTERNINLINE mxArray* SWIG_From_dec(std::string)(const std::string& s) {
 %define %casadi_output_typemaps(xName, xStubIn, xStubOut, xTsStub, xType...)
 
  // Return-by-value; Julia returns follow the Lib convention
-#ifndef SWIGJULIA
+#ifdef SWIGJAVA
+ // null is a Java value
+%typemap(out, noblock=1, fragment="casadi_all") xType, const xType { $result = swig::from< xType >($1); }
+%typemap(out, noblock=1, fragment="casadi_all") const xType& { $result = swig::from< xType >(*$1); }
+#elif !defined(SWIGJULIA)
 %typemap(out, doc=xName, pystub_out=xStubOut, tsstub_out=xTsStub, noblock=1, fragment="casadi_all") xType, const xType {
   if(!($result = swig::from< xType >($1))) SWIG_exception_fail(SWIG_TypeError,"Failed to convert output to type '" xName "'.");
 }
@@ -2233,6 +2510,9 @@ SWIGINTERNINLINE mxArray* SWIG_From_dec(std::string)(const std::string& s) {
 %typemap(directorin, noblock=1, fragment="casadi_all") const xType& {
     if(!($input = swig::from< xType >($1))) %dirout_fail(SWIG_TypeError,"For director inputs, failed to convert input to " xName ".");
  }
+#ifdef SWIGJAVA
+%java_type_director("Ljava/lang/Object;", xType)
+#endif
 
  // Enable dynamic dispatch
 %typemap(typecheck, noblock=1, fragment="casadi_all") xType &OUTPUT {
@@ -2753,6 +3033,55 @@ class ArrayInterfaceMX(ArrayInterface[MX]):
 %casadi_template(LPAIR("Function","Function"), "tuple[Function, Function]", "tuple[Function, Function]", "[Function, Function]", PREC_FUNCTION, std::pair<casadi::Function, casadi::Function>)
 %casadi_template(L_DICT, "Mapping[builtins.str, GenericType]", "dict[builtins.str, GenericType]", "Record<string, GenericType>", PREC_DICT, std::map<std::string, casadi::GenericType>)
 %casadi_template(LDICT(LL L_STR LR), "Mapping[builtins.str, Sequence[builtins.str]]", "dict[builtins.str, list[builtins.str]]", "Record<string, string[]>", PREC_DICT, std::map<std::string, std::vector<std::string> >)
+
+#ifdef SWIGJAVA
+%java_type("String", "Ljava/lang/String;", std::string)
+%java_type("java.util.List<String>", "Ljava/util/List;", std::vector<std::string>)
+%java_type("java.util.List<java.util.List<String>>", "Ljava/util/List;", std::vector<std::vector<std::string> >)
+%java_type("boolean", "Z", bool)
+%java_type("boolean[]", "[Z", std::vector<bool>)
+%java_type("boolean[][]", "[[Z", std::vector<std::vector<bool> >)
+%java_type("long", "J", casadi_int)
+%java_type("long[]", "[J", std::pair<casadi_int,casadi_int>)
+%java_type("long[]", "[J", std::vector<casadi_int>)
+%java_type("long[][]", "[[J", std::vector<std::vector<casadi_int> >)
+%java_type("double", "D", double)
+%java_type("double[]", "[D", std::vector<double>)
+%java_type("double[][]", "[[D", std::vector<std::vector<double> >)
+%java_type("Sparsity", "L$packagepath/Sparsity;", casadi::Sparsity)
+%java_type("java.util.List<Sparsity>", "Ljava/util/List;", std::vector<casadi::Sparsity>)
+%java_type("java.util.List<java.util.List<Sparsity>>", "Ljava/util/List;", std::vector<std::vector<casadi::Sparsity> >)
+%java_type_map("Sparsity", std::map<std::string, casadi::Sparsity>)
+%java_type_map("java.util.List<Sparsity>", std::map<std::string, std::vector<casadi::Sparsity> >)
+%java_type_entry("java.util.Map<String,Sparsity>", "java.util.List<String>", std::pair<std::map<std::string, casadi::Sparsity>, std::vector<std::string> >)
+%java_type_widen("DM", "L$packagepath/DM;", "double", casadi::Matrix<double>)
+%java_type("java.util.List<DM>", "Ljava/util/List;", std::vector<casadi::Matrix<double> >)
+%java_type("java.util.List<java.util.List<DM>>", "Ljava/util/List;", std::vector<std::vector<casadi::Matrix<double> > >)
+%java_type_map("DM", std::map<std::string, casadi::Matrix<double> >)
+%java_type("SX", "L$packagepath/SX;", casadi::SXElem)
+%java_type("java.util.List<SX>", "Ljava/util/List;", std::vector<casadi::SXElem>)
+%java_type_widen("SX", "L$packagepath/SX;", "DM,double", casadi::Matrix<casadi::SXElem>)
+%java_type("java.util.List<SX>", "Ljava/util/List;", std::vector<casadi::Matrix<casadi::SXElem> >)
+%java_type("java.util.List<java.util.List<SX>>", "Ljava/util/List;", std::vector<std::vector<casadi::Matrix<casadi::SXElem> > >)
+%java_type_map("SX", std::map<std::string, casadi::Matrix<casadi::SXElem> >)
+%java_type_widen("MX", "L$packagepath/MX;", "DM,double", casadi::MX)
+%java_type("java.util.List<MX>", "Ljava/util/List;", std::vector<casadi::MX>)
+%java_type("java.util.List<java.util.List<MX>>", "Ljava/util/List;", std::vector<std::vector<casadi::MX> >)
+%java_type_map("MX", std::map<std::string, casadi::MX>)
+%java_type_entry("MX", "MX", std::pair<casadi::MX, casadi::MX>)
+%java_type("DM", "L$packagepath/DM;", casadi::Matrix<casadi_int>)
+%java_type("Object", "Ljava/lang/Object;", casadi::GenericType)
+%java_type("java.util.List<Object>", "Ljava/util/List;", std::vector<casadi::GenericType>)
+%java_type("java.util.List<java.util.List<Object>>", "Ljava/util/List;", std::vector<std::vector<casadi::GenericType> >)
+%java_type_widen("Slice", "L$packagepath/Slice;", "long", casadi::Slice)
+%java_type("Function", "L$packagepath/Function;", casadi::Function)
+%java_type("java.util.List<Function>", "Ljava/util/List;", std::vector<casadi::Function>)
+%java_type_entry("Function", "Function", std::pair<casadi::Function, casadi::Function>)
+%java_type_map("Object", std::map<std::string, casadi::GenericType>)
+// Options are read from any Map with String keys
+%typemap(jstype) const std::map<std::string, casadi::GenericType>& "java.util.Map<String,?>"
+%java_type_map("java.util.List<String>", std::map<std::string, std::vector<std::string> >)
+#endif // SWIGJAVA
 
 #ifdef SWIGJULIA
 // Dicts, nested vectors and GenericType return as the Julia value
@@ -3385,6 +3714,29 @@ def dcat(args):
 %ignore casadi::MX::inv() const;
 #endif // SWIGJULIA
 
+#ifdef SWIGJAVA
+// Kotlin operator names; Sparsity and Slice keep is_equal / equality members unwrapped
+%rename(unaryMinus) operator-() const;
+%rename(unaryPlus) operator+() const;
+%rename(plus) casadi::Sparsity::operator+;
+%rename(times) casadi::Sparsity::operator*;
+%rename(minus) casadi::Slice::operator-;
+%rename(times) casadi::Slice::operator*;
+%ignore operator==;
+%ignore operator!=;
+%ignore casadi::DaeBuilder::operator();
+// Object.finalize() is called by the garbage collector
+%rename(finalize_) casadi::Callback::finalize;
+// Slice(long, boolean) would clash with the proxy constructor (pointer, ownership)
+%ignore casadi::Slice::Slice(casadi_int i, bool ind1);
+%extend casadi::Slice {
+  Slice(casadi_int i) { return new casadi::Slice(i); }
+}
+// Interface-internal macros
+%ignore CASADI_INT_TYPE_STR; %ignore MNAME; %ignore L_INT; %ignore L_BOOL; %ignore LL; %ignore LR;
+%ignore L_DICT; %ignore L_DOUBLE; %ignore L_STR; %ignore LABEL; %ignore SWIG_IND1;
+#endif // SWIGJAVA
+
 #ifdef SWIGMATLAB
 %rename(uminus) operator-;
 // Pattern intersection is elementwise; * and mtimes give the pattern of the matrix product
@@ -3492,6 +3844,18 @@ class NZproxy:
 %stub_method(__array_function__, Any, func: Any, types: Any, args: Any, kwargs: Any)
 %enddef
 #endif // SWIGPYTHON
+
+#ifdef SWIGJAVA
+// Indexing (0-based) as Kotlin's get/set operators: x[i], x[i, j], x[i] = v
+%define %java_index_pair(Type, R, C)
+    Type get(const R& rr, const C& cc) const {
+      Type m;
+      $self->get(m, false, rr, cc);
+      return m;
+    }
+    void set(const R& rr, const C& cc, const Type& m) { $self->set(m, false, rr, cc); }
+%enddef
+#endif // SWIGJAVA
 
 #ifdef SWIGMATLAB
 %{
@@ -3632,6 +3996,29 @@ class NZproxy:
     // Transpose using the A' syntax in addition to A.'
     Type ctranspose() const { return $self->T();}
 
+#elif defined(SWIGJAVA)
+    Type get(const casadi::Slice& rr) const {
+      Type m;
+      $self->get(m, false, rr);
+      return m;
+    }
+    Type get(const casadi::Matrix<casadi_int>& rr) const {
+      Type m;
+      $self->get(m, false, rr);
+      return m;
+    }
+    Type get(const casadi::Sparsity& sp) const {
+      Type m;
+      $self->get(m, false, sp);
+      return m;
+    }
+    void set(const casadi::Slice& rr, const Type& m) { $self->set(m, false, rr); }
+    void set(const casadi::Matrix<casadi_int>& rr, const Type& m) { $self->set(m, false, rr); }
+    void set(const casadi::Sparsity& sp, const Type& m) { $self->set(m, false, sp); }
+    %java_index_pair(Type, casadi::Slice, casadi::Slice)
+    %java_index_pair(Type, casadi::Slice, casadi::Matrix<casadi_int>)
+    %java_index_pair(Type, casadi::Matrix<casadi_int>, casadi::Slice)
+    %java_index_pair(Type, casadi::Matrix<casadi_int>, casadi::Matrix<casadi_int>)
 #endif
 %enddef
 
@@ -4139,6 +4526,45 @@ MX_FUN(DECL, (FLAG | IS_MX), MX)
 %warnfilter(401) casadi::Matrix<casadi_int>;
 %template() casadi::Matrix<casadi_int>;
 
+#ifdef SWIGJAVA
+// Kotlin operators (plus, minus, times, div, rem) and named relatives, through
+// the module functions, as Python's operators go through _casadi.<op>
+%define %java_binop(Self, Op, F)
+  public Self Op(Self y) { return ca.F(this, y); }
+  public Self Op(double y) { return ca.F(this, y); }
+%enddef
+%define %java_binop_dm(Op, F)
+  %java_binop(DM, Op, F)
+  public SX Op(SX y) { return ca.F(this, y); }
+  public MX Op(MX y) { return ca.F(this, y); }
+%enddef
+%define %java_binop_sym(Self, Op, F)
+  %java_binop(Self, Op, F)
+  public Self Op(DM y) { return ca.F(this, y); }
+%enddef
+%define %java_binops(M, Self)
+  M(Self, plus, plus) M(Self, minus, minus) M(Self, times, times) M(Self, div, rdivide)
+  M(Self, rem, mod) M(Self, mtimes, mtimes) M(Self, power, power)
+  M(Self, lt, lt) M(Self, le, le) M(Self, gt, gt) M(Self, ge, ge) M(Self, eq, eq) M(Self, ne, ne)
+%enddef
+%define %java_binop_dm2(Self, Op, F) %java_binop_dm(Op, F) %enddef
+%extend casadi::Matrix<double> {
+  %proxycode {
+  %java_binops(%java_binop_dm2, DM)
+  }
+}
+%extend casadi::Matrix<casadi::SXElem> {
+  %proxycode {
+  %java_binops(%java_binop_sym, SX)
+  }
+}
+%extend casadi::MX {
+  %proxycode {
+  %java_binops(%java_binop_sym, MX)
+  }
+}
+#endif // SWIGJAVA
+
 %template(DM) casadi::Matrix<double>;
 %extend casadi::Matrix<double> {
    %template(DM) Matrix<SXElem>;
@@ -4161,8 +4587,27 @@ namespace casadi{
   %feature("nothread") casadi::Matrix<double>::sparse;
 #endif
 
+#ifdef SWIGJAVA
+namespace casadi{
+  %extend Matrix<double> {
+    // double[] as a column, double[][] one array per row
+    Matrix(const std::vector<double>& x) { return new casadi::Matrix<double>(x); }
+    Matrix(const std::vector< std::vector<double> >& x) { return new casadi::Matrix<double>(x); }
+    // Dense entries, one array per row
+    std::vector< std::vector<double> > full() const {
+      std::vector<double> d($self->numel());
+      casadi::casadi_densify($self->ptr(), $self->sparsity(), casadi::get_ptr(d), false);
+      std::vector< std::vector<double> > r($self->size1(), std::vector<double>($self->size2()));
+      for (casadi_int i=0; i<$self->size1(); ++i)
+        for (casadi_int j=0; j<$self->size2(); ++j) r[i][j] = d[i + j*$self->size1()];
+      return r;
+    }
+  }
+} // namespace casadi
+#endif // SWIGJAVA
+
 // Extend DM with SWIG unique features
-#ifndef SWIGWASMJS
+#if !defined(SWIGWASMJS) && !defined(SWIGJAVA)
 namespace casadi{
   %extend Matrix<double> {
     // Convert to a dense matrix
@@ -5214,7 +5659,14 @@ class global_unpickle_context:
 #endif
 
 // Return-by-value
-#ifdef SWIGWASMJS
+#ifdef SWIGJAVA
+// A DM: a Java value has one static type
+%typemap(jni) casadi::native_DM "jobject"
+%typemap(jtype) casadi::native_DM "Object"
+%typemap(jstype) casadi::native_DM "DM"
+%typemap(javaout) casadi::native_DM { return $imclassname.swigCast($jnicall); }
+%typemap(out, noblock=1, fragment="casadi_all") casadi::native_DM { $result = swig::from< casadi::DM >($1); }
+#elif defined(SWIGWASMJS)
 %typemap(out, doc="DM", tsstub_out="DM", noblock=1, fragment="casadi_all") casadi::native_DM {
   if(!($result = swig::from< casadi::DM >($1))) SWIG_exception_fail(SWIG_TypeError,"Failed to convert output to type 'DM'.");
 }
