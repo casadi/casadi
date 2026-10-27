@@ -84,6 +84,24 @@
 }
 %rename(hash) __hash__;
 %rename(nonzero) __nonzero__;
+// C++ streams and raw pointers have no Java form
+%ignore casadi::StreamStateGuard;
+%ignore casadi::normalized_setup;
+%ignore casadi::normalized_in;
+%ignore casadi::conic_debug(const Function&, std::ostream&);
+%ignore casadi::Options::best_matches;
+%ignore casadi::to_slice2;
+%ignore casadi::hash_sparsity(casadi_int, casadi_int, const casadi_int*, const casadi_int*);
+%ignore deserialize(std::istream&);
+%ignore deserialize(DeserializingStream&);
+%ignore serialize(SerializingStream&) const;
+%ignore casadi::SerializerBase::pack(const std::vector<Linsol>&);
+%ignore casadi::DeserializerBase::blind_unpack_linsol_vector;
+%ignore casadi::DeserializerBase::unpack_linsol_vector;
+%ignore test_cast;
+%ignore casadi::MX::simplify_ref_count(std::vector<MX>&, std::vector<MX>&, const Dict&);
+%ignore casadi::MX::simplify_const_folding(std::vector<MX>&, std::vector<MX>&, const Dict&);
+%ignore casadi::MX::simplify_combine_terms(std::vector<MX>&, std::vector<MX>&, const Dict&);
 // MX extends GenMX, so SharedObject's members are spelled out
 %warnfilter(813) casadi::MX;
 %extend casadi::MX {
