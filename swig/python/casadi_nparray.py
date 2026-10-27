@@ -987,7 +987,8 @@ class ArrayInterface(object):
         # (quietly).  Symbolic operands have no numpy fallback.
         if any(ArrayInterface._arg_has_symbolic(a) for a in args):
             return NotImplemented
-        return func(*tuple(ArrayInterface._densify_arg(a) for a in args), **kwargs)
+        return func(*tuple(ArrayInterface._densify_arg(a) for a in args),
+                    **{k: ArrayInterface._densify_arg(v) for k, v in kwargs.items()})
 
     # -- display --------------------------------------------------------------
 
