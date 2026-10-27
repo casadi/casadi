@@ -734,28 +734,22 @@ namespace std {
     }
   } // namespace casadi
 %}
-#ifndef _WIN32
-%{
-#include <dlfcn.h>
-%}
-#endif
 %init %{
   casadi::Logger::writeFun = casadi::javalogger;
   casadi::Logger::flush = casadi::javaflush;
-#ifndef _WIN32
-  // Plugins next to the loaded libcasadi (a data symbol: function addresses may resolve to a PLT stub)
+  // Plugins next to the casadi_java library that NativeLoader loaded
   {
-    Dl_info info;
-    if (dladdr(reinterpret_cast<void*>(&casadi::Logger::writeFun), &info) && info.dli_fname) {
-      std::string p = info.dli_fname;
-      casadi::GlobalOptions::setCasadiPath(p.substr(0, p.find_last_of('/')));
-    }
+    JNIEnv *env = SWIG_JavaGuestEnvChecked();
+    jclass c = env->FindClass("org/casadi/NativeLoader");
+    jfieldID f = c ? env->GetStaticFieldID(c, "directory", "Ljava/lang/String;") : 0;
+    jobject d = f ? env->GetStaticObjectField(c, f) : 0;
+    env->ExceptionClear();
+    if (d) casadi::GlobalOptions::setCasadiPath(SWIG_JavaGuestString(d));
   }
-#endif
 %}
 %pragma(java) jniclasscode=%{
   static {
-    System.loadLibrary("casadi_java");
+    NativeLoader.load();
   }
 %}
 // Free functions live in the module class, like java.lang.Math
