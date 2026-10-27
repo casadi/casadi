@@ -5585,6 +5585,14 @@ class Functiontests(casadiTestCase):
     f = ca.Function.jit("f", "b[0] = a[0]*a[0];", ["a"], ["b"], {"compiler": "shell"})
     self.checkarray(f.jacobian()(3, 0), ca.DM(6), digits=5)
 
+  def test_print_long(self):
+    x = ca.MX.sym("x")
+    for n in [255, 300]:
+      name = "f"*n
+      f = ca.Function(name, [x], [x**2], {"print_time": True})
+      with self.assertOutput(name + "  : ", []):
+        f(3)
+
   def test_has_function(self):
     x = ca.MX.sym("x")
     f = ca.Function("f", [x], [x**2], {"never_inline": True})
