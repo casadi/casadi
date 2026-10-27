@@ -898,6 +898,25 @@ public class MatrixTest extends CasadiTestCase {
     checkarray(a.get_nz(false, 0), dm(1));
   }
 
+  // Java: get_nz/set_nz without the ind1 flag, like get/set
+  @Test
+  public void test_nz_without_ind1() {
+    DM a = ca.sparsify(dm(new double[][] {{1, 2}, {0, 0}, {3, 4}}));
+    checkarray(a.get_nz(new Slice(0, -1)), dm(1, 3, 2));
+    checkarray(a.get_nz(dm(3, 0)), dm(4, 1));
+    checkarray(a.get_nz(2), dm(2));
+    a.set_nz(new Slice(0, 2), dm(7, 8));
+    a.set_nz(3, new DM(9));
+    a.set_nz(dm(2), new DM(6));
+    checkarray(new DM(a.nonzeros()), dm(7, 8, 6, 9));
+    MX x = MX.sym("x", 4);
+    org.casadi.Function f = new org.casadi.Function("f", List.of(x), List.of(x.get_nz(new Slice(1, 3))));
+    checkarray(f.call(List.of(dm(1, 2, 3, 4))).get(0), dm(2, 3));
+    SX y = SX.sym("y", 3);
+    y.set_nz(1, new SX(0));
+    assertEquals("[y_0, 0, y_2]", y.toString());
+  }
+
   private void zeroRandomEntries(double[][] A) {
     for (int i = 0; i < 5; i++) A[random.nextInt(A.length)][random.nextInt(A[0].length)] = 0;
   }

@@ -198,13 +198,14 @@ def run_java(blocks, verbose):
     for name, text in blocks:
         ex = java_examples(text)
         examples.append((name, ex))
-        script += ["/reset", "import org.casadi.*;", "import java.util.*;", mark]
+        # jshell's startup imports java.util.function.*: org.casadi.Function wins
+        script += ["/reset", "import org.casadi.*;", "import org.casadi.Function;", "import java.util.*;", mark]
         for src, _ in ex:
             script += [src, mark]
     script.append("/exit")
     cmd = ["jshell", "-q", "-R-Dcasadi.library.path=" + path, "--class-path", os.path.join(path, "casadi.jar")]
     p = subprocess.run(cmd, input="\n".join(script) + "\n", stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
-    chunks = [re.sub(r"^(\$\d+|[A-Za-z_]\w*) ==> ", "", c.replace("jshell> ", "").strip("\n"))
+    chunks = [re.sub(r"(?m)^\$\d+ ==> ", "", re.sub(r"^[A-Za-z_]\w* ==> ", "", c.replace("jshell> ", "").strip("\n")))
               for c in p.stdout.split(JAVA_MARK + "\n")]
     checker = Checker()
     flags = doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE
