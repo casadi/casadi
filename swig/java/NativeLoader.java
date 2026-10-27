@@ -38,6 +38,15 @@ final class NativeLoader {
   /** Directory of the loaded casadi_java library, null if unknown */
   static String directory;
 
+  /** casadi headers for code generation: include next to the library, or ../include */
+  static String includeDirectory() {
+    if (directory == null) return null;
+    Path d = Paths.get(directory);
+    Path inc = d.resolve("include");
+    if (!Files.isDirectory(inc) && d.getParent() != null) inc = d.getParent().resolve("include");
+    return inc.toString();
+  }
+
   private NativeLoader() {}
 
   static synchronized void load() {
