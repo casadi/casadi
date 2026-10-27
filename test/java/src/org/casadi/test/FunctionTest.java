@@ -30,7 +30,6 @@ import org.casadi.Slice;
 import org.casadi.Sparsity;
 import org.casadi.ca;
 import org.junit.jupiter.api.Assumptions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /** Port of test/python/function.py */
@@ -533,7 +532,6 @@ public class FunctionTest extends CasadiTestCase {
   }
 
   @Test
-  @Disabled("BINDING: eval_buffer gets opaque SWIGTYPE_p_p_double buffers that Java cannot read or write")
   public void test_callback_buffer() {
     final class MyCallback extends Callback {
       MyCallback(String name) {
@@ -546,9 +544,9 @@ public class FunctionTest extends CasadiTestCase {
       }
 
       @Override
-      public int eval_buffer(org.casadi.SWIGTYPE_p_p_double arg, long[] sizes_arg, org.casadi.SWIGTYPE_p_p_double res,
-          long[] sizes_res) {
-        // r[:] = a**2: no way to reach the doubles behind arg/res
+      public int eval_buffer(List<java.nio.DoubleBuffer> arg, List<java.nio.DoubleBuffer> res) {
+        java.nio.DoubleBuffer a = arg.get(0), r = res.get(0);
+        for (int i = 0; i < a.capacity(); i++) r.put(i, a.get(i) * a.get(i));
         return 0;
       }
     }
@@ -557,6 +555,55 @@ public class FunctionTest extends CasadiTestCase {
     MX y = m(foo.invoke(x));
     Function f = new Function("f", List.of(x), List.of(y));
     checkarray(d(f.invoke(5)), 25);
+
+    final class MyCallback2 extends Callback {
+      MyCallback2(String name) {
+        construct(name, Map.of());
+      }
+
+      @Override
+      public boolean has_eval_buffer() {
+        return true;
+      }
+
+      @Override
+      public long get_n_in() {
+        return 3;
+      }
+
+      @Override
+      public long get_n_out() {
+        return 2;
+      }
+
+      @Override
+      public Sparsity get_sparsity_in(long i) {
+        return i == 0 ? Sparsity.dense(1, 1) : i == 1 ? Sparsity.dense(3, 1) : Sparsity.dense(3, 3);
+      }
+
+      @Override
+      public Sparsity get_sparsity_out(long i) {
+        return i == 0 ? Sparsity.dense(3, 1) : Sparsity.dense(3, 3);
+      }
+
+      @Override
+      public int eval_buffer(List<java.nio.DoubleBuffer> arg, List<java.nio.DoubleBuffer> res) {
+        // column-major, as np.frombuffer(..).reshape(order='F')
+        java.nio.DoubleBuffer a = arg.get(0), b = arg.get(1), c = arg.get(2), r0 = res.get(0), r1 = res.get(1);
+        for (int i = 0; i < 3; i++) {
+          double v = 0;
+          for (int j = 0; j < 3; j++) v += a.get(0) * c.get(i + 3 * j) * b.get(j);
+          r0.put(i, v);
+        }
+        for (int k = 0; k < 9; k++) r1.put(k, c.get(k) * c.get(k));
+        return 0;
+      }
+    }
+    MyCallback2 foo2 = new MyCallback2("my_f");
+    DM a = new DM(3), b = dm(1, 2, 3), c = dm(new double[][] {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}});
+    List<?> res = (List<?>) foo2.invoke(a, b, c);
+    checkarray((DM) res.get(0), ca.mtimes(a.times(c), b));
+    checkarray((DM) res.get(1), ca.power(c, 2));
   }
 
   @Test
