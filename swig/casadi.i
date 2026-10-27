@@ -3216,6 +3216,26 @@ class ArrayInterfaceMX(ArrayInterface[MX]):
 %typemap(jstype) const std::map<std::string, casadi::GenericType>& "java.util.Map<String,?>"
 %java_type_map("java.util.List<String>", std::map<std::string, std::vector<std::string> >)
 #endif // SWIGJAVA
+#ifdef SWIGRUST
+// Rust types accepted where casadi converts (see the traits)
+%typemap(rsaccept) casadi::Matrix<double> "DM | Sparsity | f64 | i64 | Vec<f64> | Vec<i64> | Vec<Vec<f64>>"
+%typemap(rsaccept) casadi::Matrix<casadi::SXElem> "SX | DM | Sparsity | f64 | i64 | Vec<f64> | Vec<i64> | Vec<Vec<f64>>"
+%typemap(rsaccept) casadi::MX "MX | DM | Sparsity | f64 | i64 | Vec<f64> | Vec<i64> | Vec<Vec<f64>>"
+%typemap(rstype) casadi::Matrix<casadi_int> "DM"
+%typemap(rsaccept) casadi::Matrix<casadi_int> "i64 | Vec<i64> | Vec<Vec<i64>> | Sparsity"
+%typemap(rstype) casadi::SXElem "SX"
+%typemap(rsaccept) casadi::SXElem "SX | f64 | i64"
+%typemap(rsaccept) casadi::Slice "Slice | i64"
+%typemap(rstype) casadi::GenericType "rt::Value"
+%typemap(rsaccept) casadi::GenericType "Any"
+// Numeric evaluation returns a Result, symbolic evaluation panics
+%feature("rust:result") casadi::Function::call(const std::vector<DM>&, std::vector<DM>&, bool, bool) const;
+%feature("rust:result") casadi::Function::call(const DMDict&, DMDict&, bool, bool) const;
+%rename(call_symbolic) casadi::Function::call(const std::vector<SX>&, std::vector<SX>&, bool, bool) const;
+%rename(call_symbolic) casadi::Function::call(const std::vector<MX>&, std::vector<MX>&, bool, bool) const;
+%rename(call_symbolic) casadi::Function::call(const SXDict&, SXDict&, bool, bool) const;
+%rename(call_symbolic) casadi::Function::call(const MXDict&, MXDict&, bool, bool) const;
+#endif // SWIGRUST
 
 #ifdef SWIGJULIA
 // Dicts, nested vectors and GenericType return as the Julia value
