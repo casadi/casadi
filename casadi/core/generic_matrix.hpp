@@ -117,6 +117,17 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> List.of(DM.eye(3).nnz(), DM.ones(3, 3).nnz(), new DM(3, 3).nnz())
+        [3, 9, 0]
+        jshell> new DM(new double[][]{{1, 0}, {0, 2}}).nnz()
+        4
+        jshell> MX.sym("x", 2, 0).nnz()
+        0
+        \enddoctest
+        \endlang
+
         \sa numel, nnz_lower, nnz_upper, nnz_diag, sparsity
 
         \identifier{1an} */
@@ -147,6 +158,13 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> List.of(DM.ones(3, 3).nnz_lower(), DM.eye(3).nnz_lower(), DM.ones(2, 3).nnz_lower())
+        [6, 3, 3]
+        \enddoctest
+        \endlang
+
         \sa nnz, nnz_upper, nnz_diag
 
         \identifier{1ao} */
@@ -174,6 +192,13 @@ namespace casadi {
         julia> A = ca.DM.ones(3, 3); I = ca.DM.eye(3); B = ca.DM.ones(2, 3);
         julia> ca.nnz_upper(A), ca.nnz_upper(I), ca.nnz_upper(B)
         (6, 3, 5)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> List.of(DM.ones(3, 3).nnz_upper(), DM.eye(3).nnz_upper(), DM.ones(2, 3).nnz_upper())
+        [6, 3, 5]
         \enddoctest
         \endlang
 
@@ -209,6 +234,13 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> List.of(DM.ones(3, 3).nnz_diag(), DM.eye(3).nnz_diag(), DM.ones(2, 3).nnz_diag())
+        [3, 3, 2]
+        \enddoctest
+        \endlang
+
         \sa nnz, nnz_lower, nnz_upper
 
         \identifier{1aq} */
@@ -241,6 +273,13 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> List.of(DM.eye(3).numel(), MX.sym("x", 2, 0).numel(), SX.sym("x").numel())
+        [9, 0, 1]
+        \enddoctest
+        \endlang
+
         \sa nnz, size
 
         \identifier{1ar} */
@@ -269,6 +308,14 @@ namespace casadi {
         julia> x = ca.MX.sym("x", 2, 3);
         julia> ca.size1(x), ca.size2(x)
         (2, 3)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> MX x = MX.sym("x", 2, 3);
+        jshell> List.of(x.size1(), x.size2())
+        [2, 3]
         \enddoctest
         \endlang
 
@@ -319,6 +366,13 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> List.of(DM.eye(3).dim(), DM.eye(3).dim(true), DM.ones(3, 3).dim(true))
+        [3x3, 3x3,3nz, 3x3,9nz]
+        \enddoctest
+        \endlang
+
         \sa size, nnz
 
         \identifier{1aw} */
@@ -349,6 +403,16 @@ namespace casadi {
         julia> x = ca.MX.sym("x", 2, 3);
         julia> size(x), size(x, 1), size(x, 2)
         ((2, 3), 2, 3)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> MX x = MX.sym("x", 2, 3);
+        jshell> x.size()
+        long[2] { 2, 3 }
+        jshell> List.of(x.size(1), x.size(2))
+        [2, 3]
         \enddoctest
         \endlang
 
@@ -398,6 +462,15 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> List.of(new DM(0, 3).is_empty(), new DM(0, 3).is_empty(true), new DM(0, 0).is_empty(true))
+        [true, false, true]
+        jshell> new DM(1, 1).is_empty()
+        false
+        \enddoctest
+        \endlang
+
         \identifier{1az} */
     bool is_empty(bool both=false) const { return sparsity().is_empty(both);}
 
@@ -425,6 +498,13 @@ namespace casadi {
         \doctest
         julia> ca.is_dense(ca.DM.zeros(2, 2)), ca.is_dense(ca.DM(2, 2)), ca.is_dense(ca.DM(0, 3))
         (true, false, true)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> List.of(DM.zeros(2, 2).is_dense(), new DM(2, 2).is_dense(), new DM(0, 3).is_dense())
+        [true, false, true]
         \enddoctest
         \endlang
 
@@ -458,6 +538,14 @@ namespace casadi {
         julia> x = ca.SX.sym("x", ca.Sparsity(1, 1));
         julia> ca.is_scalar(x), ca.is_scalar(x, true), ca.is_scalar(ca.SX.sym("y"), true)
         (true, false, true)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> SX x = SX.sym("x", new Sparsity(1, 1));
+        jshell> List.of(x.is_scalar(), x.is_scalar(true), SX.sym("y").is_scalar(true))
+        [true, false, true]
         \enddoctest
         \endlang
 
@@ -498,6 +586,15 @@ namespace casadi {
         (true, true, true)
         julia> ca.is_vector(ca.DM(3, 3)), ca.is_vector(ca.DM(0, 1)), ca.is_vector(ca.DM(0, 0))
         (false, true, false)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> List.of(new DM(3, 1).is_vector(), new DM(1, 3).is_vector(), new DM(1, 1).is_vector())
+        [true, true, true]
+        jshell> List.of(new DM(3, 3).is_vector(), new DM(0, 1).is_vector(), new DM(0, 0).is_vector())
+        [false, true, false]
         \enddoctest
         \endlang
 
@@ -542,6 +639,13 @@ namespace casadi {
         julia> U = ca.DM(ca.Sparsity.upper(3), 1);
         julia> ca.is_triu(U), ca.is_triu(ca.DM.zeros(2, 2)), ca.is_triu(ca.DM(2, 2))
         (true, false, true)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> List.of(new DM(Sparsity.upper(3), 1).is_triu(), DM.zeros(2, 2).is_triu(), new DM(2, 2).is_triu())
+        [true, false, true]
         \enddoctest
         \endlang
 
@@ -598,6 +702,18 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> DM x = new DM(Sparsity.diag(2), new DM(new double[]{5, 6}));
+        jshell> x.row()
+        long[2] { 0, 1 }
+        jshell> x.colind()
+        long[3] { 0, 1, 2 }
+        jshell> List.of(x.row(1), x.colind(2))
+        [1, 2]
+        \enddoctest
+        \endlang
+
         \identifier{1b8} */
     std::vector<casadi_int> get_row() const { return sparsity().get_row(); }
     std::vector<casadi_int> get_colind() const { return sparsity().get_colind(); }
@@ -634,6 +750,15 @@ namespace casadi {
         julia> ca.sparsity(ca.DM.eye(2))
         Sparsity(2x2,2nz)
         julia> ca.is_equal(ca.sparsity(ca.DM.eye(2)), ca.Sparsity.diag(2))
+        true
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> DM.eye(2).sparsity()
+        2x2,2nz
+        jshell> DM.eye(2).sparsity().is_equal(Sparsity.diag(2))
         true
         \enddoctest
         \endlang
@@ -806,6 +931,22 @@ namespace casadi {
          \enddoctest
          \endlang
 
+         \lang{java}
+         \doctest
+         jshell> ca.interp1d(new double[]{0, 1, 2}, new DM(new double[]{0, 10, 20}), new double[]{0.5, 1.5})
+         [5, 15]
+         jshell> ca.interp1d(new double[]{0, 1, 2}, new DM(new double[]{0, 10, 20}), new double[]{0.5, 1.5}, "floor")
+         [0, 10]
+         jshell> ca.interp1d(new double[]{0, 1, 2}, new DM(new double[][]{{0, 1}, {10, 11}, {20, 21}}), new double[]{0.5, 2})
+         [[5, 6],
+          [20, 21]]
+         jshell> ca.interp1d(new double[]{0, 1, 2}, new DM(new double[]{0, 10, 20}), new double[]{-1, 3})
+         [0, 20]
+         jshell> ca.interp1d(new double[]{0, 1, 2}, SX.sym("v", 3), new double[]{0.5})
+         @1=0.5, ((@1*v_0)+(@1*v_1))
+         \enddoctest
+         \endlang
+
          \sa interpolant
 
          \identifier{1bh} */
@@ -885,6 +1026,29 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> DM A = new DM(new double[][]{{1, 2}, {3, 4}});
+        jshell> ca.mpower(A, 2)
+        [[7, 10],
+         [15, 22]]
+        jshell> ca.mpower(A, 0)
+        [[1, 00],
+         [00, 1]]
+        jshell> ca.mpower(A, -1)
+        [[-2, 1],
+         [1.5, -0.5]]
+        jshell> ca.mpower(new DM(2), 0.5)
+        1.41421
+        jshell> try {
+           ...>   ca.mpower(A, 0.5);
+           ...> } catch (RuntimeException e) {
+           ...>   System.out.println("error");
+           ...> }
+        error
+        \enddoctest
+        \endlang
+
         \sa mtimes, inv, expm
 
         \identifier{1bi} */
@@ -927,6 +1091,15 @@ namespace casadi {
         [[3, 00, 1],
          [00, 3, 2],
          [1, 2, 3]])
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> ca.soc(new DM(new double[]{1, 2}), 3)
+        [[3, 00, 1],
+         [00, 3, 2],
+         [1, 2, 3]]
         \enddoctest
         \endlang
 
@@ -994,6 +1167,19 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> DM A = new DM(new double[]{1, 2, 3, 4});
+        jshell> ca.einstein(A, A, new long[]{2, 2}, new long[]{2, 2}, new long[]{2, 2}, new long[]{-1, -2}, new long[]{-2, -3}, new long[]{-1, -3})
+        [7, 10, 15, 22]
+        jshell> ca.mtimes(new DM(new double[][]{{1, 3}, {2, 4}}), new DM(new double[][]{{1, 3}, {2, 4}}))
+        [[7, 15],
+         [10, 22]]
+        jshell> ca.einstein(new DM(new double[]{1, 2, 3}), new DM(new double[]{4, 5, 6}), new long[]{3}, new long[]{3}, new long[]{}, new long[]{-1}, new long[]{-1}, new long[]{})
+        32
+        \enddoctest
+        \endlang
+
         \sa mtimes, dot
 
         \identifier{1bk} */
@@ -1046,6 +1232,14 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> DM A = new DM(new double[][]{{1, 2}, {3, 4}});
+        jshell> ca.mrdivide(new DM(new double[][]{{1, 2}}), A)
+        [[1, 0]]
+        \enddoctest
+        \endlang
+
         \sa mldivide, solve, inv
 
         \identifier{1bl} */
@@ -1079,6 +1273,14 @@ namespace casadi {
         julia> A = ca.DM([1 2; 3 4]);
         julia> A \ ca.DM([1, 2])
         DM([0, 0.5])
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> DM A = new DM(new double[][]{{1, 2}, {3, 4}});
+        jshell> ca.mldivide(A, new DM(new double[]{1, 2}))
+        [0, 0.5]
         \enddoctest
         \endlang
 
@@ -1151,6 +1353,21 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> SX x = SX.sym("x"); SX y = SX.sym("y"); SX z = SX.sym("z");
+        jshell> ca.symvar(ca.vertcat(List.of(z.times(x), y)))
+        [z, x, y]
+        jshell> ca.symvar(SX.sym("v", 2).times(3))
+        [v_0, v_1]
+        jshell> MX v = MX.sym("v", 2);
+        jshell> ca.symvar(v.get(0).times(3))
+        [v]
+        jshell> ca.symvar(new SX(3))
+        []
+        \enddoctest
+        \endlang
+
         \sa depends_on, contains
 
         \identifier{1bn} */
@@ -1198,6 +1415,18 @@ namespace casadi {
         DM(10)
         julia> ca.bilin(ca.MX.sym("A", 2, 2), ca.MX.sym("x", 2), ca.MX.sym("y", 2))
         MX(bilin(A, x, y))
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> DM A = new DM(new double[][]{{1, 2}, {3, 4}});
+        jshell> ca.bilin(A, new DM(new double[]{1, 1}), new DM(new double[]{1, 2}))
+        16
+        jshell> ca.bilin(A, new DM(new double[]{1, 1}))
+        10
+        jshell> ca.bilin(MX.sym("A", 2, 2), MX.sym("x", 2), MX.sym("y", 2))
+        bilin(A, x, y)
         \enddoctest
         \endlang
 
@@ -1257,6 +1486,17 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> DM A = new DM(new double[][]{{1, 2}, {3, 4}});
+        jshell> ca.rank1(A, 2, new DM(new double[]{1, 0}), new DM(new double[]{0, 1}))
+        [[1, 4],
+         [3, 4]]
+        jshell> ca.rank1(MX.sym("A", 2, 2), MX.sym("a"), MX.sym("x", 2), MX.sym("y", 2))
+        rank1(A, a, x, y)
+        \enddoctest
+        \endlang
+
         \sa bilin, mtimes
 
         \identifier{1bp} */
@@ -1303,6 +1543,17 @@ namespace casadi {
         SX((sq(x_0)+sq(x_1)))
         julia> ca.sumsqr(ca.MX.sym("x", 2))
         MX(dot(x, x))
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> ca.sumsqr(new DM(new double[][]{{1, 2}, {3, 4}}))
+        30
+        jshell> ca.sumsqr(SX.sym("x", 2))
+        (sq(x_0)+sq(x_1))
+        jshell> ca.sumsqr(MX.sym("x", 2))
+        dot(x, x)
         \enddoctest
         \endlang
 
@@ -1363,6 +1614,23 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> ca.logsumexp(new DM(new double[]{1, 2, 3}))
+        3.40761
+        jshell> ca.logsumexp(new DM(new double[]{1000, 1000}))
+        1000.69
+        jshell> ca.logsumexp(MX.sym("x", 3))
+        logsumexp(x)
+        jshell> try {
+           ...>   ca.logsumexp(new DM(new double[]{1, 2, 3}).T());
+           ...> } catch (RuntimeException e) {
+           ...>   System.out.println("error");
+           ...> }
+        error
+        \enddoctest
+        \endlang
+
         \sa mmax
 
         \identifier{1br} */
@@ -1393,6 +1661,13 @@ namespace casadi {
         \doctest
         julia> ca.logsumexp(ca.DM([1, 2, 3]), 0.1)
         DM(3)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> ca.logsumexp(new DM(new double[]{1, 2, 3}), 0.1)
+        3
         \enddoctest
         \endlang
 
@@ -1441,6 +1716,17 @@ namespace casadi {
         SX([a, (a+((b-a)/2)), b])
         julia> ca.linspace(ca.DM([0, 0]), ca.DM([1, 2]), 3)
         DM([0, 0, 0.5, 1, 1, 2])
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> ca.linspace(0, 1, 5)
+        [0, 0.25, 0.5, 0.75, 1]
+        jshell> ca.linspace(SX.sym("a"), SX.sym("b"), 3)
+        [a, (a+((b-a)/2)), b]
+        jshell> ca.linspace(new DM(new double[]{0, 0}), new DM(new double[]{1, 2}), 3)
+        [0, 0, 0.5, 1, 1, 2]
         \enddoctest
         \endlang
 
@@ -1496,6 +1782,18 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> ca.cross(new DM(new double[]{1, 0, 0}), new DM(new double[]{0, 1, 0}))
+        [0, 0, 1]
+        jshell> ca.cross(new DM(new double[][]{{1, 0, 0}, {0, 1, 0}}), new DM(new double[][]{{0, 1, 0}, {0, 0, 1}}))
+        [[0, 0, 1],
+         [1, 0, 0]]
+        jshell> ca.cross(SX.sym("a", 3), SX.sym("b", 3))
+        [((a_1*b_2)-(a_2*b_1)), ((a_2*b_0)-(a_0*b_2)), ((a_0*b_1)-(a_1*b_0))]
+        \enddoctest
+        \endlang
+
         \sa skew, dot
 
         \identifier{1bu} */
@@ -1539,6 +1837,17 @@ namespace casadi {
          [-2, 1, 0]])
         julia> ca.inv_skew(ca.skew(ca.DM([1, 2, 3])))
         DM([1, 2, 3])
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> ca.skew(new DM(new double[]{1, 2, 3}))
+        [[0, -3, 2],
+         [3, 0, -1],
+         [-2, 1, 0]]
+        jshell> ca.inv_skew(ca.skew(new DM(new double[]{1, 2, 3})))
+        [1, 2, 3]
         \enddoctest
         \endlang
 
@@ -1602,6 +1911,17 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> ca.det(new DM(new double[][]{{1, 2}, {3, 4}}))
+        -2
+        jshell> ca.det(SX.sym("A", 2, 2))
+        ((A_0*A_3)-(A_2*A_1))
+        jshell> ca.det(MX.sym("A", 2, 2))
+        det(A)
+        \enddoctest
+        \endlang
+
         \sa inv, inv_minor
 
         \identifier{1bx} */
@@ -1631,6 +1951,13 @@ namespace casadi {
         \doctest
         julia> ca.det(ca.DM([1 2; 3 4]), "qr")
         DM(-2)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> ca.det(new DM(new double[][]{{1, 2}, {3, 4}}), "qr")
+        -2
         \enddoctest
         \endlang
 
@@ -1670,6 +1997,14 @@ namespace casadi {
         DM(
         [[-2, 1],
          [1.5, -0.5]])
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> ca.inv_minor(new DM(new double[][]{{1, 2}, {3, 4}}))
+        [[-2, 1],
+         [1.5, -0.5]]
         \enddoctest
         \endlang
 
@@ -1732,6 +2067,21 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> ca.inv(new DM(new double[][]{{1, 2}, {3, 4}}))
+        [[-2, 1],
+         [1.5, -0.5]]
+        jshell> ca.inv(SX.sym("A", 2, 2))
+        @1=((A_0*A_3)-(A_2*A_1)),
+        [[(A_3/@1), (-(A_2/@1))],
+         [(-(A_1/@1)), (A_0/@1)]]
+        jshell> ca.inv(new DM(Sparsity.diag(2), new DM(new double[]{2, 4})))
+        [[0.5, 00],
+         [00, 0.25]]
+        \enddoctest
+        \endlang
+
         \sa solve, pinv, det, mldivide
 
         \identifier{1bz} */
@@ -1766,6 +2116,14 @@ namespace casadi {
         \lang{julia}
         \doctest
         julia> print(ca.inv(ca.DM([1 2; 3 4]), "qr"))
+        [[-2, 1],
+         [1.5, -0.5]]
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> ca.inv(new DM(new double[][]{{1, 2}, {3, 4}}), "qr")
         [[-2, 1],
          [1.5, -0.5]]
         \enddoctest
@@ -1809,6 +2167,15 @@ namespace casadi {
         DM(5)
         julia> ca.tr(ca.SX.sym("A", 2, 2))
         SX((A_0+A_3))
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> ca.trace(new DM(new double[][]{{1, 2}, {3, 4}}))
+        5
+        jshell> ca.trace(SX.sym("A", 2, 2))
+        (A_0+A_3)
         \enddoctest
         \endlang
 
@@ -1866,6 +2233,19 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> DM L = new DM(Sparsity.lower(3), new DM(new double[]{1, 2, 3, 4, 5, 6}));
+        jshell> ca.tril2symm(L)
+        [[1, 2, 3],
+         [2, 4, 5],
+         [3, 5, 6]]
+        jshell> ca.tril2symm(SX.sym("L", Sparsity.lower(2)))
+        [[L_0, L_1],
+         [L_1, L_2]]
+        \enddoctest
+        \endlang
+
         \sa triu2symm, tril, is_tril
 
         \identifier{1c2} */
@@ -1905,6 +2285,15 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> DM U = new DM(Sparsity.upper(2), new DM(new double[]{1, 2, 3}));
+        jshell> ca.triu2symm(U)
+        [[1, 2],
+         [2, 3]]
+        \enddoctest
+        \endlang
+
         \sa tril2symm, triu, is_triu
 
         \identifier{1c3} */
@@ -1940,6 +2329,15 @@ namespace casadi {
         DM(5.47723)
         julia> ca.norm_fro(ca.SX.sym("x", 2))
         SX(sqrt((sq(x_0)+sq(x_1))))
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> ca.norm_fro(new DM(new double[][]{{1, -2}, {3, 4}}))
+        5.47723
+        jshell> ca.norm_fro(SX.sym("x", 2))
+        sqrt((sq(x_0)+sq(x_1)))
         \enddoctest
         \endlang
 
@@ -1989,6 +2387,21 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> ca.norm_2(new DM(new double[]{3, 4}))
+        5
+        jshell> ca.norm_2(MX.sym("x", 2))
+        ||x||_F
+        jshell> try {
+           ...>   ca.norm_2(new DM(new double[][]{{1, 2}, {3, 4}}));
+           ...> } catch (RuntimeException e) {
+           ...>   System.out.println("error");
+           ...> }
+        error
+        \enddoctest
+        \endlang
+
         \sa norm_fro, norm_1, norm_inf, sumsqr
 
         \identifier{1c5} */
@@ -2026,6 +2439,15 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> ca.norm_1(new DM(new double[][]{{1, -2}, {3, 4}}))
+        10
+        jshell> ca.norm_1(SX.sym("x", 2))
+        (fabs(x_0)+fabs(x_1))
+        \enddoctest
+        \endlang
+
         \sa norm_inf, norm_2, norm_fro
 
         \identifier{1c6} */
@@ -2060,6 +2482,15 @@ namespace casadi {
         DM(4)
         julia> ca.norm_inf(ca.SX.sym("x", 2))
         SX(fmax(fmax(0,fabs(x_0)),fabs(x_1)))
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> ca.norm_inf(new DM(new double[][]{{1, -2}, {3, 4}}))
+        4
+        jshell> ca.norm_inf(SX.sym("x", 2))
+        fmax(fmax(0,fabs(x_0)),fabs(x_1))
         \enddoctest
         \endlang
 
@@ -2120,6 +2551,21 @@ namespace casadi {
         SX([(x_1-x_0), (x_2-x_1)])
         julia> ca.dim(diff(ca.DM(3)))
         "0x1"
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> ca.diff(new DM(new double[]{1, 4, 9, 16}))
+        [3, 5, 7]
+        jshell> ca.diff(new DM(new double[]{1, 4, 9, 16}), 2)
+        [2, 2]
+        jshell> ca.diff(new DM(new double[][]{{1, 2}, {4, 8}, {9, 10}}), 1, 1)
+        [1, 4, 1]
+        jshell> ca.diff(SX.sym("x", 3))
+        [(x_1-x_0), (x_2-x_1)]
+        jshell> ca.diff(new DM(3)).dim()
+        "0x0"
         \enddoctest
         \endlang
 
@@ -2185,6 +2631,21 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> ca.cumsum(new DM(new double[]{1, 2, 3}))
+        [1, 3, 6]
+        jshell> ca.cumsum(new DM(new double[][]{{1, 2}, {3, 4}}))
+        [[1, 2],
+         [4, 6]]
+        jshell> ca.cumsum(new DM(new double[][]{{1, 2}, {3, 4}}), 1)
+        [[1, 3],
+         [3, 7]]
+        jshell> ca.cumsum(SX.sym("x", 3))
+        @1=(x_1+x_0), [x_0, @1, (x_2+@1)]
+        \enddoctest
+        \endlang
+
         \sa diff, sum1, sum2
 
         \identifier{1c9} */
@@ -2237,6 +2698,19 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> ca.dot(new DM(new double[]{1, 2}), new DM(new double[]{3, 4}))
+        11
+        jshell> ca.dot(new DM(new double[][]{{1, 2}, {3, 4}}), new DM(new double[][]{{1, 1}, {1, 1}}))
+        10
+        jshell> ca.dot(new DM(Sparsity.diag(2), new DM(new double[]{1, 2})), new DM(new double[][]{{1, 1}, {1, 1}}))
+        3
+        jshell> ca.dot(SX.sym("x", 2), SX.sym("y", 2))
+        ((x_0*y_0)+(x_1*y_1))
+        \enddoctest
+        \endlang
+
         \sa mtimes, sumsqr, bilin
 
         \identifier{1ca} */
@@ -2279,6 +2753,15 @@ namespace casadi {
         julia> Z = ca.nullspace(A);
         julia> ca.dim(Z), ca.norm_1(A * Z)
         ("3x1", 0)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> DM A = new DM(new double[][]{{1, 2, 3}, {4, 5, 6}});
+        jshell> DM Z = ca.nullspace(A);
+        jshell> List.of(Z.dim(), ca.norm_1(ca.mtimes(A, Z)))
+        [3x1, 0]
         \enddoctest
         \endlang
 
@@ -2329,6 +2812,17 @@ namespace casadi {
         DM([-1, 0, 3])
         julia> ca.polyval(ca.SX.sym("p", 3), ca.SX.sym("x"))
         SX(((((p_0*x)+p_1)*x)+p_2))
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> ca.polyval(new DM(new double[]{1, 2, 3}), 2)
+        11
+        jshell> ca.polyval(new DM(new double[]{1, 0, -1}), new DM(new double[]{0, 1, 2}))
+        [-1, 0, 3]
+        jshell> ca.polyval(SX.sym("p", 3), SX.sym("x"))
+        ((((p_0*x)+p_1)*x)+p_2)
         \enddoctest
         \endlang
 
@@ -2388,6 +2882,20 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> ca.diag(new DM(new double[]{1, 2}))
+        [[1, 00],
+         [00, 2]]
+        jshell> ca.diag(new DM(new double[][]{{1, 2}, {3, 4}}))
+        [1, 4]
+        jshell> ca.diag(new DM(Sparsity.upper(2), new DM(new double[]{1, 2, 3})))
+        [1, 3]
+        jshell> ca.diag(DM.ones(2, 3))
+        [1, 1]
+        \enddoctest
+        \endlang
+
         \sa trace, diagcat, Sparsity::diag
 
         \identifier{1cd} */
@@ -2436,6 +2944,22 @@ namespace casadi {
         [[1, 2],
          [4, 3]])
         julia> try ca.unite(ca.DM.eye(2), ca.DM.eye(2)) catch e; println("error") end
+        error
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> DM A = new DM(Sparsity.upper(2), new DM(new double[]{1, 2, 3}));
+        jshell> DM B = new DM(Sparsity.triplet(2, 2, new long[]{1}, new long[]{0}), new DM(new double[]{4}));
+        jshell> ca.unite(A, B)
+        [[1, 2],
+         [4, 3]]
+        jshell> try {
+           ...>   ca.unite(DM.eye(2), DM.eye(2));
+           ...> } catch (RuntimeException e) {
+           ...>   System.out.println("error");
+           ...> }
         error
         \enddoctest
         \endlang
@@ -2493,6 +3017,20 @@ namespace casadi {
          [@1, x_1]])
         julia> ca.densify(ca.MX.sym("x", ca.Sparsity.diag(2)))
         MX(dense(x))
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> ca.densify(DM.eye(2))
+        [[1, 0],
+         [0, 1]]
+        jshell> ca.densify(SX.sym("x", Sparsity.diag(2)))
+        @1=0,
+        [[x_0, @1],
+         [@1, x_1]]
+        jshell> ca.densify(MX.sym("x", Sparsity.diag(2)))
+        dense(x)
         \enddoctest
         \endlang
 
@@ -2566,6 +3104,20 @@ namespace casadi {
         DM(
         [[1, 00],
          [00, 2]])
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> ca.project(new DM(new double[][]{{1, 2}, {3, 4}}), Sparsity.diag(2))
+        [[1, 00],
+         [00, 4]]
+        jshell> ca.project(DM.eye(2), Sparsity.dense(2, 2))
+        [[1, 0],
+         [0, 1]]
+        jshell> ca.project(new DM(Sparsity.diag(2), new DM(new double[]{1, 2})), Sparsity.upper(2), true)
+        [[1, 00],
+         [00, 2]]
         \enddoctest
         \endlang
 
@@ -2645,6 +3197,26 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> ca.if_else(new DM(1), new DM(10), new DM(20))
+        10
+        jshell> ca.if_else(new DM(0), new DM(10), new DM(20))
+        20
+        jshell> ca.if_else(new DM(new double[]{1, 0}), new DM(new double[]{1, 2}), new DM(new double[]{3, 4}))
+        [1, 4]
+        jshell> SX x = SX.sym("x");
+        jshell> ca.if_else(ca.gt(x, 0), x, x.unaryMinus())
+        @1=(0<x), ((@1?x:0)+((!@1)?(-x):0))
+        jshell> Function f = new Function("f", List.of(x), List.of(ca.if_else(ca.ge(x, 0), ca.sqrt(x), 0)));
+        jshell> f.invoke(-1)
+        0
+        jshell> MX X = MX.sym("X");
+        jshell> ca.if_else(ca.gt(X, 0), X, X.unaryMinus(), true)
+        switch((0<X), X){0}
+        \enddoctest
+        \endlang
+
         \sa conditional, if_else_zero, Function::if_else
 
         \identifier{1ci} */
@@ -2703,6 +3275,21 @@ namespace casadi {
         julia> X = ca.MX.sym("X"); Y = ca.MX.sym("Y");
         julia> ca.conditional(X, [Y, 2 * Y], 0, true)
         MX(switch(X, Y){0})
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> ca.conditional(new DM(1), List.of(new DM(10), new DM(20)), new DM(-1))
+        20
+        jshell> ca.conditional(new DM(5), List.of(new DM(10), new DM(20)), new DM(-1))
+        -1
+        jshell> SX x = SX.sym("x"); SX y = SX.sym("y"); SX z = SX.sym("z");
+        jshell> ca.conditional(x, List.of(y, z), 0)
+        @1=(x==1), ((@1?z:0)+((!@1)?((x==0)?y:0):0))
+        jshell> MX X = MX.sym("X"); MX Y = MX.sym("Y");
+        jshell> ca.conditional(X, List.of(Y, ca.times(2, Y)), 0, true)
+        switch(X, Y){0}
         \enddoctest
         \endlang
 
@@ -2774,6 +3361,21 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> SX x = SX.sym("x"); SX y = SX.sym("y");
+        jshell> List.of(ca.depends_on(x.times(y), x), ca.depends_on(x.times(y), SX.sym("z")))
+        [true, false]
+        jshell> List.of(ca.depends_on(ca.times(0, x), x), ca.depends_on(x.minus(x), x), ca.depends_on(new SX(3), x))
+        [false, false, false]
+        jshell> ca.depends_on(ca.vertcat(List.of(x, new SX(3))), ca.vertcat(List.of(x, y)))
+        true
+        jshell> MX v = MX.sym("v", 2);
+        jshell> ca.depends_on(v.get(0), v)
+        true
+        \enddoctest
+        \endlang
+
         \sa which_depends, symvar, contains, jacobian_sparsity
 
         \identifier{1ck} */
@@ -2839,6 +3441,24 @@ namespace casadi {
     * julia> X = ca.MX.sym("X"); Y = ca.MX.sym("Y");
     * julia> ca.contains([X, Y], Y), ca.contains([X + Y], Y)
     * (true, false)
+    * \enddoctest
+    * \endlang
+    *
+    * \lang{java}
+    * \doctest
+    * jshell> SX x = SX.sym("x"); SX y = SX.sym("y"); SX z = SX.sym("z");
+    * jshell> SX e = x.plus(y);
+    * jshell> List.of(ca.contains(List.of(x, y), y), ca.contains(List.of(e), y), ca.contains(List.of(e), e))
+    * [true, false, true]
+    * jshell> ca.contains(List.of(SX.sym("x")), x)
+    * false
+    * jshell> List.of(ca.contains_all(List.of(x, y, z), List.of(x, y)), ca.contains_all(List.of(x, y), List.of(x, z)))
+    * [true, false]
+    * jshell> List.of(ca.contains_any(List.of(x, y), List.of(x, z)), ca.contains_any(List.of(x, y), List.of(z)))
+    * [true, false]
+    * jshell> MX X = MX.sym("X"); MX Y = MX.sym("Y");
+    * jshell> List.of(ca.contains(List.of(X, Y), Y), ca.contains(List.of(X.plus(Y)), Y))
+    * [true, false]
     * \enddoctest
     * \endlang
 
@@ -2912,6 +3532,22 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> SX x = SX.sym("x"); SX y = SX.sym("y"); SX z = SX.sym("z");
+        jshell> ca.substitute(x.times(y).plus(x), x, 2)
+        ((2.*y)+2)
+        jshell> ca.substitute(x.times(y).plus(x), x, z.power(2))
+        @1=sq(z), ((@1*y)+@1)
+        jshell> SX p = SX.sym("p", 2);
+        jshell> ca.substitute(ca.sumsqr(p), p, new DM(new double[]{1, 2}))
+        5
+        jshell> MX X = MX.sym("X"); MX Y = MX.sym("Y");
+        jshell> ca.substitute(X.times(Y).plus(X), X, Y)
+        (sq(Y)+Y)
+        \enddoctest
+        \endlang
+
         \sa substitute_inplace, graph_substitute, Function
 
         \identifier{1cl} */
@@ -2958,6 +3594,16 @@ namespace casadi {
         julia> ca.substitute([x + y], [x, y], [y, x])
         1-element Vector{SX}:
          SX((x+y))
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> SX x = SX.sym("x"); SX y = SX.sym("y");
+        jshell> ca.substitute(List.of(x.times(y), x.plus(y)), List.of(x, y), List.of(new SX(1), new SX(2)))
+        [2, 3]
+        jshell> ca.substitute(List.of(x.plus(y)), List.of(x, y), List.of(y, x))
+        [(x+y)]
         \enddoctest
         \endlang
 
@@ -3018,6 +3664,17 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> SX x = SX.sym("x"); SX y = SX.sym("y");
+        jshell> ca.substitute_inplace(List.of(x, y), List.of(y.plus(1), new SX(3)), List.of(x.times(y)))
+        [[4, 3], [12]]
+        jshell> MX X = MX.sym("X"); MX Y = MX.sym("Y");
+        jshell> ca.substitute_inplace(List.of(X, Y), List.of(Y.plus(1), new MX(3)), List.of(X.times(Y)))
+        [[1, 3], [00]]
+        \enddoctest
+        \endlang
+
         \sa substitute
 
         \identifier{1cn} */
@@ -3067,6 +3724,17 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> SX x = SX.sym("x"); SX y = SX.sym("y");
+        jshell> SX e = ca.sin(x.plus(y)).times(ca.cos(x.plus(y)));
+        jshell> ca.cse(e)
+        @1=(x+y), (sin(@1)*cos(@1))
+        jshell> List.of(ca.n_nodes(e), ca.n_nodes(ca.cse(e)))
+        [7, 6]
+        \enddoctest
+        \endlang
+
         \sa n_nodes, shared, extract
 
         \identifier{1co} */
@@ -3107,6 +3775,16 @@ namespace casadi {
         MX(vertcat(sin((X+Y)), cos((X+Y))))
         julia> vcat(ca.cse([sin(X + Y), cos(X + Y)])...)
         MX(@1=(X+Y), vertcat(sin(@1), cos(@1)))
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> MX X = MX.sym("X"); MX Y = MX.sym("Y");
+        jshell> ca.vertcat(List.of(ca.sin(X.plus(Y)), ca.cos(X.plus(Y))))
+        vertcat(sin((X+Y)), cos((X+Y)))
+        jshell> ca.vertcat(ca.cse(List.of(ca.sin(X.plus(Y)), ca.cos(X.plus(Y)))))
+        @1=(X+Y), vertcat(sin(@1), cos(@1))
         \enddoctest
         \endlang
 
@@ -3192,6 +3870,23 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> DM A = new DM(new double[][]{{1, 2}, {3, 4}});
+        jshell> ca.solve(A, new DM(new double[]{1, 2}))
+        [0, 0.5]
+        jshell> ca.solve(A, DM.eye(2))
+        [[-2, 1],
+         [1.5, -0.5]]
+        jshell> ca.solve(SX.sym("A", 2, 2), SX.sym("b", 2))
+        @1=((A_0*A_3)-(A_2*A_1)), [(((A_3/@1)*b_0)-((A_2/@1)*b_1)), (((A_0/@1)*b_1)-((A_1/@1)*b_0))]
+        jshell> ca.solve(MX.sym("A", 2, 2), MX.sym("b", 2))
+        (A\b)
+        jshell> ca.solve(new DM(2), new DM(new double[]{1, 2}))
+        [0.5, 1]
+        \enddoctest
+        \endlang
+
         \sa inv, mldivide, Linsol, qr
 
         \identifier{1cq} */
@@ -3240,6 +3935,16 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> DM A = new DM(new double[][]{{1, 2}, {3, 4}});
+        jshell> ca.solve(A, new DM(new double[]{1, 2}), "qr")
+        [0, 0.5]
+        jshell> ca.solve(MX.sym("A", 2, 2), MX.sym("b", 2), "qr")
+        (A\b)
+        \enddoctest
+        \endlang
+
         \sa Linsol, has_linsol
 
         \identifier{1cr} */
@@ -3285,6 +3990,14 @@ namespace casadi {
     * julia> x = ca.SX.sym("x"); y = ca.SX.sym("y");
     * julia> ca.linearize(sin(x), x, y)
     * SX((sin(y)+(cos(y)*x)))
+    * \enddoctest
+    * \endlang
+    *
+    * \lang{java}
+    * \doctest
+    * jshell> SX x = SX.sym("x"); SX y = SX.sym("y");
+    * jshell> ca.linearize(ca.sin(x), x, y)
+    * (sin(y)+(cos(y)*x))
     * \enddoctest
     * \endlang
     *
@@ -3359,6 +4072,21 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> DM A = new DM(new double[][]{{1, 0, 0}, {0, 2, 0}});
+        jshell> ca.pinv(A)
+        [[1, 0],
+         [0, 0.5],
+         [0, 0]]
+        jshell> ca.mtimes(A, ca.pinv(A))
+        [[1, 0],
+         [0, 1]]
+        jshell> ca.pinv(SX.sym("A", 1, 2))
+        @1=(sq(A_0)+sq(A_1)), [(A_0/@1), (A_1/@1)]
+        \enddoctest
+        \endlang
+
         \sa inv, solve, nullspace
 
         \identifier{1ct} */
@@ -3396,6 +4124,15 @@ namespace casadi {
         \lang{julia}
         \doctest
         julia> print(ca.pinv(ca.DM([1 0 0; 0 2 0]), "qr"))
+        [[1, 0],
+         [0, 0.5],
+         [0, 0]]
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> ca.pinv(new DM(new double[][]{{1, 0, 0}, {0, 2, 0}}), "qr")
         [[1, 0],
          [0, 0.5],
          [0, 0]]
@@ -3503,6 +4240,23 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> SX x = SX.sym("x"); SX y = SX.sym("y");
+        jshell> SX J = ca.jacobian(ca.vertcat(List.of(x.times(y), x.power(2))), ca.vertcat(List.of(x, y)));
+        jshell> J
+        [[y, x],
+         [(2.*x), 00]]
+        jshell> J.dim(true)
+        "2x2,3nz"
+        jshell> SX A = SX.sym("A", 2, 2);
+        jshell> ca.jacobian(ca.times(2, A), A).dim()
+        "4x4"
+        jshell> ca.jacobian(new SX(0, 1), ca.vertcat(List.of(x, y))).dim()
+        "0x2"
+        \enddoctest
+        \endlang
+
         \sa gradient, hessian, jtimes, jacobian_sparsity, Function::jacobian
 
         \identifier{1cv} */
@@ -3565,6 +4319,20 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> SX x = SX.sym("x"); SX y = SX.sym("y");
+        jshell> ca.gradient(x.times(y).plus(x.power(2)), ca.vertcat(List.of(x, y)))
+        [((2.*x)+y), x]
+        jshell> ca.gradient(x.power(2), ca.vertcat(List.of(x, y)))
+        [(2.*x), 0]
+        jshell> SX A = SX.sym("A", 2, 2);
+        jshell> ca.gradient(ca.sumsqr(A), A)
+        [[(2.*A_0), (2.*A_2)],
+         [(2.*A_1), (2.*A_3)]]
+        \enddoctest
+        \endlang
+
         \sa jacobian, hessian, jtimes
 
         \identifier{23x} */
@@ -3598,6 +4366,14 @@ namespace casadi {
         julia> x = ca.SX.sym("x");
         julia> ca.tangent([x^2; 3 * x], x)
         SX([(2.*x), 3])
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> SX x = SX.sym("x");
+        jshell> ca.tangent(ca.vertcat(List.of(x.power(2), ca.times(3, x))), x)
+        [(2.*x), 3]
         \enddoctest
         \endlang
 
@@ -3672,6 +4448,22 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> SX x = SX.sym("x"); SX y = SX.sym("y");
+        jshell> SX ex = ca.vertcat(List.of(x.times(y), x.power(2))); SX arg = ca.vertcat(List.of(x, y));
+        jshell> ca.jtimes(ex, arg, new DM(new double[]{1, 0}))
+        [y, (2.*x)]
+        jshell> ca.jtimes(ex, arg, new DM(new double[]{1, 0}), true)
+        [y, x]
+        jshell> ca.jtimes(ex, arg, DM.eye(2))
+        [[y, x],
+         [(2.*x), 0]]
+        jshell> ca.jtimes(ex, arg, SX.sym("v", 2))
+        [((y*v_0)+(x*v_1)), ((2.*x)*v_0)]
+        \enddoctest
+        \endlang
+
         \sa jacobian, forward, reverse
 
         \identifier{1cw} */
@@ -3726,6 +4518,16 @@ namespace casadi {
         2-element Vector{Vector{SX}}:
          SX[y, (2.*x)]
          SX[x, 0]
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> SX x = SX.sym("x"); SX y = SX.sym("y");
+        jshell> ca.forward(List.of(x.times(y), x.power(2)), List.of(x, y), List.of(List.of(new SX(1), new SX(0))))
+        [[y, (2.*x)]]
+        jshell> ca.forward(List.of(x.times(y), x.power(2)), List.of(x, y), List.of(List.of(new SX(1), new SX(0)), List.of(new SX(0), new SX(1))))
+        [[y, (2.*x)], [x, 0]]
         \enddoctest
         \endlang
 
@@ -3786,6 +4588,16 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> SX x = SX.sym("x"); SX y = SX.sym("y");
+        jshell> ca.reverse(List.of(x.times(y), x.power(2)), List.of(x, y), List.of(List.of(new SX(1), new SX(0))))
+        [[y, x]]
+        jshell> ca.reverse(List.of(x.times(y), x.power(2)), List.of(x, y), List.of(List.of(new SX(1), new SX(1))))
+        [[((2.*x)+y), x]]
+        \enddoctest
+        \endlang
+
         \sa forward, jtimes, gradient, Function::reverse
 
         \identifier{1cy} */
@@ -3843,6 +4655,20 @@ namespace casadi {
          [@1, 00]])
         julia> g
         SX([((2.*x)*y), sq(x)])
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> SX x = SX.sym("x"); SX y = SX.sym("y");
+        jshell> List<Object> Hg = ca.hessian(x.power(2).times(y), ca.vertcat(List.of(x, y)));
+        jshell> SX H = (SX) Hg.get(0); SX g = (SX) Hg.get(1);
+        jshell> H
+        @1=(2.*x),
+        [[(2.*y), @1],
+         [@1, 00]]
+        jshell> g
+        [((2.*x)*y), sq(x)]
         \enddoctest
         \endlang
 
@@ -3922,6 +4748,19 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> SX x = SX.sym("x"); SX y = SX.sym("y");
+        jshell> SX e = ca.vertcat(List.of(x.times(y), x.power(2), ca.times(3, x)));
+        jshell> ca.which_depends(e, ca.vertcat(List.of(x, y)), 1, false)
+        boolean[2] { true, true }
+        jshell> ca.which_depends(e, ca.vertcat(List.of(x, y)), 1, true)
+        boolean[3] { true, true, true }
+        jshell> ca.which_depends(e, ca.vertcat(List.of(x, y)), 2, true)
+        boolean[3] { true, true, false }
+        \enddoctest
+        \endlang
+
         \sa depends_on, is_linear, jacobian_sparsity
 
         \identifier{1cz} */
@@ -3955,6 +4794,14 @@ namespace casadi {
         julia> x = ca.SX.sym("x"); y = ca.SX.sym("y");
         julia> ca.jacobian_sparsity([x * y; x^2; 3], [x; y])
         Sparsity(3x2,3nz)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> SX x = SX.sym("x"); SX y = SX.sym("y");
+        jshell> ca.jacobian_sparsity(ca.vertcat(List.of(x.times(y), x.power(2), new SX(3))), ca.vertcat(List.of(x, y)))
+        3x2,3nz
         \enddoctest
         \endlang
 
@@ -4005,6 +4852,16 @@ namespace casadi {
     * \enddoctest
     * \endlang
     *
+    * \lang{java}
+    * \doctest
+    * jshell> SX x = SX.sym("x"); SX y = SX.sym("y");
+    * jshell> List.of(ca.is_linear(ca.times(2, x).plus(y), ca.vertcat(List.of(x, y))), ca.is_linear(x.times(y), ca.vertcat(List.of(x, y))))
+    * [true, false]
+    * jshell> List.of(ca.is_linear(ca.sin(y).times(x), x), ca.is_linear(x.times(x).div(x), x))
+    * [true, false]
+    * \enddoctest
+    * \endlang
+    *
     * \sa is_quadratic, linear_coeff, which_depends
 
         \identifier{1d0} */
@@ -4046,6 +4903,16 @@ namespace casadi {
     * julia> ca.is_quadratic(x * y + x^2, [x; y]), ca.is_quadratic(x^3, x)
     * (true, false)
     * julia> ca.is_quadratic(x, x)
+    * true
+    * \enddoctest
+    * \endlang
+    *
+    * \lang{java}
+    * \doctest
+    * jshell> SX x = SX.sym("x"); SX y = SX.sym("y");
+    * jshell> List.of(ca.is_quadratic(x.times(y).plus(x.power(2)), ca.vertcat(List.of(x, y))), ca.is_quadratic(x.power(3), x))
+    * [true, false]
+    * jshell> ca.is_quadratic(x, x)
     * true
     * \enddoctest
     * \endlang
@@ -4117,6 +4984,25 @@ namespace casadi {
     * \enddoctest
     * \endlang
     *
+    * \lang{java}
+    * \doctest
+    * jshell> SX x = SX.sym("x"); SX y = SX.sym("y");
+    * jshell> List<Object> Abc = ca.quadratic_coeff(x.power(2).plus(ca.times(2, x).times(y)).plus(ca.times(3, x)).plus(4), ca.vertcat(List.of(x, y)));
+    * jshell> Abc.get(0)
+    * @1=2,
+    * [[@1, @1],
+    *  [@1, 00]]
+    * jshell> List.of(Abc.get(1), Abc.get(2))
+    * [[3, 0], 4]
+    * jshell> try {
+    *    ...>   ca.quadratic_coeff(x.power(3), x);
+    *    ...> } catch (RuntimeException e) {
+    *    ...>   System.out.println("error");
+    *    ...> }
+    * error
+    * \enddoctest
+    * \endlang
+    *
     * \sa linear_coeff, is_quadratic, hessian
 
         \identifier{1d2} */
@@ -4171,6 +5057,18 @@ namespace casadi {
     *  [00, 3]])
     * julia> b
     * SX([1, 0])
+    * \enddoctest
+    * \endlang
+    *
+    * \lang{java}
+    * \doctest
+    * jshell> SX x = SX.sym("x"); SX y = SX.sym("y");
+    * jshell> List<Object> Ab = ca.linear_coeff(ca.vertcat(List.of(ca.times(2, x).plus(y).plus(1), ca.times(3, y))), ca.vertcat(List.of(x, y)));
+    * jshell> Ab.get(0)
+    * [[2, 1],
+    *  [00, 3]]
+    * jshell> Ab.get(1)
+    * [1, 0]
     * \enddoctest
     * \endlang
     *
@@ -4264,6 +5162,21 @@ namespace casadi {
      * ((x*p), SX[], SX[])
      * julia> ca.extract_parametric(x * p, p, Dict("extract_trivial" => true))
      * ((x*e_0), SX[e_0], SX[p])
+     * \enddoctest
+     * \endlang
+     *
+     * \lang{java}
+     * \doctest
+     * jshell> SX x = SX.sym("x"); SX y = SX.sym("y"); SX p = SX.sym("p");
+     * jshell> List<Object> r = ca.extract_parametric(x.minus(ca.sqrt(p)).times(y).plus(ca.cos(p).power(2)), p);
+     * jshell> r.get(0)
+     * (((x-e_0)*y)+e_1)
+     * jshell> List.of(r.get(1), r.get(2))
+     * [[e_0, e_1], [sqrt(p), sq(cos(p))]]
+     * jshell> ca.extract_parametric(x.times(p), p)
+     * [(x*p), [], []]
+     * jshell> ca.extract_parametric(x.times(p), p, Map.of("extract_trivial", true))
+     * [(x*e_0), [e_0], [p]]
      * \enddoctest
      * \endlang
      *
@@ -4387,6 +5300,16 @@ namespace casadi {
     * \enddoctest
     * \endlang
     *
+    * \lang{java}
+    * \doctest
+    * jshell> SX x = SX.sym("x"); SX y = SX.sym("y"); SX p = SX.sym("p");
+    * jshell> ca.separate_linear(ca.cos(p).plus(ca.times(7, x)).plus(x.times(y)), ca.vertcat(List.of(x, y)), p)
+    * [cos(p), (7*x), (x*y)]
+    * jshell> ca.separate_linear(p.times(x), x, p)
+    * [0, (p*x), 0]
+    * \enddoctest
+    * \endlang
+    *
     * \sa extract_parametric, linear_coeff
 
         \identifier{2mo} */
@@ -4440,6 +5363,16 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> SX x = SX.sym("x"); SX y = SX.sym("y");
+        jshell> List.of(ca.n_nodes(x), ca.n_nodes(x.plus(y)), ca.n_nodes(ca.vertcat(List.of(x.plus(y), x.plus(y)))))
+        [1, 3, 4]
+        jshell> ca.n_nodes(new SX(0, 1))
+        0
+        \enddoctest
+        \endlang
+
         \sa cse, Function::n_nodes
 
         \identifier{2mp} */
@@ -4474,6 +5407,14 @@ namespace casadi {
         julia> x = ca.SX.sym("x"); y = ca.SX.sym("y");
         julia> ca.simplify(x * 2 * 3), ca.simplify(x * 0 + y * 1)
         ((6*x), y)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> SX x = SX.sym("x"); SX y = SX.sym("y");
+        jshell> List.of(ca.simplify(x.times(2).times(3)), ca.simplify(x.times(0).plus(y.times(1))))
+        [(6*x), y]
         \enddoctest
         \endlang
 
@@ -4512,6 +5453,14 @@ namespace casadi {
         julia> x = ca.SX.sym("x");
         julia> ca.transform(x * 2 * 3)
         SX((6*x))
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> SX x = SX.sym("x");
+        jshell> ca.transform(x.times(2).times(3))
+        (6*x)
         \enddoctest
         \endlang
 
@@ -4572,6 +5521,17 @@ namespace casadi {
         ("(a+b)", "sin(a)")
         julia> X = ca.MX.sym("X"); Y = ca.MX.sym("Y");
         julia> ca.print_operator([X; Y], ["a", "b"])
+        "vertcat(a, b)"
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> SX x = SX.sym("x"); SX y = SX.sym("y");
+        jshell> List.of(ca.print_operator(x.plus(y), List.of("a", "b")), ca.print_operator(ca.sin(x), List.of("a")))
+        [(a+b), sin(a)]
+        jshell> MX X = MX.sym("X"); MX Y = MX.sym("Y");
+        jshell> ca.print_operator(ca.vertcat(List.of(X, Y)), List.of("a", "b"))
         "vertcat(a, b)"
         \enddoctest
         \endlang
@@ -4661,6 +5621,23 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> SX x = SX.sym("x"); SX y = SX.sym("y");
+        jshell> SX e = x.plus(y);
+        jshell> ca.extract(List.of(ca.sin(e), ca.cos(e)))
+        [[sin(v_0), cos(v_0)], [v_0], [(x+y)]]
+        jshell> ca.extract(List.of(ca.sin(e), ca.cos(e)), Map.of("prefix", "w_", "offset", 3))
+        [[sin(w_3), cos(w_3)], [w_3], [(x+y)]]
+        jshell> ca.extract(List.of(ca.sin(x.plus(y)), ca.cos(x.plus(y))))
+        [[sin((x+y)), cos((x+y))], [], []]
+        jshell> MX X = MX.sym("X"); MX Y = MX.sym("Y");
+        jshell> Function f = new Function("f", List.of(X), List.of(ca.sin(X))); MX E = X.plus(Y);
+        jshell> ca.extract(List.of(((MX) f.invoke(E)).times((MX) f.invoke(E))), Map.of("lift_shared", false, "lift_calls", true))
+        [[(v_1*v_2)], [v_0, v_1, v_2], [(X+Y), f(v_0){0}, f(v_0){0}]]
+        \enddoctest
+        \endlang
+
         \sa shared, cse, substitute
 
         \identifier{1d5} */
@@ -4716,6 +5693,17 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> SX x = SX.sym("x"); SX y = SX.sym("y");
+        jshell> SX e = x.plus(y);
+        jshell> ca.shared(List.of(ca.sin(e).times(ca.cos(e)).plus(e)))
+        [[((sin(v_0)*cos(v_0))+v_0)], [v_0], [(x+y)]]
+        jshell> ca.shared(List.of(ca.sin(e), ca.cos(e)), "w_", "_s")
+        [[sin(w_0_s), cos(w_0_s)], [w_0_s], [(x+y)]]
+        \enddoctest
+        \endlang
+
         \sa extract, cse
 
         \identifier{1d6} */
@@ -4763,6 +5751,16 @@ namespace casadi {
          [12, 14]])
         julia> ca.repsum(ca.SX.sym("x", 4), 2)
         SX([(x_0+x_2), (x_1+x_3)])
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> ca.repsum(new DM(new double[][]{{1, 2, 3, 4}, {5, 6, 7, 8}}), 1, 2)
+        [[4, 6],
+         [12, 14]]
+        jshell> ca.repsum(SX.sym("x", 4), 2)
+        [(x_0+x_2), (x_1+x_3)]
         \enddoctest
         \endlang
 
@@ -4816,6 +5814,17 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> List.of(ca.mmin(new DM(new double[][]{{3, -1}, {2, 5}})), ca.mmax(new DM(new double[][]{{3, -1}, {2, 5}})))
+        [-1, 5]
+        jshell> ca.mmin(new DM(Sparsity.diag(2), new DM(new double[]{3, 4})))
+        0
+        jshell> ca.mmin(SX.sym("x", 3))
+        fmin(fmin(x_0,x_1),x_2)
+        \enddoctest
+        \endlang
+
         \sa mmax, fmin, norm_inf
 
         \identifier{1d8} */
@@ -4853,6 +5862,15 @@ namespace casadi {
         DM(0)
         julia> ca.mmax(ca.MX.sym("x", 3))
         MX(max(x))
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> ca.mmax(new DM(Sparsity.diag(2), new DM(new double[]{-3, -4})))
+        0
+        jshell> ca.mmax(MX.sym("x", 3))
+        max(x)
         \enddoctest
         \endlang
 
@@ -4943,6 +5961,20 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> List.of(SX.sym("x"), MX.sym("x", 2, 3).dim())
+        [x, 2x3]
+        jshell> SX.sym("x", 2, 2)
+        [[x_0, x_2],
+         [x_1, x_3]]
+        jshell> SX.sym("[a,b,c]", 3)
+        [a, b, c]
+        jshell> ca.is_equal(SX.sym("x"), SX.sym("x"))
+        false
+        \enddoctest
+        \endlang
+
         \sa symvar, zeros, ones
 
         \identifier{1da} */
@@ -4994,6 +6026,16 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> SX.sym("p", Sparsity.diag(2))
+        [[p_0, 00],
+         [00, p_1]]
+        jshell> MX.sym("p", Sparsity.diag(2)).dim(true)
+        "2x2,2nz"
+        \enddoctest
+        \endlang
+
         \identifier{1dc} */
     static MatType sym(const std::string& name, const Sparsity& sp) {
       return MatType::_sym(name, sp);
@@ -5030,6 +6072,13 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> MX.sym("x", Sparsity.dense(2, 1), 3)
+        [x0, x1, x2]
+        \enddoctest
+        \endlang
+
         \identifier{1dd} */
     static std::vector<MatType > sym(const std::string& name, const Sparsity& sp, casadi_int p);
 
@@ -5057,6 +6106,13 @@ namespace casadi {
         2-element Vector{SX}:
          SX(x0)
          SX(x1)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> SX.sym("x", 1, 1, 2)
+        [x0, x1]
         \enddoctest
         \endlang
 
@@ -5103,6 +6159,13 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> MX.sym("x", 1, 1, 2, 2)
+        [[x_00, x_01], [x_10, x_11]]
+        \enddoctest
+        \endlang
+
         \identifier{1dg} */
     static std::vector<std::vector<MatType> >
       sym(const std::string& name, casadi_int nrow, casadi_int ncol, casadi_int p, casadi_int r) {
@@ -5143,6 +6206,15 @@ namespace casadi {
         (4, 2, 0)
         julia> ca.MX.zeros(2, 3)
         MX(zeros(2x3))
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> List.of(DM.zeros(2, 2).nnz(), DM.zeros(Sparsity.diag(2)).nnz(), new DM(2, 2).nnz())
+        [4, 2, 0]
+        jshell> MX.zeros(2, 3)
+        zeros(2x3)
         \enddoctest
         \endlang
 
@@ -5198,6 +6270,17 @@ namespace casadi {
         DM(
         [[1, 00],
          [00, 1]])
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> DM.ones(2, 3)
+        [[1, 1, 1],
+         [1, 1, 1]]
+        jshell> DM.ones(Sparsity.diag(2))
+        [[1, 00],
+         [00, 1]]
         \enddoctest
         \endlang
 
