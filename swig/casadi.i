@@ -5607,6 +5607,75 @@ namespace casadi {
   $input = casadi::julia_buffers($1, $2);
 }
 #endif // SWIGJULIA
+#ifdef SWIGJAVA
+// eval_buffer: arg and res reach Java as Lists of direct DoubleBuffers over casadi's memory (null for a null)
+%{
+namespace casadi {
+  jobject java_buffers(double** p, const std::vector<casadi_int>& sz) {
+    JNIEnv* e = SWIG_JavaGuestEnvChecked();
+    static jclass bb = java_class("java/nio/ByteBuffer"), bo = java_class("java/nio/ByteOrder");
+    static jmethodID order = e->GetMethodID(bb, "order", "(Ljava/nio/ByteOrder;)Ljava/nio/ByteBuffer;");
+    static jmethodID as_double = e->GetMethodID(bb, "asDoubleBuffer", "()Ljava/nio/DoubleBuffer;");
+    static jmethodID native_order = e->GetStaticMethodID(bo, "nativeOrder", "()Ljava/nio/ByteOrder;");
+    jobject no = e->CallStaticObjectMethod(bo, native_order);
+    SWIG_JavaGuestCheck(e);
+    jobject r = SWIG_JavaGuestListNew(static_cast<jint>(sz.size()));
+    for (size_t i = 0; i < sz.size(); ++i) {
+      jobject d = 0;
+      if (p[i]) {
+        jobject b = e->NewDirectByteBuffer(p[i], static_cast<jlong>(sz[i] * sizeof(double)));
+        SWIG_JavaGuestCheck(e);
+        jobject o = e->CallObjectMethod(b, order, no);
+        SWIG_JavaGuestCheck(e);
+        d = e->CallObjectMethod(o, as_double);
+        SWIG_JavaGuestCheck(e);
+        e->DeleteLocalRef(o);
+        e->DeleteLocalRef(b);
+      }
+      SWIG_JavaGuestListAppend(r, d);
+    }
+    e->DeleteLocalRef(no);
+    return r;
+  }
+  // Pointers and lengths of a List of direct buffers
+  bool java_from_buffers(jobject list, std::vector<double*>& p, std::vector<casadi_int>& sz) {
+    JNIEnv* e = SWIG_JavaGuestEnvChecked();
+    if (!list || !SWIG_JavaGuestIsList(list)) return false;
+    jint n = SWIG_JavaGuestListSize(list);
+    p.resize(n);
+    sz.resize(n);
+    for (jint i = 0; i < n; ++i) {
+      jobject b = SWIG_JavaGuestListGet(list, i);
+      p[i] = b ? static_cast<double*>(e->GetDirectBufferAddress(b)) : 0;
+      sz[i] = b ? static_cast<casadi_int>(e->GetDirectBufferCapacity(b)) : 0;
+      if (b && !p[i]) {
+        SWIG_JavaGuestRelease(b);
+        return false;
+      }
+      SWIG_JavaGuestRelease(b);
+    }
+    return true;
+  }
+} // namespace casadi
+%}
+%define %java_buffers(PTR, SIZES)
+%typemap(jni) (PTR, SIZES) "jobject"
+%typemap(jtype) (PTR, SIZES) "Object"
+%typemap(jstype) (PTR, SIZES) "java.util.List<java.nio.DoubleBuffer>"
+%typemap(javain) (PTR, SIZES) "$javainput"
+%typemap(javadirectorin) (PTR, SIZES) "$imclassname.swigCast($jniinput)"
+%typemap(directorin, descriptor="Ljava/util/List;", noblock=1) (PTR, SIZES) {
+  $input = casadi::java_buffers(const_cast<double**>($1), $2);
+}
+%typemap(in, noblock=1) (PTR, SIZES) (std::vector<double*> p, std::vector<casadi_int> sz) {
+  if (!casadi::java_from_buffers($input, p, sz)) SWIG_exception_fail(SWIG_TypeError, "Expected a List of direct DoubleBuffers");
+  $1 = casadi::get_ptr(p);
+  $2 = &sz;
+}
+%enddef
+%java_buffers(const double** arg, const std::vector<casadi_int>& sizes_arg)
+%java_buffers(double** res, const std::vector<casadi_int>& sizes_res)
+#endif // SWIGJAVA
 %include <casadi/core/callback.hpp>
 
 #ifdef SWIGPYTHON
