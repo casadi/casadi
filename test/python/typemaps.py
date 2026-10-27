@@ -633,6 +633,26 @@ class typemaptests(casadiTestCase):
     finally:
       ca.GlobalOptions.setNumpyMode(orig)
 
+  def test_numpy_dm_tolerance(self):
+    """issue #4462: a DM tolerance (keyword or positional) must not recurse."""
+    import numpy as np
+    from typing import Any
+    big: Any = ca.DM(4.0)
+    half: Any = ca.DM(0.5)
+    orig = ca.GlobalOptions.getNumpyMode()
+    try:
+      for mode in (-1, 0, 1):
+        ca.GlobalOptions.setNumpyMode(mode)
+        with warnings.catch_warnings():
+          warnings.simplefilter("ignore", category=FutureWarning)
+          self.assertTrue(np.allclose(1.0, 1.0, atol=big))
+          self.assertTrue(np.allclose(1.0, 1.0, 1e-5, big))
+          self.assertFalse(np.allclose(1.0, 2.0, atol=half))
+          self.assertTrue(np.all(np.isclose(1.0, 1.5, rtol=half)))
+          self.assertFalse(np.any(np.isclose(1.0, 2.0, atol=half)))
+    finally:
+      ca.GlobalOptions.setNumpyMode(orig)
+
   def test_numpy_warning_shown_once(self):
     """The legacy-mode FutureWarning is deduped to once per process by a
     lowest-precedence 'once' filter -- so a user is never flooded WITHOUT

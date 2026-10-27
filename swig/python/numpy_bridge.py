@@ -2252,7 +2252,9 @@ def _np_allclose(a, b, rtol=1e-05, atol=1e-08, equal_nan=False):
         return np.asarray(z)
     a_np = _to_np(a)
     b_np = _to_np(b)
-    if a_np is None or b_np is None:
+    rtol = _to_np(rtol)
+    atol = _to_np(atol)
+    if a_np is None or b_np is None or rtol is None or atol is None:
         # symbolic non-constant: can't decide, fall back to NEP-18 default
         # (which will raise a TypeError on SX/MX -- the desired behaviour).
         return NotImplemented
@@ -3220,4 +3222,6 @@ def _numpy_array_function_dispatch(self, func, types, args, kwargs):
                           and any(isinstance(x, DM) for x in a)
                      else a
                      for a in args)
-    return func(*new_args, **kwargs)
+    new_kwargs = {k: v.full() if isinstance(v, DM) else v
+                  for k, v in kwargs.items()}
+    return func(*new_args, **new_kwargs)
