@@ -114,6 +114,23 @@ class OptiCallback;
     \enddoctest
     \endlang
 
+    \lang{java}
+    \doctest
+    jshell> Opti opti = new Opti();
+    jshell> MX x = opti.variable();
+    jshell> MX y = opti.variable();
+    jshell> opti.minimize(y.minus(x.power(2)).power(2));
+    jshell> opti.subject_to(ca.eq(x.power(2).plus(y.power(2)), 1));
+    jshell> opti.subject_to(ca.ge(x.plus(y), 1));
+    jshell> opti.solver("ipopt", Map.of("print_time", false), Map.of("print_level", 0, "sb", "yes"));
+    jshell> OptiSol sol = opti.solve();
+    jshell> List.of(sol.value(x), sol.value(y))
+    [0.7862, 0.6180]
+    jshell> sol.value(opti.f())
+    0
+    \enddoctest
+    \endlang
+
     Parametric problems are re-solved by changing parameter values:
 
     \lang{python}
@@ -171,6 +188,25 @@ class OptiCallback;
     \enddoctest
     \endlang
 
+    \lang{java}
+    \doctest
+    jshell> Opti opti = new Opti();
+    jshell> MX x = opti.variable(2);
+    jshell> MX p = opti.parameter();
+    jshell> opti.minimize(ca.sumsqr(x.minus(p)));
+    jshell> opti.subject_to(ca.le(1, ca.le(ca.sum1(x), 2)));
+    jshell> opti.solver("ipopt", Map.of("print_time", false), Map.of("print_level", 0, "sb", "yes"));
+    jshell> opti.set_value(p, 3);
+    jshell> OptiSol sol = opti.solve();
+    jshell> sol.value(ca.sum1(x))
+    2
+    jshell> opti.set_value(p, 0);
+    jshell> sol = opti.solve();
+    jshell> sol.value(ca.sum1(x))
+    1
+    \enddoctest
+    \endlang
+
     An iteration callback:
 
     \lang{python}
@@ -221,6 +257,24 @@ class OptiCallback;
     julia> ca.callback(opti)
     julia> sol = ca.solve(opti);
     julia> length(history)
+    2
+    \enddoctest
+    \endlang
+
+    \lang{java}
+    \doctest
+    jshell> Opti opti = new Opti();
+    jshell> MX x = opti.variable();
+    jshell> opti.minimize(x.minus(1).power(2));
+    jshell> opti.solver("ipopt", Map.of("print_time", false), Map.of("print_level", 0, "sb", "yes"));
+    jshell> List<List<Object>> history = new ArrayList<>();
+    jshell> opti.callback(i -> history.add(List.of(i, opti.debug().value(x))));
+    jshell> OptiSol sol = opti.solve();
+    jshell> history
+    [[0, 0], [1, 1]]
+    jshell> opti.callback(null);
+    jshell> sol = opti.solve();
+    jshell> history.size()
     2
     \enddoctest
     \endlang
@@ -301,6 +355,24 @@ public:
                  println(last(split(sprint(showerror, e), "\n")))
              end
       Specified problem type 'lp'unknown. Choose 'nlp' (default) or 'conic'.
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> Opti opti = new Opti();
+      jshell> List.of(opti.nx(), opti.np(), opti.ng())
+      [0, 0, 0]
+      jshell> opti = new Opti("conic");
+      jshell> MX x = opti.variable(2);
+      jshell> opti.minimize(ca.sumsqr(x.minus(1)));
+      jshell> opti.subject_to(ca.le(x.get(0).plus(x.get(1)), 1));
+      jshell> opti.solver("qrqp", Map.of("print_time", false, "print_iter", false,
+         ...>                         "print_header", false, "print_info", false));
+      jshell> opti.solve().value(x)
+      [0.5, 0.5]
+      jshell> new Opti("lp")
+      |  Exception org.casadi.CasadiException: ...Specified problem type 'lp'unknown. Choose 'nlp' (default) or 'conic'...
       \enddoctest
       \endlang
 
@@ -385,6 +457,30 @@ public:
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> Opti opti = new Opti();
+      jshell> MX x = opti.variable();
+      jshell> MX X = opti.variable(3, 2);
+      jshell> x.size()
+      long[2] { 1, 1 }
+      jshell> X.size()
+      long[2] { 3, 2 }
+      jshell> X.is_symbolic()
+      true
+      jshell> MX S = opti.variable(2, 2, "symmetric");
+      jshell> S.size()
+      long[2] { 2, 2 }
+      jshell> S.is_symbolic()
+      false
+      jshell> opti.minimize(ca.sumsqr(X).plus(x.power(2)).plus(ca.sumsqr(S)));
+      jshell> opti.nx()
+      10
+      jshell> opti.variable(2, 3, "symmetric")
+      |  Exception org.casadi.CasadiException: ...You specified attribute 'symmetric', while matrix is not even square, but 2-by-3...
+      \enddoctest
+      \endlang
+
       \identifier{18} */
   MX variable(casadi_int n=1, casadi_int m=1, const std::string& attribute="full");
   /// Create a decision variable with a given sparsity pattern; only "full" is supported
@@ -454,6 +550,21 @@ public:
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> Opti opti = new Opti();
+      jshell> MX x = opti.variable();
+      jshell> MX p = opti.parameter(2);
+      jshell> opti.minimize(ca.sumsqr(x.minus(p)));
+      jshell> opti.solver("ipopt", Map.of("print_time", false), Map.of("print_level", 0, "sb", "yes"));
+      jshell> opti.solve()
+      |  Exception org.casadi.CasadiException: ...You have forgotten to assign a value to a parameter ('set_value'), or have set it to NaN/Inf:...
+      jshell> opti.set_value(p, new DM(new double[] {1, 3}));
+      jshell> opti.solve().value(x)
+      2
+      \enddoctest
+      \endlang
+
       \identifier{19} */
   MX parameter(casadi_int n=1, casadi_int m=1, const std::string& attribute="full");
   /// Create a parameter with a given sparsity pattern
@@ -512,6 +623,19 @@ public:
                  println(last(split(sprint(showerror, e), "\n")))
              end
       Objective must be scalar, got 2x1.
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> Opti opti = new Opti();
+      jshell> MX x = opti.variable(2);
+      jshell> opti.minimize(ca.sumsqr(x));
+      jshell> opti.minimize(x.get(0).power(2), 2);
+      jshell> System.out.println(opti.f() + " " + opti.f_linear_scale())
+      sq(opti..._x_1[0]) 2.0
+      jshell> opti.minimize(x);
+      |  Exception org.casadi.CasadiException: ...Objective must be scalar, got 2x1...
       \enddoctest
       \endlang
 
@@ -638,6 +762,27 @@ public:
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> Opti opti = new Opti();
+      jshell> MX x = opti.variable(3);
+      jshell> MX y = opti.variable();
+      jshell> MX p = opti.parameter();
+      jshell> opti.subject_to(ca.ge(x, 0));
+      jshell> opti.subject_to(ca.eq(x.get(0).plus(x.get(1)), p));
+      jshell> opti.subject_to(ca.le(-1, ca.le(y, 1)));
+      jshell> opti.subject_to(List.of(ca.ge(y, x.get(2)), ca.ge(y.times(x.get(0)), 1)));
+      jshell> opti.ng()
+      7
+      jshell> System.out.println(opti.lbg() + " " + opti.ubg())
+      vertcat(zeros(3x1), opti..._p_1, -1, -inf, 1) vertcat(inf(3x1), opti..._p_1, 1, 0, inf)
+      jshell> opti.subject_to(ca.le(new MX(2), 3));
+      |  Exception org.casadi.CasadiException: ...You passed a constant to `subject_to`. You need a symbol to form a constraint...
+      jshell> opti.subject_to(ca.le(MX.sym("w"), 3));
+      |  Exception org.casadi.CasadiException: ...MX symbol 'w' of shape 1x1, declared outside of Opti...
+      \enddoctest
+      \endlang
+
       Elementwise constraints on matrices need vec(); options attach metadata:
 
       \lang{python}
@@ -693,6 +838,23 @@ public:
       julia> ca.subject_to(opti, con, Dict("meta" => Dict("label" => "nonneg")))
       julia> ca.ng(opti), ca.user_dict(opti, con)["label"]
       (4, "nonneg")
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> Opti opti = new Opti();
+      jshell> MX A = opti.variable(2, 2);
+      jshell> opti.subject_to(ca.ge(A, 0));
+      jshell> opti.minimize(ca.sumsqr(A));
+      jshell> opti.solver("ipopt", Map.of("print_time", false), Map.of("print_level", 0, "sb", "yes"));
+      jshell> opti.solve()
+      |  Exception org.casadi.CasadiException: ...Psd constraints not implemented yet...
+      jshell> opti.subject_to();
+      jshell> MX con = ca.ge(ca.vec(A), 0);
+      jshell> opti.subject_to(con, Map.of("meta", Map.of("label", "nonneg")));
+      jshell> List.of(opti.ng(), opti.user_dict(con).get("label"))
+      [4, nonneg]
       \enddoctest
       \endlang
 
@@ -768,6 +930,25 @@ public:
                  println(split(sprint(showerror, e), "\n")[end-1])
              end
       This expression has a dual for a constraint that is not given to Opti:
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> Opti opti = new Opti();
+      jshell> MX x = opti.variable();
+      jshell> MX con = ca.ge(x, 1);
+      jshell> opti.subject_to(con);
+      jshell> opti.minimize(x.power(2));
+      jshell> opti.ng()
+      1
+      jshell> opti.subject_to();
+      jshell> opti.ng()
+      0
+      jshell> opti.solver("ipopt", Map.of("print_time", false), Map.of("print_level", 0, "sb", "yes"));
+      jshell> OptiSol sol = opti.solve();
+      jshell> sol.value(opti.dual(con))
+      |  Exception org.casadi.CasadiException: ...This expression has a dual for a constraint that is not given to Opti:...
       \enddoctest
       \endlang
 
@@ -853,6 +1034,24 @@ public:
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> Opti opti = new Opti();
+      jshell> MX x = opti.variable();
+      jshell> opti.minimize(x.minus(2).power(2));
+      jshell> opti.solve()
+      |  Exception org.casadi.CasadiException: ...You must call 'solver' on the Opti stack...
+      jshell> opti.solver("ipopt", Map.of("print_time", false), Map.of("print_level", 0, "sb", "yes"));
+      jshell> opti.solve().value(x)
+      2
+      jshell> opti.solver("sqpmethod", Map.of("print_time", false, "print_header", false,
+         ...>   "print_iteration", false, "print_status", false, "qpsol", "qrqp",
+         ...>   "qpsol_options", Map.of("print_iter", false, "print_header", false, "print_info", false)));
+      jshell> opti.solve().value(x)
+      2
+      \enddoctest
+      \endlang
+
       \sa nlpsol, qpsol, solve
 
       \identifier{1c} */
@@ -933,6 +1132,22 @@ public:
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> Opti opti = new Opti();
+      jshell> MX x = opti.variable(2);
+      jshell> MX p = opti.parameter();
+      jshell> opti.set_initial(x, 1);
+      jshell> opti.set_initial(ca.times(10, x.get(0)), 2);
+      jshell> System.out.println(opti.initial())
+      [([0.2, 1]==opti..._x_1)]
+      jshell> opti.set_initial(p, 1);
+      |  Exception org.casadi.CasadiException: ...You cannot set an initial value for a parameter. Did you mean 'set_value'?...
+      jshell> opti.set_initial(x.get(0).times(x.get(1)), 1);
+      |  Exception org.casadi.CasadiException: ...Use symbols or simple mappings of symbols...
+      \enddoctest
+      \endlang
+
       Warm start from a previous solution:
 
       \lang{python}
@@ -980,6 +1195,23 @@ public:
       julia> opti.set_initial(ca.value_variables(sol))
       julia> ca.set_initial(opti, ca.lam_g(opti), ca.value(sol, ca.lam_g(opti)))
       julia> ca.stats(ca.solve(opti))["iter_count"] < ca.stats(sol)["iter_count"]
+      true
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> Opti opti = new Opti();
+      jshell> MX x = opti.variable();
+      jshell> MX y = opti.variable();
+      jshell> opti.minimize(y.minus(x.power(2)).power(2));
+      jshell> opti.subject_to(ca.eq(x.power(2).plus(y.power(2)), 1));
+      jshell> opti.subject_to(ca.ge(x.plus(y), 1));
+      jshell> opti.solver("ipopt", Map.of("print_time", false), Map.of("print_level", 0, "sb", "yes"));
+      jshell> OptiSol sol = opti.solve();
+      jshell> opti.set_initial(sol.value_variables());
+      jshell> opti.set_initial(opti.lam_g(), sol.value(opti.lam_g()));
+      jshell> (long) opti.solve().stats().get("iter_count") < (long) sol.stats().get("iter_count")
       true
       \enddoctest
       \endlang
@@ -1061,6 +1293,23 @@ public:
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> Opti opti = new Opti();
+      jshell> MX x = opti.variable();
+      jshell> MX p = opti.parameter(2);
+      jshell> opti.set_value(p, new DM(new double[] {1, 2}));
+      jshell> opti.set_value(p.get(1), 5);
+      jshell> opti.value(p)
+      [1, 5]
+      jshell> opti.set_value(x, 1);
+      |  Exception org.casadi.CasadiException: ...You cannot set a value for a variable. Did you mean 'set_initial'?...
+      jshell> opti.set_value(List.of(ca.eq(p, 7)));
+      jshell> opti.value(p)
+      [7, 7]
+      \enddoctest
+      \endlang
+
       \sa set_initial, value_parameters
 
       \identifier{1d} */
@@ -1133,6 +1382,20 @@ public:
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> Opti opti = new Opti();
+      jshell> MX x = opti.variable();
+      jshell> opti.set_domain(x, "integer");
+      jshell> opti.minimize(x.minus(1.4).power(2));
+      jshell> opti.solver("ipopt", Map.of("print_time", false), Map.of("print_level", 0, "sb", "yes"));
+      jshell> opti.solve()
+      |  Exception org.casadi.CasadiException: ...Discrete variables require a solver with integer support...
+      jshell> opti.set_domain(x, "binary");
+      |  Exception org.casadi.CasadiException: ...Unknown domain 'binary'. Known values are 'real', 'integer'...
+      \enddoctest
+      \endlang
+
       \identifier{27t} */
   void set_domain(const MX& x, const std::string& domain);
 
@@ -1189,6 +1452,21 @@ public:
       300.0
       julia> ca.x_linear_scale(opti), ca.x_linear_scale_offset(opti)
       (20, 273.15)
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> Opti opti = new Opti();
+      jshell> MX T = opti.variable();
+      jshell> opti.set_linear_scale(T, 20, 273.15);
+      jshell> opti.minimize(T.minus(300).power(2));
+      jshell> opti.solver("ipopt", Map.of("print_time", false), Map.of("print_level", 0, "sb", "yes"));
+      jshell> OptiSol sol = opti.solve();
+      jshell> List.of(sol.value(T), opti.x_linear_scale(), opti.x_linear_scale_offset())
+      [300, 20, 273.15]
+      jshell> opti.debug().arg().get("x0")
+      -13.6575
       \enddoctest
       \endlang
 
@@ -1271,6 +1549,24 @@ public:
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> Opti opti = new Opti();
+      jshell> MX x = opti.variable();
+      jshell> opti.minimize(x.minus(1).power(6));
+      jshell> opti.solver("ipopt", Map.of("print_time", false),
+         ...>             Map.of("print_level", 0, "max_iter", 2, "sb", "yes"));
+      jshell> opti.solve()
+      |  Exception org.casadi.CasadiException: ...Solver failed...'Maximum_Iterations_Exceeded'...
+      jshell> List.of(opti.debug().value(x), opti.return_status())
+      [0.36, Maximum_Iterations_Exceeded]
+      jshell> opti.solver("ipopt", Map.of("print_time", false), Map.of("print_level", 0, "sb", "yes"));
+      jshell> OptiSol sol = opti.solve();
+      jshell> List.of(sol.value(x), sol.stats().get("success"))
+      [1.0, true]
+      \enddoctest
+      \endlang
+
       \sa solve_limited, OptiSol, stats, return_status
 
       \identifier{2mu} */
@@ -1317,6 +1613,19 @@ public:
       julia> sol = ca.solve_limited(opti);
       julia> ca.stats(sol)["unified_return_status"], ca.value(sol, x)
       ("SOLVER_RET_LIMITED", 0.36)
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> Opti opti = new Opti();
+      jshell> MX x = opti.variable();
+      jshell> opti.minimize(x.minus(1).power(6));
+      jshell> opti.solver("ipopt", Map.of("print_time", false),
+         ...>             Map.of("print_level", 0, "max_iter", 2, "sb", "yes"));
+      jshell> OptiSol sol = opti.solve_limited();
+      jshell> List.of(sol.stats().get("unified_return_status"), sol.value(x))
+      [SOLVER_RET_LIMITED, 0.36]
       \enddoctest
       \endlang
 
@@ -1424,6 +1733,30 @@ public:
       \enddoctest
       \endlang
 
+      \lang{java}
+      The result is always a DM, also for a scalar or a sparse matrix.
+
+      \doctest
+      jshell> Opti opti = new Opti();
+      jshell> MX x = opti.variable();
+      jshell> MX p = opti.parameter();
+      jshell> opti.minimize(x.minus(p).power(2));
+      jshell> opti.set_value(p, 3);
+      jshell> opti.value(ca.times(2, p))
+      6
+      jshell> opti.value(x)
+      |  Exception org.casadi.CasadiException: ...This action is forbidden since you have not solved the Opti stack yet (with calling 'solve')...
+      jshell> List.of(opti.value(x.plus(p), List.of(ca.eq(x, 1))), opti.value(x.power(2), opti.initial()))
+      [4, 0]
+      jshell> opti.solver("ipopt", Map.of("print_time", false), Map.of("print_level", 0, "sb", "yes"));
+      jshell> OptiSol sol = opti.solve();
+      jshell> List.of(opti.value(x), sol.value(x), sol.value(x.plus(p), List.of(ca.eq(p, 10))))
+      [3, 3, 13]
+      jshell> List.of(sol.value(ca.vertcat(x, p)).getClass().getSimpleName(), sol.value(new DM(new double[] {1, 2})))
+      [DM, [1, 2]]
+      \enddoctest
+      \endlang
+
       \sa initial, value_variables, OptiSol::value
 
       \identifier{2mv} */
@@ -1476,6 +1809,19 @@ public:
       julia> s = ca.stats(sol);
       julia> s["success"], s["return_status"], s["unified_return_status"], s["iter_count"]
       (true, "Solve_Succeeded", "SOLVER_RET_SUCCESS", 1)
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> Opti opti = new Opti();
+      jshell> MX x = opti.variable();
+      jshell> opti.minimize(x.minus(1).power(2));
+      jshell> opti.solver("ipopt", Map.of("print_time", false), Map.of("print_level", 0, "sb", "yes"));
+      jshell> OptiSol sol = opti.solve();
+      jshell> Map<String, Object> s = sol.stats();
+      jshell> List.of(s.get("success"), s.get("return_status"), s.get("unified_return_status"), s.get("iter_count"))
+      [true, Solve_Succeeded, SOLVER_RET_SUCCESS, 1]
       \enddoctest
       \endlang
 
@@ -1538,6 +1884,25 @@ public:
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> Opti opti = new Opti();
+      jshell> MX x = opti.variable();
+      jshell> opti.minimize(x.power(2));
+      jshell> opti.return_status()
+      "unknown"
+      jshell> opti.subject_to(ca.ge(x, 1));
+      jshell> opti.subject_to(ca.le(x, -1));
+      jshell> opti.solver("ipopt", Map.of("print_time", false), Map.of("print_level", 0, "sb", "yes"));
+      jshell> try {
+         ...>   opti.solve();
+         ...> } catch (CasadiException e) {
+         ...>   System.out.println(opti.return_status());
+         ...> }
+      Infeasible_Problem_Detected
+      \enddoctest
+      \endlang
+
       \identifier{1g} */
   std::string return_status() const;
 
@@ -1580,6 +1945,19 @@ public:
       MX[(2==opti..._x_1)]
       julia> opti.value(x^2 + 1, ca.initial(opti))
       5.0
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> Opti opti = new Opti();
+      jshell> MX x = opti.variable();
+      jshell> opti.set_initial(x, 2);
+      jshell> opti.minimize(x.power(2));
+      jshell> System.out.println(opti.initial())
+      [(2==opti..._x_1)]
+      jshell> opti.value(x.power(2).plus(1), opti.initial())
+      5
       \enddoctest
       \endlang
 
@@ -1641,6 +2019,23 @@ public:
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> Opti opti = new Opti();
+      jshell> MX x = opti.variable();
+      jshell> MX p = opti.parameter();
+      jshell> opti.minimize(x.minus(p).power(2));
+      jshell> opti.set_value(p, 2);
+      jshell> opti.solver("ipopt", Map.of("print_time", false), Map.of("print_level", 0, "sb", "yes"));
+      jshell> OptiSol sol = opti.solve();
+      jshell> System.out.println(opti.value_variables() + " " + opti.value_parameters())
+      [(2==opti..._x_1)] [(2==opti..._p_1)]
+      jshell> opti.set_initial(sol.value_variables());
+      jshell> opti.value(x, opti.initial())
+      2
+      \enddoctest
+      \endlang
+
       \identifier{267} */
   std::vector<MX> value_variables() const;
   std::vector<MX> value_parameters() const;
@@ -1697,6 +2092,22 @@ public:
       Dict{String, DM} with 2 entries:
         "g" => 7
         "jac_g_x" => 2
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> Opti opti = new Opti();
+      jshell> MX x = opti.variable();
+      jshell> MX p = opti.parameter();
+      jshell> opti.set_linear_scale(x, 2, 1);
+      jshell> opti.minimize(x.minus(p).power(2));
+      jshell> opti.subject_to(ca.ge(x, 0));
+      jshell> Function h = new Function("nlp_jac_g", List.of(opti.x(), opti.p()), List.of(opti.g(), ca.jacobian(opti.g(), opti.x())),
+         ...>                          List.of("x", "p"), List.of("g", "jac_g_x"));
+      jshell> Function hs = opti.scale_helper(h);
+      jshell> hs.call(Map.of("x", new DM(3), "p", new DM(0)))
+      {g=7, jac_g_x=2}
       \enddoctest
       \endlang
 
@@ -1785,6 +2196,28 @@ public:
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> Opti opti = new Opti();
+      jshell> MX x = opti.variable();
+      jshell> opti.minimize(x.minus(3).power(2));
+      jshell> MX con = ca.le(x, 1);
+      jshell> opti.subject_to(con);
+      jshell> opti.solver("ipopt", Map.of("print_time", false), Map.of("print_level", 0, "sb", "yes"));
+      jshell> OptiSol sol = opti.solve();
+      jshell> List.of(sol.value(opti.dual(con)), sol.value(opti.lam_g()))
+      [4, 4]
+      jshell> opti.subject_to();
+      jshell> con = ca.ge(x, 4);
+      jshell> opti.subject_to(con);
+      jshell> sol = opti.solve();
+      jshell> List.of(sol.value(opti.dual(con)), sol.value(opti.lam_g()))
+      [2, -2]
+      jshell> opti.dual(ca.ge(x, 4))
+      |  Exception org.casadi.CasadiException: ...Constraint not present in Opti stack...
+      \enddoctest
+      \endlang
+
       \sa lam_g
 
       \identifier{1h} */
@@ -1821,6 +2254,17 @@ public:
       julia> y = ca.variable(opti);
       julia> ca.minimize(opti, ca.sumsqr(x))
       julia> ca.nx(opti)
+      3
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> Opti opti = new Opti();
+      jshell> MX x = opti.variable(3);
+      jshell> MX y = opti.variable();
+      jshell> opti.minimize(ca.sumsqr(x));
+      jshell> opti.nx()
       3
       \enddoctest
       \endlang
@@ -1863,6 +2307,17 @@ public:
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> Opti opti = new Opti();
+      jshell> MX x = opti.variable();
+      jshell> MX p = opti.parameter(2, 2);
+      jshell> opti.minimize(x.times(ca.sum1(ca.vec(p))));
+      jshell> opti.np()
+      4
+      \enddoctest
+      \endlang
+
       \identifier{269} */
   casadi_int np() const;
 
@@ -1897,6 +2352,17 @@ public:
       julia> ca.subject_to(opti, 0 <= (x <= 1))
       julia> ca.subject_to(opti, x[1] == x[2])
       julia> ca.ng(opti)
+      3
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> Opti opti = new Opti();
+      jshell> MX x = opti.variable(2);
+      jshell> opti.subject_to(ca.le(0, ca.le(x, 1)));
+      jshell> opti.subject_to(ca.eq(x.get(0), x.get(1)));
+      jshell> opti.ng()
       3
       \enddoctest
       \endlang
@@ -1955,6 +2421,21 @@ public:
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> Opti opti = new Opti();
+      jshell> MX x = opti.variable(2);
+      jshell> MX y = opti.variable();
+      jshell> opti.minimize(ca.sumsqr(x).plus(y.power(2)));
+      jshell> opti.x().size()
+      long[2] { 3, 1 }
+      jshell> opti.solver("ipopt", Map.of("print_time", false), Map.of("print_level", 0, "sb", "yes"));
+      jshell> OptiSol sol = opti.solve();
+      jshell> sol.value(ca.jacobian(opti.f(), opti.x()))
+      [[0, 0, 0]]
+      \enddoctest
+      \endlang
+
       \identifier{26b} */
   MX x() const;
 
@@ -1990,6 +2471,17 @@ public:
       julia> ca.minimize(opti, x*p[1])
       julia> size(ca.p(opti))
       (2, 1)
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> Opti opti = new Opti();
+      jshell> MX x = opti.variable();
+      jshell> MX p = opti.parameter(2);
+      jshell> opti.minimize(x.times(p.get(0)));
+      jshell> opti.p().size()
+      long[2] { 2, 1 }
       \enddoctest
       \endlang
 
@@ -2034,6 +2526,18 @@ public:
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> Opti opti = new Opti();
+      jshell> MX x = opti.variable();
+      jshell> opti.subject_to(ca.ge(x, 1));
+      jshell> opti.subject_to(ca.eq(x.power(2), 4));
+      jshell> opti.minimize(x);
+      jshell> System.out.println(opti.g())
+      vertcat(opti..._x_1, sq(opti..._x_1))
+      \enddoctest
+      \endlang
+
       \identifier{26d} */
   MX g() const;
 
@@ -2071,6 +2575,18 @@ public:
       julia> ca.minimize(opti, x^2)
       julia> ca.f(opti)
       MX(sq(opti34_x_1))
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> Opti opti = new Opti();
+      jshell> MX x = opti.variable();
+      jshell> opti.f()
+      0
+      jshell> opti.minimize(x.power(2));
+      jshell> System.out.println(opti.f())
+      sq(opti..._x_1)
       \enddoctest
       \endlang
 
@@ -2117,6 +2633,20 @@ public:
       julia> ca.subject_to(opti, x^2 == 4)
       julia> ca.minimize(opti, x)
       julia> print(ca.lbg(opti), " ", ca.ubg(opti))
+      vertcat(1, -inf, 4) vertcat(inf, opti..._p_1, 4)
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> Opti opti = new Opti();
+      jshell> MX x = opti.variable();
+      jshell> MX p = opti.parameter();
+      jshell> opti.subject_to(ca.ge(x, 1));
+      jshell> opti.subject_to(ca.le(x, p));
+      jshell> opti.subject_to(ca.eq(x.power(2), 4));
+      jshell> opti.minimize(x);
+      jshell> System.out.println(opti.lbg() + " " + opti.ubg())
       vertcat(1, -inf, 4) vertcat(inf, opti..._p_1, 4)
       \enddoctest
       \endlang
@@ -2187,6 +2717,23 @@ public:
       julia> L = ca.f(opti) + ca.dot(ca.lam_g(opti), ca.g(opti));
       julia> ca.value(sol, ca.hessian(L, ca.x(opti))[1])
       2.0
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> Opti opti = new Opti();
+      jshell> MX x = opti.variable();
+      jshell> MX p = opti.parameter();
+      jshell> opti.minimize(x.power(2));
+      jshell> opti.subject_to(ca.ge(x, p));
+      jshell> opti.set_value(p, 1);
+      jshell> opti.solver("ipopt", Map.of("print_time", false), Map.of("print_level", 0, "sb", "yes"));
+      jshell> OptiSol sol = opti.solve();
+      jshell> sol.value(opti.lam_g())
+      -2
+      jshell> sol.value((MX) ca.hessian(opti.f().plus(ca.dot(opti.lam_g(), opti.g())), opti.x()).get(0))
+      2
       \enddoctest
       \endlang
 
@@ -2297,6 +2844,32 @@ public:
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> Opti opti = new Opti();
+      jshell> MX x = opti.variable();
+      jshell> MX y = opti.variable();
+      jshell> MX p = opti.parameter();
+      jshell> opti.minimize(x.minus(p).power(2).plus(y.minus(x).power(2)));
+      jshell> opti.subject_to(ca.ge(x, 0));
+      jshell> opti.solver("ipopt", Map.of("print_time", false), Map.of("print_level", 0, "sb", "yes"));
+      jshell> Function F = opti.to_function("F", List.of(p, x), List.of(ca.vertcat(x, y), opti.lam_g()),
+         ...>                                List.of("p", "x0"), List.of("xy", "lam"));
+      jshell> F
+      F:(p,x0)->(xy[2],lam) MXFunction
+      jshell> Map<String, DM> r = F.call(Map.of("p", new DM(2), "x0", new DM(1)));
+      jshell> List.of(r.get("xy"), r.get("lam"))
+      [[2, 2], 0.0000]
+      jshell> F.stats().get("success")
+      true
+      jshell> F = opti.to_function("F", Map.of("p", p, "x", x), List.of("p"), List.of("x"));
+      jshell> F.invoke(3)
+      3
+      jshell> opti.to_function("F", List.of(p.plus(1)), List.of(x))
+      |  Exception org.casadi.CasadiException: ...Argument 0 is not purely symbolic...
+      \enddoctest
+      \endlang
+
       \sa nlpsol
 
       \identifier{1j} */
@@ -2346,6 +2919,17 @@ public:
       julia> ca.subject_to(opti, ca.Opti.bounded(0, x[1] + x[2], 1))
       julia> ca.ng(opti), ca.lbg(opti), ca.ubg(opti)
       (3, vertcat(all_-1(2x1), 0), ones(3x1))
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> Opti opti = new Opti();
+      jshell> MX x = opti.variable(2);
+      jshell> opti.subject_to(opti.bounded(-1, x, 1));
+      jshell> opti.subject_to(Opti.bounded(0, x.get(0).plus(x.get(1)), 1));
+      jshell> List.of(opti.ng(), opti.lbg(), opti.ubg())
+      [3, vertcat(all_-1(2x1), 0), ones(3x1)]
       \enddoctest
       \endlang
 
@@ -2410,6 +2994,24 @@ public:
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> Opti opti = new Opti();
+      jshell> MX x = opti.variable();
+      jshell> opti.minimize(x.minus(1).power(6));
+      jshell> opti.solver("ipopt", Map.of("print_time", false),
+         ...>             Map.of("print_level", 0, "max_iter", 2, "sb", "yes"));
+      jshell> try {
+         ...>   opti.solve();
+         ...> } catch (CasadiException e) {
+         ...> }
+      jshell> opti.debug().value(x)
+      0.36
+      jshell> System.out.println(opti.debug().x_describe(0))
+      Opti decision variable 'opti..._x_1' of shape 1x1, called from ...
+      \enddoctest
+      \endlang
+
       \sa OptiAdvanced, advanced, copy
 
       \identifier{1l} */
@@ -2446,6 +3048,16 @@ public:
       julia> ca.minimize(opti, x^2)
       julia> print(ca.symvar(ca.advanced(opti)))
       MX[opti..._x_1]
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> Opti opti = new Opti();
+      jshell> MX x = opti.variable();
+      jshell> opti.minimize(x.power(2));
+      jshell> System.out.println(opti.advanced().symvar())
+      [opti..._x_1]
       \enddoctest
       \endlang
 
@@ -2487,6 +3099,18 @@ public:
       julia> ca.subject_to(opti2, x >= 2)
       julia> ca.ng(opti), ca.ng(opti2)
       (0, 1)
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> Opti opti = new Opti();
+      jshell> MX x = opti.variable();
+      jshell> opti.minimize(x.power(2));
+      jshell> Opti opti2 = opti.copy();
+      jshell> opti2.subject_to(ca.ge(x, 2));
+      jshell> List.of(opti.ng(), opti2.ng())
+      [0, 1]
       \enddoctest
       \endlang
 
@@ -2547,6 +3171,22 @@ public:
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> Opti opti = new Opti();
+      jshell> MX x = opti.variable();
+      jshell> opti.update_user_dict(x, Map.of("name", "speed", "unit", "m/s"));
+      jshell> Map<String, Object> d = opti.user_dict(x);
+      jshell> List.of(d.get("name"), d.get("unit"), d.containsKey("stacktrace"))
+      [speed, m/s, true]
+      jshell> MX con = ca.ge(x, 0);
+      jshell> opti.subject_to(con);
+      jshell> opti.update_user_dict(con, Map.of("name", "nonneg"));
+      jshell> opti.user_dict(con).get("name")
+      "nonneg"
+      \enddoctest
+      \endlang
+
       \identifier{1o} */
   void update_user_dict(const MX& m, const Dict& meta);
   void update_user_dict(const std::vector<MX>& m, const Dict& meta);
@@ -2590,6 +3230,17 @@ public:
                  println(last(split(sprint(showerror, e), "\n")))
              end
       Symbol expected, got expression.
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> Opti opti = new Opti();
+      jshell> MX x = opti.variable();
+      jshell> new TreeSet<>(opti.user_dict(x).keySet())
+      [stacktrace]
+      jshell> opti.user_dict(x.plus(1))
+      |  Exception org.casadi.CasadiException: ...Symbol expected, got expression...
       \enddoctest
       \endlang
 
@@ -2649,6 +3300,23 @@ public:
         #constraints: 1 (ng = 1)
         CasADi solver needs updating.
       })
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> Opti opti = new Opti();
+      jshell> MX x = opti.variable(2);
+      jshell> opti.minimize(ca.sumsqr(x));
+      jshell> opti.subject_to(ca.ge(x.get(0), 1));
+      jshell> System.out.println(opti)
+      Opti {
+        instance #...
+        #variables: 1 (nx = 2)
+        #parameters: 0 (np = 0)
+        #constraints: 1 (ng = 1)
+        CasADi solver needs updating.
+      }
       \enddoctest
       \endlang
 
@@ -2846,6 +3514,20 @@ public:
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> Opti opti = new Opti();
+      jshell> MX x = opti.variable(2);
+      jshell> opti.minimize(ca.sumsqr(x));
+      jshell> opti.subject_to(ca.ge(x.get(0), 1));
+      jshell> opti.solver("ipopt", Map.of("print_time", false), Map.of("print_level", 0, "sb", "yes"));
+      jshell> OptiSol sol = opti.solve();
+      jshell> Function S = opti.debug().solver();
+      jshell> List.of(S.name(), S.class_name(), S.name_in())
+      [solver, IpoptInterface, [x0, p, lbx, ubx, lbg, ubg, lam_x0, lam_g0]]
+      \enddoctest
+      \endlang
+
       \identifier{2n0} */
   Function casadi_solver() const;
 
@@ -2880,6 +3562,16 @@ public:
       julia> d = ca.debug(opti);
       julia> ca.is_parametric(d, 2*p), ca.is_parametric(d, x*p)
       (true, false)
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> Opti opti = new Opti();
+      jshell> MX x = opti.variable();
+      jshell> MX p = opti.parameter();
+      jshell> List.of(opti.debug().is_parametric(ca.times(2, p)), opti.debug().is_parametric(x.times(p)))
+      [true, false]
       \enddoctest
       \endlang
 
@@ -2936,6 +3628,19 @@ public:
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> Opti opti = new Opti();
+      jshell> MX x = opti.variable();
+      jshell> MX p = opti.parameter();
+      jshell> MX y = opti.variable();
+      jshell> System.out.println(opti.debug().symvar())
+      [opti..._x_1, opti..._p_1, opti..._x_2]
+      jshell> System.out.println(opti.debug().symvar(y.times(p).plus(1)) + " " + opti.debug().symvar(y.times(p), VariableType.OPTI_PAR))
+      [opti..._p_1, opti..._x_2] [opti..._p_1]
+      \enddoctest
+      \endlang
+
       \identifier{1u} */
   std::vector<MX> symvar() const;
   std::vector<MX> symvar(const MX& expr) const;
@@ -2981,6 +3686,18 @@ public:
       julia> println(c.type == ca.OPTI_DOUBLE_INEQUALITY, " ", c.lb, " ", c.ub, " ", c.canon)
       true 0 1 opti..._x_1
       julia> ca.canon_expr(opti.debug, x + 1).type == ca.OPTI_UNKNOWN
+      true
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> Opti opti = new Opti();
+      jshell> MX x = opti.variable();
+      jshell> MetaCon c = opti.debug().canon_expr(ca.le(0, ca.le(x, 1)));
+      jshell> System.out.println((c.getType() == ConstraintType.OPTI_DOUBLE_INEQUALITY) + " " + c.getLb() + " " + c.getUb() + " " + c.getCanon())
+      true 0 1 opti..._x_1
+      jshell> opti.debug().canon_expr(x.plus(1)).getType() == ConstraintType.OPTI_UNKNOWN
       true
       \enddoctest
       \endlang
@@ -3049,6 +3766,21 @@ public:
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> Opti opti = new Opti();
+      jshell> MX x = opti.variable();
+      jshell> MX y = opti.variable();
+      jshell> opti.minimize(x.power(2));
+      jshell> OptiAdvanced d = opti.debug();
+      jshell> d.active_symvar(VariableType.OPTI_VAR)
+      []
+      jshell> d.bake();
+      jshell> System.out.println(d.active_symvar(VariableType.OPTI_VAR) + " " + d.active_values(VariableType.OPTI_VAR))
+      [opti..._x_1] [0]
+      \enddoctest
+      \endlang
+
       \identifier{2n3} */
   std::vector<MX> active_symvar(VariableType type) const;
   /// Initial guesses (or parameter values) of the symbols returned by active_symvar
@@ -3089,6 +3821,17 @@ public:
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> Opti opti = new Opti();
+      jshell> MX x = opti.variable(2);
+      jshell> MX y = opti.variable();
+      jshell> opti.minimize(ca.sumsqr(x).plus(y.power(2)));
+      jshell> System.out.println(opti.debug().x_lookup(1) + " " + opti.debug().x_lookup(2))
+      opti..._x_1 opti..._x_2
+      \enddoctest
+      \endlang
+
       \identifier{2n4} */
   MX x_lookup(casadi_index i) const;
   /** \brief Get the constraint expression that owns row i of g
@@ -3121,6 +3864,17 @@ public:
       julia> ca.subject_to(opti, x[1] + x[2] == 1)
       julia> ca.g_lookup(ca.debug(opti), 2)
       MX((1==(opti52_x_1[0]+opti52_x_1[1])))
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> Opti opti = new Opti();
+      jshell> MX x = opti.variable(2);
+      jshell> opti.subject_to(ca.ge(x, 0));
+      jshell> opti.subject_to(ca.eq(x.get(0).plus(x.get(1)), 1));
+      jshell> System.out.println(opti.debug().g_lookup(2))
+      (1==(opti..._x_1[0]+opti..._x_1[1]))
       \enddoctest
       \endlang
 
@@ -3173,6 +3927,17 @@ public:
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> Opti opti = new Opti();
+      jshell> MX x = opti.variable(3);
+      jshell> opti.minimize(ca.sumsqr(x));
+      jshell> System.out.println(opti.debug().x_describe(2))
+      Opti decision variable 'opti..._x_1' of shape 3x1, called from ...
+      At nonzero 2.
+      \enddoctest
+      \endlang
+
       \identifier{2n6} */
   std::string x_describe(casadi_index i, const Dict& opts=Dict()) const;
   /** \brief Describe row i of the constraint vector g
@@ -3203,6 +3968,17 @@ public:
       julia> x = ca.variable(opti, 3);
       julia> ca.subject_to(opti, x >= 0)
       julia> print(ca.g_describe(ca.debug(opti), 1))
+      Opti constraint of shape 3x1, called from ...
+      At nonzero 1, part 0.
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> Opti opti = new Opti();
+      jshell> MX x = opti.variable(3);
+      jshell> opti.subject_to(ca.ge(x, 0));
+      jshell> System.out.println(opti.debug().g_describe(1))
       Opti constraint of shape 3x1, called from ...
       At nonzero 1, part 0.
       \enddoctest
@@ -3250,6 +4026,20 @@ public:
       julia> ca.describe(ca.debug(opti), ca.MX.sym("w"))
       "MX symbol 'w' of shape 1x1, declared outside of Opti."
       julia> print(ca.describe(ca.debug(opti), x*p))
+      General expression, dependent on 2 symbols:
+        Opti decision variable 'opti..._x_1' of shape 1x1, called from ...
+        Opti parameter 'opti..._p_1' of shape 1x1, called from ...
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> Opti opti = new Opti();
+      jshell> MX x = opti.variable();
+      jshell> MX p = opti.parameter();
+      jshell> opti.debug().describe(MX.sym("w"))
+      "MX symbol 'w' of shape 1x1, declared outside of Opti."
+      jshell> System.out.println(opti.debug().describe(x.times(p)))
       General expression, dependent on 2 symbols:
         Opti decision variable 'opti..._x_1' of shape 1x1, called from ...
         Opti parameter 'opti..._p_1' of shape 1x1, called from ...
@@ -3323,6 +4113,29 @@ public:
              catch e
              end
       julia> ca.show_infeasibilities(ca.debug(opti), 1e-6)
+      Violated constraints (tol 1e-06), in order of declaration:
+      ------- i = 0/2 ------
+      1 <= ... <= inf (viol ...)
+      Opti constraint of shape 1x1, called from ...
+      ------- i = 1/2 ------
+      -inf <= ... <= -1 (viol ...)
+      Opti constraint of shape 1x1, called from ...
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> Opti opti = new Opti();
+      jshell> MX x = opti.variable();
+      jshell> opti.minimize(x.power(2));
+      jshell> opti.subject_to(ca.ge(x, 1));
+      jshell> opti.subject_to(ca.le(x, -1));
+      jshell> opti.solver("ipopt", Map.of("print_time", false), Map.of("print_level", 0, "sb", "yes"));
+      jshell> try {
+         ...>   opti.solve();
+         ...> } catch (CasadiException e) {
+         ...> }
+      jshell> opti.debug().show_infeasibilities(1e-6);
       Violated constraints (tol 1e-06), in order of declaration:
       ------- i = 0/2 ------
       1 <= ... <= inf (viol ...)
@@ -3407,6 +4220,27 @@ public:
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> Opti opti = new Opti();
+      jshell> MX x = opti.variable();
+      jshell> MX p = opti.parameter();
+      jshell> opti.minimize(x.minus(p).power(2));
+      jshell> opti.subject_to(ca.le(x, 1));
+      jshell> opti.set_value(p, 3);
+      jshell> opti.solver("ipopt", Map.of("print_time", false), Map.of("print_level", 0, "sb", "yes"));
+      jshell> OptiSol sol = opti.solve();
+      jshell> OptiAdvanced d = opti.debug();
+      jshell> d.solve_prepare();
+      jshell> d.arg()
+      {lam_g0=0, lbg=-inf, p=3, ubg=1, x0=0}
+      jshell> Map<String, DM> r = d.solve_actual(d.arg());
+      jshell> d.res(r);
+      jshell> List.of(d.value(x), new TreeSet<>(d.res().keySet()))
+      [1, [f, g, lam_g, lam_p, lam_x, x]]
+      \enddoctest
+      \endlang
+
       \identifier{2na} */
   void solve_prepare();
   /// Run the solver on an argument dict (see solve_prepare)
@@ -3449,6 +4283,17 @@ public:
       julia> ca.subject_to(opti, 1 <= (x^2 <= 4))
       julia> print(ca.constraints(ca.debug(opti)))
       MX[(0<=opti..._x_1), (1<=(sq(opti..._x_1)<=4))]
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> Opti opti = new Opti();
+      jshell> MX x = opti.variable();
+      jshell> opti.subject_to(ca.ge(x, 0));
+      jshell> opti.subject_to(ca.le(1, ca.le(x.power(2), 4)));
+      jshell> System.out.println(opti.debug().constraints())
+      [(0<=opti..._x_1), (1<=(sq(opti..._x_1)<=4))]
       \enddoctest
       \endlang
 
@@ -3556,6 +4401,22 @@ protected:
     \enddoctest
     \endlang
 
+    \lang{java}
+    \doctest
+    jshell> Opti opti = new Opti();
+    jshell> MX x = opti.variable();
+    jshell> MX p = opti.parameter();
+    jshell> opti.minimize(x.minus(p).power(2));
+    jshell> opti.solver("ipopt", Map.of("print_time", false), Map.of("print_level", 0, "sb", "yes"));
+    jshell> opti.set_value(p, 1);
+    jshell> OptiSol sol1 = opti.solve();
+    jshell> opti.set_value(p, 2);
+    jshell> OptiSol sol2 = opti.solve();
+    jshell> List.of(sol1.value(x), sol2.value(x))
+    [1, 2]
+    \enddoctest
+    \endlang
+
     \date 2017
     \author Joris Gillis, Erik Lambrechts
 
@@ -3645,6 +4506,31 @@ class CASADI_EXPORT OptiSol : public SWIG_IF_ELSE(PrintableCommon, Printable<Opt
         \enddoctest
         \endlang
 
+        \lang{java}
+        The result is always a DM, also for a scalar or a sparse matrix.
+
+        \doctest
+        jshell> Opti opti = new Opti();
+        jshell> MX x = opti.variable();
+        jshell> MX y = opti.variable();
+        jshell> opti.minimize(y.minus(x.power(2)).power(2));
+        jshell> opti.subject_to(ca.eq(x.power(2).plus(y.power(2)), 1));
+        jshell> opti.subject_to(ca.ge(x.plus(y), 1));
+        jshell> opti.solver("ipopt", Map.of("print_time", false), Map.of("print_level", 0, "sb", "yes"));
+        jshell> OptiSol sol = opti.solve();
+        jshell> sol.value(x)
+        0.7862
+        jshell> sol.value(ca.vertcat(x, y)).size()
+        long[2] { 2, 1 }
+        jshell> sol.value(opti.f(), List.of(ca.eq(y, 2)))
+        1.9098
+        jshell> sol.value(x.power(2).plus(y), opti.initial())
+        0
+        jshell> sol.value(ca.jacobian(opti.g(), opti.x())).size()
+        long[2] { 2, 2 }
+        \enddoctest
+        \endlang
+
         \identifier{2nd} */
     native_DM value(const MX& x, const std::vector<MX>& values=std::vector<MX>()) const;
     native_DM value(const DM& x, const std::vector<MX>& values=std::vector<MX>()) const;
@@ -3707,6 +4593,23 @@ class CASADI_EXPORT OptiSol : public SWIG_IF_ELSE(PrintableCommon, Printable<Opt
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> Opti opti = new Opti();
+        jshell> MX x = opti.variable();
+        jshell> MX p = opti.parameter();
+        jshell> opti.minimize(x.minus(p).power(2));
+        jshell> opti.set_value(p, 2);
+        jshell> opti.solver("ipopt", Map.of("print_time", false), Map.of("print_level", 0, "sb", "yes"));
+        jshell> OptiSol sol = opti.solve();
+        jshell> System.out.println(sol.value_variables() + " " + sol.value_parameters())
+        [(2==opti..._x_1)] [(2==opti..._p_1)]
+        jshell> opti.set_initial(sol.value_variables());
+        jshell> opti.solve().stats().get("iter_count")
+        0
+        \enddoctest
+        \endlang
+
         \identifier{2ne} */
     std::vector<MX> value_variables() const;
     std::vector<MX> value_parameters() const;
@@ -3751,6 +4654,18 @@ class CASADI_EXPORT OptiSol : public SWIG_IF_ELSE(PrintableCommon, Printable<Opt
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> Opti opti = new Opti();
+        jshell> MX x = opti.variable();
+        jshell> opti.minimize(x.minus(1).power(2));
+        jshell> opti.solver("ipopt", Map.of("print_time", false), Map.of("print_level", 0, "sb", "yes"));
+        jshell> OptiSol sol = opti.solve();
+        jshell> List.of(sol.stats().get("success"), sol.stats().get("return_status"))
+        [true, Solve_Succeeded]
+        \enddoctest
+        \endlang
+
         \identifier{1w} */
     Dict stats() const;
 
@@ -3792,6 +4707,18 @@ class CASADI_EXPORT OptiSol : public SWIG_IF_ELSE(PrintableCommon, Printable<Opt
         julia> sol = ca.solve(opti);
         julia> ca.return_status(ca.opti(sol)), ca.value(ca.debug(ca.opti(sol)), x)
         ("Solve_Succeeded", 1.0)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> Opti opti = new Opti();
+        jshell> MX x = opti.variable();
+        jshell> opti.minimize(x.minus(1).power(2));
+        jshell> opti.solver("ipopt", Map.of("print_time", false), Map.of("print_level", 0, "sb", "yes"));
+        jshell> OptiSol sol = opti.solve();
+        jshell> List.of(sol.opti().return_status(), sol.opti().debug().value(x))
+        [Solve_Succeeded, 1]
         \enddoctest
         \endlang
 

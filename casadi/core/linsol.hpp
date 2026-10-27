@@ -132,6 +132,33 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> DM A = new DM(new double[][] {{3, 1}, {1, 2}}); DM b = new DM(new double[] {4, 3});
+      jshell> Linsol L = new Linsol("L", "qr", A.sparsity());
+      jshell> L.plugin_name()
+      "qr"
+      jshell> L.sparsity()
+      2x2
+      jshell> L.solve(A, b)
+      [1, 1]
+      jshell> L.solve(new DM(new double[][] {{1, 2}, {0, 1}}), new DM(new double[] {1, 1}), true)
+      [1, -1]
+      jshell> L.solve(A, new DM(new double[][] {{4, 1}, {3, 0}}))
+      [[1, 0.4],
+       [1, -0.2]]
+      jshell> L.det(A)
+      5.0
+      jshell> L.solve(new DM(new double[][] {{1, 1}, {1, 1}}), b)
+      |  Exception org.casadi.CasadiException: ...'nfact' failed...
+      jshell> MX Am = MX.sym("A", A.sparsity()); MX bm = MX.sym("b", 2);
+      jshell> import org.casadi.Function;
+      jshell> Function f = new Function("f", List.of(Am, bm), List.of(L.solve(Am, bm), L.det(Am)));
+      jshell> f.invoke(A, b)
+      [[1, 1], 5]
+      \enddoctest
+      \endlang
+
       \generalsection{Linsol}
       \pluginssection{Linsol}
 
@@ -196,6 +223,16 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> Linsol L = new Linsol("L", "ldl", Sparsity.dense(2, 2));
+        jshell> L
+        Linear solver LinsolLdl
+        jshell> new Linsol("L", "qr", Sparsity.dense(2, 2), Map.of("no_such_option", 1))
+        |  Exception org.casadi.CasadiException: ...Unknown option...
+        \enddoctest
+        \endlang
+
         \identifier{2pe} */
     explicit Linsol(const std::string& name, const std::string& solver,
                     const Sparsity& sp, const Dict& opts=Dict());
@@ -244,6 +281,15 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> Linsol.has_plugin("qr")
+        true
+        jshell> Linsol.has_plugin("no_such_plugin")
+        false
+        \enddoctest
+        \endlang
+
         \identifier{2pf} */
     static bool has_plugin(const std::string& name);
 
@@ -280,6 +326,13 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> Linsol.load_plugin("no_such_plugin")
+        |  Exception org.casadi.CasadiException: ...no_such_plugin...
+        \enddoctest
+        \endlang
+
         \identifier{2pg} */
     static void load_plugin(const std::string& name);
 
@@ -304,6 +357,13 @@ namespace casadi {
         \lang{julia}
         \doctest
         julia> occursin("LDL", ca.Linsol.doc("ldl"))
+        true
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> Linsol.doc("ldl").contains("LDL")
         true
         \enddoctest
         \endlang
@@ -367,6 +427,21 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> DM A = new DM(new double[][] {{3, 1}, {1, 2}});
+        jshell> Linsol L = new Linsol("L", "ldl", A.sparsity());
+        jshell> L.nfact(A)
+        jshell> L.neig(A)
+        0
+        jshell> L.rank(A)
+        2
+        jshell> L.nfact(new DM(new double[][] {{-1, 0}, {0, 1}}))
+        jshell> L.neig(new DM(new double[][] {{-1, 0}, {0, 1}}))
+        1
+        \enddoctest
+        \endlang
+
         \identifier{2pj} */
     void nfact(const DM& A) const;
 
@@ -418,6 +493,16 @@ namespace casadi {
                    println(occursin("matching row count", sprint(showerror, e)))
                end
         true
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> Linsol L = new Linsol("L", "qr", Sparsity.dense(2, 2));
+        jshell> L.solve(new DM(new double[][] {{3, 1}, {1, 2}}), new DM(new double[] {4, 3}))
+        [1, 1]
+        jshell> L.solve(new DM(new double[][] {{3, 1}, {1, 2}}), new DM(new double[] {1, 2, 3}))
+        |  Exception org.casadi.CasadiException: ...matching row count...
         \enddoctest
         \endlang
 
@@ -473,6 +558,18 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> DM A = new DM(new double[][] {{-2, 0}, {0, 1}});
+        jshell> Linsol L = new Linsol("L", "ldl", A.sparsity());
+        jshell> L.nfact(A)
+        jshell> L.neig(A)
+        1
+        jshell> new Linsol("L", "qr", A.sparsity()).neig(A)
+        |  Exception org.casadi.CasadiException: ...'neig' not defined...
+        \enddoctest
+        \endlang
+
         \identifier{1kk} */
     casadi_int neig(const DM& A) const;
 
@@ -507,6 +604,16 @@ namespace casadi {
         julia> L = ca.Linsol("L", "ldl", ca.sparsity(A));
         julia> ca.nfact(L, A)
         julia> ca.rank(L, A)
+        2
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> DM A = new DM(new double[][] {{2, 1}, {1, 3}});
+        jshell> Linsol L = new Linsol("L", "ldl", A.sparsity());
+        jshell> L.nfact(A)
+        jshell> L.rank(A)
         2
         \enddoctest
         \endlang
@@ -552,6 +659,16 @@ namespace casadi {
                    println(occursin("'det' not defined", sprint(showerror, e)))
                end
         true
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> DM A = new DM(new double[][] {{3, 1}, {1, 2}});
+        jshell> new Linsol("L", "qr", A.sparsity()).det(A)
+        5.0
+        jshell> new Linsol("L", "ldl", A.sparsity()).det(A)
+        |  Exception org.casadi.CasadiException: ...'det' not defined...
         \enddoctest
         \endlang
 
@@ -608,6 +725,23 @@ namespace casadi {
         (2, Dict{String, Any}())
         julia> L = ca.Linsol("L", "qr", ca.Sparsity.dense(1, 1), Dict("record_time" => true));
         julia> ca.solve(L, ca.DM(2), ca.DM(4)); ca.stats(L)["n_call_solve"]
+        1
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> Linsol L = new Linsol("L", "qr", Sparsity.dense(1, 1));
+        jshell> L.stats()
+        |  Exception org.casadi.CasadiException: ...did not solve a problem yet...
+        jshell> L.solve(new DM(2), new DM(4))
+        2
+        jshell> L.stats()
+        {}
+        jshell> L = new Linsol("L", "qr", Sparsity.dense(1, 1), Map.of("record_time", true));
+        jshell> L.solve(new DM(2), new DM(4))
+        2
+        jshell> L.stats().get("n_call_solve")
         1
         \enddoctest
         \endlang
@@ -671,6 +805,15 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> ca.has_linsol("qr")
+      true
+      jshell> ca.has_linsol("no_such_plugin")
+      false
+      \enddoctest
+      \endlang
+
       \identifier{2pm} */
   CASADI_EXPORT bool has_linsol(const std::string& name);
 
@@ -708,6 +851,13 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> ca.load_linsol("no_such_plugin")
+      |  Exception org.casadi.CasadiException: ...no_such_plugin...
+      \enddoctest
+      \endlang
+
       \identifier{2pn} */
   CASADI_EXPORT void load_linsol(const std::string& name);
 
@@ -732,6 +882,13 @@ namespace casadi {
       \lang{julia}
       \doctest
       julia> occursin("QR", ca.doc_linsol("qr"))
+      true
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> ca.doc_linsol("qr").contains("QR")
       true
       \enddoctest
       \endlang

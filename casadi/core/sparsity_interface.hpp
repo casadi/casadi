@@ -165,6 +165,26 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> ca.horzcat(new DM(new double[]{1, 2}), new DM(new double[]{3, 4}), new DM(new double[]{5, 6}))
+        [[1, 3, 5],
+         [2, 4, 6]]
+        jshell> ca.horzcat(List.of(SX.sym("x", 2), DM.ones(2, 1)))
+        @1=1,
+        [[x_0, @1],
+         [x_1, @1]]
+        jshell> ca.horzcat(MX.sym("x", 2, 2), MX.sym("y", 2, 0))
+        x
+        jshell> ca.horzcat(List.<DM>of()).size()
+        long[2] { 1, 0 }
+        jshell> ca.horzcat(new DM(2, 3), new DM(0, 0)).size()
+        long[2] { 2, 3 }
+        jshell> ca.horzcat(DM.ones(2, 2), DM.ones(3, 1))
+        |  Exception org.casadi.CasadiException: ...Mismatching number of rows...
+        \enddoctest
+        \endlang
+
         \sa vertcat, diagcat, veccat, horzsplit
 
         \identifier{3e} */
@@ -243,6 +263,23 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> ca.vertcat(List.of(SX.sym("x", 2), 3))
+        [x_0, x_1, 3]
+        jshell> ca.vertcat(new DM(new double[][]{{1, 2}}), DM.eye(2))
+        [[1, 2],
+         [1, 00],
+         [00, 1]]
+        jshell> ca.vertcat(MX.sym("a", 2, 3), MX.sym("b", 1, 3))
+        horzcat(a', b')'
+        jshell> ca.vertcat(List.<DM>of()).size()
+        long[2] { 0, 1 }
+        jshell> ca.vertcat(MX.sym("a", 2, 2), MX.sym("b", 2, 3))
+        |  Exception org.casadi.CasadiException: ...vertcat dimension mismatch...
+        \enddoctest
+        \endlang
+
         \sa horzcat, diagcat, veccat, vertsplit
 
         \identifier{3f} */
@@ -318,6 +355,22 @@ namespace casadi {
                    println(occursin("end at 5", sprint(showerror, err)))
                end
         true
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> DM x = new DM(new double[][]{{1, 2, 3, 4, 5}, {6, 7, 8, 9, 10}});
+        jshell> ca.horzsplit(x, new long[]{0, 2, 5})
+        [
+        [[1, 2],
+         [6, 7]],
+        [[3, 4, 5],
+         [8, 9, 10]]]
+        jshell> ca.horzsplit(x, new long[]{0, 0, 5}).get(0).size()
+        long[2] { 2, 0 }
+        jshell> ca.horzsplit(x, new long[]{0, 2})
+        |  Exception org.casadi.CasadiException: ...must start at 0, be nondecreasing and end at 5...
         \enddoctest
         \endlang
 
@@ -402,6 +455,21 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> ca.horzsplit(SX.sym("x", 1, 3))
+        [x_0, x_1, x_2]
+        jshell> ca.horzsplit(new DM(new double[][]{{1, 2, 3, 4, 5}}), 2)
+        [[[1, 2]], [[3, 4]], 5]
+        jshell> ca.horzsplit(MX.sym("x", 2, 4), 2)
+        [horzsplit(x){0}, horzsplit(x){1}]
+        jshell> ca.horzsplit(Sparsity.diag(3), 2)
+        [3x2,2nz, 3x1,1nz]
+        jshell> ca.horzsplit(MX.sym("x", 2, 0))
+        []
+        \enddoctest
+        \endlang
+
         \sa horzsplit_n, vertsplit
 
         \identifier{3h} */
@@ -463,6 +531,17 @@ namespace casadi {
                    println(occursin("must be a multiple of n", sprint(showerror, err)))
                end
         true
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> ca.horzsplit_n(new DM(new double[][]{{1, 2, 3, 4}}), 2)
+        [[[1, 2]], [[3, 4]]]
+        jshell> ca.horzsplit_n(new DM(2, 0), 3)
+        [2x0, 2x0, 2x0]
+        jshell> ca.horzsplit_n(new DM(new double[][]{{1, 2, 3}}), 2)
+        |  Exception org.casadi.CasadiException: ...must be a multiple of n...
         \enddoctest
         \endlang
 
@@ -530,6 +609,19 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> SX x = SX.sym("x", 5);
+        jshell> ca.vertsplit(x, new long[]{0, 2, 5})
+        [[x_0, x_1], [x_2, x_3, x_4]]
+        jshell> List<DM> parts = List.of(DM.ones(2, 1), DM.ones(3, 1));
+        jshell> ca.vertsplit(x, ca.offset(parts))
+        [[x_0, x_1], [x_2, x_3, x_4]]
+        jshell> ca.vertsplit(new DM(new double[][]{{1, 2}, {3, 4}}), new long[]{0, 1, 2})
+        [[[1, 2]], [[3, 4]]]
+        \enddoctest
+        \endlang
+
         \sa vertsplit_n, horzsplit, offset
 
         \identifier{3i} */
@@ -574,6 +666,17 @@ namespace casadi {
         julia> ca.offset(ca.DM[])
         1-element Vector{Int64}:
          0
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> ca.offset(List.of(new DM(2, 3), new DM(4, 3)))
+        long[3] { 0, 2, 6 }
+        jshell> ca.offset(List.of(new DM(2, 3), new DM(2, 4)), false)
+        long[3] { 0, 3, 7 }
+        jshell> ca.offset(List.of())
+        long[1] { 0 }
         \enddoctest
         \endlang
 
@@ -657,6 +760,21 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> ca.vertsplit(SX.sym("a", 4))
+        [a_0, a_1, a_2, a_3]
+        jshell> ca.vertsplit(SX.sym("a", 4), 2)
+        [[a_0, a_1], [a_2, a_3]]
+        jshell> ca.vertsplit(new DM(new double[]{0, 1, 2, 3, 4}), 2)
+        [[0, 1], [2, 3], 4]
+        jshell> ca.vertsplit(MX.sym("x", 4), 2)
+        [vertsplit(x){0}, vertsplit(x){1}]
+        jshell> ca.vertsplit(MX.sym("x", 0, 2))
+        []
+        \enddoctest
+        \endlang
+
         \sa vertsplit_n, horzsplit
 
         \identifier{3k} */
@@ -708,6 +826,15 @@ namespace casadi {
                    println(occursin("must be a multiple of n", sprint(showerror, err)))
                end
         true
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> ca.vertsplit_n(new DM(new double[]{1, 2, 3, 4}), 2)
+        [[1, 2], [3, 4]]
+        jshell> ca.vertsplit_n(new DM(new double[]{1, 2, 3}), 2)
+        |  Exception org.casadi.CasadiException: ...must be a multiple of n...
         \enddoctest
         \endlang
 
@@ -772,6 +899,18 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> ca.blockcat(List.of(List.of(new DM(1), new DM(new double[][]{{2, 3}})), List.of(new DM(new double[]{4, 5}), DM.eye(2))))
+        [[1, 2, 3],
+         [4, 1, 00],
+         [5, 00, 1]]
+        jshell> MX a = MX.sym("a", 2, 2), b = MX.sym("b", 2, 1), c = MX.sym("c", 1, 2), d = MX.sym("d");
+        jshell> ca.blockcat(List.of(List.of(a, b), List.of(c, d)))
+        horzcat(horzcat(a, b)', horzcat(c, d)')'
+        \enddoctest
+        \endlang
+
         \sa horzcat, vertcat, blocksplit
 
         \identifier{3l} */
@@ -806,6 +945,14 @@ namespace casadi {
         DM(
         [[1, 2],
          [3, 4]])
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> ca.blockcat(1, 2, 3, 4)
+        [[1, 2],
+         [3, 4]]
         \enddoctest
         \endlang
 
@@ -860,6 +1007,16 @@ namespace casadi {
          DM[
         [[4, 5],
          [7, 8]], [6, 9]]
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> DM x = new DM(new double[][]{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}});
+        jshell> ca.blocksplit(x, new long[]{0, 1, 3}, new long[]{0, 2, 3})
+        [[[[1, 2]], 3], [
+        [[4, 5],
+         [7, 8]], [6, 9]]]
         \enddoctest
         \endlang
 
@@ -932,6 +1089,20 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> DM x = new DM(new double[][]{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}});
+        jshell> ca.blocksplit(x, 2, 2)
+        [[
+        [[1, 2],
+         [4, 5]], [3, 6]], [[[7, 8]], 9]]
+        jshell> ca.blockcat(ca.blocksplit(x, 2, 2))
+        [[1, 2, 3],
+         [4, 5, 6],
+         [7, 8, 9]]
+        \enddoctest
+        \endlang
+
         \sa blockcat
 
         \identifier{3o} */
@@ -999,6 +1170,22 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> ca.diagcat(DM.ones(1, 2), new DM(3))
+        [[1, 1, 00],
+         [00, 00, 3]]
+        jshell> ca.diagcat(SX.sym("x"), SX.sym("y", 2))
+        [[x, 00],
+         [00, y_0],
+         [00, y_1]]
+        jshell> ca.diagcat(MX.sym("x"), MX.sym("y", 2, 2))
+        diagcat(x, y)
+        jshell> ca.diagcat(List.<DM>of()).size()
+        long[2] { 0, 0 }
+        \enddoctest
+        \endlang
+
         \sa horzcat, vertcat, diagsplit
 
         \identifier{3p} */
@@ -1044,6 +1231,14 @@ namespace casadi {
         2-element Vector{DM}:
          DM([[1, 2]])
          DM(6)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> DM x = new DM(new double[][]{{1, 2, 0}, {0, 0, 6}});
+        jshell> ca.diagsplit(x, new long[]{0, 1, 2}, new long[]{0, 2, 3})
+        [[[1, 2]], 6]
         \enddoctest
         \endlang
 
@@ -1107,6 +1302,18 @@ namespace casadi {
                    println(occursin("must be square", sprint(showerror, err)))
                end
         true
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> DM x = new DM(new double[][]{{1, 2, 0}, {3, 4, 0}, {0, 0, 5}});
+        jshell> ca.diagsplit(x, new long[]{0, 2, 3})
+        [
+        [[1, 2],
+         [3, 4]], 5]
+        jshell> ca.diagsplit(DM.ones(2, 3), new long[]{0, 2})
+        |  Exception org.casadi.CasadiException: ...must be square...
         \enddoctest
         \endlang
 
@@ -1194,6 +1401,23 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> ca.diagsplit(new DM(new double[][]{{1, 0}, {0, 4}}))
+        [1, 4]
+        jshell> ca.diagsplit(ca.diagcat(SX.sym("a", 2, 2), SX.sym("b", 2, 2)), 2)
+        [
+        [[a_0, a_2],
+         [a_1, a_3]],
+        [[b_0, b_2],
+         [b_1, b_3]]]
+        jshell> ca.diagsplit(MX.sym("x", Sparsity.diag(4)), 2)
+        [diagsplit(x){0}, diagsplit(x){1}]
+        jshell> ca.diagsplit(MX.sym("x", 4, 4), 2)
+        |  Exception org.casadi.CasadiException: ...nonzeros outside the diagonal blocks...
+        \enddoctest
+        \endlang
+
         \sa diagcat
 
         \identifier{3s} */
@@ -1232,6 +1456,13 @@ namespace casadi {
         2-element Vector{DM}:
          DM([[1, 2]])
          DM([[7, 8]])
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> ca.diagsplit(new DM(new double[][]{{1, 2, 0, 0}, {0, 0, 7, 8}}), 1, 2)
+        [[[1, 2]], [[7, 8]]]
         \enddoctest
         \endlang
 
@@ -1278,6 +1509,17 @@ namespace casadi {
         MX(vertcat(vec(x), y'))
         julia> [vec(ca.DM([1 2; 3 4])); 5]
         DM([1, 3, 2, 4, 5])
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> ca.veccat(new DM(new double[][]{{1, 2}, {3, 4}}), new DM(5))
+        [1, 3, 2, 4, 5]
+        jshell> ca.veccat(MX.sym("x", 2, 2), MX.sym("y", 1, 3))
+        vertcat(vec(x), y')
+        jshell> ca.veccat(List.<DM>of()).size()
+        long[2] { 0, 1 }
         \enddoctest
         \endlang
 
@@ -1375,6 +1617,24 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> DM A = new DM(new double[][]{{1, 2}, {3, 4}});
+        jshell> ca.mtimes(A, A)
+        [[7, 10],
+         [15, 22]]
+        jshell> ca.mtimes(A, 2)
+        [[2, 4],
+         [6, 8]]
+        jshell> ca.mtimes(Sparsity.diag(2), Sparsity.dense(2, 1))
+        2x1
+        jshell> ca.mtimes(MX.sym("x", 2, 3), MX.sym("y", 3, 1))
+        mac(x,y,zeros(2x1))
+        jshell> ca.mtimes(A, DM.ones(3, 1))
+        |  Exception org.casadi.CasadiException: ...incompatible dimensions...
+        \enddoctest
+        \endlang
+
         \sa mac, times, norm_0_mul
 
         \identifier{3v} */
@@ -1410,6 +1670,15 @@ namespace casadi {
                    println(occursin("must not be empty", sprint(showerror, err)))
                end
         true
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> ca.mtimes(List.of(new DM(new double[][]{{1, 2}}), new DM(new double[][]{{1, 0}, {0, 2}}), new DM(new double[]{1, 1})))
+        5
+        jshell> ca.mtimes(List.<DM>of())
+        |  Exception org.casadi.CasadiException: ...must not be empty...
         \enddoctest
         \endlang
 
@@ -1482,6 +1751,20 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> DM A = new DM(new double[][]{{1, 2}, {3, 4}});
+        jshell> ca.mac(A, A, DM.eye(2))
+        [[8, 00],
+         [00, 23]]
+        jshell> ca.mac(A, A, DM.ones(2, 2))
+        [[8, 11],
+         [16, 23]]
+        jshell> ca.mac(MX.sym("x", 2, 3), MX.sym("y", 3, 2), MX.sym("z", Sparsity.diag(2)))
+        mac(x,y,z)
+        \enddoctest
+        \endlang
+
         \sa mtimes
 
         \identifier{3x} */
@@ -1524,6 +1807,17 @@ namespace casadi {
         julia> ca.MX.sym("x", 2, 3)'
         MX(x')
         julia> ca.is_equal(ca.transpose(ca.Sparsity.lower(2)), ca.Sparsity.upper(2))
+        true
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> ca.transpose(new DM(new double[][]{{1, 2, 3}}))
+        [1, 2, 3]
+        jshell> ca.transpose(MX.sym("x", 2, 3))
+        x'
+        jshell> ca.transpose(Sparsity.lower(2)).is_equal(Sparsity.upper(2))
         true
         \enddoctest
         \endlang
@@ -1579,6 +1873,17 @@ namespace casadi {
         DM([1, 00, 00, 1])
         julia> vec(ca.MX.sym("x", 1, 3))
         MX(x')
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> ca.vec(new DM(new double[][]{{1, 2}, {3, 4}}))
+        [1, 3, 2, 4]
+        jshell> ca.vec(DM.eye(2))
+        [1, 00, 00, 1]
+        jshell> ca.vec(MX.sym("x", 1, 3))
+        x'
         \enddoctest
         \endlang
 
@@ -1663,6 +1968,24 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> DM x = new DM(new double[][]{{1, 2, 3}, {4, 5, 6}});
+        jshell> ca.reshape(x, 3, 2)
+        [[1, 5],
+         [4, 3],
+         [2, 6]]
+        jshell> ca.reshape(x, -1, 1)
+        [1, 4, 2, 5, 3, 6]
+        jshell> ca.reshape(DM.eye(2), 1, 4)
+        [[1, 00, 00, 1]]
+        jshell> ca.reshape(MX.sym("x", 2, 3), 3, 2)
+        reshape(x)
+        jshell> ca.reshape(x, 4, 2)
+        |  Exception org.casadi.CasadiException: ...number of elements must remain the same...
+        \enddoctest
+        \endlang
+
         \sa vec, sparsity_cast, transpose
 
         \identifier{40} */
@@ -1697,6 +2020,14 @@ namespace casadi {
         DM(
         [[1, 3],
          [2, 4]])
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> ca.reshape(new DM(new double[]{1, 2, 3, 4}), new long[]{2, 2})
+        [[1, 3],
+         [2, 4]]
         \enddoctest
         \endlang
 
@@ -1742,6 +2073,15 @@ namespace casadi {
                    println(occursin("Reshape mismatch", sprint(showerror, err)))
                end
         true
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> ca.reshape(SX.sym("x", 2, 2), Sparsity.dense(4, 1))
+        [x_0, x_1, x_2, x_3]
+        jshell> ca.reshape(MX.sym("x", Sparsity.diag(2)), Sparsity.dense(4, 1))
+        |  Exception org.casadi.CasadiException: ...Reshape mismatch...
         \enddoctest
         \endlang
 
@@ -1809,6 +2149,19 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> ca.sparsity_cast(new DM(new double[][]{{1, 2}, {3, 4}}), Sparsity.dense(1, 4))
+        [[1, 3, 2, 4]]
+        jshell> ca.sparsity_cast(DM.eye(3), Sparsity.dense(3, 1))
+        [1, 1, 1]
+        jshell> ca.sparsity_cast(MX.sym("x", Sparsity.diag(3)), Sparsity.dense(3, 1))
+        nonzeros(x)
+        jshell> ca.sparsity_cast(MX.sym("x", 2, 2), Sparsity.dense(3, 1))
+        |  Exception org.casadi.CasadiException: ...Mismatching nonzero count...
+        \enddoctest
+        \endlang
+
         \sa reshape
 
         \identifier{24z} */
@@ -1865,6 +2218,19 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> ca.sprank(Sparsity.diag(3))
+        3
+        jshell> ca.sprank(Sparsity.triplet(3, 3, new long[]{0, 1, 2}, new long[]{0, 0, 0}))
+        1
+        jshell> ca.sprank(new DM(new double[][]{{1, 2}, {2, 4}}))
+        2
+        jshell> ca.sprank(new DM(2, 3))
+        0
+        \enddoctest
+        \endlang
+
         \identifier{43} */
     inline friend casadi_int sprank(const MatType& x) {
       return MatType::sprank(x);
@@ -1912,6 +2278,17 @@ namespace casadi {
                    println(occursin("Dimension error", sprint(showerror, err)))
                end
         true
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> ca.norm_0_mul(DM.eye(3), DM.ones(3, 2))
+        6
+        jshell> ca.norm_0_mul(Sparsity.diag(3), Sparsity.diag(3))
+        3
+        jshell> ca.norm_0_mul(DM.ones(2, 3), DM.ones(2, 3))
+        |  Exception org.casadi.CasadiException: ...Dimension error...
         \enddoctest
         \endlang
 
@@ -1976,6 +2353,20 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> DM x = new DM(new double[][]{{1, 2, 3}, {4, 5, 6}});
+        jshell> ca.triu(x)
+        [[1, 2, 3],
+         [00, 5, 6]]
+        jshell> ca.triu(x, false)
+        [[00, 2, 3],
+         [00, 00, 6]]
+        jshell> ca.triu(MX.sym("x", 2, 2))
+        project(x)
+        \enddoctest
+        \endlang
+
         \sa tril
 
         \identifier{45} */
@@ -2027,6 +2418,18 @@ namespace casadi {
         DM(
         [[00, 00, 00],
          [4, 00, 00]])
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> DM x = new DM(new double[][]{{1, 2, 3}, {4, 5, 6}});
+        jshell> ca.tril(x)
+        [[1, 00, 00],
+         [4, 5, 00]]
+        jshell> ca.tril(x, false)
+        [[00, 00, 00],
+         [4, 00, 00]]
         \enddoctest
         \endlang
 
@@ -2089,6 +2492,21 @@ namespace casadi {
          [00, 00, 3, 4]])
         julia> size(kron(ca.MX.sym("a", 2, 2), ca.MX.sym("b", 1, 2)))
         (2, 4)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> ca.kron(new DM(new double[][]{{1, 2}}), new DM(new double[][]{{1}, {10}}))
+        [[1, 2],
+         [10, 20]]
+        jshell> ca.kron(DM.eye(2), new DM(new double[][]{{1, 2}, {3, 4}}))
+        [[1, 2, 00, 00],
+         [3, 4, 00, 00],
+         [00, 00, 1, 2],
+         [00, 00, 3, 4]]
+        jshell> ca.kron(MX.sym("a", 2, 2), MX.sym("b", 1, 2)).size()
+        long[2] { 2, 4 }
         \enddoctest
         \endlang
 
@@ -2162,6 +2580,23 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> ca.repmat(new DM(new double[][]{{1, 2}}), 2, 2)
+        [[1, 2, 1, 2],
+         [1, 2, 1, 2]]
+        jshell> ca.repmat(DM.eye(2), 1, 2)
+        [[1, 00, 1, 00],
+         [00, 1, 00, 1]]
+        jshell> ca.repmat(MX.sym("x", 2), 1, 3)
+        repmat(x, 3)
+        jshell> ca.repmat(MX.sym("x", 2), 3, 1)
+        vertcat(x, x, x)
+        jshell> ca.repmat(DM.ones(2, 3), 0, 2).size()
+        long[2] { 0, 6 }
+        \enddoctest
+        \endlang
+
         \identifier{48} */
     inline friend MatType repmat(const MatType &A, casadi_int n, casadi_int m=1) {
       return MatType::repmat(A, n, m);
@@ -2189,6 +2624,13 @@ namespace casadi {
         \doctest
         julia> ca.repmat(ca.DM(7), 1, 3)
         DM([[7, 7, 7]])
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> ca.repmat(new DM(7), new long[]{1, 3})
+        [[7, 7, 7]]
         \enddoctest
         \endlang
 
@@ -2388,6 +2830,19 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> ca.sum1(new DM(new double[][]{{1, 2, 3}, {4, 5, 6}}))
+        [[5, 7, 9]]
+        jshell> ca.sum1(SX.sym("x", 2, 2))
+        [[(x_0+x_1), (x_2+x_3)]]
+        jshell> ca.sum1(MX.sym("x", 2, 3))
+        mac(ones(1x2),x,zeros(1x3))
+        jshell> ca.sum1(new DM(0, 3))
+        [[00, 00, 00]]
+        \enddoctest
+        \endlang
+
         \sa sum2, sum
 
         \identifier{4p} */
@@ -2430,6 +2885,17 @@ namespace casadi {
         SX([(x_0+x_2), (x_1+x_3)])
         julia> ca.sum2(ca.DM(3, 3))
         DM([00, 00, 00])
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> ca.sum2(new DM(new double[][]{{1, 2, 3}, {4, 5, 6}}))
+        [6, 15]
+        jshell> ca.sum2(SX.sym("x", 2, 2))
+        [(x_0+x_2), (x_1+x_3)]
+        jshell> ca.sum2(new DM(3, 3))
+        [00, 00, 00]
         \enddoctest
         \endlang
 
@@ -2481,6 +2947,21 @@ namespace casadi {
         SX(((x_0+x_1)+x_2))
         julia> sum(ca.DM(3, 0))
         DM(00)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        ca.sum also accepts an axis argument: ca.sum(x, 0) is ca.sum1(x) and ca.sum(x, 1) is ca.sum2(x).
+
+        \doctest
+        jshell> ca.sum(new DM(new double[][]{{1, 2, 3}, {4, 5, 6}}))
+        21
+        jshell> ca.sum(new DM(new double[][]{{1, 2, 3}, {4, 5, 6}}), 0)
+        [[5, 7, 9]]
+        jshell> ca.sum(SX.sym("x", 3))
+        ((x_0+x_1)+x_2)
+        jshell> ca.sum(new DM(3, 0))
+        00
         \enddoctest
         \endlang
 

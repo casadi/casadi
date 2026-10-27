@@ -174,6 +174,35 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> SX x = SX.sym("x"); SX y = SX.sym("y"); SX p = SX.sym("p");
+      jshell> var nlp = Map.of("x", ca.vertcat(List.of(x, y)), "p", p,
+         ...>   "f", ca.minus(1, x).power(2).plus(p.times(y.minus(x.power(2)).power(2))), "g", x.plus(y));
+      jshell> var opts = Map.of("ipopt.print_level", 0, "ipopt.sb", "yes", "print_time", false);
+      jshell> Function S = ca.nlpsol("S", "ipopt", nlp, opts);
+      jshell> System.out.println(S)
+      S:(x0[2],p,lbx[2],ubx[2],lbg,ubg,lam_x0[2],lam_g0)->(x[2],f,g,lam_x[2],lam_g,lam_p) ...
+      jshell> var sol = S.invoke(Map.of("x0", new double[] {2.5, 3.0}, "p", 100, "lbg", -1, "ubg", 1));
+      jshell> sol.get("f")
+      0.1456
+      jshell> sol.get("x")
+      [0.6188, 0.3812]
+      jshell> S.stats().get("success")
+      true
+      jshell> S.stats().get("return_status")
+      "Solve_Succeeded"
+      jshell> var res = (List<?>) S.invoke(new double[] {2.5, 3.0}, 100, Double.NEGATIVE_INFINITY,
+         ...>   Double.POSITIVE_INFINITY, -1, 1, 0, 0);
+      jshell> res.get(1)
+      0.1456
+      jshell> res.get(4)
+      0.3407
+      jshell> S.invoke(Map.of("p", 100)).get("x")
+      [1, 1]
+      \enddoctest
+      \endlang
+
       \lang{python}
       \doctest
       >>> x = SX.sym("x"); p = SX.sym("p")
@@ -228,6 +257,29 @@ namespace casadi {
       julia> dxdp = ca.Function("dxdp", [pm], [ca.jacobian(S(p=pm)["x"], pm)]);
       julia> dxdp(5)
       DM(1)
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> SX x = SX.sym("x"); SX p = SX.sym("p");
+      jshell> var opts = Map.of("ipopt.print_level", 0, "ipopt.sb", "yes", "print_time", false);
+      jshell> Function S = ca.nlpsol("S", "ipopt",
+         ...>   Map.of("x", x, "p", p, "f", x.minus(p).power(2).plus(p.times(3)), "g", x.times(2)), opts);
+      jshell> var sol = S.invoke(Map.of("p", 1, "lbg", 4));
+      jshell> sol.get("x")
+      2
+      jshell> sol.get("lam_g")
+      -1
+      jshell> sol.get("lam_p")
+      -1
+      jshell> S.invoke(Map.of("p", 1, "ubx", 0)).get("lam_x")
+      2
+      jshell> MX pm = MX.sym("p");
+      jshell> MX xm = (MX) S.invoke(Map.of("p", pm)).get("x");
+      jshell> Function dxdp = new Function("dxdp", List.of(pm), List.of(ca.jacobian(xm, pm)));
+      jshell> dxdp.invoke(5)
+      1
       \enddoctest
       \endlang
 
@@ -313,6 +365,30 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> SX x = SX.sym("x");
+      jshell> var opts = Map.of("ipopt.print_level", 0, "ipopt.sb", "yes", "print_time", false);
+      jshell> Function S = ca.nlpsol("S", "ipopt", Map.of("x", x, "f", x, "g", x), opts);
+      jshell> var sol = S.invoke(Map.of("lbx", 0, "ubx", 1, "lbg", 2, "ubg", 3));
+      jshell> S.stats().get("success")
+      false
+      jshell> S.stats().get("return_status")
+      "Infeasible_Problem_Detected"
+      jshell> var opts2 = Map.of("ipopt.print_level", 0, "ipopt.sb", "yes", "print_time", false,
+         ...>   "error_on_fail", true);
+      jshell> S = ca.nlpsol("S", "ipopt", Map.of("x", x, "f", x, "g", x), opts2);
+      jshell> S.invoke(Map.of("lbx", 0, "ubx", 1, "lbg", 2, "ubg", 3))
+      |  Exception org.casadi.CasadiException: ...nlpsol process failed...
+      jshell> S.invoke(Map.of("lbx", 1, "ubx", 0))
+      |  Exception org.casadi.CasadiException: ...
+      Ill-posed problem detected: LBX[0] <= UBX[0] was violated. Got LBX[0]=1 and UBX[0] = 0.
+      ...
+      jshell> ca.nlpsol("S", "ipopt", Map.of("x", x, "f", x, "h", x), opts)
+      |  Exception org.casadi.CasadiException: ...No such field: h...
+      \enddoctest
+      \endlang
+
       \generalsection{Nlpsol}
       \pluginssection{Nlpsol}
 
@@ -390,6 +466,13 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> ca.nlpsol_in()
+      [x0, p, lbx, ubx, lbg, ubg, lam_x0, lam_g0]
+      \enddoctest
+      \endlang
+
       \sa nlpsol_out, nlpsol_n_in, nlpsol_default_in
 
       \identifier{1sy} */
@@ -436,6 +519,13 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> ca.nlpsol_out()
+      [x, f, g, lam_x, lam_g, lam_p]
+      \enddoctest
+      \endlang
+
       \sa nlpsol_in, nlpsol_n_out
 
       \identifier{1sz} */
@@ -469,6 +559,17 @@ namespace casadi {
       \doctest
       julia> ca.nlpsol_in(0), ca.nlpsol_in(7), ca.nlpsol_in(8)
       ("x0", "lam_g0", "")
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> ca.nlpsol_in(0)
+      "x0"
+      jshell> ca.nlpsol_in(7)
+      "lam_g0"
+      jshell> ca.nlpsol_in(8)
+      ""
       \enddoctest
       \endlang
 
@@ -506,6 +607,17 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> ca.nlpsol_out(0)
+      "x"
+      jshell> ca.nlpsol_out(5)
+      "lam_p"
+      jshell> ca.nlpsol_out(6)
+      ""
+      \enddoctest
+      \endlang
+
       \identifier{1t1} */
   CASADI_EXPORT std::string nlpsol_out(casadi_int ind);
 
@@ -532,6 +644,15 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> ca.nlpsol_n_in()
+      8
+      jshell> ca.nlpsol_in().size()
+      8
+      \enddoctest
+      \endlang
+
       \identifier{1t2} */
   CASADI_EXPORT casadi_int nlpsol_n_in();
 
@@ -555,6 +676,15 @@ namespace casadi {
       \doctest
       julia> ca.nlpsol_n_out(), length(ca.nlpsol_out())
       (6, 6)
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> ca.nlpsol_n_out()
+      6
+      jshell> ca.nlpsol_out().size()
+      6
       \enddoctest
       \endlang
 
@@ -604,6 +734,15 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> ca.nlpsol_default_in()
+      double[8] { 0.0, 0.0, -Infinity, Infinity, -Infinity, Infinity, 0.0, 0.0 }
+      jshell> ca.nlpsol_default_in(3)
+      Infinity
+      \enddoctest
+      \endlang
+
       \identifier{1t4} */
   CASADI_EXPORT double nlpsol_default_in(casadi_int ind);
   CASADI_EXPORT std::vector<double> nlpsol_default_in();
@@ -635,6 +774,18 @@ namespace casadi {
       julia> opts = ca.nlpsol_options("sqpmethod");
       julia> "max_iter" in opts, "qpsol" in opts, "print_time" in opts
       (true, true, false)
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> var opts = ca.nlpsol_options("sqpmethod");
+      jshell> opts.contains("max_iter")
+      true
+      jshell> opts.contains("qpsol")
+      true
+      jshell> opts.contains("print_time")
+      false
       \enddoctest
       \endlang
 
@@ -672,6 +823,15 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> ca.nlpsol_option_type("sqpmethod", "max_iter")
+      "OT_INT"
+      jshell> ca.nlpsol_option_type("ipopt", "ipopt")
+      "OT_DICT"
+      \enddoctest
+      \endlang
+
       \identifier{1t6} */
   CASADI_EXPORT std::string nlpsol_option_type(const std::string& name, const std::string& op);
 
@@ -697,6 +857,13 @@ namespace casadi {
       \lang{julia}
       \doctest
       julia> ca.nlpsol_option_info("sqpmethod", "max_iter")
+      "Maximum number of SQP iterations"
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> ca.nlpsol_option_info("sqpmethod", "max_iter")
       "Maximum number of SQP iterations"
       \enddoctest
       \endlang
@@ -727,6 +894,15 @@ namespace casadi {
       \doctest
       julia> ca.has_nlpsol("ipopt"), ca.has_nlpsol("no_such_plugin")
       (true, false)
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> ca.has_nlpsol("ipopt")
+      true
+      jshell> ca.has_nlpsol("no_such_plugin")
+      false
       \enddoctest
       \endlang
 
@@ -767,6 +943,13 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> ca.load_nlpsol("no_such_plugin")
+      |  Exception org.casadi.CasadiException: ...no_such_plugin...
+      \enddoctest
+      \endlang
+
       \identifier{2pc} */
   CASADI_EXPORT void load_nlpsol(const std::string& name);
 
@@ -791,6 +974,13 @@ namespace casadi {
       \lang{julia}
       \doctest
       julia> occursin("max_iter", ca.doc_nlpsol("sqpmethod"))
+      true
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> ca.doc_nlpsol("sqpmethod").contains("max_iter")
       true
       \enddoctest
       \endlang

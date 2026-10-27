@@ -165,6 +165,32 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> SX x = SX.sym("x"); SX p = SX.sym("p");
+      jshell> Map<String, SX> dae = Map.of("x", x, "p", p, "ode", p.unaryMinus().times(x), "quad", x);
+      jshell> Function F = ca.integrator("F", "cvodes", dae);
+      jshell> System.out.println(F)
+      F:(x0,z0[0],p,u[0],adj_xf[],adj_zf[],adj_qf[])->(xf,zf[0],qf,adj_x0[],...,adj_u[]) ...
+      jshell> Map<String, GenericMatrix> r = F.invoke(Map.of("x0", 1, "p", 1));
+      jshell> r.get("xf")
+      0.3679
+      jshell> r.get("qf")
+      0.6321
+      jshell> F = ca.integrator("F", "rk", dae, 0, new double[]{1, 2, 3});
+      jshell> F.invoke(Map.of("x0", 1, "p", 1)).get("xf")
+      [[0.3679, 0.1353, 0.0498]]
+      jshell> List<?> res = (List<?>) F.invoke(1, 0, 1, 0, 0, 0, 0);
+      jshell> DM xf = (DM) res.get(0), zf = (DM) res.get(1), adj_x0 = (DM) res.get(3);
+      jshell> xf.size()
+      long[2] { 1, 3 }
+      jshell> zf.size()
+      long[2] { 0, 3 }
+      jshell> adj_x0.size()
+      long[2] { 0, 0 }
+      \enddoctest
+      \endlang
+
       \lang{python}
       \doctest
       >>> x = SX.sym("x"); z = SX.sym("z"); u = SX.sym("u")
@@ -245,6 +271,29 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> SX x = SX.sym("x"); SX z = SX.sym("z"); SX u = SX.sym("u");
+      jshell> Function F = ca.integrator("F", "idas", Map.of("x", x, "z", z, "ode", z.unaryMinus(), "alg", z.power(2).minus(x)));
+      jshell> Map<String, GenericMatrix> r = F.invoke(Map.of("x0", 1, "z0", 1));
+      jshell> r.get("xf")
+      0.25
+      jshell> r.get("zf")
+      0.5
+      jshell> F.invoke(Map.of("x0", 1, "z0", -1)).get("zf")
+      -1.5
+      jshell> F = ca.integrator("F", "rk", Map.of("x", x, "u", u, "ode", u), 0, new double[]{1, 2, 3});
+      jshell> F.invoke(Map.of("x0", 0, "u", new double[]{1, 2, 3})).get("xf")
+      [[1, 3, 6]]
+      jshell> F.invoke(Map.of("x0", 0, "u", 1)).get("xf")
+      [[1, 2, 3]]
+      jshell> ca.integrator("F", "cvodes", Map.of("x", x, "z", z, "ode", z.unaryMinus(), "alg", z.minus(x)))
+      |  Exception org.casadi.CasadiException: ...does not support algebraic variables...
+      jshell> ca.integrator("F", "cvodes", Map.of("x", x, "ode", ca.vertcat(List.of(x, x))))
+      |  Exception org.casadi.CasadiException: ...Dimension mismatch for 'ode'...
+      \enddoctest
+      \endlang
+
       \lang{python}
       \doctest
       >>> x = SX.sym("x"); p = SX.sym("p")
@@ -293,6 +342,26 @@ namespace casadi {
       julia> J = ca.Function("J", [pm], [ca.jacobian(F(x0=1, p=pm)["xf"], pm)]);
       julia> J(1)
       DM(-0.3679)
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> SX x = SX.sym("x"); SX p = SX.sym("p");
+      jshell> Map<String, SX> dae = Map.of("x", x, "p", p, "ode", p.unaryMinus().times(x), "quad", x);
+      jshell> Function F = ca.integrator("F", "cvodes", dae, Map.of("nadj", 1));
+      jshell> System.out.println(F)
+      F:(x0,z0[0],p,u[0],adj_xf,adj_zf[0],adj_qf)->(xf,zf[0],qf,adj_x0,...,adj_p,adj_u[0]) ...
+      jshell> Map<String, GenericMatrix> r = F.invoke(Map.of("x0", 1, "p", 1, "adj_xf", 1));
+      jshell> r.get("adj_x0")
+      0.3679
+      jshell> r.get("adj_p")
+      -0.3679
+      jshell> F = ca.integrator("F", "cvodes", dae);
+      jshell> MX pm = MX.sym("p");
+      jshell> Function J = new Function("J", List.of(pm), List.of(ca.jacobian((MX) F.invoke(Map.of("x0", 1, "p", pm)).get("xf"), pm)));
+      jshell> J.invoke(1)
+      -0.3679
       \enddoctest
       \endlang
 
@@ -361,6 +430,15 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> ca.has_integrator("rk")
+      true
+      jshell> ca.has_integrator("no_such_plugin")
+      false
+      \enddoctest
+      \endlang
+
       \identifier{2oi} */
   CASADI_EXPORT bool has_integrator(const std::string& name);
 
@@ -398,6 +476,13 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> ca.load_integrator("no_such_plugin")
+      |  Exception org.casadi.CasadiException: ...no_such_plugin...
+      \enddoctest
+      \endlang
+
       \identifier{2oj} */
   CASADI_EXPORT void load_integrator(const std::string& name);
 
@@ -422,6 +507,13 @@ namespace casadi {
       \lang{julia}
       \doctest
       julia> occursin("Runge-Kutta", ca.doc_integrator("rk"))
+      true
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> ca.doc_integrator("rk").contains("Runge-Kutta")
       true
       \enddoctest
       \endlang
@@ -465,6 +557,13 @@ namespace casadi {
        "adj_xf"
        "adj_zf"
        "adj_qf"
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> ca.integrator_in()
+      [x0, z0, p, u, adj_xf, adj_zf, adj_qf]
       \enddoctest
       \endlang
 
@@ -512,6 +611,13 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> ca.integrator_out()
+      [xf, zf, qf, adj_x0, adj_z0, adj_p, adj_u]
+      \enddoctest
+      \endlang
+
       \sa integrator_in, integrator_n_out
 
       \identifier{7c} */
@@ -541,6 +647,17 @@ namespace casadi {
       \doctest
       julia> ca.integrator_in(0), ca.integrator_in(6), ca.integrator_in(7)
       ("x0", "adj_qf", "")
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> ca.integrator_in(0)
+      "x0"
+      jshell> ca.integrator_in(6)
+      "adj_qf"
+      jshell> ca.integrator_in(7)
+      ""
       \enddoctest
       \endlang
 
@@ -574,6 +691,17 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> ca.integrator_out(0)
+      "xf"
+      jshell> ca.integrator_out(6)
+      "adj_u"
+      jshell> ca.integrator_out(7)
+      ""
+      \enddoctest
+      \endlang
+
       \identifier{7e} */
   CASADI_EXPORT std::string integrator_out(casadi_int ind);
 
@@ -600,6 +728,13 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> ca.integrator_n_in()
+      7
+      \enddoctest
+      \endlang
+
       \identifier{7f} */
   CASADI_EXPORT casadi_int integrator_n_in();
 
@@ -622,6 +757,13 @@ namespace casadi {
       \lang{julia}
       \doctest
       julia> ca.integrator_n_out()
+      7
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> ca.integrator_n_out()
       7
       \enddoctest
       \endlang
@@ -661,6 +803,13 @@ namespace casadi {
        "z"
        "p"
        "u"
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> ca.dyn_in()
+      [t, x, z, p, u]
       \enddoctest
       \endlang
 
@@ -714,6 +863,17 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> ca.dyn_out()
+      [ode, alg, quad, zero]
+      jshell> SX x = SX.sym("x"); SX t = SX.sym("t"); SX e = new SX(0, 1);
+      jshell> Function dae = new Function("dae", List.of(t, x, e, e, e), List.of(x.unaryMinus(), e, x, e), ca.dyn_in(), ca.dyn_out());
+      jshell> ca.integrator("F", "rk", dae).invoke(Map.of("x0", 1)).get("xf")
+      0.3679
+      \enddoctest
+      \endlang
+
       \sa dyn_in, integrator
 
       \identifier{25q} */
@@ -742,6 +902,15 @@ namespace casadi {
       \doctest
       julia> ca.dyn_in(1), ca.dyn_in(5)
       ("x", "")
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> ca.dyn_in(1)
+      "x"
+      jshell> ca.dyn_in(5)
+      ""
       \enddoctest
       \endlang
 
@@ -774,6 +943,15 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> ca.dyn_out(0)
+      "ode"
+      jshell> ca.dyn_out(4)
+      ""
+      \enddoctest
+      \endlang
+
       \identifier{25s} */
   CASADI_EXPORT std::string dyn_out(casadi_int ind);
 
@@ -800,6 +978,13 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> ca.dyn_n_in()
+      5
+      \enddoctest
+      \endlang
+
       \identifier{25t} */
   CASADI_EXPORT casadi_int dyn_n_in();
 
@@ -822,6 +1007,13 @@ namespace casadi {
       \lang{julia}
       \doctest
       julia> ca.dyn_n_out()
+      4
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> ca.dyn_n_out()
       4
       \enddoctest
       \endlang
@@ -866,6 +1058,13 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> ca.event_in()
+      [index, t, x, z, p, u]
+      \enddoctest
+      \endlang
+
       \sa event_out
 
       \identifier{2b4} */
@@ -897,6 +1096,13 @@ namespace casadi {
       2-element Vector{String}:
        "post_x"
        "post_z"
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> ca.event_out()
+      [post_x, post_z]
       \enddoctest
       \endlang
 

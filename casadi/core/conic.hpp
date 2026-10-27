@@ -197,6 +197,37 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> SX x = SX.sym("x"); SX y = SX.sym("y");
+      jshell> var qp = Map.of("x", ca.vertcat(List.of(x, y)),
+         ...>   "f", x.power(2).plus(y.power(2)).plus(x.times(y)).minus(x.times(3)), "g", x.plus(y));
+      jshell> var opts = Map.of("print_iter", false, "print_header", false, "print_info", false);
+      jshell> Function S = ca.qpsol("S", "qrqp", qp, opts);
+      jshell> S.name_in()
+      [x0, p, lbx, ubx, lbg, ubg, lam_x0, lam_g0]
+      jshell> S.name_out()
+      [x, f, g, lam_x, lam_g, lam_p]
+      jshell> var sol = S.invoke(Map.of("lbg", 1, "ubg", 1, "lbx", 0));
+      jshell> sol.get("x")
+      [1, 0]
+      jshell> sol.get("f")
+      -2
+      jshell> sol.get("lam_g")
+      1
+      jshell> sol.get("lam_x")
+      [0, -2]
+      jshell> sol.get("g")
+      1
+      jshell> ((DM) sol.get("lam_p")).size()
+      long[2] { 0, 0 }
+      jshell> S.stats().get("success")
+      true
+      jshell> S.stats().get("return_status")
+      "success"
+      \enddoctest
+      \endlang
+
       \lang{python}
       \doctest
       >>> H = DM([[2, 1], [1, 2]]); g = DM([-3, 0]); A = DM([[1, 1]])
@@ -267,6 +298,31 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> DM H = new DM(new double[][] {{2, 1}, {1, 2}}); DM g = new DM(new double[] {-3, 0});
+      jshell> DM A = new DM(new double[][] {{1, 1}});
+      jshell> var opts = Map.of("print_iter", false, "print_header", false, "print_info", false);
+      jshell> Function C = ca.conic("C", "qrqp", Map.of("h", H.sparsity(), "a", A.sparsity()), opts);
+      jshell> System.out.println(C)
+      C:(h[2x2],g[2],a[1x2],lba,uba,lbx[2],ubx[2],x0[2],...)->(x[2],cost,lam_a,lam_x[2]) Qrqp
+      jshell> var sol = C.invoke(Map.of("h", H, "g", g, "a", A, "lba", 1, "uba", 1, "lbx", 0));
+      jshell> sol.get("x")
+      [1, 0]
+      jshell> sol.get("cost")
+      -2
+      jshell> sol.get("lam_a")
+      1
+      jshell> sol.get("lam_x")
+      [0, -2]
+      jshell> Function LP = ca.conic("LP", "qrqp", Map.of("a", A.sparsity()), opts);
+      jshell> LP.invoke(Map.of("g", g, "a", A, "lba", 1, "uba", 1, "lbx", 0, "ubx", 1)).get("x")
+      [1, 0]
+      jshell> ca.conic("C", "qrqp", Map.of("h", Sparsity.upper(2)), opts)
+      |  Exception org.casadi.CasadiException: ...square & symmetric...
+      \enddoctest
+      \endlang
+
       \lang{python}
       \doctest
       >>> x = SX.sym("x")
@@ -324,6 +380,30 @@ namespace casadi {
                  println(occursin("integer support", sprint(showerror, e)))
              end
       true
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> SX x = SX.sym("x");
+      jshell> var opts = Map.of("print_iter", false, "print_header", false, "print_info", false);
+      jshell> var opts2 = Map.of("print_iter", false, "print_header", false, "print_info", false,
+         ...>   "error_on_fail", false);
+      jshell> Function S = ca.qpsol("S", "qrqp", Map.of("x", x, "f", x.power(2), "g", x), opts2);
+      jshell> var sol = S.invoke(Map.of("lbx", 0, "ubx", 1, "lbg", 2, "ubg", 3));
+      jshell> S.stats().get("success")
+      false
+      jshell> S = ca.qpsol("S", "qrqp", Map.of("x", x, "f", x.power(2).minus(x.times(4)), "g", x.times(2)), opts);
+      jshell> S.invoke(Map.of("ubx", 1)).get("lam_x")
+      2
+      jshell> S.invoke(Map.of("lbx", 3)).get("lam_x")
+      -2
+      jshell> S.invoke(Map.of("ubg", 2)).get("lam_g")
+      1
+      jshell> var opts3 = Map.of("print_iter", false, "print_header", false, "print_info", false,
+         ...>   "discrete", new boolean[] {true});
+      jshell> ca.qpsol("S", "qrqp", Map.of("x", x, "f", x.power(2)), opts3)
+      |  Exception org.casadi.CasadiException: ...integer support...
       \enddoctest
       \endlang
 
@@ -403,6 +483,13 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> ca.conic_in()
+      [h, g, a, lba, uba, lbx, ubx, x0, lam_x0, lam_a0, q, p]
+      \enddoctest
+      \endlang
+
       \sa conic_out, conic_n_in, nlpsol_in
 
       \identifier{1ee} */
@@ -441,6 +528,13 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> ca.conic_out()
+      [x, cost, lam_a, lam_x]
+      \enddoctest
+      \endlang
+
       \sa conic_in, conic_n_out
 
       \identifier{1ef} */
@@ -473,6 +567,17 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> ca.conic_in(0)
+      "h"
+      jshell> ca.conic_in(11)
+      "p"
+      jshell> ca.conic_in(12)
+      ""
+      \enddoctest
+      \endlang
+
       \identifier{1eg} */
   CASADI_EXPORT std::string conic_in(casadi_int ind);
 
@@ -502,6 +607,15 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> ca.conic_out(1)
+      "cost"
+      jshell> ca.conic_out(4)
+      ""
+      \enddoctest
+      \endlang
+
       \identifier{1eh} */
   CASADI_EXPORT std::string conic_out(casadi_int ind);
 
@@ -528,6 +642,13 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> ca.conic_n_in()
+      12
+      \enddoctest
+      \endlang
+
       \identifier{1ei} */
   CASADI_EXPORT casadi_int conic_n_in();
 
@@ -550,6 +671,13 @@ namespace casadi {
       \lang{julia}
       \doctest
       julia> ca.conic_n_out()
+      4
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> ca.conic_n_out()
       4
       \enddoctest
       \endlang
@@ -581,6 +709,15 @@ namespace casadi {
       \doctest
       julia> "max_iter" in ca.conic_options("qrqp"), "discrete" in ca.conic_options("qrqp")
       (true, false)
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> ca.conic_options("qrqp").contains("max_iter")
+      true
+      jshell> ca.conic_options("qrqp").contains("discrete")
+      false
       \enddoctest
       \endlang
 
@@ -617,6 +754,15 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> ca.conic_option_type("qrqp", "max_iter")
+      "OT_INT"
+      jshell> ca.conic_option_type("qrqp", "print_iter")
+      "OT_BOOL"
+      \enddoctest
+      \endlang
+
       \identifier{1el} */
   CASADI_EXPORT std::string conic_option_type(const std::string& name, const std::string& op);
 
@@ -642,6 +788,13 @@ namespace casadi {
       \lang{julia}
       \doctest
       julia> ca.conic_option_info("qrqp", "max_iter")
+      "Maximum number of iterations [1000]."
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> ca.conic_option_info("qrqp", "max_iter")
       "Maximum number of iterations [1000]."
       \enddoctest
       \endlang
@@ -672,6 +825,15 @@ namespace casadi {
       \doctest
       julia> ca.has_conic("qrqp"), ca.has_conic("no_such_plugin")
       (true, false)
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> ca.has_conic("qrqp")
+      true
+      jshell> ca.has_conic("no_such_plugin")
+      false
       \enddoctest
       \endlang
 
@@ -712,6 +874,13 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> ca.load_conic("no_such_plugin")
+      |  Exception org.casadi.CasadiException: ...no_such_plugin...
+      \enddoctest
+      \endlang
+
       \identifier{2oe} */
   CASADI_EXPORT void load_conic(const std::string& name);
 
@@ -736,6 +905,13 @@ namespace casadi {
       \lang{julia}
       \doctest
       julia> occursin("active-set", ca.doc_conic("qrqp"))
+      true
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> ca.doc_conic("qrqp").contains("active-set")
       true
       \enddoctest
       \endlang
@@ -789,6 +965,17 @@ namespace casadi {
              end
       true
       julia> rm(d, recursive=true)
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> Function C = ca.conic("C", "qrqp", Map.of("h", Sparsity.dense(1)), Map.of("print_header", false));
+      jshell> var d = Files.createTempDirectory(null);
+      jshell> String fn = d.resolve("C_debug.txt").toString();
+      jshell> ca.conic_debug(C, fn)
+      |  Exception org.casadi.CasadiException: ...generateNativeCode not defined...
+      jshell> Files.delete(Path.of(fn)); Files.delete(d);
       \enddoctest
       \endlang
 

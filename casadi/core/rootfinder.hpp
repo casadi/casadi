@@ -149,6 +149,37 @@ namespace casadi {
    * \enddoctest
    * \endlang
    *
+   * \lang{java}
+   * \doctest
+   * jshell> SX x = SX.sym("x"); SX p = SX.sym("p");
+   * jshell> Function G = ca.rootfinder("G", "newton", Map.of("x", x, "p", p, "g", x.power(2).minus(p)));
+   * jshell> G
+   * G:(x0,p)->(x) Newton
+   * jshell> G.invoke(Map.of("x0", 1, "p", 2)).get("x")
+   * 1.41421
+   * jshell> G.invoke(1, 2)
+   * 1.41421
+   * jshell> G.stats().get("success")
+   * true
+   * jshell> G.stats().get("return_status")
+   * "success"
+   * jshell> MX pm = MX.sym("p");
+   * jshell> Function dxdp = new Function("dxdp", List.of(pm), List.of(ca.jacobian((MX) G.invoke(Map.of("x0", 1, "p", pm)).get("x"), pm)));
+   * jshell> dxdp.invoke(4)
+   * 0.25
+   * jshell> Function f = new Function("f", List.of(x, p), List.of(x.power(2).minus(p), x.times(3)), List.of("x", "p"), List.of("g", "h"));
+   * jshell> G = ca.rootfinder("G", "newton", f);
+   * jshell> G
+   * G:(x0,p)->(x,h) Newton
+   * jshell> G.invoke(Map.of("x0", 1, "p", 4))
+   * {h=6, x=2}
+   * jshell> f = new Function("f", List.of(p, x), List.of(x.times(3), x.power(2).minus(p)), List.of("p", "x"), List.of("h", "g"));
+   * jshell> G = ca.rootfinder("G", "newton", f, Map.of("implicit_input", 1, "implicit_output", 1));
+   * jshell> G
+   * G:(p,x0)->(h,x) Newton
+   * \enddoctest
+   * \endlang
+   *
    * \lang{python}
    * \doctest
    * >>> x = SX.sym("x"); p = SX.sym("p")
@@ -230,6 +261,38 @@ namespace casadi {
    * \enddoctest
    * \endlang
    *
+   * \lang{java}
+   * \doctest
+   * jshell> SX x = SX.sym("x"); SX p = SX.sym("p");
+   * jshell> Function G = ca.rootfinder("G", "newton", Map.of("x", x, "p", p, "g", x.power(2).minus(p)), Map.of("max_iter", 2));
+   * jshell> try {
+   *    ...>   G.invoke(Map.of("x0", 1, "p", 2));
+   *    ...> } catch (CasadiException e) {
+   *    ...>   System.out.println(e.getMessage().contains("rootfinder process failed"));
+   *    ...> }
+   * true
+   * jshell> var opts = Map.of("max_iter", 2, "error_on_fail", false, "print_iteration", false);
+   * jshell> G = ca.rootfinder("G", "newton", Map.of("x", x, "p", p, "g", x.power(2).minus(p)), opts);
+   * jshell> G.invoke(Map.of("x0", 1, "p", 2)).get("x")
+   * 1.41667
+   * jshell> G.stats().get("return_status")
+   * "max_iteration_reached"
+   * jshell> SX X = SX.sym("x", 2);
+   * jshell> try {
+   *    ...>   ca.rootfinder("G", "newton", Map.of("x", X, "g", ca.vertcat(List.of(X.get(0).minus(1), new SX(1)))));
+   *    ...> } catch (CasadiException e) {
+   *    ...>   System.out.println(e.getMessage().contains("structurally rank-deficient"));
+   *    ...> }
+   * true
+   * jshell> try {
+   *    ...>   ca.rootfinder("G", "newton", Map.of("x", X, "g", X.get(0)));
+   *    ...> } catch (CasadiException e) {
+   *    ...>   System.out.println(e.getMessage().contains("Dimension mismatch"));
+   *    ...> }
+   * true
+   * \enddoctest
+   * \endlang
+   *
    * \generalsection{Rootfinder}
    * \pluginssection{Rootfinder}
    *
@@ -289,6 +352,13 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> ca.rootfinder_in()
+      [x0, p]
+      \enddoctest
+      \endlang
+
       \sa rootfinder_out, rootfinder_n_in
 
       \identifier{1ty} */
@@ -318,6 +388,13 @@ namespace casadi {
       julia> ca.rootfinder_out()
       1-element Vector{String}:
        "x"
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> ca.rootfinder_out()
+      [x]
       \enddoctest
       \endlang
 
@@ -353,6 +430,17 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> ca.rootfinder_in(0)
+      "x0"
+      jshell> ca.rootfinder_in(1)
+      "p"
+      jshell> ca.rootfinder_in(2)
+      ""
+      \enddoctest
+      \endlang
+
       \identifier{1u0} */
   CASADI_EXPORT std::string rootfinder_in(casadi_int ind);
 
@@ -382,6 +470,15 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> ca.rootfinder_out(0)
+      "x"
+      jshell> ca.rootfinder_out(1)
+      ""
+      \enddoctest
+      \endlang
+
       \identifier{1u1} */
   CASADI_EXPORT std::string rootfinder_out(casadi_int ind);
 
@@ -408,6 +505,13 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> ca.rootfinder_n_in()
+      2
+      \enddoctest
+      \endlang
+
       \identifier{1u2} */
   CASADI_EXPORT casadi_int rootfinder_n_in();
 
@@ -430,6 +534,13 @@ namespace casadi {
       \lang{julia}
       \doctest
       julia> ca.rootfinder_n_out()
+      1
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> ca.rootfinder_n_out()
       1
       \enddoctest
       \endlang
@@ -464,6 +575,18 @@ namespace casadi {
       julia> opts = ca.rootfinder_options("newton");
       julia> "max_iter" in opts, "abstol" in opts, "linear_solver" in opts
       (true, true, false)
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> List<String> opts = ca.rootfinder_options("newton");
+      jshell> opts.contains("max_iter")
+      true
+      jshell> opts.contains("abstol")
+      true
+      jshell> opts.contains("linear_solver")
+      false
       \enddoctest
       \endlang
 
@@ -505,6 +628,15 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> ca.rootfinder_option_type("newton", "max_iter")
+      "OT_INT"
+      jshell> ca.rootfinder_option_type("newton", "abstol")
+      "OT_DOUBLE"
+      \enddoctest
+      \endlang
+
       \identifier{1u5} */
   CASADI_EXPORT std::string rootfinder_option_type(const std::string& name, const std::string& op);
 
@@ -530,6 +662,13 @@ namespace casadi {
       \lang{julia}
       \doctest
       julia> ca.rootfinder_option_info("newton", "abstol")
+      "Stopping criterion tolerance on max(|F|)"
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> ca.rootfinder_option_info("newton", "abstol")
       "Stopping criterion tolerance on max(|F|)"
       \enddoctest
       \endlang
@@ -560,6 +699,15 @@ namespace casadi {
       \doctest
       julia> ca.has_rootfinder("newton"), ca.has_rootfinder("no_such_plugin")
       (true, false)
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> ca.has_rootfinder("newton")
+      true
+      jshell> ca.has_rootfinder("no_such_plugin")
+      false
       \enddoctest
       \endlang
 
@@ -600,6 +748,17 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> try {
+         ...>   ca.load_rootfinder("no_such_plugin");
+         ...> } catch (CasadiException e) {
+         ...>   System.out.println(e.getMessage().contains("no_such_plugin"));
+         ...> }
+      true
+      \enddoctest
+      \endlang
+
       \identifier{2nh} */
   CASADI_EXPORT void load_rootfinder(const std::string& name);
 
@@ -624,6 +783,13 @@ namespace casadi {
       \lang{julia}
       \doctest
       julia> occursin("newton iterations", ca.doc_rootfinder("newton"))
+      true
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> ca.doc_rootfinder("newton").contains("newton iterations")
       true
       \enddoctest
       \endlang

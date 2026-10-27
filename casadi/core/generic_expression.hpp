@@ -157,6 +157,28 @@ class GenericExpression : public GenericExpressionCommon {
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> ca.plus(new DM(new double[]{1, 2}), new DM(new double[]{10, 20}))
+      [11, 22]
+      jshell> new DM(new double[]{1, 2}).plus(1)
+      [2, 3]
+      jshell> DM.eye(2).plus(DM.eye(2))
+      [[2, 00],
+       [00, 2]]
+      jshell> DM.eye(2).plus(1)
+      [[2, 1],
+       [1, 2]]
+      jshell> SX.sym("x", 2, 2).plus(SX.sym("y", 2))
+      [[(x_0+y_0), (x_2+y_0)],
+       [(x_1+y_1), (x_3+y_1)]]
+      jshell> MX.sym("x", 2, 0).plus(1).size()
+      long[2] { 2, 0 }
+      jshell> DM.ones(2, 2).plus(DM.ones(1, 2))
+      |  Exception org.casadi.CasadiException: ...Dimension mismatch...
+      \enddoctest
+      \endlang
+
       \identifier{on} */
   static ExType plus(const ExType &x, const ExType &y) {
     return ExType::binary(OP_ADD, x, y);
@@ -214,6 +236,19 @@ class GenericExpression : public GenericExpressionCommon {
       julia> x = ca.SX.sym("x");
       julia> x - x
       SX(0)
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> ca.minus(new DM(new double[]{5, 6}), new DM(new double[]{1, 2}))
+      [4, 4]
+      jshell> DM.eye(2).minus(1)
+      [[0, -1],
+       [-1, 0]]
+      jshell> SX x = SX.sym("x");
+      jshell> x.minus(x)
+      0
       \enddoctest
       \endlang
 
@@ -280,6 +315,19 @@ class GenericExpression : public GenericExpressionCommon {
       DM(
       [[1, 00],
        [00, 1]])
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> ca.times(new DM(new double[]{1, 2}), new DM(new double[]{3, 4}))
+      [3, 8]
+      jshell> new DM(new double[][]{{1, 2}, {3, 4}}).times(new DM(new double[][]{{1, 2}, {3, 4}}))
+      [[1, 4],
+       [9, 16]]
+      jshell> DM.eye(2).times(DM.ones(2, 2))
+      [[1, 00],
+       [00, 1]]
       \enddoctest
       \endlang
 
@@ -354,6 +402,21 @@ class GenericExpression : public GenericExpressionCommon {
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> ca.rdivide(new DM(new double[]{1, 2}), 4)
+      [0.25, 0.5]
+      jshell> new DM(new double[]{1, 2}).div(new DM(new double[]{4, 8}))
+      [0.25, 0.25]
+      jshell> ca.rdivide(1, DM.eye(2))
+      [[1, inf],
+       [inf, 1]]
+      jshell> DM.eye(2).div(2)
+      [[0.5, 00],
+       [00, 0.5]]
+      \enddoctest
+      \endlang
+
       \sa mldivide, mrdivide, solve
 
       \identifier{oq} */
@@ -422,6 +485,20 @@ class GenericExpression : public GenericExpressionCommon {
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> ca.lt(new DM(new double[]{1, 2, 3}), 2)
+      [1, 0, 0]
+      jshell> new DM(new double[]{1, 2, 3}).lt(new DM(new double[]{3, 2, 1}))
+      [1, 0, 0]
+      jshell> SX.sym("x", 2).lt(SX.sym("y", 2))
+      [(x_0<y_0), (x_1<y_1)]
+      jshell> DM.eye(2).lt(1)
+      [[0, 1],
+       [1, 0]]
+      \enddoctest
+      \endlang
+
       \sa le, gt, ge, eq, ne, if_else
 
       \identifier{or} */
@@ -472,6 +549,16 @@ class GenericExpression : public GenericExpressionCommon {
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> ca.le(new DM(new double[]{1, 2, 3}), 2)
+      [1, 1, 0]
+      jshell> SX x = SX.sym("x");
+      jshell> x.le(x)
+      1
+      \enddoctest
+      \endlang
+
       \sa lt
 
       \identifier{os} */
@@ -519,6 +606,15 @@ class GenericExpression : public GenericExpressionCommon {
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> ca.gt(new DM(new double[]{1, 2, 3}), 2)
+      [0, 0, 1]
+      jshell> ca.gt(SX.sym("x"), SX.sym("y"))
+      (y<x)
+      \enddoctest
+      \endlang
+
       \sa lt
 
       \identifier{ot} */
@@ -562,6 +658,15 @@ class GenericExpression : public GenericExpressionCommon {
       DM([0, 1, 1])
       julia> ca.ge(ca.MX.sym("x"), ca.MX.sym("y"))
       MX((y<=x))
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> ca.ge(new DM(new double[]{1, 2, 3}), 2)
+      [0, 1, 1]
+      jshell> ca.ge(MX.sym("x"), MX.sym("y"))
+      (y<=x)
       \enddoctest
       \endlang
 
@@ -635,6 +740,23 @@ class GenericExpression : public GenericExpressionCommon {
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> ca.eq(new DM(new double[]{1, 2, 3}), 2)
+      [0, 1, 0]
+      jshell> DM.eye(2).eq(new DM(new double[][]{{1, 0}, {0, 1}}))
+      [[1, 1],
+       [1, 1]]
+      jshell> SX x = SX.sym("x");
+      jshell> x.eq(x)
+      1
+      jshell> x.eq(SX.sym("x"))
+      (x==x)
+      jshell> new DM(Double.NaN).eq(new DM(Double.NaN))
+      0
+      \enddoctest
+      \endlang
+
       \sa ne, is_equal
 
       \identifier{ov} */
@@ -682,6 +804,16 @@ class GenericExpression : public GenericExpressionCommon {
       julia> x = ca.MX.sym("x");
       julia> x != x
       MX(0)
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> ca.ne(new DM(new double[]{1, 2, 3}), 2)
+      [1, 0, 1]
+      jshell> MX x = MX.sym("x");
+      jshell> x.ne(x)
+      0
       \enddoctest
       \endlang
 
@@ -747,6 +879,18 @@ class GenericExpression : public GenericExpressionCommon {
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> ca.logic_and(new DM(new double[]{1, 2, 0}), new DM(new double[]{3, 0, 0}))
+      [1, 0, 0]
+      jshell> ca.logic_and(SX.sym("x"), SX.sym("y"))
+      (x&&y)
+      jshell> ca.logic_and(DM.eye(2), DM.ones(2, 2))
+      [[1, 00],
+       [00, 1]]
+      \enddoctest
+      \endlang
+
       \sa logic_or, logic_not
 
       \identifier{ox} */
@@ -793,6 +937,15 @@ class GenericExpression : public GenericExpressionCommon {
       DM([1, 0, 1])
       julia> ca.logic_or(ca.MX.sym("x"), ca.MX.sym("y"))
       MX((x||y))
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> ca.logic_or(new DM(new double[]{1, 0, 0}), new DM(new double[]{0, 0, 2}))
+      [1, 0, 1]
+      jshell> ca.logic_or(MX.sym("x"), MX.sym("y"))
+      (x||y)
       \enddoctest
       \endlang
 
@@ -854,6 +1007,18 @@ class GenericExpression : public GenericExpressionCommon {
        [1, 0]])
       julia> ca.logic_not(ca.SX.sym("x"))
       SX((!x))
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> ca.logic_not(new DM(new double[]{1, 0, -1}))
+      [0, 1, 0]
+      jshell> ca.logic_not(DM.eye(2))
+      [[0, 1],
+       [1, 0]]
+      jshell> ca.logic_not(SX.sym("x"))
+      (!x)
       \enddoctest
       \endlang
 
@@ -919,6 +1084,18 @@ class GenericExpression : public GenericExpressionCommon {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> ca.abs(new DM(new double[]{-1, 0, 2}))
+        [1, 0, 2]
+        jshell> ca.abs(DM.eye(2).times(-1))
+        [[1, 00],
+         [00, 1]]
+        jshell> ca.abs(SX.sym("x"))
+        fabs(x)
+        \enddoctest
+        \endlang
+
         \sa sign, copysign
 
         \identifier{p0} */
@@ -966,6 +1143,15 @@ class GenericExpression : public GenericExpressionCommon {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> ca.sqrt(new DM(new double[]{4, 9}))
+        [2, 3]
+        jshell> SX.sym("x").power(0.5)
+        sqrt(x)
+        \enddoctest
+        \endlang
+
         \sa sq, pow
 
         \identifier{p1} */
@@ -1001,6 +1187,13 @@ class GenericExpression : public GenericExpressionCommon {
         \doctest
         julia> ca.SX.sym("x")^2
         SX(sq(x))
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> SX.sym("x").power(2)
+        sq(x)
         \enddoctest
         \endlang
 
@@ -1049,6 +1242,16 @@ class GenericExpression : public GenericExpressionCommon {
          [00, 0.841471]])
         julia> sin.(ca.MX.sym("x", 2))
         MX(sin(x))
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> ca.sin(DM.eye(2))
+        [[0.841471, 00],
+         [00, 0.841471]]
+        jshell> ca.sin(MX.sym("x", 2))
+        sin(x)
         \enddoctest
         \endlang
 
@@ -1106,6 +1309,18 @@ class GenericExpression : public GenericExpressionCommon {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> ca.cos(DM.eye(2))
+        [[0.540302, 1],
+         [1, 0.540302]]
+        jshell> ca.cos(SX.sym("s", Sparsity.diag(2)))
+        @1=1,
+        [[cos(s_0), @1],
+         [@1, cos(s_1)]]
+        \enddoctest
+        \endlang
+
         \sa sin, tan, acos
 
         \identifier{p4} */
@@ -1140,6 +1355,13 @@ class GenericExpression : public GenericExpressionCommon {
         \doctest
         julia> tan.(ca.DM([0, 1]))
         DM([0, 1.55741])
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> ca.tan(new DM(new double[]{0, 1}))
+        [0, 1.55741]
         \enddoctest
         \endlang
 
@@ -1181,6 +1403,13 @@ class GenericExpression : public GenericExpressionCommon {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> ca.atan(new DM(new double[]{0, 1}))
+        [0, 0.785398]
+        \enddoctest
+        \endlang
+
         \sa atan2, tan
 
         \identifier{p6} */
@@ -1215,6 +1444,13 @@ class GenericExpression : public GenericExpressionCommon {
         \doctest
         julia> asin.(ca.DM([0, 1]))
         DM([0, 1.5708])
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> ca.asin(new DM(new double[]{0, 1}))
+        [0, 1.5708]
         \enddoctest
         \endlang
 
@@ -1255,6 +1491,13 @@ class GenericExpression : public GenericExpressionCommon {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> ca.acos(new DM(new double[]{0, 1}))
+        [1.5708, 0]
+        \enddoctest
+        \endlang
+
         \sa cos, asin
 
         \identifier{p8} */
@@ -1289,6 +1532,13 @@ class GenericExpression : public GenericExpressionCommon {
         \doctest
         julia> tanh.(ca.DM([0, 1]))
         DM([0, 0.761594])
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> ca.tanh(new DM(new double[]{0, 1}))
+        [0, 0.761594]
         \enddoctest
         \endlang
 
@@ -1329,6 +1579,13 @@ class GenericExpression : public GenericExpressionCommon {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> ca.sinh(new DM(new double[]{0, 1}))
+        [0, 1.1752]
+        \enddoctest
+        \endlang
+
         \sa asinh, cosh, tanh
 
         \identifier{pa} */
@@ -1363,6 +1620,13 @@ class GenericExpression : public GenericExpressionCommon {
         \doctest
         julia> cosh.(ca.DM([0, 1]))
         DM([1, 1.54308])
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> ca.cosh(new DM(new double[]{0, 1}))
+        [1, 1.54308]
         \enddoctest
         \endlang
 
@@ -1403,6 +1667,13 @@ class GenericExpression : public GenericExpressionCommon {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> ca.atanh(new DM(new double[]{0, 0.5}))
+        [0, 0.549306]
+        \enddoctest
+        \endlang
+
         \sa tanh
 
         \identifier{pc} */
@@ -1440,6 +1711,13 @@ class GenericExpression : public GenericExpressionCommon {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> ca.asinh(new DM(new double[]{-1, 1}))
+        [-0.881374, 0.881374]
+        \enddoctest
+        \endlang
+
         \sa sinh
 
         \identifier{pd} */
@@ -1474,6 +1752,13 @@ class GenericExpression : public GenericExpressionCommon {
         \doctest
         julia> acosh.(ca.DM([1, 2]))
         DM([0, 1.31696])
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> ca.acosh(new DM(new double[]{1, 2}))
+        [0, 1.31696]
         \enddoctest
         \endlang
 
@@ -1525,6 +1810,16 @@ class GenericExpression : public GenericExpressionCommon {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> ca.exp(DM.eye(2))
+        [[2.71828, 1],
+         [1, 2.71828]]
+        jshell> ca.exp(MX.sym("m", Sparsity.diag(2)))
+        exp(dense(m))
+        \enddoctest
+        \endlang
+
         \sa log, expm1
 
         \identifier{pf} */
@@ -1566,6 +1861,15 @@ class GenericExpression : public GenericExpressionCommon {
         DM([0, -inf])
         julia> log(ca.SX.sym("x"))
         SX(log(x))
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> ca.log(new DM(new double[]{1, 0}))
+        [0, -inf]
+        jshell> ca.log(SX.sym("x"))
+        log(x)
         \enddoctest
         \endlang
 
@@ -1613,6 +1917,15 @@ class GenericExpression : public GenericExpressionCommon {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> ca.log10(new DM(new double[]{1, 10, 1000}))
+        [0, 1, 3]
+        jshell> ca.log10(SX.sym("x"))
+        (0.434294*log(x))
+        \enddoctest
+        \endlang
+
         \sa log
 
         \identifier{ph} */
@@ -1657,6 +1970,15 @@ class GenericExpression : public GenericExpressionCommon {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> ca.log1p(new DM(new double[]{0, 1e-10}))
+        [0, 1e-10]
+        jshell> ca.log1p(SX.sym("x"))
+        log1p(x)
+        \enddoctest
+        \endlang
+
         \sa log, expm1
 
         \identifier{pi} */
@@ -1692,6 +2014,13 @@ class GenericExpression : public GenericExpressionCommon {
         \doctest
         julia> expm1.(ca.DM([0, 1e-10]))
         DM([0, 1e-10])
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> ca.expm1(new DM(new double[]{0, 1e-10}))
+        [0, 1e-10]
         \enddoctest
         \endlang
 
@@ -1745,6 +2074,17 @@ class GenericExpression : public GenericExpressionCommon {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> ca.floor(new DM(new double[]{-1.5, 1.5}))
+        [-2, 1]
+        jshell> ca.floor(new DM(new double[]{7, -7}).div(2))
+        [3, -4]
+        jshell> ca.floor(SX.sym("x").div(2))
+        floor((x/2))
+        \enddoctest
+        \endlang
+
         \sa ceil, sign
 
         \identifier{pk} */
@@ -1780,6 +2120,13 @@ class GenericExpression : public GenericExpressionCommon {
         \doctest
         julia> ceil.(ca.DM([-1.5, 1.5]))
         DM([-1, 2])
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> ca.ceil(new DM(new double[]{-1.5, 1.5}))
+        [-1, 2]
         \enddoctest
         \endlang
 
@@ -1820,6 +2167,13 @@ class GenericExpression : public GenericExpressionCommon {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> ca.erf(new DM(new double[]{0, 1}))
+        [0, 0.842701]
+        \enddoctest
+        \endlang
+
         \sa erfinv
 
         \identifier{pm} */
@@ -1855,6 +2209,13 @@ class GenericExpression : public GenericExpressionCommon {
         \doctest
         julia> ca.erfinv(ca.DM([0, 0.5, 1]))
         DM([0, 0.476936, inf])
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> ca.erfinv(new DM(new double[]{0, 0.5, 1}))
+        [0, 0.476936, inf]
         \enddoctest
         \endlang
 
@@ -1903,6 +2264,15 @@ class GenericExpression : public GenericExpressionCommon {
         DM([-1, 0, 1])
         julia> sign(ca.SX.sym("x"))
         SX(sign(x))
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> ca.sign(new DM(new double[]{-2, 0, 3}))
+        [-1, 0, 1]
+        jshell> ca.sign(SX.sym("x"))
+        sign(x)
         \enddoctest
         \endlang
 
@@ -1972,6 +2342,28 @@ class GenericExpression : public GenericExpressionCommon {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> ca.power(new DM(new double[]{1, 2, 3}), 2)
+        [1, 4, 9]
+        jshell> new DM(new double[]{1, 2, 3}).power(new DM(new double[]{3, 2, 1}))
+        [1, 4, 3]
+        jshell> ca.power(2, new DM(new double[]{1, 2, 3}))
+        [2, 4, 8]
+        jshell> SX x = SX.sym("x");
+        jshell> x.power(2)
+        sq(x)
+        jshell> x.power(3)
+        (x*sq(x))
+        jshell> x.power(-1)
+        (1./x)
+        jshell> x.power(x)
+        pow(x,x)
+        jshell> x.power(2.5)
+        pow(x,2.5)
+        \enddoctest
+        \endlang
+
         \sa sq, sqrt, constpow, mpower
 
         \identifier{pp} */
@@ -2027,6 +2419,22 @@ class GenericExpression : public GenericExpressionCommon {
     DM([2, -1, 1, -2])
     julia> ca.fmod(ca.SX.sym("x"), 2)
     SX(fmod(x,2))
+    \enddoctest
+    \endlang
+
+    \lang{java}
+    \doctest
+    jshell> DM x = new DM(new double[]{5, 5, -5, -5}), y = new DM(new double[]{3, -3, 3, -3});
+    jshell> ca.fmod(x, y)
+    [2, 2, -2, -2]
+    jshell> x.rem(y)
+    [2, 2, -2, -2]
+    jshell> x.minus(y.times(ca.floor(x.div(y))))
+    [2, -1, 1, -2]
+    jshell> ca.fmod(SX.sym("x"), 2)
+    fmod(x,2)
+    jshell> SX.sym("x").rem(2)
+    fmod(x,2)
     \enddoctest
     \endlang
 
@@ -2093,6 +2501,17 @@ class GenericExpression : public GenericExpressionCommon {
     \enddoctest
     \endlang
 
+    \lang{java}
+    \doctest
+    jshell> ca.remainder(new DM(new double[]{5, 5, -5, -5}), new DM(new double[]{3, -3, 3, -3}))
+    [-1, -1, 1, 1]
+    jshell> ca.remainder(new DM(new double[]{2.5, 3.5}), 2)
+    [0.5, -0.5]
+    jshell> ca.remainder(MX.sym("x"), 2)
+    remainder(x,2)
+    \enddoctest
+    \endlang
+
     \sa fmod
 
         \identifier{24x} */
@@ -2137,6 +2556,15 @@ class GenericExpression : public GenericExpressionCommon {
         DM([2.35619, -2.35619, 0])
         julia> atan(ca.SX.sym("y"), ca.SX.sym("x"))
         SX(atan2(y,x))
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> ca.atan2(new DM(new double[]{1, -1, 0}), new DM(new double[]{-1, -1, 1}))
+        [2.35619, -2.35619, 0]
+        jshell> ca.atan2(SX.sym("y"), SX.sym("x"))
+        atan2(y,x)
         \enddoctest
         \endlang
 
@@ -2226,6 +2654,20 @@ class GenericExpression : public GenericExpressionCommon {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> ca.fmin(new DM(new double[]{1, 5}), new DM(new double[]{3, 2}))
+        [1, 2]
+        jshell> ca.fmin(new DM(new double[]{1, Double.NaN}), new DM(new double[]{Double.NaN, 2}))
+        [1, 2]
+        jshell> ca.fmin(DM.eye(2), 1)
+        [[1, 00],
+         [00, 1]]
+        jshell> ca.fmin(SX.sym("x"), SX.sym("y"))
+        fmin(x,y)
+        \enddoctest
+        \endlang
+
         \sa fmax, mmin
 
         \identifier{pt} */
@@ -2280,6 +2722,19 @@ class GenericExpression : public GenericExpressionCommon {
         DM([1, 2])
         julia> max(ca.MX.sym("x"), ca.MX.sym("y"))
         MX(fmax(x,y))
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> ca.fmax(new DM(new double[]{1, 5}), new DM(new double[]{3, 2}))
+        [3, 5]
+        jshell> ca.fmax(new DM(new double[]{1, 5}), 3)
+        [3, 5]
+        jshell> ca.fmax(new DM(new double[]{1, Double.NaN}), new DM(new double[]{Double.NaN, 2}))
+        [1, 2]
+        jshell> ca.fmax(MX.sym("x"), MX.sym("y"))
+        fmax(x,y)
         \enddoctest
         \endlang
 
@@ -2363,6 +2818,29 @@ class GenericExpression : public GenericExpressionCommon {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> SX x = SX.sym("x");
+        jshell> ca.is_equal(x, x)
+        true
+        jshell> ca.is_equal(x, SX.sym("x"))
+        false
+        jshell> ca.is_equal(x.times(x), x.times(x))
+        false
+        jshell> ca.is_equal(x.times(x), x.times(x), 1)
+        true
+        jshell> ca.is_equal(new DM(new double[]{1, 2}), new DM(new double[]{1, 2}))
+        true
+        jshell> ca.is_equal(new DM(new double[]{1, 2}), new DM(new double[]{1, 3}))
+        false
+        jshell> MX y = MX.sym("y");
+        jshell> ca.is_equal(y.times(y), y.times(y))
+        false
+        jshell> ca.is_equal(y.times(y), y.times(y), 1)
+        true
+        \enddoctest
+        \endlang
+
         \sa eq
 
         \identifier{pv} */
@@ -2408,6 +2886,17 @@ class GenericExpression : public GenericExpressionCommon {
          DM(-3)
          julia> ca.copysign(ca.SX.sym("x"), ca.SX.sym("y"))
          SX(copysign(x,y))
+         \enddoctest
+         \endlang
+
+         \lang{java}
+         \doctest
+         jshell> ca.copysign(new DM(new double[]{1, -2}), new DM(new double[]{-1, 1}))
+         [-1, 2]
+         jshell> ca.copysign(new DM(3), new DM(-0.0))
+         -3
+         jshell> ca.copysign(SX.sym("x"), SX.sym("y"))
+         copysign(x,y)
          \enddoctest
          \endlang
 
@@ -2461,6 +2950,18 @@ class GenericExpression : public GenericExpressionCommon {
          \enddoctest
          \endlang
 
+         \lang{java}
+         \doctest
+         jshell> ca.constpow(new DM(2), 3)
+         8
+         jshell> MX x = MX.sym("x");
+         jshell> ca.constpow(x, 2.5)
+         pow(x,2.5)
+         jshell> ca.jacobian(ca.constpow(x, 2.5), x)
+         (2.5*pow(x,1.5))
+         \enddoctest
+         \endlang
+
          \sa pow
 
          \identifier{2om} */
@@ -2511,6 +3012,16 @@ class GenericExpression : public GenericExpressionCommon {
          \enddoctest
          \endlang
 
+         \lang{java}
+         \doctest
+         jshell> MX x = MX.sym("x");
+         jshell> Function f = new Function("f", List.of(x), List.of(x.printme(7).times(2)));
+         jshell> f.invoke(3)
+         |> 7 : 3.0000000000000000e+00
+         6
+         \enddoctest
+         \endlang
+
          \identifier{2on} */
      static ExType printme(const ExType& x, const ExType& y) {
        return ExType::binary(OP_PRINTME, x, y);
@@ -2556,6 +3067,17 @@ class GenericExpression : public GenericExpressionCommon {
         DM(1.41421e+200)
         julia> hypot(ca.SX.sym("x"), ca.SX.sym("y"))
         SX(hypot(x,y))
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> ca.hypot(new DM(3), new DM(4))
+        5
+        jshell> ca.hypot(new DM(1e200), new DM(1e200))
+        1.41421e+200
+        jshell> ca.hypot(SX.sym("x"), SX.sym("y"))
+        hypot(x,y)
         \enddoctest
         \endlang
 
