@@ -118,6 +118,8 @@ SWIG_Python_AppendOutput_Tuple(PyObject* result, PyObject* obj, int is_void) {
 #define GUESTOBJECT casadi_emval_struct
 #elif defined(SWIGJULIA)
 #define GUESTOBJECT jl_value_t
+#elif defined(SWIGRUST)
+#define GUESTOBJECT SwigRV
 #else
 #define GUESTOBJECT void
 #endif
@@ -663,7 +665,7 @@ namespace std {
     GUESTOBJECT* from_ptr(const std::string *a);
 
     // std::vector
-#ifdef SWIGMATLAB
+#if defined(SWIGMATLAB) || defined(SWIGRUST)
     bool to_ptr(GUESTOBJECT *p, std::vector<double> **m);
     GUESTOBJECT* from_ptr(const std::vector<double> *a);
     bool to_ptr(GUESTOBJECT *p, std::vector<casadi_int>** m);
@@ -672,7 +674,7 @@ namespace std {
     GUESTOBJECT* from_ptr(const std::vector<bool> *a);
     bool to_ptr(GUESTOBJECT *p, std::vector<std::string>** m);
     GUESTOBJECT* from_ptr(const std::vector<std::string> *a);
-#endif // SWIGMATLAB
+#endif // SWIGMATLAB || SWIGRUST
     template<typename M> bool to_ptr(GUESTOBJECT *p, std::vector<M>** m);
     template<typename M> bool to_ptr(GUESTOBJECT *p, std::vector< std::vector<M> >** m);
     template<typename M> GUESTOBJECT* from_ptr(const std::vector<M> *a);
@@ -783,6 +785,10 @@ namespace std {
       double* d = static_cast<double*>(mxGetData(p));
       casadi_densify(m.ptr(), m.sparsity(), d, false); // Column-major
       return p;
+#elif defined(SWIGRUST)
+      SwigRV *p = SWIG_Rust_NewNum(SWIG_RV_F64, m.size1(), m.size2());
+      if (m.numel()) casadi_densify(m.ptr(), m.sparsity(), &p->f64[0], false);
+      return p;
 #else
       return 0;
 #endif
@@ -802,6 +808,16 @@ namespace std {
       casadi::casadi_copy(m.ptr(), m.nnz(), static_cast<double*>(mxGetData(p)));
       std::copy(m.colind(), m.colind()+m.size2()+1, mxGetJc(p));
       std::copy(m.row(), m.row()+m.nnz(), mxGetIr(p));
+      return p;
+#elif defined(SWIGRUST)
+      SwigRV *p = new SwigRV();
+      p->kind = SWIG_RV_NUM;
+      p->rows = m.size1();
+      p->cols = m.size2();
+      p->sparse = true;
+      p->colind.assign(m.colind(), m.colind()+m.size2()+1);
+      p->row.assign(m.row(), m.row()+m.nnz());
+      p->f64 = m.nonzeros();
       return p;
 #else
       return 0;
@@ -990,6 +1006,9 @@ namespace std {
       if (!p) return true;
       return jl_is_nothing(p);
 #endif
+#ifdef SWIGRUST
+      return !p || p->kind == SWIG_RV_NIL;
+#endif
 #ifdef SWIGWASMJS
       // EM_VAL == 0 is the uninitialized handle.  Otherwise inspect the
       // val with borrow semantics (take + release ownership) so the
@@ -1082,6 +1101,8 @@ namespace std {
 #elif defined(SWIGJULIA)
       // Box as a Julia Bool; used by director-in paths.
       return jl_box_bool(*a);
+#elif defined(SWIGRUST)
+      return SWIG_Rust_NewBool(*a);
 #else
       return 0;
 #endif
@@ -1145,6 +1166,8 @@ namespace std {
 #elif defined(SWIGJULIA)
       // Box as a Julia Int64; used by director-in paths (e.g. get_sparsity_in).
       return jl_box_int64(static_cast<int64_t>(*a));
+#elif defined(SWIGRUST)
+      return SWIG_Rust_NewI64(*a);
 #else
       return 0;
 #endif
@@ -1197,6 +1220,8 @@ namespace std {
 #elif defined(SWIGJULIA)
       // Box as a Julia Float64; used by director-in paths.
       return jl_box_float64(*a);
+#elif defined(SWIGRUST)
+      return SWIG_Rust_NewF64(*a);
 #else
       return 0;
 #endif
@@ -1417,9 +1442,73 @@ namespace std {
     }
 #endif // SWIGMATLAB
 
+#ifdef SWIGRUST
+    // Numeric vector: dense with one dimension at most 1, of element types elems
+    template<typename T> bool to_ptr_num(GUESTOBJECT *p, std::vector<T> **m, bool f64, bool i64, bool b) {
+      if (!SWIG_Rust_IsVector(p)) return false;
+      if (!(p->elem==SWIG_RV_F64 ? f64 : p->elem==SWIG_RV_I64 ? i64 : b)) return false;
+      if (m) {
+        if (p->elem==SWIG_RV_F64) (**m).assign(p->f64.begin(), p->f64.end());
+        else (**m).assign(p->i64.begin(), p->i64.end());
+      }
+      return true;
+    }
+
+    // List: element-wise conversion
+    template<typename M> bool to_ptr_list(GUESTOBJECT *p, std::vector<M>** m) {
+      if (p->kind != SWIG_RV_LIST) return false;
+      if (m) (**m).resize(p->items.size());
+      for (size_t i=0; i<p->items.size(); ++i) {
+        M tmp, *tmp_p = &tmp;
+        if (!to_ptr(p->items[i], m ? &tmp_p : 0)) return false;
+        if (m) (**m)[i] = *tmp_p;
+      }
+      return true;
+    }
+
+    bool to_ptr(GUESTOBJECT *p, std::vector<double> **m) {
+      if (is_null(p)) return false;
+      return to_ptr_num(p, m, true, true, false) || to_ptr_list(p, m);
+    }
+
+    bool to_ptr(GUESTOBJECT *p, std::vector<casadi_int>** m) {
+      if (is_null(p)) return false;
+      return to_ptr_num(p, m, false, true, true) || to_ptr_list(p, m);
+    }
+
+    bool to_ptr(GUESTOBJECT *p, std::vector<bool>** m) {
+      if (is_null(p)) return false;
+      return to_ptr_num(p, m, false, false, true) || to_ptr_list(p, m);
+    }
+
+    bool to_ptr(GUESTOBJECT *p, std::vector<std::string>** m) {
+      if (is_null(p)) return false;
+      return to_ptr_list(p, m);
+    }
+#endif // SWIGRUST
+
     template<typename M> bool to_ptr(GUESTOBJECT *p, std::vector<M>** m) {
       // Treat Null
       if (is_null(p)) return false;
+#ifdef SWIGRUST
+      if (to_ptr_list(p, m)) return true;
+      // Numeric vector: element-wise through scalars
+      if (SWIG_Rust_IsVector(p)) {
+        size_t n = p->numel();
+        if (m) (**m).resize(n);
+        for (size_t i=0; i<n; ++i) {
+          SwigRV *e = p->elem==SWIG_RV_F64 ? SWIG_Rust_NewF64(p->f64[i])
+            : p->elem==SWIG_RV_I64 ? SWIG_Rust_NewI64(p->i64[i]) : SWIG_Rust_NewBool(p->i64[i]!=0);
+          M tmp, *tmp_p = &tmp;
+          bool ok = to_ptr(e, m ? &tmp_p : 0);
+          delete e;
+          if (!ok) return false;
+          if (m) (**m)[i] = *tmp_p;
+        }
+        return true;
+      }
+      return false;
+#endif // SWIGRUST
 #ifdef SWIGJULIA
       if (!jl_is_array(p)) {
         // Other AbstractVectors (ranges, views, ...): collect, then retry
@@ -1612,6 +1701,28 @@ namespace std {
       return mxCreateCharMatrixFromStrings(str.size(), str.empty() ? 0 : &str[0]);
     }
 #endif // SWIGMATLAB
+#ifdef SWIGRUST
+    GUESTOBJECT* from_ptr(const std::vector<double> *a) {
+      SwigRV *ret = SWIG_Rust_NewNum(SWIG_RV_F64, a->size(), 1);
+      std::copy(a->begin(), a->end(), ret->f64.begin());
+      return ret;
+    }
+    GUESTOBJECT* from_ptr(const std::vector<casadi_int> *a) {
+      SwigRV *ret = SWIG_Rust_NewNum(SWIG_RV_I64, a->size(), 1);
+      std::copy(a->begin(), a->end(), ret->i64.begin());
+      return ret;
+    }
+    GUESTOBJECT* from_ptr(const std::vector<bool> *a) {
+      SwigRV *ret = SWIG_Rust_NewNum(SWIG_RV_BOOL, a->size(), 1);
+      std::copy(a->begin(), a->end(), ret->i64.begin());
+      return ret;
+    }
+    GUESTOBJECT* from_ptr(const std::vector<std::string> *a) {
+      SwigRV *ret = SWIG_Rust_NewList(a->size());
+      for (size_t k=0; k<a->size(); ++k) ret->items[k] = from_ref(a->at(k));
+      return ret;
+    }
+#endif // SWIGRUST
 // No wasm-js from_ptr(const std::vector<std::string>*) on purpose: the
 // generic from_ptr<std::vector<M>> carrier path handles returns; a JS-array
 // overload would break the `_ptr` wrapping.  Director paths opt into
@@ -1696,6 +1807,18 @@ namespace std {
           return 0;
         }
         PyList_SetItem(ret, k, el);
+      }
+      return ret;
+#elif defined(SWIGRUST)
+      // std::vector maps to a list
+      SwigRV *ret = SWIG_Rust_NewList(a->size());
+      for (casadi_int k=0; k<a->size(); ++k) {
+        SwigRV *el = from_ref(a->at(k));
+        if (!el) {
+          delete ret;
+          return 0;
+        }
+        ret->items[k] = el;
       }
       return ret;
 #elif defined(SWIGMATLAB)
@@ -1812,6 +1935,12 @@ namespace std {
         return true;
       }
 #endif // SWIGJULIA
+#ifdef SWIGRUST
+      if (p && p->kind==SWIG_RV_NIL) {
+        if (m) **m=GenericType();
+        return true;
+      }
+#endif // SWIGRUST
 
       // Treat Null
       if (is_null(p)) return false;
@@ -1885,6 +2014,11 @@ namespace std {
       case OT_VOIDPTR:
         return jl_nothing;
 #endif
+#ifdef SWIGRUST
+      case OT_NULL:
+      case OT_VOIDPTR:
+        return new SwigRV();
+#endif
       default: return 0;
       }
     }
@@ -1921,6 +2055,12 @@ namespace std {
 #ifdef SWIGJULIA
       if (jl_is_string(p)) {
         if (m) **m = std::string(jl_string_ptr(p), jl_string_len(p));
+        return true;
+      }
+#endif
+#ifdef SWIGRUST
+      if (p->kind==SWIG_RV_STR) {
+        if (m) **m = p->str;
         return true;
       }
 #endif
@@ -1994,6 +2134,8 @@ namespace std {
       return reinterpret_cast<GUESTOBJECT*>(v.release_ownership());
 #elif defined(SWIGJULIA)
       return jl_cstr_to_string(a->c_str());
+#elif defined(SWIGRUST)
+      return SWIG_Rust_NewStr(a->data(), a->size());
 #else
       return 0;
 #endif
@@ -2054,6 +2196,16 @@ namespace std {
         return true;
       }
 #endif // SWIGPYTHON
+#ifdef SWIGRUST
+      if (SWIG_Rust_IsScalar(p) && p->elem==SWIG_RV_I64) {
+        if (m) {
+          (**m).start = p->i64[0];
+          (**m).stop = (**m).start+1;
+          if ((**m).stop==0) (**m).stop = std::numeric_limits<casadi_int>::max();
+        }
+        return true;
+      }
+#endif // SWIGRUST
 
       // No match
       return false;
@@ -2149,6 +2301,19 @@ namespace std {
         }
         return true;
       }
+#elif defined(SWIGRUST)
+      if (p && p->kind==SWIG_RV_DICT) {
+        for (size_t k=0; k<p->items.size(); ++k) {
+          if (m) {
+            M *v=&(**m)[p->keys[k]], *v2=v;
+            if (!casadi::to_ptr(p->items[k], &v)) return false;
+            if (v!=v2) *v2=*v; // if only pointer changed
+          } else {
+            if (!casadi::to_ptr(p->items[k], static_cast<M**>(0))) return false;
+          }
+        }
+        return true;
+      }
 #elif defined(SWIGMATLAB)
       if (mxIsStruct(p) && mxGetM(p)==1 && mxGetN(p)==1) {
 	casadi_int len = mxGetNumberOfFields(p);
@@ -2198,6 +2363,18 @@ namespace std {
         }
         PyDict_SetItemString(p, it->first.c_str(), e);
         Py_DECREF(e);
+      }
+      return p;
+#elif defined(SWIGRUST)
+      SwigRV *p = SWIG_Rust_NewDict();
+      for (typename std::map<std::string, M>::const_iterator it=a->begin(); it!=a->end(); ++it) {
+        SwigRV *e = from_ptr(&it->second);
+        if (!e) {
+          delete p;
+          return 0;
+        }
+        p->keys.push_back(it->first);
+        p->items.push_back(e);
       }
       return p;
 #elif defined(SWIGMATLAB)
@@ -2281,6 +2458,11 @@ namespace std {
         return to_val(jl_fieldref(p, 0), m ? &(**m).first : 0)
           && to_val(jl_fieldref(p, 1), m ? &(**m).second : 0);
       }
+#elif defined(SWIGRUST)
+      if (p && p->kind==SWIG_RV_LIST && p->items.size()==2) {
+        return to_val(p->items[0], m ? &(**m).first : 0)
+          && to_val(p->items[1], m ? &(**m).second : 0);
+      }
 #endif
       // No match
       return false;
@@ -2308,6 +2490,11 @@ namespace std {
       mxArray* ret = mxCreateCellMatrix(1, 2);
       mxSetCell(ret, 0, from_ref(a->first));
       mxSetCell(ret, 1, from_ref(a->second));
+      return ret;
+#elif defined(SWIGRUST)
+      SwigRV *ret = SWIG_Rust_NewList(2);
+      ret->items[0] = from_ref(a->first);
+      ret->items[1] = from_ref(a->second);
       return ret;
 #else
       return 0;
@@ -2497,6 +2684,48 @@ namespace std {
     }
 #endif // SWIGJULIA
 
+#ifdef SWIGRUST
+    // Numeric matrix (dense or sparse, f64 or i64), a list of numbers (a column)
+    // or a list of equally long numeric rows -> DM
+    bool DM_from_rust(GUESTOBJECT *p, DM** m) {
+      if (SWIG_Rust_IsNum(p)) {
+        if (p->elem==SWIG_RV_BOOL) return false;
+        if (m) {
+          Sparsity sp = p->sparse ? Sparsity(p->rows, p->cols,
+            std::vector<casadi_int>(p->colind.begin(), p->colind.end()),
+            std::vector<casadi_int>(p->row.begin(), p->row.end())) : Sparsity::dense(p->rows, p->cols);
+          **m = DM(sp);
+          if (p->elem==SWIG_RV_F64) std::copy(p->f64.begin(), p->f64.end(), (*m)->ptr());
+          else std::copy(p->i64.begin(), p->i64.end(), (*m)->ptr());
+        }
+        return true;
+      }
+      if (p->kind!=SWIG_RV_LIST) return false;
+      size_t n = p->items.size();
+      if (n==0) {
+        if (m) **m = DM(0, 1);
+        return true;
+      }
+      // Rows given as numeric vectors
+      if (SWIG_Rust_IsVector(p->items[0]) && p->items[0]->numel()!=1) {
+        casadi_int ncol = p->items[0]->numel();
+        std::vector<double> rows;
+        for (size_t i=0; i<n; ++i) {
+          std::vector<double> r, *r_p = &r;
+          if (!SWIG_Rust_IsVector(p->items[i]) || p->items[i]->numel()!=ncol) return false;
+          if (!to_ptr(p->items[i], &r_p)) return false;
+          rows.insert(rows.end(), r_p->begin(), r_p->end());
+        }
+        if (m) **m = DM::reshape(DM(rows), ncol, n).T();
+        return true;
+      }
+      std::vector<double> col, *col_p = &col;
+      if (!to_ptr(p, &col_p)) return false;
+      if (m) **m = DM(*col_p);
+      return true;
+    }
+#endif // SWIGRUST
+
     bool to_ptr(GUESTOBJECT *p, DM** m) {
       // Treat Null
       if (is_null(p)) return false;
@@ -2529,6 +2758,9 @@ namespace std {
 #ifdef SWIGJULIA
       if (DM_from_julia_array(p, m)) return true;
 #endif // SWIGJULIA
+#ifdef SWIGRUST
+      if (DM_from_rust(p, m)) return true;
+#endif // SWIGRUST
 
 #ifdef SWIGPYTHON
       // Object has __DM__ method.  A returned None means "I am explicitly
@@ -2723,6 +2955,18 @@ namespace std {
       }
 #endif // SWIGPYTHON
 
+#ifdef SWIGRUST
+      if (SWIG_Rust_IsNum(p) && p->elem!=SWIG_RV_F64) {
+        if (m) {
+          Sparsity sp = p->sparse ? Sparsity(p->rows, p->cols,
+            std::vector<casadi_int>(p->colind.begin(), p->colind.end()),
+            std::vector<casadi_int>(p->row.begin(), p->row.end())) : Sparsity::dense(p->rows, p->cols);
+          **m = IM(sp);
+          std::copy(p->i64.begin(), p->i64.end(), (*m)->ptr());
+        }
+        return true;
+      }
+#endif // SWIGRUST
 #ifdef SWIGMATLAB
       // In MATLAB, it is common to use floating point values to represent integers
       if (mxIsDouble(p) && mxGetNumberOfDimensions(p)==2) {
@@ -4450,7 +4694,7 @@ class NZproxy:
 %enddef
 #endif // SWIGPYTHON
 
-#if defined(SWIGXML) || defined(SWIGWASMJS) || defined(SWIGJULIA)
+#if defined(SWIGXML) || defined(SWIGWASMJS) || defined(SWIGJULIA) || defined(SWIGRUST)
 %define %matrix_helpers(Type, xIndex)
 %enddef
 #endif
