@@ -7798,7 +7798,39 @@ opti_metadata_modifiers(casadi::Opti)
 #endif
 
 %julia_convention_repair()
+#ifdef SWIGJAVA
+// Source location of the Java caller as metadata, as Python and MATLAB attach it
+%typemap(javaout) casadi::MX variable, casadi::MX parameter {
+    MX r = $imclassname.swigCast($jnicall);
+    update_user_dict(r, swigStacktrace(false));
+    return r;
+  }
+%typemap(javain, post="      update_user_dict(g, swigStacktrace(true));") const casadi::MX& g, const std::vector<casadi::MX>& g "$javainput"
+%extend casadi::Opti {
+  %proxycode %{
+  private static java.util.Map<String, Object> swigStacktrace(boolean all) {
+    java.util.List<java.util.Map<String, Object>> st = new java.util.ArrayList<>();
+    for (StackTraceElement e : new Throwable().getStackTrace()) {
+      if (e.getClassName().equals(Opti.class.getName())) continue;
+      java.util.Map<String, Object> f = new java.util.LinkedHashMap<>();
+      f.put("file", String.valueOf(e.getFileName()));
+      f.put("line", (long) e.getLineNumber());
+      f.put("name", e.getMethodName());
+      st.add(f);
+      if (!all) break;
+    }
+    java.util.Map<String, Object> meta = new java.util.LinkedHashMap<>();
+    meta.put("stacktrace", st);
+    return meta;
+  }
+  %}
+}
+#endif // SWIGJAVA
 %include <casadi/core/optistack.hpp>
+#ifdef SWIGJAVA
+%clear casadi::MX variable, casadi::MX parameter;
+%clear const casadi::MX& g, const std::vector<casadi::MX>& g;
+#endif // SWIGJAVA
 
 
 #ifdef SWIGPYTHON
