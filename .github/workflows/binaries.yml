@@ -65,33 +65,38 @@ jobs:
           
     - name: generate Python 3
       run: >
-        docker run --rm -v`pwd`:/local ghcr.io/casadi/ci-swig:v7 /bin/bash -c
+        docker run --rm -v`pwd`:/local ghcr.io/casadi/ci-swig:v9 /bin/bash -c
         "mkdir build && cd build && cmake -DWITH_SELFCONTAINED=ON -DWITH_PYTHON=ON -DSWIG_EXPORT=ON -DWITH_COMMON=OFF -DWITH_PYTHON_GIL_RELEASE=OFF .. && make python_source && cd .. && rm -rf build"
 
     - name: generate Python 3
       run: >
-        docker run --rm -v`pwd`:/local ghcr.io/casadi/ci-swig:v7 /bin/bash -c
+        docker run --rm -v`pwd`:/local ghcr.io/casadi/ci-swig:v9 /bin/bash -c
         "mkdir build && cd build && cmake -DWITH_SELFCONTAINED=ON -DWITH_PYTHON=ON -DSWIG_EXPORT=ON -DWITH_COMMON=OFF -DWITH_PYTHON_GIL_RELEASE=ON .. && make python_source && cd .. && rm -rf build"
   
     - name: generate Matlab
       run: >
-        docker run --rm -v`pwd`:/local ghcr.io/casadi/ci-swig:v7 /bin/bash -c
+        docker run --rm -v`pwd`:/local ghcr.io/casadi/ci-swig:v9 /bin/bash -c
         "mkdir build && cd build && cmake -DWITH_SELFCONTAINED=ON -DWITH_MATLAB=ON -DSWIG_EXPORT=ON -DWITH_COMMON=OFF .. && make matlab_source && cd .. && rm -rf build"
     
     - name: generate wasm-js
       run: >
-        docker run --rm -v`pwd`:/local ghcr.io/casadi/ci-swig:v7 /bin/bash -c
+        docker run --rm -v`pwd`:/local ghcr.io/casadi/ci-swig:v9 /bin/bash -c
         "mkdir build && cd build && cmake -DWITH_WASM_JS=ON -DSWIG_EXPORT=ON -DWITH_COMMON=OFF .. && make wasm_source && cd .. && rm -rf build"
 
     - name: generate julia
       run: >
-        docker run --rm -v`pwd`:/local ghcr.io/casadi/ci-swig:v7 /bin/bash -c
+        docker run --rm -v`pwd`:/local ghcr.io/casadi/ci-swig:v9 /bin/bash -c
         "mkdir build && cd build && cmake -DWITH_JULIA=ON -DSWIG_EXPORT=ON -DWITH_COMMON=OFF .. && make julia_source && cd .. && rm -rf build"
 
     - name: generate java
       run: >
-        docker run --rm -v`pwd`:/local ghcr.io/casadi/ci-swig:v7 /bin/bash -c
+        docker run --rm -v`pwd`:/local ghcr.io/casadi/ci-swig:v9 /bin/bash -c
         "mkdir build && cd build && cmake -DWITH_JAVA=ON -DSWIG_EXPORT=ON -DWITH_COMMON=OFF .. && make java_source && cd .. && rm -rf build"
+
+    - name: generate rust
+      run: >
+        docker run --rm -v`pwd`:/local ghcr.io/casadi/ci-swig:v9 /bin/bash -c
+        "mkdir build && cd build && cmake -DWITH_RUST=ON -DSWIG_EXPORT=ON -DWITH_COMMON=OFF .. && make rust_source && cd .. && rm -rf build"
 
     - name: set CMAKE default options
       run: |
@@ -384,6 +389,27 @@ jobs:
             casadi-${{ matrix.os }}64-java.zip
             casadi-natives-${{ matrix.platform }}.jar
           retention-days: 5
+
+  rust:
+    needs: [swig, version]
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/download-artifact@v8.0.1
+        with:
+          name: casadi_source_wrapper
+      - name: Unpack source (incl. pre-generated Rust wrapper)
+        run: unzip -q casadi_source.zip
+      - name: Install Fortran toolchain (from-source solver builds)
+        run: sudo apt-get update && sudo apt-get install -y gfortran
+      - name: Build core + Rust wrapper (SWIG_IMPORT) with full solver set
+        run: |
+          # Same solver set as the julia job, so solver-dependent examples run
+          cmake -Bbuild -DCMAKE_BUILD_TYPE=Release -DWITH_RUST=ON -DSWIG_IMPORT=ON ${{ env.build_flags }} ${{ env.build_flags_julia_off }} -H.
+          cmake --build build -j$(nproc)
+      - name: Rust checks (crate tests, examples)
+        run: |
+          rustc --version
+          test/rust/check.sh build
 
   java-osx:
     needs: [core-osx,swig,version]
