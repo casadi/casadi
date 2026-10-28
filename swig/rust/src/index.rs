@@ -20,6 +20,14 @@ impl ToRV for Index {
     }
 }
 
+/// Python's start:stop:step, e.g. `x.at(step(0.., 2))` for `x[0::2]`
+pub fn step(range: impl Idx, step: i64) -> Slice {
+    match range.index() {
+        Index::Slice(s) => Slice::new_with(s.start(), s.stop(), step),
+        _ => panic!("step needs a range"),
+    }
+}
+
 fn slice(start: i64, stop: i64) -> Index {
     Index::Slice(Slice::new(start, stop))
 }

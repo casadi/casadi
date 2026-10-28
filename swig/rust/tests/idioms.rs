@@ -74,3 +74,37 @@ fn indexing() {
     let s = SX::sym_with("s", 4, 1);
     assert_eq!(s.at(1).str(), "s_1");
 }
+
+#[test]
+fn gap_fixes() {
+    // enum values are constants
+    assert!(OP_CONST > 0 && OP_ADD != OP_SUB);
+    let x = MX::sym("x");
+    let p = MX::sym("p");
+    let f = Function::named("f", vec![&x, &p], vec![&x * &p], vec!["x", "p"], vec!["y"]);
+    // keyword call, symbolic: numbers are promoted to MX
+    let r: std::collections::HashMap<String, MX> = f.eval(dict! {"x" => &x, "p" => 2.0});
+    assert_eq!(r["y"].str(), "f(x, 2){0}");
+    // keyword call, numeric
+    let r: std::collections::HashMap<String, DM> = f.eval(dict! {"x" => 3.0, "p" => 2.0});
+    assert_eq!(r["y"].nonzeros(), vec![6.0]);
+    // scalar result, slice arguments
+    let a = vec![DM::new(3.0), DM::new(4.0)];
+    let y: f64 = f.eval(&a);
+    assert_eq!(y, 12.0);
+    // float literals infer without f32
+    let t = linspace(0.0, 1.0, 3).nonzeros();
+    assert_eq!(t, vec![0.0, 0.5, 1.0]);
+    assert_eq!(eq(&x, 0.0).numel(), 1);
+    // strided slices, bool as a matrix, reshape(x, n, m)
+    let v = DM::new(vec![0.0, 1.0, 2.0, 3.0, 4.0]);
+    assert_eq!(v.at(step(0.., 2)).nonzeros(), vec![0.0, 2.0, 4.0]);
+    assert_eq!(DM::new(true).nonzeros(), vec![1.0]);
+    assert_eq!(reshape(&v.at(..4), 2, 2).size2(), 2);
+    assert_eq!(logic_not(&DM::new(0.0)).nonzeros(), vec![1.0]);
+    // Value prints like Python
+    let s = Value::Dict([("a".to_string(), Value::Str("b".into())), ("n".to_string(), Value::Int(3))].into());
+    assert_eq!(s.to_string(), r#"{"a": "b", "n": 3}"#);
+    assert_eq!(Value::Str("ok".into()).to_string(), "ok");
+    assert_eq!(Value::Int(3).as_f64(), Some(3.0));
+}

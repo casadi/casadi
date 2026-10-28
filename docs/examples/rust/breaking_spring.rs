@@ -39,7 +39,7 @@ fn main() {
 
     // Equations
     dae.eq(&dae.der_with(&x), &v);
-    let spring: ca::MX = ca::if_else(&ca::not(&b), &(-&k * &x + &d), 0.0);
+    let spring: ca::MX = ca::if_else(&ca::logic_not(&b), &(-&k * &x + &d), 0.0);
     dae.eq(&f, &spring);
     dae.eq(&dae.der_with(&v), &((&f - &c * &v) / &m));
     dae.when(&ca::gt(&x, 2.0), vec![dae.assign("b", 1.0)]);

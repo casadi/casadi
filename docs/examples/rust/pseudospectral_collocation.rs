@@ -209,7 +209,7 @@ fn solve_ocp(n: usize, c: usize) -> Data {
 
     // numerical state control state derivative time costates
     let xs = sol.value(&xx);
-    let us = ca::reshape_with(&sol.value(&uu), nu, -1);
+    let us = ca::reshape(&sol.value(&uu), nu, -1);
     let xds = sol.value(&(2.0 / (tf - t0) * ca::mtimes(&xx, &d.T())));
     let ts: Vec<f64> = tau.iter().map(|t| (tf - t0) / 2.0 * t + 0.5 * (tf + t0)).collect();
 
