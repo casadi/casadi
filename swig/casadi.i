@@ -3268,14 +3268,6 @@ class ArrayInterfaceMX(ArrayInterface[MX]):
 %rename(inf_sparsity) inf(const Sparsity&);
 %rename(nan_sparsity) nan(const Sparsity&);
 %rename(rand_sparsity) rand(const Sparsity&);
-%rename(mtimes_list) casadi::casadi_mtimes(const std::vector< Sparsity >&);
-%rename(mtimes_list) casadi::casadi_mtimes(const std::vector< Sparsity >&, const std::string&);
-%rename(mtimes_list) casadi::casadi_mtimes(const std::vector< MX >&);
-%rename(mtimes_list) casadi::casadi_mtimes(const std::vector< MX >&, const std::string&);
-%rename(mtimes_list) casadi::casadi_mtimes(const std::vector< Matrix<double> >&);
-%rename(mtimes_list) casadi::casadi_mtimes(const std::vector< Matrix<double> >&, const std::string&);
-%rename(mtimes_list) casadi::casadi_mtimes(const std::vector< Matrix<SXElem> >&);
-%rename(mtimes_list) casadi::casadi_mtimes(const std::vector< Matrix<SXElem> >&, const std::string&);
 #endif // SWIGRUST
 
 #ifdef SWIGJULIA
@@ -6100,8 +6092,8 @@ class global_unpickle_context:
 %typemap(jtype) casadi::native_DM "Object"
 %typemap(jstype) casadi::native_DM "DM"
 %typemap(javaout) casadi::native_DM { return $imclassname.swigCast($jnicall); }
-%typemap(out, noblock=1, fragment="casadi_all") casadi::native_DM { $result = swig::from< casadi::DM >($1); }
-#elif defined(SWIGWASMJS)
+#endif
+#if defined(SWIGWASMJS) || defined(SWIGRUST) || defined(SWIGJAVA)
 %typemap(out, doc="DM", tsstub_out="DM", noblock=1, fragment="casadi_all") casadi::native_DM {
   if(!($result = swig::from< casadi::DM >($1))) SWIG_exception_fail(SWIG_TypeError,"Failed to convert output to type 'DM'.");
 }
