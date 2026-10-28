@@ -1,5 +1,5 @@
 //! Function evaluation like Python's f(a, b) and f(x0=a, p=b)
-use crate::{ffi, raw, rt, Function, DM, MX, SX};
+use crate::{ffi, raw, rt, Callback, Function, DM, MX, SX};
 use rt::ToRV;
 use std::collections::{BTreeMap, HashMap};
 
@@ -166,7 +166,9 @@ fn coerce(v: rt::RV, target: Target) -> rt::RV {
     }
 }
 
-impl Function {
+macro_rules! eval_impl {
+    ($($T:ty),*) => {$(
+impl $T {
     /// Evaluate like Python's `f(a, b)` or `f(x0=a, p=b)`; the result type selects numeric, SX or MX
     /// evaluation, and arguments are converted to it
     ///
@@ -191,3 +193,7 @@ impl Function {
         }
     }
 }
+    )*};
+}
+
+eval_impl!(Function, Callback);
