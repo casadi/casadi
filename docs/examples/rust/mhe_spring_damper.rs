@@ -96,7 +96,7 @@ fn main() {
     let params_num = |u: &ca::DM, y: &ca::DM, s: &ca::DM, x0: &ca::DM| ca::vertcat(vec![ca::vec(u), ca::vec(y), ca::vec(s), x0.clone()]);
     let split_shooting = |v: &ca::DM| {
         let nx = (nstates * n) as i64;
-        (ca::reshape_with(&v.at(..nx), nstates, n), ca::reshape_with(&v.at(nx..), ndisturbances, n - 1))
+        (ca::reshape(&v.at(..nx), nstates, n), ca::reshape(&v.at(nx..), ndisturbances, n - 1))
     };
 
     // Define the ODE right hand side

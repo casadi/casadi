@@ -2689,7 +2689,6 @@ namespace std {
     // or a list of equally long numeric rows -> DM
     bool DM_from_rust(GUESTOBJECT *p, DM** m) {
       if (SWIG_Rust_IsNum(p)) {
-        if (p->elem==SWIG_RV_BOOL) return false;
         if (m) {
           Sparsity sp = p->sparse ? Sparsity(p->rows, p->cols,
             std::vector<casadi_int>(p->colind.begin(), p->colind.end()),
@@ -3863,9 +3862,9 @@ class ArrayInterfaceMX(ArrayInterface[MX]):
 
 #ifdef SWIGRUST
 // Rust types accepted where casadi converts (see to_ptr)
-%typemap(rsaccept) casadi::Matrix<double> "DM | Sparsity | f64 | i64 | Vec<f64> | Vec<i64> | Vec<Vec<f64>>"
-%typemap(rsaccept) casadi::Matrix<casadi::SXElem> "SX | DM | Sparsity | f64 | i64 | Vec<f64> | Vec<i64> | Vec<Vec<f64>>"
-%typemap(rsaccept) casadi::MX "MX | DM | Sparsity | f64 | i64 | Vec<f64> | Vec<i64> | Vec<Vec<f64>>"
+%typemap(rsaccept) casadi::Matrix<double> "DM | Sparsity | f64 | i64 | bool | Vec<f64> | Vec<i64> | Vec<Vec<f64>>"
+%typemap(rsaccept) casadi::Matrix<casadi::SXElem> "SX | DM | Sparsity | f64 | i64 | bool | Vec<f64> | Vec<i64> | Vec<Vec<f64>>"
+%typemap(rsaccept) casadi::MX "MX | DM | Sparsity | f64 | i64 | bool | Vec<f64> | Vec<i64> | Vec<Vec<f64>>"
 %typemap(rstype) casadi::Matrix<casadi_int> "DM"
 %typemap(rsaccept) casadi::Matrix<casadi_int> "i64 | Vec<i64> | Vec<Vec<i64>> | Sparsity"
 %typemap(rstype) casadi::SXElem "SX"
@@ -3913,6 +3912,15 @@ class ArrayInterfaceMX(ArrayInterface[MX]):
 %rename(inf_sparsity) inf(const Sparsity&);
 %rename(nan_sparsity) nan(const Sparsity&);
 %rename(rand_sparsity) rand(const Sparsity&);
+%rename(reshape_sparsity) casadi::casadi_reshape(const Sparsity&, const Sparsity&);
+%rename(reshape_sparsity) casadi::casadi_reshape(const MX&, const Sparsity&);
+%rename(reshape_sparsity) casadi::casadi_reshape(const Matrix<double>&, const Sparsity&);
+%rename(reshape_sparsity) casadi::casadi_reshape(const Matrix<SXElem>&, const Sparsity&);
+%rename(logic_and) casadi_and;
+%rename(logic_or) casadi_or;
+%rename(logic_not) casadi_not;
+%rename(logic_all) casadi_all;
+%rename(logic_any) casadi_any;
 #endif // SWIGRUST
 
 %julia_convention_repair()
