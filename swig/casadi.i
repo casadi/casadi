@@ -3940,6 +3940,8 @@ class ArrayInterfaceMX(ArrayInterface[MX]):
 %rename(create_io) casadi::GraphBuilder::create(const std::string&, const std::vector<std::string>&, const std::vector<std::string>&, const Dict&) const;
 %rename(erase_linear) erase(const std::vector<casadi_int>&, bool);
 %ignore casadi::DaeBuilder::create(const std::string&, const std::vector<std::string>&, const std::vector<std::string>&, bool, bool) const;
+// Overridden from Rust through CallbackImpl::eval; the wrapper calls the C++ implementation
+%rename(eval_dm) casadi::Callback::eval;
 #endif // SWIGRUST
 
 %julia_convention_repair()

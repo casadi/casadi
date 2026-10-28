@@ -150,3 +150,47 @@ fn dict_owns_values() {
     let o = make_opts(&x);
     assert_eq!(o.0.len(), 4);
 }
+
+struct Square;
+
+impl CallbackImpl for Square {
+    fn eval(&self, arg: Vec<DM>) -> Vec<DM> {
+        vec![&arg[0] * &arg[0]]
+    }
+    fn get_name_in(&self, _i: i64) -> String {
+        "x".into()
+    }
+}
+
+#[test]
+fn callbacks() {
+    // Callback: overridden methods run in Rust, the others in C++
+    let cb = Callback::from_impl(Square);
+    cb.construct("sq");
+    let y: DM = cb.eval([3.0]);
+    assert_eq!(y.nonzeros(), vec![9.0]);
+    assert_eq!(cb.name_in_with(0), "x");
+    // a panic in Rust becomes a casadi error
+    struct Bad;
+    impl CallbackImpl for Bad {
+        fn eval(&self, _arg: Vec<DM>) -> Vec<DM> {
+            panic!("bad input")
+        }
+    }
+    let bad = Callback::from_impl(Bad);
+    bad.construct("bad");
+    let r = Function::from(&bad).call(vec![DM::new(1.0)]);
+    assert!(r.unwrap_err().to_string().contains("bad input"));
+    // Opti iteration callback capturing non-Send values
+    let opti = Opti::default();
+    let x = opti.variable();
+    opti.minimize(&power(&(&x - 3.0), 2.0));
+    opti.solver_with("ipopt", dict! {"print_time" => false, "ipopt.print_level" => 0, "ipopt.sb" => "yes"}, None);
+    let seen = std::rc::Rc::new(std::cell::RefCell::new(Vec::new()));
+    let (s, o, xc) = (seen.clone(), opti.clone(), x.clone());
+    opti.callback(move |i| s.borrow_mut().push((i, o.debug().value(&xc).to_double())));
+    let sol = opti.solve();
+    assert!((sol.value(&x).to_double() - 3.0).abs() < 1e-8);
+    assert!(!seen.borrow().is_empty());
+    opti.clear_callback();
+}
