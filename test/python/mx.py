@@ -4448,6 +4448,22 @@ class MXtests(casadiTestCase):
     res = f(ca.vertcat(100,1000,10000))
     self.checkarray(res,10000)
 
+  def test_logsumexp_scalar(self):
+    x = ca.MX.sym("x")
+    margin = ca.MX.sym("margin")
+    f = ca.Function("f",[x,margin],[ca.logsumexp(x,margin)])
+    f_ref = ca.Function("f_ref",[x,margin],[x])
+
+    for value,width in [(-3,0.1),(0,1),(3,2)]:
+      self.checkarray(f(value,width),value)
+    self.checkfunction(f,f_ref,inputs=[3,0.1])
+    self.check_codegen(f,inputs=[3,0.1])
+
+    f_pair = ca.Function("f_pair",[x,margin],[ca.logsumexp(ca.vertcat(x,x),margin)])
+    self.checkarray(f_pair(3,0.1),3.1)
+    with self.assertInException("Argument must be dense"):
+      ca.logsumexp(ca.MX(ca.Sparsity(1,1)),0.1)
+
   def test_empty_broadcast(self):
     for nc in [0,2]:
       res = ca.atan2(ca.MX.sym("c",nc,1),ca.MX.sym("t",nc,3))
