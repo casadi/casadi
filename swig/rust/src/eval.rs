@@ -61,7 +61,7 @@ impl<A: EvalArgs + ?Sized> EvalArgs for &A {
     }
 }
 
-impl EvalArgs for rt::Dict<'_> {
+impl EvalArgs for rt::Dict {
     fn to_args(&self) -> Args {
         Args::Named(self.0.iter().map(|(k, v)| (k.clone(), v.to_rv())).collect())
     }

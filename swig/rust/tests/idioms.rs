@@ -124,3 +124,29 @@ fn defaults_with_none() {
     let r = std::panic::catch_unwind(|| MX::sym_with("y", None, 2));
     assert!(r.is_err(), "a value after None must panic");
 }
+
+fn make_opts(h: &MX) -> Dict {
+    // a dict built from locals can be returned: it owns its values
+    let local = MX::sym("local");
+    dict! {"h" => h, "l" => &local, "nested" => dict! {"a" => 1, "b" => "s"}, "v" => vec![1.0, 2.0]}
+}
+
+#[test]
+fn dict_owns_values() {
+    let x = MX::sym("x");
+    let f = Function::named("f", vec![&x], vec![&x * 2.0], vec!["x0"], vec!["xf"]);
+    // reassigning a variable that the dict reads (was E0506)
+    let mut xk = MX::sym("xk");
+    for _ in 0..2 {
+        let r: std::collections::HashMap<String, MX> = f.eval(dict! {"x0" => &xk});
+        xk = r["xf"].clone();
+        xk = f.eval::<std::collections::HashMap<String, MX>>(dict! {"x0" => &xk})["xf"].clone();
+    }
+    assert_eq!(xk.str(), "f(f(f(f(xk){0}){0}){0}){0}");
+    // a temporary stored in the dict (was E0716)
+    let d = dict! {"t" => &Sparsity::dense(2)};
+    assert_eq!(d.0.len(), 1);
+    // a dict returned from a function (was E0597)
+    let o = make_opts(&x);
+    assert_eq!(o.0.len(), 4);
+}
