@@ -25,7 +25,7 @@ fn main() {
     let u = ca::MX::sym("u");
 
     // State
-    let x = ca::MX::sym_with("x", 3, 1);
+    let x = ca::MX::sym_with("x", 3, None);
     let _s = x.at(0); // position
     let v = x.at(1); // speed
     let m = x.at(2); // mass
@@ -54,7 +54,7 @@ fn main() {
     let nu = 50;
 
     // Control for all segments
-    let uu = ca::MX::sym_with("U", nu, 1);
+    let uu = ca::MX::sym_with("U", nu, None);
 
     // Initial conditions
     let x0 = ca::MX::new(vec![0.0, 0.0, 1.0]);

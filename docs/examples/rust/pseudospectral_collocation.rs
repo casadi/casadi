@@ -161,8 +161,8 @@ fn solve_ocp(n: usize, c: usize) -> Data {
     // initial and final time
     let nx = 2;
     let nu = 1;
-    let x = ca::MX::sym_with("x", nx, 1);
-    let u = ca::MX::sym_with("u", nu, 1);
+    let x = ca::MX::sym_with("x", nx, None);
+    let u = ca::MX::sym_with("u", nu, None);
     let xd = ca::Function::new("xd", vec![&x, &u], vec![ca::vertcat(vec![ca::power(&x.at(1), 3.0), u.clone()])]);
     let lag = ca::Function::new("lag", vec![&x, &u], vec![4.0 * ca::power(&u, 2.0)]);
     let x_t0 = ca::DM::new(vec![0.0, 1.0]);

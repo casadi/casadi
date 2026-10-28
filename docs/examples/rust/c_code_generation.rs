@@ -19,7 +19,6 @@
 //
 
 use casadi as ca;
-use casadi::dict;
 use std::process::Command;
 use std::time::Instant;
 
@@ -73,9 +72,9 @@ fn main() {
     println!("time =  {}  ms", t1.elapsed().as_secs_f64() * 1e3);
 
     // Read function
-    let grad_det_no_opt = ca::external_with(name, format!("./{}", oname_no_opt), &dict! {});
-    let grad_det_o3 = ca::external_with(name, format!("./{}", oname_o3), &dict! {});
-    let grad_det_os = ca::external_with(name, format!("./{}", oname_os), &dict! {});
+    let grad_det_no_opt = ca::external_with(name, format!("./{}", oname_no_opt), None);
+    let grad_det_o3 = ca::external_with(name, format!("./{}", oname_o3), None);
+    let grad_det_os = ca::external_with(name, format!("./{}", oname_os), None);
     let f_test = [&grad_det, &grad_det_no_opt, &grad_det_o3, &grad_det_os];
 
     for f in f_test {

@@ -57,7 +57,7 @@ fn main() {
     let n = 100;
     let m = 80;
     let ms = 55;
-    let x = ca::SX::sym_with("x", n, 1);
+    let x = ca::SX::sym_with("x", n, None);
     // --- Hessian: dense symmetric matrix ---
     let mm = rng.matrix(n, n, Rng::standard_normal);
     let h = 0.5 * ca::mtimes(&mm, &mm.T()); // symmetrize

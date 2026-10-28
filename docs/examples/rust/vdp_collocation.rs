@@ -102,7 +102,7 @@ fn main() {
     // Declare variables (use scalar graph)
     let t = ca::SX::sym("t"); // time
     let u = ca::SX::sym("u"); // control
-    let x = ca::SX::sym_with("x", 2, 1); // state
+    let x = ca::SX::sym_with("x", 2, None); // state
 
     // ODE rhs function and quadratures
     let xdot = ca::vertcat(vec![(1.0 - x.at(1) * x.at(1)) * x.at(0) - x.at(1) + &u, x.at(0)]);
@@ -134,7 +134,7 @@ fn main() {
     let nv = n_x + n_u + n_xf;
 
     // NLP variable vector
-    let v = ca::MX::sym_with("V", nv as i64, 1);
+    let v = ca::MX::sym_with("V", nv as i64, None);
 
     // All variables with bounds and initial guess
     let mut vars_lb = vec![0.0; nv];

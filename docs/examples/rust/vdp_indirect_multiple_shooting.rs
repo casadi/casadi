@@ -37,7 +37,7 @@ fn main() {
     let l = &x0 * &x0 + &x1 * &x1 + &u * &u;
 
     // Costate
-    let lam = ca::SX::sym_with("lam", 2, 1);
+    let lam = ca::SX::sym_with("lam", 2, None);
 
     // Hamiltonian function
     let h = ca::dot(&lam, &xdot) + &l;
@@ -126,7 +126,7 @@ fn main() {
     let tgrid = tgrid.nonzeros();
 
     // Simulator to get optimal state and control trajectories
-    let simulator = ca::integrator_with("simulator", "cvodes", &dae, 0.0, tgrid, dict! {});
+    let simulator = ca::integrator_with("simulator", "cvodes", &dae, 0.0, tgrid, None);
 
     // Simulate to get the trajectories
     let sol = simulator.call(&dict! {"x0" => x_sol.at(0..4)}).unwrap()["xf"].clone();

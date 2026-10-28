@@ -108,3 +108,19 @@ fn gap_fixes() {
     assert_eq!(Value::Str("ok".into()).to_string(), "ok");
     assert_eq!(Value::Int(3).as_f64(), Some(3.0));
 }
+
+#[test]
+fn defaults_with_none() {
+    let x = MX::sym_with("x", 3, None);
+    assert_eq!((x.size1(), x.size2()), (3, 1));
+    let opti = Opti::default();
+    let v = opti.variable_with(2, 4, None);
+    assert_eq!((v.size1(), v.size2()), (2, 4));
+    let s = Sparsity::dense_with(3, None);
+    assert_eq!(s.size2(), 1);
+    let f = Function::new("f", vec![&x], vec![&x * 2.0]);
+    let g = f.map_with(4, "serial");
+    assert_eq!(g.size2_in(0), 4);
+    let r = std::panic::catch_unwind(|| MX::sym_with("y", None, 2));
+    assert!(r.is_err(), "a value after None must panic");
+}

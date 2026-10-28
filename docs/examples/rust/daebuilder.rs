@@ -21,7 +21,6 @@
 // Joel Andersson, UW Madison 2017
 
 use casadi as ca;
-use casadi::dict;
 
 fn main() {
     // Start with an empty DaeBuilder instance
@@ -30,7 +29,7 @@ fn main() {
     // Add input expressions
     let a = dae.add_var("a", "parameter", "tunable");
     let b = dae.add_var("b", "parameter", "tunable");
-    let u = dae.add_3("u", "input", dict! {});
+    let u = dae.add_causality("u", "input");
     let h = dae.add("h");
     let v = dae.add("v");
     let m = dae.add("m");

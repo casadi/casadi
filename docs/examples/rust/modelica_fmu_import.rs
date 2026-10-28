@@ -18,7 +18,6 @@
 //
 
 use casadi as ca;
-use casadi::dict;
 use std::process::Command;
 
 fn main() {
@@ -58,7 +57,7 @@ print(fmu_file);
     assert!(ok.success(), "unzip failed");
 
     // Create a CasADi/DaeBuilder instance from the unzipped FMU
-    let dae = ca::DaeBuilder::new_with("rocket", unzipped_path.to_str().unwrap(), dict! {});
+    let dae = ca::DaeBuilder::new_with("rocket", unzipped_path.to_str().unwrap(), None);
     dae.disp_with(true);
 
     // Get state vector, initial conditions, bounds
@@ -83,7 +82,7 @@ print(fmu_file);
 
     // Let's create a CasADi function for evaluating the ODE right-hand-side.
     // We only need to specify the expressions that are varying:
-    let f = dae.create_4("f", vec!["x", "u"], vec!["ode"], dict! {});
+    let f = dae.create_io("f", vec!["x", "u"], vec!["ode"]);
 
     // This is a standard CasADi function that can be embedded into CasADi expressions
     println!("{}", f);
@@ -99,5 +98,5 @@ print(fmu_file);
     println!("jac_ode_u0:  {}", jac_ode_u0);
 
     // Code generation for the functions are currently work in progress
-    f.generate_with("fmu_codegen", dict! {});
+    f.generate_with("fmu_codegen", None);
 }

@@ -95,10 +95,10 @@ fn main() {
     // Declare variables (use scalar graph)
     let tt = ca::SX::sym("t"); // time
     let u = ca::SX::sym("u"); // control
-    let mut xd = ca::SX::sym_with("xd", ndstate, 1); // differential state
-    let xa = ca::SX::sym_with("xa", nastate, 1); // algebraic state
-    let xddot = ca::SX::sym_with("xdot", ndstate, 1); // differential state time derivative
-    let p = ca::SX::sym_with("p", 0, 1); // parameters
+    let mut xd = ca::SX::sym_with("xd", ndstate, None); // differential state
+    let xa = ca::SX::sym_with("xa", nastate, None); // algebraic state
+    let xddot = ca::SX::sym_with("xdot", ndstate, None); // differential state time derivative
+    let p = ca::SX::sym_with("p", 0, None); // parameters
 
     let x = ca::SX::sym("x");
     let y = ca::SX::sym("y");
@@ -210,7 +210,7 @@ fn main() {
     let nv = nxd + nxa + nuu + nxf + np;
 
     // NLP variable vector
-    let v = ca::MX::sym_with("V", nv as i64, 1);
+    let v = ca::MX::sym_with("V", nv as i64, None);
 
     // All variables with bounds and initial guess
     let mut vars_lb = vec![0.0; nv];

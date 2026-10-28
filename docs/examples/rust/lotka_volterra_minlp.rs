@@ -43,7 +43,7 @@ fn main() {
     let ubu = 1.0;
 
     // Declare model variables
-    let x = ca::SX::sym_with("x", 2, 1);
+    let x = ca::SX::sym_with("x", 2, None);
     let u = ca::SX::sym("u");
 
     // Model equations
@@ -57,13 +57,13 @@ fn main() {
     let f_dyn = if false {
         // CVODES from the SUNDIALS suite
         let dae = dict! {"x" => &x, "p" => &u, "ode" => &xdot, "quad" => &l};
-        ca::integrator_with("F", "cvodes", &dae, 0.0, t / n as f64, dict! {})
+        ca::integrator_with("F", "cvodes", &dae, 0.0, t / n as f64, None)
     } else {
         // Fixed step Runge-Kutta 4 integrator
         let m = 4; // RK4 steps per interval
         let dt = t / n as f64 / m as f64;
         let f = ca::Function::new("f", vec![&x, &u], vec![&xdot, &l]);
-        let x0_sym = ca::MX::sym_with("X0", 2, 1);
+        let x0_sym = ca::MX::sym_with("X0", 2, None);
         let u_sym = ca::MX::sym("U");
         let mut xs = x0_sym.clone();
         let mut q = ca::MX::new(0.0);
@@ -102,7 +102,7 @@ fn main() {
     let mut ubg: Vec<f64> = vec![];
 
     // "Lift" initial conditions
-    let x0_sym = ca::MX::sym_with("X0", 2, 1);
+    let x0_sym = ca::MX::sym_with("X0", 2, None);
     w.push(x0_sym.clone());
     lbw.extend(&x0);
     ubw.extend(&x0);
