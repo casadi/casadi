@@ -36,7 +36,7 @@ fn main() {
     let l = &x0 * &x0 + &x1 * &x1 + &u * &u;
 
     // Costate
-    let lam = ca::SX::sym_with("lam", 2, 1);
+    let lam = ca::SX::sym_with("lam", 2, None);
 
     // Hamiltonian function
     let h = ca::dot(&lam, &xdot) + &l;
@@ -80,7 +80,7 @@ fn main() {
     let x_init = vec![0.0, 1.0];
 
     // The initial costate
-    let l_init = ca::MX::sym_with("l_init", 2, 1);
+    let l_init = ca::MX::sym_with("l_init", 2, None);
 
     // The initial condition for the shooting
     let xx = ca::vertcat(vec![&ca::MX::new(ca::DM::new(x_init.clone())), &l_init]);
@@ -117,7 +117,7 @@ fn main() {
     let tgrid = tgrid.nonzeros();
 
     // Simulator to get optimal state and control trajectories
-    let simulator = ca::integrator_with("simulator", "cvodes", &dae, 0.0, tgrid.clone(), dict! {});
+    let simulator = ca::integrator_with("simulator", "cvodes", &dae, 0.0, tgrid.clone(), None);
 
     // Simulate to get the state trajectory
     let x0_sim: Vec<f64> = x_init.iter().chain(l_init_opt.iter()).copied().collect();

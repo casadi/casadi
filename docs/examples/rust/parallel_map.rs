@@ -17,7 +17,6 @@
 //     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use casadi as ca;
-use casadi::dict;
 use std::f64::consts::PI;
 use std::time::Instant;
 
@@ -40,7 +39,7 @@ fn main() {
     let f0 = ca::Function::new("f", vec![&x], vec![&y]);
 
     // evaluate it serially, the old-fasioned way
-    let xs = ca::MX::sym_with("x", n, 1);
+    let xs = ca::MX::sym_with("x", n, None);
     let ys: Vec<ca::MX> = (0..n).map(|k| f0.eval([xs.at(k)])).collect();
     let f_naive_parallel = ca::Function::new("fParallel", vec![&xs], vec![ca::vertcat(&ys)]);
 
@@ -60,7 +59,7 @@ fn main() {
     //println!("{}", out_naive == out_map);
 
     // evaluate it using new parallel map construct
-    let f_map = f0.map_with("map", "openmp", n, Vec::<i64>::new(), Vec::<i64>::new(), &dict! {});
+    let f_map = f0.map_with(n, "openmp");
 
     println!("evaluating parallel map function...");
     let t0 = Instant::now();

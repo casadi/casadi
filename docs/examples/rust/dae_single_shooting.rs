@@ -47,7 +47,7 @@ use std::collections::{BTreeMap, HashMap};
 
 fn main() {
     // Declare variables
-    let x = ca::SX::sym_with("x", 2, 1); // Differential states
+    let x = ca::SX::sym_with("x", 2, None); // Differential states
     let z = ca::SX::sym("z"); // Algebraic variable
     let u = ca::SX::sym("u"); // Control
 
@@ -63,10 +63,10 @@ fn main() {
     // Create an integrator
     let dae = dict! {"x" => &x, "z" => &z, "p" => &u, "ode" => &f_x, "alg" => &f_z, "quad" => &f_q};
     // interval length 0.5s
-    let i = ca::integrator_with("I", "idas", &dae, 0.0, 0.5, dict! {});
+    let i = ca::integrator_with("I", "idas", &dae, 0.0, 0.5, None);
 
     // All controls
-    let uu = ca::MX::sym_with("U", 20, 1);
+    let uu = ca::MX::sym_with("U", 20, None);
 
     // Construct graph of integrator calls
     let mut xx = ca::MX::new(vec![0.0, 1.0]);

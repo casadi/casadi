@@ -3276,6 +3276,25 @@ class ArrayInterfaceMX(ArrayInterface[MX]):
 %rename(logic_not) casadi_not;
 %rename(logic_all) casadi_all;
 %rename(logic_any) casadi_any;
+// Overloads that are not a truncation of the _with form
+%rename(map_named) casadi::Function::map(const std::string&, const std::string&, casadi_int, const std::vector<casadi_int>&, const std::vector<casadi_int>&, const Dict&) const;
+%rename(map_named) casadi::Function::map(const std::string&, const std::string&, casadi_int, const std::vector<std::string>&, const std::vector<std::string>&, const Dict&) const;
+%rename(mapaccum_named) casadi::Function::mapaccum(const std::string&, casadi_int, const Dict&) const;
+%rename(export_code_file) casadi::Function::export_code(const std::string&, const std::string&, const Dict&) const;
+%rename(integrator_opts) casadi::integrator(const std::string&, const std::string&, const SXDict&, const Dict&);
+%rename(integrator_opts) casadi::integrator(const std::string&, const std::string&, const MXDict&, const Dict&);
+%rename(integrator_opts) casadi::integrator(const std::string&, const std::string&, const Function&, const Dict&);
+%rename(external_opts) casadi::external(const std::string&, const Dict&);
+%rename(subject_to_scaled) casadi::Opti::subject_to(const MX&, const DM&, const Dict&);
+%rename(subject_to_scaled) casadi::Opti::subject_to(const std::vector<MX>&, const DM&, const Dict&);
+%rename(add_causality) casadi::DaeBuilder::add(const std::string&, const std::string&, const Dict&);
+%rename(add_expr) casadi::DaeBuilder::add(const std::string&, const std::string&, const std::string&, const MX&, const Dict&);
+%rename(create_default) casadi::DaeBuilder::create() const;
+%rename(create_default) casadi::GraphBuilder::create() const;
+%rename(create_io) casadi::DaeBuilder::create(const std::string&, const std::vector<std::string>&, const std::vector<std::string>&, const Dict&) const;
+%rename(create_io) casadi::GraphBuilder::create(const std::string&, const std::vector<std::string>&, const std::vector<std::string>&, const Dict&) const;
+%rename(erase_linear) erase(const std::vector<casadi_int>&, bool);
+%ignore casadi::DaeBuilder::create(const std::string&, const std::vector<std::string>&, const std::vector<std::string>&, bool, bool) const;
 #endif // SWIGRUST
 
 #ifdef SWIGJULIA

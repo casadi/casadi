@@ -30,9 +30,9 @@ fn main() {
     let dae = ca::DaeBuilder::new("bouncing_ball");
 
     // Model variables
-    let _t = dae.add_3("t", "independent", dict! {});
-    let h = dae.add_3("h", "output", dict! {"start" => 5, "initial" => "exact"});
-    let v = dae.add_3("v", "output", dict! {"start" => 0, "initial" => "exact"});
+    let _t = dae.add_causality("t", "independent");
+    let h = dae.add_causality_with("h", "output", dict! {"start" => 5, "initial" => "exact"});
+    let v = dae.add_causality_with("v", "output", dict! {"start" => 0, "initial" => "exact"});
 
     // Dynamic equations
     dae.eq(&dae.der_with(&h), &v);
@@ -51,7 +51,7 @@ fn main() {
     // Simulate
     let tgrid: ca::DM = ca::linspace(dae.start_time(), dae.stop_time(), 100);
     let tgrid = tgrid.nonzeros();
-    let sim = ca::integrator_with("sim", "cvodes", &dae.create(), 0.0, &tgrid,
+    let sim = ca::integrator_with("sim", "cvodes", &dae.create_default(), 0.0, &tgrid,
                                   dict! {"transition" => dae.transition()});
     let simres = sim.call(&dict! {"x0" => dae.start(dae.x())}).unwrap();
 
