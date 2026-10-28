@@ -1993,6 +1993,24 @@ class SXtests(casadiTestCase):
       self.checkarray(fm(v),ref)
       self.check_codegen(fm,inputs=[v])
 
+  def test_logsumexp_scalar(self):
+    x = ca.SX.sym("x")
+    margin = ca.SX.sym("margin")
+    f = ca.Function("f",[x,margin],[ca.logsumexp(x,margin)])
+    f_ref = ca.Function("f_ref",[x,margin],[x])
+
+    for value,width in [(-3,0.1),(0,1),(3,2)]:
+      self.checkarray(ca.logsumexp(ca.DM(value),width),value)
+      self.checkarray(f(value,width),value)
+    self.checkfunction(f,f_ref,inputs=[3,0.1])
+    self.check_codegen(f,inputs=[3,0.1])
+
+    f_pair = ca.Function("f_pair",[x,margin],[ca.logsumexp(ca.vertcat(x,x),margin)])
+    self.checkarray(f_pair(3,0.1),3.1)
+    for sparse_scalar in [ca.DM(ca.Sparsity(1,1)),ca.SX(ca.Sparsity(1,1))]:
+      with self.assertInException("Argument must be dense"):
+        ca.logsumexp(sparse_scalar,0.1)
+
   def test_extract_parametric_call_sx(self):
     x = ca.MX.sym("x")
     y = ca.MX.sym("y")

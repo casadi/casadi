@@ -1398,6 +1398,7 @@ namespace casadi {
 
         \identifier{1bs} */
     inline friend MatType logsumexp(const MatType& x, const MatType& margin) {
+      if (x.is_scalar(true)) return x;
       MatType alpha = log(x.size1()) / margin;
       return MatType::logsumexp(alpha*x)/alpha;
     }
