@@ -21,7 +21,7 @@ use casadi::dict;
 
 fn main() {
     // Declare variables
-    let x = ca::SX::sym_with("x", 2, 1);
+    let x = ca::SX::sym_with("x", 2, None);
 
     // Form the NLP
     let f = ca::power(&x.at(0), 2.0) + ca::power(&x.at(1), 2.0); // objective

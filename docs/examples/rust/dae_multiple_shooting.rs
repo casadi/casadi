@@ -62,7 +62,7 @@ fn main() {
     // Create an integrator
     let dae = dict! {"x" => &x, "z" => &z, "p" => &u, "ode" => &f_x, "alg" => &f_z, "quad" => &f_q};
     // interval length 0.5s
-    let i = ca::integrator_with("I", "idas", &dae, 0.0, 0.5, dict! {});
+    let i = ca::integrator_with("I", "idas", &dae, 0.0, 0.5, None);
 
     // Number of intervals
     let nk = 20;
@@ -75,7 +75,7 @@ fn main() {
     let mut j = ca::MX::new(0.0); // Cost function
 
     // Initial conditions
-    let mut xk = ca::MX::sym_with("X0", 2, 1);
+    let mut xk = ca::MX::sym_with("X0", 2, None);
     w.push(xk.clone());
     lbw.extend([0.0, 1.0]);
     ubw.extend([0.0, 1.0]);

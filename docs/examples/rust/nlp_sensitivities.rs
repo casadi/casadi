@@ -122,7 +122,7 @@ fn main() {
     let mut u_plot: Vec<ca::MX> = vec![];
 
     // "Lift" initial conditions
-    let mut xk = ca::MX::sym_with("X0", 2, 1);
+    let mut xk = ca::MX::sym_with("X0", 2, None);
     w.push(xk.clone());
     lbw.extend([0.0, 1.0]);
     ubw.extend([0.0, 1.0]);
@@ -130,7 +130,7 @@ fn main() {
     x_plot.push(xk.clone());
 
     // Perturb with P
-    let p = ca::MX::sym_with("P", 2, 1);
+    let p = ca::MX::sym_with("P", 2, None);
     xk = &xk + &p;
 
     // Formulate the NLP

@@ -90,7 +90,7 @@ fn main() {
     let us = ca::SX::sym_with("U", 1, n - 1);
     let ys = ca::SX::sym_with("Y", nmeas, n);
     let s = ca::SX::sym_with("S", nstates, nstates);
-    let x0s = ca::SX::sym_with("x0", nstates, 1);
+    let x0s = ca::SX::sym_with("x0", nstates, None);
     let parameters = ca::vertcat(vec![ca::vec(&us), ca::vec(&ys), ca::vec(&s), x0s.clone()]);
     // Numeric counterparts
     let params_num = |u: &ca::DM, y: &ca::DM, s: &ca::DM, x0: &ca::DM| ca::vertcat(vec![ca::vec(u), ca::vec(y), ca::vec(s), x0.clone()]);

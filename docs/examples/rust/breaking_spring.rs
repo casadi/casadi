@@ -29,13 +29,13 @@ fn main() {
 
     // Model variables
     let m = dae.add_var_with("m", "parameter", "tunable", dict! {"start" => 1, "description" => "Mass"});
-    let v = dae.add_3("v", "local", dict! {"start" => -5, "description" => "Velocity"});
-    let x = dae.add_3("x", "local", dict! {"start" => -1, "description" => "Displacement"});
+    let v = dae.add_causality_with("v", "local", dict! {"start" => -5, "description" => "Velocity"});
+    let x = dae.add_causality_with("x", "local", dict! {"start" => -1, "description" => "Displacement"});
     let k = dae.add_var_with("k", "parameter", "tunable", dict! {"start" => 2, "description" => "Spring constant"});
     let c = dae.add_var_with("c", "parameter", "tunable", dict! {"start" => 0.1, "description" => "Damping constant"});
-    let d = dae.add_3("d", "input", dict! {"start" => 0, "description" => "Disturbance"});
-    let f = dae.add_3("f", "local", dict! {"description" => "Spring force"});
-    let b = dae.add_3("b", "local", dict! {"type" => "Boolean", "start" => false, "description" => "Is the spring broken?"});
+    let d = dae.add_causality_with("d", "input", dict! {"start" => 0, "description" => "Disturbance"});
+    let f = dae.add_causality_with("f", "local", dict! {"description" => "Spring force"});
+    let b = dae.add_causality_with("b", "local", dict! {"type" => "Boolean", "start" => false, "description" => "Is the spring broken?"});
 
     // Equations
     dae.eq(&dae.der_with(&x), &v);
@@ -49,7 +49,7 @@ fn main() {
     let tgrid: ca::DM = ca::linspace(0.0, 4.0, 101);
     let tgrid = tgrid.nonzeros();
     let simopts = dict! {"transition" => dae.transition(), "verbose" => false, "event_tol" => 1e-12};
-    let sim = ca::integrator_with("sim", "cvodes", &dae.create(), 0.0, &tgrid, simopts);
+    let sim = ca::integrator_with("sim", "cvodes", &dae.create_default(), 0.0, &tgrid, simopts);
 
     // Disturbance trajectory
     let mut d_traj = vec![0.0; tgrid.len()];

@@ -32,7 +32,7 @@ const INF: f64 = f64::INFINITY;
 
 fn main() {
     // Declare variable x
-    let x = ca::MX::sym_with("x", 2, 1);
+    let x = ca::MX::sym_with("x", 2, None);
 
     // Formulate the NLP
     let f = 100.0 * ca::power(x.at(1) - ca::power(&x.at(0), 2.0), 2.0) + ca::power(1.0 - x.at(0), 2.0);

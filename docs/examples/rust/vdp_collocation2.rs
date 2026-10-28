@@ -32,7 +32,7 @@ fn main() {
 
     // casadi.tools structures are not available: the state vector is laid out by hand
     // states = [x (2), L (1)]
-    let states = ca::SX::sym_with("states", 3, 1);
+    let states = ca::SX::sym_with("states", 3, None);
     let x = states.at(0..2); //  vdp oscillator states
     let l = states.at(2); //  helper state: Langrange integrand
 
@@ -115,7 +115,7 @@ fn main() {
     //   struct_symMX([(entry("X",repeat=[nk+1,d+1],struct=states), entry("U",repeat=[nk],shape=nu))])
     // which interleaves X[k,:] and U[k]
     let nv = (nk + 1) * (d + 1) * nx + nk * nu;
-    let vv = ca::MX::sym_with("V", nv as i64, 1);
+    let vv = ca::MX::sym_with("V", nv as i64, None);
     let ix = |k: usize, j: usize| k * ((d + 1) * nx + nu) + j * nx;
     let iu = |k: usize| k * ((d + 1) * nx + nu) + (d + 1) * nx;
     let vx = |k: usize, j: usize| vv.at(ix(k, j)..ix(k, j) + nx);

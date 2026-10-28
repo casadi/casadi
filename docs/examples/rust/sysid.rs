@@ -97,7 +97,7 @@ fn main() {
     let one_sample = ca::Function::new("one_sample", vec![&states, &controls, &params], vec![&x]);
 
     // ############ Simulating the system ##########
-    let all_samples = one_sample.mapaccum_3("all_samples", n, &dict! {});
+    let all_samples = one_sample.mapaccum_named("all_samples", n);
 
     // Choose an excitation signal
     let u_data = 0.1 * ca::DM::new(random(n as usize, 0));
@@ -160,7 +160,7 @@ fn main() {
     // All states become decision variables
     let xs = ca::MX::sym_with("X", 2, n);
 
-    let xn: ca::MX = one_sample.map_threads(n, "openmp", n).eval((&xs, u_data.T(), ca::repmat_with(&params * &scale, 1, n)));
+    let xn: ca::MX = one_sample.map_with(n, "openmp").eval((&xs, u_data.T(), ca::repmat_with(&params * &scale, 1, n)));
 
     let gaps = xn.at((.., ..-1)) - xs.at((.., 1..));
 

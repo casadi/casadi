@@ -36,7 +36,7 @@ fn main() {
 
     // Create a function
     let a = ca::MX::sym("a");
-    let b = ca::MX::sym_with("b", 2, 1);
+    let b = ca::MX::sym_with("b", 2, None);
     let c = ca::MX::sym_with("c", 2, 2);
     let f = ca::Function::named(
         "f",

@@ -105,26 +105,26 @@ fn main() {
             let inverted = true; // Inverted pendulum on a cart rather than crane with hanging load
 
             // States
-            let x_l = dae.add_3("xL", "local", dict! {"initial" => "exact", "start" => 0,
+            let x_l = dae.add_causality_with("xL", "local", dict! {"initial" => "exact", "start" => 0,
                 "description" => "Horizontal position of the load"});
-            let y = dae.add_3("y", "local", dict! {"initial" => "exact",
+            let y = dae.add_causality_with("y", "local", dict! {"initial" => "exact",
                 "start" => if inverted { length } else { -length },
                 "description" => "Vertical position of the load"});
-            let x_c = dae.add_3("xC", "local", dict! {"initial" => "exact", "start" => 0,
+            let x_c = dae.add_causality_with("xC", "local", dict! {"initial" => "exact", "start" => 0,
                 "description" => "Horizontal position of the crane"});
-            let dx_l = dae.add_3("dxL", "local", dict! {"initial" => "exact", "start" => 0,
+            let dx_l = dae.add_causality_with("dxL", "local", dict! {"initial" => "exact", "start" => 0,
                 "description" => "Horizontal velocity of the load"});
-            let dy = dae.add_3("dy", "local", dict! {"initial" => "exact", "start" => 0,
+            let dy = dae.add_causality_with("dy", "local", dict! {"initial" => "exact", "start" => 0,
                 "description" => "Vertical velocity of the load"});
-            let dx_c = dae.add_3("dxC", "local", dict! {"initial" => "exact", "start" => 0,
+            let dx_c = dae.add_causality_with("dxC", "local", dict! {"initial" => "exact", "start" => 0,
                 "description" => "Horizontal velocity of the crane"});
 
             // Input
-            let u = dae.add_3("u", "input", dict! {"min" => -2, "max" => 2, "start" => 0,
+            let u = dae.add_causality_with("u", "input", dict! {"min" => -2, "max" => 2, "start" => 0,
                 "description" => "Horizontal force applied to the crane"});
 
             // Algebraic variables
-            let t = dae.add_3("T", "local", dict! {"initial" => "approx", "start" => if inverted { g } else { -g },
+            let t = dae.add_causality_with("T", "local", dict! {"initial" => "approx", "start" => if inverted { g } else { -g },
                 "description" => "Tension in the rope/pole"});
 
             // Ordinary differential equations
@@ -164,12 +164,12 @@ fn main() {
             dae
         }
         // Use FMU generated from CasADi using the script above: Standard FMU + CasADi expressions + LS-DAE
-        Some("casadi_symbolic_fmu") => ca::DaeBuilder::new_with("Crane", "./Crane.fmu", dict! {}),
+        Some("casadi_symbolic_fmu") => ca::DaeBuilder::new_with("Crane", "./Crane.fmu", None),
         // Use FMU generated from CasADi using the script above: Standard FMU + LS-DAE
         Some("casadi_blackbox_fmu") => ca::DaeBuilder::new_with("Crane", "./Crane.fmu",
                                                                 dict! {"enable_ls_serialization" => false}),
         // Use FMU compiled from Modelica using Dymola
-        Some("dymola_fmu") => ca::DaeBuilder::new_with("crane", "../../../test/data/Crane.fmu", dict! {}),
+        Some("dymola_fmu") => ca::DaeBuilder::new_with("crane", "../../../test/data/Crane.fmu", None),
         Some(other) => panic!("Unknown FMU option: {}", other),
     };
 
@@ -177,7 +177,7 @@ fn main() {
     dae.disp_with(true);
 
     // DAE right-hand-side function
-    let ffcn = dae.create_4("ffcn", vec!["x", "z", "u"], vec!["ode", "alg", "y"], dict! {});
+    let ffcn = dae.create_io("ffcn", vec!["x", "z", "u"], vec!["ode", "alg", "y"]);
 
     // Variable names
     let u = dae.u();
@@ -247,7 +247,7 @@ fn main() {
     let mut tk = 0.0;
 
     // Add a variable for the initial state
-    let mut xk = ca::MX::sym_with("X0", x.len() as i64, 1);
+    let mut xk = ca::MX::sym_with("X0", x.len() as i64, None);
     x_all.push(xk.clone());
     w.push(xk.clone());
     xgrid.push(tk);

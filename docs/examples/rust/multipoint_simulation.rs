@@ -40,7 +40,7 @@ fn main() {
 
     // We will integrate the problem using CVODES, while also calculating the integral of y
     let dae = dict! {"x" => &x, "u" => &u, "ode" => &xdot, "quad" => &y};
-    let f = ca::integrator_with("F", "cvodes", &dae, tgrid[0], tgrid[1..].to_vec(), dict! {});
+    let f = ca::integrator_with("F", "cvodes", &dae, tgrid[0], tgrid[1..].to_vec(), None);
 
     // We are also interested in the pointwise values of y, so let's create a function for that too
     let yfun = ca::Function::named("yfun", vec![&x], vec![&y], vec!["x"], vec!["y"]);

@@ -36,7 +36,7 @@ fn main() {
 
     // Create a function
     let a = ca::SX::sym("a");
-    let b = ca::SX::sym_with("b", 2, 1);
+    let b = ca::SX::sym_with("b", 2, None);
     let f = ca::Function::named("f", vec![&a, &b], vec![2.0 * &a + &b], vec!["a", "b"], vec!["r"]);
 
     // Input values of the same dimensions as the above

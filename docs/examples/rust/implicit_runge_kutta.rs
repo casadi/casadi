@@ -33,8 +33,8 @@ fn main() {
     let np = 1;
 
     // Declare variables
-    let x = ca::SX::sym_with("x", nx, 1); // state
-    let p = ca::SX::sym_with("u", np, 1); // control
+    let x = ca::SX::sym_with("x", nx, None); // state
+    let p = ca::SX::sym_with("u", np, None); // control
 
     // ODE right hand side function
     let ode = ca::vertcat(vec![
@@ -89,9 +89,9 @@ fn main() {
     }
 
     // Total number of variables for one finite element
-    let x0 = ca::MX::sym_with("X0", nx, 1);
-    let pp = ca::MX::sym_with("P", np, 1);
-    let v = ca::MX::sym_with("V", d as i64 * nx, 1);
+    let x0 = ca::MX::sym_with("X0", nx, None);
+    let pp = ca::MX::sym_with("P", np, None);
+    let v = ca::MX::sym_with("V", d as i64 * nx, None);
 
     // Get the state at each collocation point
     let mut xx = vec![x0.clone()];
@@ -150,7 +150,7 @@ fn main() {
     );
 
     // Create a convensional integrator for reference
-    let ref_integrator = ca::integrator_with("ref_integrator", "cvodes", &dae, 0.0, tf, dict! {});
+    let ref_integrator = ca::integrator_with("ref_integrator", "cvodes", &dae, 0.0, tf, None);
 
     // Test values
     let x0_val = vec![0.0, 1.0, 0.0];

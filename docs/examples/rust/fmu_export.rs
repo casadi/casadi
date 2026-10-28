@@ -30,13 +30,13 @@ fn main() {
     let dae = ca::DaeBuilder::new("vdp");
 
     // States
-    let _t = dae.add_3("t", "independent", dict! {});
-    let x1 = dae.add_3("x1", "output", dict! {"start" => 1});
-    let x2 = dae.add_3("x2", "output", dict! {"start" => 0});
+    let _t = dae.add_causality("t", "independent");
+    let x1 = dae.add_causality_with("x1", "output", dict! {"start" => 1});
+    let x2 = dae.add_causality_with("x2", "output", dict! {"start" => 0});
     let q = dae.add("q");
 
     // Input
-    let u = dae.add_3("u", "input", dict! {});
+    let u = dae.add_causality("u", "input");
 
     // Set ODE right-hand-sides
     dae.eq(&dae.der_with(&x1), &((1.0 - &x2 * &x2) * &x1 - &x2 + &u));

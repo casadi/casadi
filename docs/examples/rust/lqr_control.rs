@@ -73,8 +73,8 @@ fn main() {
     // Simulation of the open-loop system
     // -----------------------------------
 
-    let _y = ca::SX::sym_with("y", ns, 1);
-    let _u = ca::SX::sym_with("u", nu, 1);
+    let _y = ca::SX::sym_with("y", ns, None);
+    let _u = ca::SX::sym_with("u", nu, None);
 
     let _x0 = ca::DM::new(vec![1.0, 0.0, 0.0]);
     // no control
