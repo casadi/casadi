@@ -11,6 +11,8 @@ root=$(cd "$(dirname "$0")/../.." && pwd)
 build=$(cd "$1" && pwd)
 export CASADI_RUST_GEN=$build/swig/rust CASADI_LIB=$build/lib CASADI_PLUGIN_SEARCH_PATH=$build/lib
 export CARGO_TARGET_DIR=$build/swig/rust/cargo
+# plugins built from external projects (uno -> libhighs) find their dependencies here
+export LD_LIBRARY_PATH=$build/lib:$build/external_projects/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
 cd "$root/swig/rust"
 cargo test
 cargo build --examples
