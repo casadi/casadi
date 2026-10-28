@@ -56,3 +56,21 @@ fn function_is_send_sync() {
     });
     assert_eq!(t.join().unwrap(), 9.0);
 }
+
+#[test]
+fn indexing() {
+    let mut a = DM::new(vec![vec![1.0, 2.0, 3.0], vec![4.0, 5.0, 6.0]]);
+    assert_eq!(a.at((1, 2)).nonzeros(), vec![6.0]);
+    assert_eq!(a.at((.., 0)).nonzeros(), vec![1.0, 4.0]);
+    assert_eq!(a.at((0, 1..)).nonzeros(), vec![2.0, 3.0]);
+    assert_eq!(a.at(-1).nonzeros(), vec![6.0]);
+    assert_eq!(a.at(vec![0, 3]).nonzeros(), vec![1.0, 5.0]);
+    assert_eq!(a.nz(1..=2).nonzeros(), vec![4.0, 2.0]);
+    a.set_at((0, ..), 0.0);
+    assert_eq!(a.nonzeros(), vec![0.0, 4.0, 0.0, 5.0, 0.0, 6.0]);
+    let mut x = MX::sym_with("x", 3, 1);
+    assert_eq!(x.at(..2).str(), "x[:2]");
+    x.set_nz_at(0, 1.0);
+    let s = SX::sym_with("s", 4, 1);
+    assert_eq!(s.at(1).str(), "s_1");
+}

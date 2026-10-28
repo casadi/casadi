@@ -3913,14 +3913,6 @@ class ArrayInterfaceMX(ArrayInterface[MX]):
 %rename(inf_sparsity) inf(const Sparsity&);
 %rename(nan_sparsity) nan(const Sparsity&);
 %rename(rand_sparsity) rand(const Sparsity&);
-%rename(mtimes_list) casadi::casadi_mtimes(const std::vector< Sparsity >&);
-%rename(mtimes_list) casadi::casadi_mtimes(const std::vector< Sparsity >&, const std::string&);
-%rename(mtimes_list) casadi::casadi_mtimes(const std::vector< MX >&);
-%rename(mtimes_list) casadi::casadi_mtimes(const std::vector< MX >&, const std::string&);
-%rename(mtimes_list) casadi::casadi_mtimes(const std::vector< Matrix<double> >&);
-%rename(mtimes_list) casadi::casadi_mtimes(const std::vector< Matrix<double> >&, const std::string&);
-%rename(mtimes_list) casadi::casadi_mtimes(const std::vector< Matrix<SXElem> >&);
-%rename(mtimes_list) casadi::casadi_mtimes(const std::vector< Matrix<SXElem> >&, const std::string&);
 #endif // SWIGRUST
 
 %julia_convention_repair()
@@ -7165,6 +7157,10 @@ class global_unpickle_context:
 #ifdef SWIGWASMJS
 %typemap(out, doc="DM", tsstub_out="DM", noblock=1, fragment="casadi_all") casadi::native_DM {
   if(!($result = casadi::from_ref($1))) SWIG_exception_fail(SWIG_TypeError,"Failed to convert output to type 'DM'.");
+}
+#elif defined(SWIGRUST)
+%typemap(out, noblock=1) casadi::native_DM {
+  $result = SWIG_NewPointerObj(new casadi::DM($1), $descriptor(casadi::Matrix<double> *), SWIG_POINTER_OWN);
 }
 #elif defined(SWIGJULIA)
 %typemap(out, doc="DM", noblock=1) casadi::native_DM {
