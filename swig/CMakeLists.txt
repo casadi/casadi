@@ -68,6 +68,10 @@ if(WITH_JULIA)
    add_subdirectory(julia)
 endif()
 
+if(WITH_RUST)
+   add_subdirectory(rust)
+endif()
+
 if(WITH_WASM_JS)
    add_subdirectory(wasm-js)
 endif()
