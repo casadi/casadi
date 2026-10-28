@@ -2056,6 +2056,9 @@ static int CVAdataStore(CVodeMem cv_mem, CkpntMem ck_mem)
     flag = CVode(cv_mem, t1_, ytmp, &t, CV_ONE_STEP);
     if (flag < 0) return(CV_FWD_FAIL);
 
+    /* CVodeF records a step ending at a TSTOP with the time TSTOP */
+    if (SUNRabs(t1_ - t) <= HUNDRED*uround*(SUNRabs(t) + SUNRabs(h))) t = t1_;
+
     dt_mem[i]->t = t;
     IMstore(cv_mem, dt_mem[i]);
     i++;
