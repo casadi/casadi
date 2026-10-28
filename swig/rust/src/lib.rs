@@ -7,6 +7,7 @@ mod eval;
 mod fmt;
 mod index;
 mod ops;
+mod opti;
 
 pub use eval::{Args, Elem, EvalArgs, EvalOut, Target};
 pub use rt::{Dict, Value};
@@ -15,3 +16,5 @@ pub use index::{step, At, Idx, Index};
 // casadi is built with atomic reference counts and thread-safe evaluation
 unsafe impl Send for Function {}
 unsafe impl Sync for Function {}
+unsafe impl Send for Callback {}
+unsafe impl Sync for Callback {}

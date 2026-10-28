@@ -1,5 +1,5 @@
 //! Display and Debug through casadi's printing
-use crate::{Function, Sparsity, DM, MX, SX};
+use crate::{Callback, Function, Sparsity, DM, MX, SX};
 use std::fmt;
 
 macro_rules! display {
@@ -17,4 +17,4 @@ macro_rules! display {
     )*};
 }
 
-display!(DM, SX, MX, Sparsity, Function);
+display!(DM, SX, MX, Sparsity, Function, Callback);
