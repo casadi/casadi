@@ -222,8 +222,9 @@ void Fmu2::logger(fmi2ComponentEnvironment componentEnvironment,
     fmi2String category,
     fmi2String message, ...) {
   // Variable number of arguments
-  va_list args;
+  va_list args, args2;
   va_start(args, message);
+  va_copy(args2, args);
   // Static & dynamic buffers
   char buf[256];
   size_t buf_sz = sizeof(buf);
@@ -231,10 +232,10 @@ void Fmu2::logger(fmi2ComponentEnvironment componentEnvironment,
   // Try to print with a small buffer
   int n = vsnprintf(buf, buf_sz, message, args);
   // Need a larger buffer?
-  if (n > buf_sz) {
+  if (n >= buf_sz) {
     buf_sz = n + 1;
     buf_dyn = new char[buf_sz];
-    n = vsnprintf(buf_dyn, buf_sz, message, args);
+    n = vsnprintf(buf_dyn, buf_sz, message, args2);
   }
   // Print buffer content
   if (n >= 0) {
@@ -243,6 +244,7 @@ void Fmu2::logger(fmi2ComponentEnvironment componentEnvironment,
   }
   // Cleanup
   delete[] buf_dyn;
+  va_end(args2);
   va_end(args);
   // Throw error if failure
   casadi_assert(n>=0, "Print failure while processing '" + std::string(message) + "'");

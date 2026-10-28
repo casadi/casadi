@@ -79,8 +79,9 @@ namespace casadi {
 extern "C" {
   int casadi_printf(const char *fmt, ...) {
     // Variable number of arguments
-    va_list args;
+    va_list args, args2;
     va_start(args, fmt);
+    va_copy(args2, args);
     // Static & dynamic buffers
     char buf[256];
     size_t buf_sz = sizeof(buf);
@@ -88,15 +89,16 @@ extern "C" {
     // Try to print with a small buffer
     casadi_int n = vsnprintf(buf, buf_sz, fmt, args);
     // Need a larger buffer?
-    if (n>static_cast<casadi_int>(buf_sz)) {
+    if (n>=static_cast<casadi_int>(buf_sz)) {
       buf_sz = static_cast<size_t>(n+1);
       buf_dyn = new char[buf_sz];
-      n = vsnprintf(buf_dyn, buf_sz, fmt, args);
+      n = vsnprintf(buf_dyn, buf_sz, fmt, args2);
     }
     // Print buffer content
     if (n>=0) casadi::uout() << (buf_dyn ? buf_dyn : buf) << std::flush;
     // Cleanup
     delete[] buf_dyn;
+    va_end(args2);
     va_end(args);
     return n;
   }
