@@ -73,6 +73,12 @@ namespace casadi {
         "the value's type must match the parameter's type "
         "(int parameters take int, dpar take double, spar take string)."
         }},
+      {"detect_socp",
+       {OT_BOOL,
+        "Pass psd constraints with SOCP sparsity as second-order cones, "
+        "verifying at runtime that they have SOCP values [true]. "
+        "If false, all psd constraints are passed as generic psd cones."
+        }},
      }
    };
 
@@ -80,17 +86,21 @@ namespace casadi {
     // Call the init method of the base class
     Conic::init(opts);
 
+    // Default options
+    bool detect_socp = true;
+
     // Read user options
     for (auto&& op : opts) {
       if (op.first=="mosek") {
         opts_ = op.second;
+      } else if (op.first=="detect_socp") {
+        detect_socp = op.second;
       }
     }
 
-    // Pre-compute SOCP mapping (must run before set_mosek_prob so the
+    // Pre-compute psd mapping (must run before set_mosek_prob so the
     // socp pointer is resolved in p_)
-    has_socp_ = !Q_.is_null() && Q_.nnz() > 0;
-    if (has_socp_) build_socp_config();
+    init_psd(detect_socp);
 
     init_dependent();
     set_mosek_prob();
@@ -156,6 +166,17 @@ namespace casadi {
 
     p_.socp = has_socp_ ? &socp_ : nullptr;
 
+    p_.psd_n_blocks = psd_r_.empty() ? 0 : static_cast<int>(psd_r_.size() - 1);
+    p_.psd_r = get_ptr(psd_r_);
+    p_.psd_nnz = static_cast<int>(psd_afe_.size());
+    p_.psd_afe = get_ptr(psd_afe_);
+    p_.psd_var = get_ptr(psd_var_);
+    p_.psd_nnz_q = static_cast<int>(psd_map_q_.size());
+    p_.psd_nnz_p = static_cast<int>(psd_map_p_.size());
+    p_.psd_map_q = get_ptr(psd_map_q_);
+    p_.psd_map_p = get_ptr(psd_map_p_);
+    p_.psd_scale = get_ptr(psd_scale_);
+
     casadi_mosek_setup(&p_);
   }
 
@@ -198,11 +219,26 @@ namespace casadi {
       g << "socp_p.mq_row = " << g.constant(socp_mq_row_) << ";\n";
       g << "socp_p.mq_data = " << g.constant(socp_mq_data_) << ";\n";
       g << "socp_p.map_P = " << g.constant(socp_map_P_) << ";\n";
+      g << "socp_p.n_chk_q = " << socp_.n_chk_q << ";\n";
+      g << "socp_p.n_chk_p = " << socp_.n_chk_p << ";\n";
+      g << "socp_p.chk_q = " << (socp_chk_q_.empty() ? "0" : g.constant(socp_chk_q_)) << ";\n";
+      g << "socp_p.chk_p = " << (socp_chk_p_.empty() ? "0" : g.constant(socp_chk_p_)) << ";\n";
       g << "casadi_socp_setup(&socp_p);\n";
       g << "p.socp = &socp_p;\n";
     } else {
       g << "p.socp = 0;\n";
     }
+
+    g << "p.psd_n_blocks = " << (psd_r_.empty() ? 0 : psd_r_.size() - 1) << ";\n";
+    codegen_int_field(g, "psd_r",     "psd_r",     psd_r_);
+    g << "p.psd_nnz = " << psd_afe_.size() << ";\n";
+    codegen_int_field(g, "psd_afe",   "psd_afe",   psd_afe_);
+    codegen_int_field(g, "psd_var",   "psd_var",   psd_var_);
+    g << "p.psd_nnz_q = " << psd_map_q_.size() << ";\n";
+    g << "p.psd_nnz_p = " << psd_map_p_.size() << ";\n";
+    codegen_int_field(g, "psd_map_q", "psd_map_q", psd_map_q_);
+    codegen_int_field(g, "psd_map_p", "psd_map_p", psd_map_p_);
+    g << "p.psd_scale = " << (psd_scale_.empty() ? "0" : g.constant(psd_scale_)) << ";\n";
 
     g << "casadi_mosek_setup(&p);\n";
   }
@@ -238,6 +274,9 @@ namespace casadi {
       g << "d->socp.q = arg[" << CONIC_Q << "];\n";
       g << "d->socp.p = arg[" << CONIC_P << "];\n";
     }
+    g << "d->q = arg[" << CONIC_Q << "];\n";
+    g << "d->p = arg[" << CONIC_P << "];\n";
+    if (has_socp_) g << "if (casadi_socp_check(&d->socp)) return 1;\n";
 
     // Apply user options.  Resolve the parameter's type at runtime via
     // MSK_getparamname/MSK_getparamtype is awkward; the simplest robust
@@ -280,6 +319,8 @@ namespace casadi {
     socp_mq_row_.assign(sm.map_Q.row(), sm.map_Q.row() + sm.map_Q.nnz());
     socp_mq_data_.assign(sm.map_Q.ptr(), sm.map_Q.ptr() + sm.map_Q.nnz());
     socp_map_P_ = sm.map_P;
+    socp_chk_q_ = sm.chk_Q;
+    socp_chk_p_ = sm.chk_P;
 
     socp_.n_blocks = static_cast<casadi_int>(sm.r.size() - 1);
     socp_.r = get_ptr(socp_r_);
@@ -289,7 +330,39 @@ namespace casadi {
     socp_.mq_row = get_ptr(socp_mq_row_);
     socp_.mq_data = get_ptr(socp_mq_data_);
     socp_.map_P = get_ptr(socp_map_P_);
+    socp_.n_chk_q = static_cast<casadi_int>(socp_chk_q_.size() / 2);
+    socp_.n_chk_p = static_cast<casadi_int>(socp_chk_p_.size() / 2);
+    socp_.chk_q = get_ptr(socp_chk_q_);
+    socp_.chk_p = get_ptr(socp_chk_p_);
     casadi_socp_setup(&socp_);
+  }
+
+  void MosekInterface::init_psd(bool detect_socp) {
+    has_socp_ = false;
+    if (Q_.is_null() || Q_.nnz()==0) return;
+    if (detect_socp) {
+      try {
+        build_socp_config();
+        has_socp_ = true;
+        return;
+      } catch (std::exception&) {
+        // Not of SOCP form
+      }
+    }
+    build_psd_config();
+  }
+
+  void MosekInterface::build_psd_config() {
+    SDPSvecMem sm;
+    sdp_svec_init(sm);
+    std::vector<casadi_int> row, col;
+    sm.F.get_triplet(row, col);
+    psd_r_ = vector_static_cast<int>(sm.r);
+    psd_afe_ = vector_static_cast<int>(row);
+    psd_var_ = vector_static_cast<int>(col);
+    psd_map_q_ = vector_static_cast<int>(sm.map_Q);
+    psd_map_p_ = vector_static_cast<int>(sm.map_P);
+    psd_scale_ = sm.scale;
   }
 
   static void mosek_stream_cb(void* /*h*/, const char* s) { std::fputs(s, stderr); }
@@ -339,6 +412,8 @@ namespace casadi {
       m->d.socp.q = arg[CONIC_Q];
       m->d.socp.p = arg[CONIC_P];
     }
+    m->d.q = arg[CONIC_Q];
+    m->d.p = arg[CONIC_P];
 
     // Push user parameters to MOSEK using typed setters dispatched on
     // CasADi-side value type.  The "na" (name-addressed) variants accept
@@ -368,6 +443,11 @@ namespace casadi {
   solve(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
     auto m = static_cast<MosekMemory*>(mem);
 
+    casadi_assert(!has_socp_ || !casadi_socp_check(&m->d.socp),
+      "MOSEK: psd constraint has SOCP sparsity but not SOCP values "
+      "(each block must be soc(x, y) = [y*I, x; x', y]). "
+      "Set option 'detect_socp' to false to pass it as a generic psd constraint.");
+
     m->fstats.at("solver").tic();
     int rc = casadi_mosek_solve(&m->d, arg, res, iw, w);
     m->fstats.at("solver").toc();
@@ -390,10 +470,11 @@ namespace casadi {
   }
 
   MosekInterface::MosekInterface(DeserializingStream& s) : Conic(s) {
-    s.version("MosekInterface", 1);
+    int version = s.version("MosekInterface", 1, 2);
     s.unpack("MosekInterface::opts", opts_);
-    has_socp_ = !Q_.is_null() && Q_.nnz() > 0;
-    if (has_socp_) build_socp_config();
+    bool detect_socp = true;
+    if (version >= 2) s.unpack("MosekInterface::has_socp", detect_socp);
+    init_psd(detect_socp);
     init_dependent();
     set_mosek_prob();
   }
@@ -401,8 +482,9 @@ namespace casadi {
   void MosekInterface::serialize_body(SerializingStream &s) const {
     Conic::serialize_body(s);
 
-    s.version("MosekInterface", 1);
+    s.version("MosekInterface", 2);
     s.pack("MosekInterface::opts", opts_);
+    s.pack("MosekInterface::has_socp", has_socp_);
   }
 
 } // end namespace casadi

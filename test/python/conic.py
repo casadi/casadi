@@ -95,7 +95,7 @@ if "SKIP_MOSEK_TESTS" not in os.environ and ca.has_conic("mosek"):
                                     "MSK_DPAR_INTPNT_QO_TOL_DFEAS":1e-10,
                                     "MSK_DPAR_INTPNT_CO_TOL_REL_GAP":1e-10,
                                     "MSK_DPAR_INTPNT_CO_TOL_PFEAS":1e-10,
-                                    "MSK_DPAR_INTPNT_CO_TOL_DFEAS":1e-10}},{"quadratic": True, "less_digits": 1, "dual": True, "soc": True, "codegen": mosek_codegen, "binary":True, "discrete": True, "sos":False}))
+                                    "MSK_DPAR_INTPNT_CO_TOL_DFEAS":1e-10}},{"quadratic": True, "less_digits": 1, "dual": True, "soc": True, "codegen": mosek_codegen, "binary":True, "discrete": True, "sos":False, "sdp": True}))
 
 # if has_conic("sqic"):
 #   conics.append(("sqic",{},{}))
@@ -1430,6 +1430,75 @@ class ConicTests(casadiTestCase):
       res = solver(lbx=ca.vertcat(-inf,-inf,-inf,-inf,1))
 
       self.checkarray(res["x"][:-1],x0,conic,digits=4)
+
+  def test_SDP(self):
+
+    for conic, qp_options, aux_options in conics:
+      if not aux_options.get("sdp", False): continue
+      print("test_SDP",conic,qp_options)
+      x = ca.MX.sym("x",2)
+      t = ca.MX.sym("t")
+
+      #  min  t + 0.3 x0 - 0.2 x1
+      #
+      #    t I - (A0 + x0 A1 + x1 A2) psd
+      #
+      A0 = ca.DM([[2,1,0],[1,-1,3],[0,3,1]])
+      A1 = ca.DM([[1,0,2],[0,-2,1],[2,1,0]])
+      A2 = ca.DM([[0,1,-1],[1,1,0],[-1,0,3]])
+      h = t*ca.DM.eye(3)-(A0+x[0]*A1+x[1]*A2)
+      f = t+0.3*x[0]-0.2*x[1]
+      x_ref = ca.DM([-0.769878,-1.217981,1.429648])
+
+      solver = ca.qpsol("mysolver",conic,{'h':h,'x': ca.vertcat(x,t),"f": f},qp_options)
+      res = solver()
+      self.checkarray(res["x"],x_ref,conic,digits=5)
+      self.checkarray(res["f"],1.442281,conic,digits=5)
+      self.assertTrue(solver.stats()["success"])
+
+      # Permuted, with additional blocks
+      H = ca.MX(5,5)
+      H[[0,2,4],[0,2,4]] = h
+      H[1,1] = x[0]+1
+      H[3,3] = 2-x[1]
+      H[1,3] = 0.5
+      H[3,1] = 0.5
+
+      solver = ca.qpsol("mysolver",conic,{'h':H,'x': ca.vertcat(x,t),"f": f},qp_options)
+      res = solver()
+      self.checkarray(res["x"],x_ref,conic,digits=5)
+
+      # Active constraint in the second block
+      solver = ca.qpsol("mysolver",conic,{'h':H,'x': ca.vertcat(x,t),"f": t+3*x[0]},qp_options)
+      res = solver()
+      self.assertTrue(solver.stats()["success"])
+      H_sol = ca.evalf(ca.substitute(H,ca.vertcat(x,t),res["x"]))[[1,3],[1,3]]
+      self.checkarray(min(numpy.linalg.eigvalsh(H_sol.full())),0,conic,digits=5)
+
+      self.check_serialize(solver,{})
+      if aux_options["codegen"]:
+        self.check_codegen(solver,{},**aux_options["codegen"])
+
+      # SOCP sparsity, but not SOCP values
+      y = ca.MX.sym("y",2)
+      h = ca.blockcat([[1+y[0],y[1]],[y[1],2-y[0]]])
+      solver = ca.qpsol("mysolver",conic,{'h':h,'x':y,"f": y[1]},qp_options)
+      with self.assertInException("detect_socp"):
+        solver()
+
+      opts = {**qp_options, "detect_socp": False}
+      solver = ca.qpsol("mysolver",conic,{'h':h,'x':y,"f": y[1]},opts)
+      res = solver()
+      self.checkarray(res["x"],ca.DM([0.5,-1.5]),conic,digits=5)
+      self.check_serialize(solver,{})
+      if aux_options["codegen"]:
+        self.check_codegen(solver,{},**aux_options["codegen"])
+
+      # SOCP passed as generic psd constraint
+      h = ca.soc(ca.vertcat(y[0]-5,y[1]-7),4)
+      solver = ca.qpsol("mysolver",conic,{'h':h,'x':y,"f": 2*y[0]+y[1]},opts)
+      res = solver()
+      self.checkarray(res["x"],ca.DM([5-8/ca.sqrt(5),7-4/ca.sqrt(5)]),conic,digits=5)
 
   def test_no_success(self):
 

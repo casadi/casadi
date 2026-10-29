@@ -49,6 +49,19 @@ struct casadi_mosek_prob {
 
   // SOCP support.  Null if no SOC cones.
   const casadi_socp_prob<T1> *socp;
+
+  // Generic psd support: F x + g in one svec psd cone per block.  0 blocks if absent.
+  int psd_n_blocks;
+  // Affine expression offsets of the blocks (psd_n_blocks+1)
+  const int *psd_r;
+  // F in triplet form
+  int psd_nnz;
+  const int *psd_afe, *psd_var;
+  // Nonzeros of Q (P) -> nonzeros of F (entries of g)
+  int psd_nnz_q, psd_nnz_p;
+  const int *psd_map_q, *psd_map_p;
+  // svec scaling per affine expression
+  const T1 *psd_scale;
 };
 // C-REPLACE "casadi_mosek_prob<T1>" "struct casadi_mosek_prob"
 
@@ -80,6 +93,10 @@ struct casadi_mosek_data {
 
   // SOCP runtime data (only meaningful when prob->socp != NULL)
   casadi_socp_data<T1> socp;
+
+  // Generic psd: inputs q and p, and F/g values
+  const T1 *q, *p;
+  T1 *psd_f, *psd_g;
 
   // 0 until the first solve has appended vars/cons/cones to the task;
   // gates the one-shot model-building path inside solve.
@@ -137,6 +154,9 @@ void casadi_mosek_work(const casadi_mosek_prob<T1>* p,
     // Cone variable index scratch, sized to the largest cone block.
     *sz_iw += p->socp->max_block;
   }
+
+  *sz_w += p->psd_nnz;                     // psd_f
+  if (p->psd_n_blocks) *sz_w += p->psd_r[p->psd_n_blocks];  // psd_g
 }
 
 // SYMBOL "mosek_set_work"
@@ -155,8 +175,11 @@ void casadi_mosek_set_work(casadi_mosek_data<T1>* d,
     casadi_socp_init(&d->socp, iw, w);
     d->cone_idx = reinterpret_cast<int*>(*iw);  *iw += p->socp->max_block;
   }
-}
 
+  d->psd_f = *w; *w += p->psd_nnz;
+  d->psd_g = *w;
+  if (p->psd_n_blocks) *w += p->psd_r[p->psd_n_blocks];
+}
 
 // C-REPLACE "SOLVER_RET_SUCCESS" "0"
 // C-REPLACE "SOLVER_RET_LIMITED" "2"
@@ -308,6 +331,30 @@ int casadi_mosek_solve(casadi_mosek_data<T1>* d,
         MSK_appendcone(task, MSK_CT_QUAD, 0.0, static_cast<int>(bs), d->cone_idx);
       }
     }
+  }
+
+  // Generic psd: affine conic constraints, one svec psd cone per block
+  if (p->psd_n_blocks) {
+    int n_afe = p->psd_r[p->psd_n_blocks];
+    if (!d->model_built) {
+      MSKint64t domidx;
+      if (MSK_appendafes(task, n_afe) != MSK_RES_OK) return 1;
+      for (i = 0; i < p->psd_n_blocks; ++i) {
+        int n = p->psd_r[i + 1] - p->psd_r[i];
+        if (MSK_appendsvecpsdconedomain(task, n, &domidx) != MSK_RES_OK) return 1;
+        if (MSK_appendaccseq(task, domidx, n, p->psd_r[i], 0) != MSK_RES_OK) return 1;
+      }
+    }
+    for (k = 0; k < p->psd_nnz; ++k) d->psd_f[k] = 0;
+    for (k = 0; k < n_afe; ++k) d->psd_g[k] = 0;
+    if (d->q) for (k = 0; k < p->psd_nnz_q; ++k) d->psd_f[p->psd_map_q[k]] += d->q[k];
+    if (d->p) for (k = 0; k < p->psd_nnz_p; ++k) d->psd_g[p->psd_map_p[k]] += d->p[k];
+    for (k = 0; k < p->psd_nnz; ++k) {
+      MSK_putafefentry(task, p->psd_afe[k], p->psd_var[k],
+                       p->psd_scale[p->psd_afe[k]] * d->psd_f[k]);
+    }
+    for (k = 0; k < n_afe; ++k) d->psd_g[k] *= p->psd_scale[k];
+    MSK_putafegslice(task, 0, n_afe, d->psd_g);
   }
 
   // MIP integer flags (model structure, set once)
