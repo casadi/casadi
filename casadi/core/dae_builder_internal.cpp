@@ -3921,6 +3921,8 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
           // Aliases currently ignored
         } else if (c.name == "Annotations") {
           // Annotations currently ignored
+        } else if (c.name == "Start") {
+          // Start currently ignored
         } else {
           casadi_error("Cannot handle: " + c.name);
         }
