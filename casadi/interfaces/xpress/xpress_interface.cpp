@@ -275,6 +275,10 @@ namespace casadi {
       g << "socp_p.mq_row = " << g.constant(socp_mq_row_) << ";\n";
       g << "socp_p.mq_data = " << g.constant(socp_mq_data_) << ";\n";
       g << "socp_p.map_P = " << g.constant(socp_map_P_) << ";\n";
+      g << "socp_p.n_chk_q = " << socp_.n_chk_q << ";\n";
+      g << "socp_p.n_chk_p = " << socp_.n_chk_p << ";\n";
+      g << "socp_p.chk_q = " << (socp_chk_q_.empty() ? "0" : g.constant(socp_chk_q_)) << ";\n";
+      g << "socp_p.chk_p = " << (socp_chk_p_.empty() ? "0" : g.constant(socp_chk_p_)) << ";\n";
       g << "casadi_socp_setup(&socp_p);\n";
       g << "p.socp = &socp_p;\n";
     } else {
@@ -318,6 +322,7 @@ namespace casadi {
     if (has_socp_) {
       g << "d->socp.q = arg[" << CONIC_Q << "];\n";
       g << "d->socp.p = arg[" << CONIC_P << "];\n";
+      g << "if (casadi_socp_check(&d->socp)) return 1;\n";
     }
 
     g << "d->x0 = " << (mip_start_ ? ("arg[" + str(CONIC_X0) + "]") : std::string("0")) << ";\n";
@@ -371,6 +376,8 @@ namespace casadi {
     socp_mq_row_.assign(sm.map_Q.row(), sm.map_Q.row() + sm.map_Q.nnz());
     socp_mq_data_.assign(sm.map_Q.ptr(), sm.map_Q.ptr() + sm.map_Q.nnz());
     socp_map_P_ = sm.map_P;
+    socp_chk_q_ = sm.chk_Q;
+    socp_chk_p_ = sm.chk_P;
 
     socp_.n_blocks = static_cast<casadi_int>(sm.r.size() - 1);
     socp_.r = get_ptr(socp_r_);
@@ -380,6 +387,10 @@ namespace casadi {
     socp_.mq_row = get_ptr(socp_mq_row_);
     socp_.mq_data = get_ptr(socp_mq_data_);
     socp_.map_P = get_ptr(socp_map_P_);
+    socp_.n_chk_q = static_cast<casadi_int>(socp_chk_q_.size() / 2);
+    socp_.n_chk_p = static_cast<casadi_int>(socp_chk_p_.size() / 2);
+    socp_.chk_q = get_ptr(socp_chk_q_);
+    socp_.chk_p = get_ptr(socp_chk_p_);
     casadi_socp_setup(&socp_);
   }
 
@@ -483,6 +494,10 @@ namespace casadi {
   int XpressInterface::
   solve(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
     auto m = static_cast<XpressMemory*>(mem);
+
+    casadi_assert(!has_socp_ || !casadi_socp_check(&m->d.socp),
+      "XPRESS: psd constraint has SOCP sparsity but not SOCP values "
+      "(each block must be soc(x, y) = [y*I, x; x', y]).");
 
     m->fstats.at("solver").tic();
     int rc = casadi_xpress_solve(&m->d, arg, res, iw, w);

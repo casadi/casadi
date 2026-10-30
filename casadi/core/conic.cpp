@@ -935,6 +935,92 @@ namespace casadi {
 
     // Get the transpose and mapping
     mem.AT = A_.transpose(mem.A_mapping);
+
+    sdp_to_socp_check_init(mem);
+  }
+
+  void Conic::sdp_to_socp_check_init(SDPToSOCPMem& mem) const {
+    mem.chk_Q.clear();
+    mem.chk_P.clear();
+    // Each block is soc(X, Z) = [Z I, X; X', Z]; only its last column is used
+    for (casadi_int b=0; b+1<static_cast<casadi_int>(mem.r.size()); ++b) {
+      casadi_int e = mem.r[b+1]-1;
+      for (casadi_int i=mem.r[b]; i<e; ++i) {
+        // Pairs of entries of Q x + P (column-major) that must be equal
+        casadi_int pairs[4] = {i+i*np_, e+e*np_, e+i*np_, i+e*np_};
+        for (casadi_int t=0; t<4; t+=2) {
+          casadi_int l1 = pairs[t], l2 = pairs[t+1];
+          for (casadi_int j=0; j<nx_; ++j) {
+            casadi_int k1 = Q_.get_nz(l1, j), k2 = Q_.get_nz(l2, j);
+            if (k1>=0 || k2>=0) {
+              mem.chk_Q.push_back(k1);
+              mem.chk_Q.push_back(k2);
+            }
+          }
+          casadi_int k1 = P_.get_nz(l1 % np_, l1 / np_), k2 = P_.get_nz(l2 % np_, l2 / np_);
+          if (k1>=0 || k2>=0) {
+            mem.chk_P.push_back(k1);
+            mem.chk_P.push_back(k2);
+          }
+        }
+      }
+    }
+  }
+
+  // svec index of entry (i, j): lower triangle, column-major
+  static casadi_int svec_index(const std::vector<casadi_int>& dim,
+      const std::vector<casadi_int>& r, const std::vector<casadi_int>& blk,
+      const std::vector<casadi_int>& loc, casadi_int i, casadi_int j) {
+    casadi_int b = blk[i], d = dim[b];
+    casadi_int a = std::max(loc[i], loc[j]), c = std::min(loc[i], loc[j]);
+    return r[b] + c*d - c*(c-1)/2 + a-c;
+  }
+
+  void Conic::sdp_svec_init(SDPSvecMem& mem) const {
+    // Independent blocks
+    Sparsity aggregate = reshape(sum2(Q_), np_, np_) + P_;
+    std::vector<casadi_int> perm, r;
+    casadi_int nb = aggregate.scc(perm, r);
+
+    // Block and local index of each row/column
+    std::vector<casadi_int> blk(np_), loc(np_);
+    mem.dim = diff(r);
+    mem.r.resize(nb+1);
+    mem.r[0] = 0;
+    for (casadi_int b=0; b<nb; ++b) {
+      for (casadi_int k=r[b]; k<r[b+1]; ++k) {
+        blk[perm[k]] = b;
+        loc[perm[k]] = k-r[b];
+      }
+      mem.r[b+1] = mem.r[b] + mem.dim[b]*(mem.dim[b]+1)/2;
+    }
+
+    // Off-diagonals: svec scales by sqrt(2), averaged over both triangles
+    mem.scale.resize(mem.r[nb]);
+    for (casadi_int i=0; i<np_; ++i) {
+      for (casadi_int j=0; j<np_; ++j) {
+        if (blk[i]!=blk[j]) continue;
+        mem.scale[svec_index(mem.dim, mem.r, blk, loc, i, j)] = i==j ? 1 : 1/sqrt(2.0);
+      }
+    }
+
+    // F
+    std::vector<casadi_int> row, col;
+    for (casadi_int j=0; j<Q_.size2(); ++j) {
+      for (casadi_int k=Q_.colind(j); k<Q_.colind(j+1); ++k) {
+        row.push_back(svec_index(mem.dim, mem.r, blk, loc, Q_.row(k) % np_, Q_.row(k) / np_));
+        col.push_back(j);
+      }
+    }
+    mem.F = Sparsity::triplet(mem.r[nb], nx_, row, col, mem.map_Q, true);
+
+    // g
+    mem.map_P.resize(P_.nnz());
+    for (casadi_int j=0; j<P_.size2(); ++j) {
+      for (casadi_int k=P_.colind(j); k<P_.colind(j+1); ++k) {
+        mem.map_P[k] = svec_index(mem.dim, mem.r, blk, loc, P_.row(k), j);
+      }
+    }
   }
 
   Dict Conic::get_stats(void* mem) const {
@@ -962,6 +1048,7 @@ namespace casadi {
     s.unpack("Conic::SDPToSOCPMem::map_Q", m.map_Q);
     s.unpack("Conic::SDPToSOCPMem::map_P", m.map_P);
     s.unpack("Conic::SDPToSOCPMem::indval_size", m.indval_size);
+    sdp_to_socp_check_init(m);
   }
 
   void Conic::serialize_body(SerializingStream &s) const {
