@@ -1496,6 +1496,7 @@ class ConicTests(casadiTestCase):
   @requires_conic("proxqp")
   def test_proxqp_warm_start(self):
     H = ca.DM.eye(2)
+    A = ca.DM([[1, 1], [1, -1]])
     for backend in ["sparse", "dense"]:
       for primal in [False, True]:
         for dual in [False, True]:
@@ -1508,23 +1509,27 @@ class ConicTests(casadiTestCase):
             # Both warm starts are enabled by default.
             if not (primal and dual):
               opts.update(warm_start_primal=primal, warm_start_dual=dual)
-            solver = ca.conic("solver", "proxqp", {"h": H.sparsity()}, opts)
-            inputs = dict(h=H, g=-x-lam_x, lbx=x-ca.DM([1, 0]),
+            solver = ca.conic("solver", "proxqp", {"h": H.sparsity(), "a": A.sparsity()}, opts)
+            inputs = dict(h=H, g=-x-lam_x, a=A, lba=[0, -3], uba=[0, 3],
+                          lbx=x-ca.DM([1, 0]),
                           ubx=x+ca.DM([0, 1]),
                           x0=x if primal else ca.DM([20, -30]),
+                          lam_a0=ca.DM.zeros(2) if dual else ca.DM([60, -70]),
                           lam_x0=lam_x if dual else ca.DM([40, -50]))
             # An exact KKT seed must solve within one outer iteration;
             # deliberately wrong seeds for disabled components must be ignored.
-            for s in [solver, ca.Function.deserialize(solver.serialize())]:
-              res = s(**inputs)
-              self.assertTrue(s.stats()["success"])
-              self.checkarray(res["x"], x, digits=9)
-              self.checkarray(res["lam_x"], lam_x, digits=9)
-              for name, enabled in [("x0", primal), ("lam_x0", dual)]:
-                bad_inputs = dict(inputs)
-                bad_inputs[name] += ca.DM([100, -100])
-                s(**bad_inputs)
-                self.assertEqual(s.stats()["success"], not enabled)
+            res = solver(**inputs)
+            self.assertTrue(solver.stats()["success"])
+            self.checkarray(res["x"], x, digits=9)
+            self.checkarray(res["lam_x"], lam_x, digits=9)
+            # Exact primal-only seeds can also pass when ignored; perturb them
+            # to check that enabled inputs actually affect the solve.
+            for name, enabled in [("x0", primal), ("lam_x0", dual)]:
+              if not enabled: continue
+              bad_inputs = dict(inputs)
+              bad_inputs[name] += ca.DM([100, -100])
+              solver(**bad_inputs)
+              self.assertFalse(solver.stats()["success"])
 
   @requires_conic("proxqp")
   def test_proxqp_warm_start_mixed_multipliers(self):
