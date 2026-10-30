@@ -996,6 +996,8 @@ m = casadi.dcat({DM([1, 2]), 3.0});
 assert(isa(m, 'casadi.DM') && isequal(full(m), [1 2 0; 0 0 3]));
 m = casadi.vvcat({DM([1; 2]), DM([3; 4])});
 assert(isa(m, 'casadi.DM') && isequal(full(m), [1; 2; 3; 4]));
+m = blockcat({DM(1) DM(2); DM(3) DM(4)});
+assert(isequal(full(m), [1 2; 3 4]));
 
 
 % Chained indexing acts on the result of the first subscript
