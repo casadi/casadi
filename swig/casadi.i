@@ -205,6 +205,9 @@ SWIG_Python_AppendOutput_Tuple(PyObject* result, PyObject* obj, int is_void) {
 #elif defined(SWIGJAVA)
 #define GUESTOBJECT _jobject
 #define CASADI_NOT_NONE(p) p
+#elif defined(SWIGRUST)
+#define GUESTOBJECT SwigRV
+#define CASADI_NOT_NONE(p) !p || p->kind != SWIG_RV_NIL
 #else
 #define GUESTOBJECT void
 #endif
@@ -1023,6 +1026,10 @@ SWIGINTERNINLINE mxArray* SWIG_From_dec(std::string)(const std::string& s) {
       double* d = static_cast<double*>(mxGetData(p));
       casadi_densify(m.ptr(), m.sparsity(), d, false); // Column-major
       return p;
+#elif defined(SWIGRUST)
+      SwigRV *p = SWIG_Rust_NewNum(SWIG_RV_F64, m.size1(), m.size2());
+      if (m.numel()) casadi_densify(m.ptr(), m.sparsity(), &p->f64[0], false);
+      return p;
 #else
       return 0;
 #endif
@@ -1042,6 +1049,16 @@ SWIGINTERNINLINE mxArray* SWIG_From_dec(std::string)(const std::string& s) {
       casadi::casadi_copy(m.ptr(), m.nnz(), static_cast<double*>(mxGetData(p)));
       std::copy(m.colind(), m.colind()+m.size2()+1, mxGetJc(p));
       std::copy(m.row(), m.row()+m.nnz(), mxGetIr(p));
+      return p;
+#elif defined(SWIGRUST)
+      SwigRV *p = new SwigRV();
+      p->kind = SWIG_RV_NUM;
+      p->rows = m.size1();
+      p->cols = m.size2();
+      p->sparse = true;
+      p->colind.assign(m.colind(), m.colind()+m.size2()+1);
+      p->row.assign(m.row(), m.row()+m.nnz());
+      p->f64 = m.nonzeros();
       return p;
 #else
       return 0;
@@ -1234,12 +1251,22 @@ SWIGINTERNINLINE mxArray* SWIG_From_dec(std::string)(const std::string& s) {
       return !p || jl_is_nothing(p);
 #elif defined(SWIGJAVA)
       return !p;
+#elif defined(SWIGRUST)
+      return !p || p->kind == SWIG_RV_NIL;
 #else
       if (!p) return true;
       emscripten::val v = SWIG_WASMJS_Borrow(p);
       return v.isNull() || v.isUndefined();
 #endif
     }
+#ifdef SWIGRUST
+
+    Sparsity get_sparsity(const SwigRV* p) {
+      if (!p->sparse) return Sparsity::dense(p->rows, p->cols);
+      return Sparsity(p->rows, p->cols, std::vector<casadi_int>(p->colind.begin(), p->colind.end()),
+                      std::vector<casadi_int>(p->row.begin(), p->row.end()));
+    }
+#endif // SWIGRUST
 #ifdef SWIGMATLAB
 
     Sparsity get_sparsity(const mxArray* p) {
@@ -1737,40 +1764,7 @@ SWIGINTERNINLINE mxArray* SWIG_From_dec(std::string)(const std::string& s) {
 // Linsol: only as the element of a std::vector in the serializer API
 %casadi_class_traits("Linsol", casadi::Linsol)
 #endif
-#ifdef SWIGJAVA
-// An integer i is the slice i:i+1
-%fragment(SWIG_Traits_frag(casadi::Slice), "header", fragment="casadi_aux", fragment=SWIG_Traits_frag(long long)) {
-  namespace swig {
-    template<> struct traits<casadi::Slice> {
-      typedef pointer_category category;
-      static const char* type_name() { return "Slice"; }
-    };
-    template<> struct traits_asptr<casadi::Slice> {
-      static bool conv(jobject p, casadi::Slice* m) {
-        long long i;
-        if (!SWIG_IsOK(swig::asval(p, &i))) return false;
-        if (m) {
-          m->start = i;
-          m->stop = m->start+1;
-          if (m->stop==0) m->stop = std::numeric_limits<casadi_int>::max();
-        }
-        return true;
-      }
-      static int asptr(jobject p, casadi::Slice** m) {
-        return casadi_asptr<casadi::Slice>(p, m, $descriptor(casadi::Slice*), conv);
-      }
-      static bool in_place(jobject p, casadi::Slice** m) {
-        return casadi_in_place<casadi::Slice>(p, m, $descriptor(casadi::Slice*), conv);
-      }
-    };
-    template<> struct traits_from<casadi::Slice> {
-      static jobject from(const casadi::Slice& a) {
-        return SWIG_NewPointerObj(new casadi::Slice(a), $descriptor(casadi::Slice *), SWIG_POINTER_OWN);
-      }
-    };
-  } // namespace swig
-}
-#elif !defined(SWIGPYTHON)
+#if !defined(SWIGPYTHON) && !defined(SWIGRUST) && !defined(SWIGJAVA)
 %casadi_class_traits("Slice", casadi::Slice)
 #else
 %fragment(SWIG_Traits_frag(casadi::Slice), "header", fragment="casadi_aux") {
@@ -1780,7 +1774,17 @@ SWIGINTERNINLINE mxArray* SWIG_From_dec(std::string)(const std::string& s) {
       static const char* type_name() { return "Slice"; }
     };
     template<> struct traits_asptr<casadi::Slice> {
-      static bool conv(PyObject* p, casadi::Slice* m) {
+      static bool conv(GUESTOBJECT* p, casadi::Slice* m) {
+#if defined(SWIGRUST) || defined(SWIGJAVA)
+        long long i;
+        if (!SWIG_IsOK(swig::asval(p, m ? &i : 0))) return false;
+        if (m) {
+          m->start = i;
+          m->stop = m->start+1;
+          if (m->stop==0) m->stop = std::numeric_limits<casadi_int>::max();
+        }
+        return true;
+#else
         // Python casadi_int
         if (PyLong_Check(p)) {
           if (m) {
@@ -1818,22 +1822,23 @@ SWIGINTERNINLINE mxArray* SWIG_From_dec(std::string)(const std::string& s) {
           return true;
         }
         return false;
+#endif
       }
-      static int asptr(PyObject* p, casadi::Slice** m) {
+      static int asptr(GUESTOBJECT* p, casadi::Slice** m) {
         return casadi_asptr<casadi::Slice>(p, m, $descriptor(casadi::Slice*), conv);
       }
-      static bool in_place(PyObject* p, casadi::Slice** m) {
+      static bool in_place(GUESTOBJECT* p, casadi::Slice** m) {
         return casadi_in_place<casadi::Slice>(p, m, $descriptor(casadi::Slice*), conv);
       }
     };
     template<> struct traits_from<casadi::Slice> {
-      static PyObject* from(const casadi::Slice& a) {
+      static GUESTOBJECT* from(const casadi::Slice& a) {
         return SWIG_NewPointerObj(new casadi::Slice(a), $descriptor(casadi::Slice *), SWIG_POINTER_OWN);
       }
     };
   } // namespace swig
 }
-#endif // SWIGPYTHON
+#endif // SWIGPYTHON || SWIGRUST
 
 %fragment(SWIG_Traits_frag(casadi::Matrix<double>), "header", fragment="casadi_aux",
           fragment=SWIG_Traits_frag(double), fragment="casadi_containers") {
@@ -1966,6 +1971,36 @@ SWIGINTERNINLINE mxArray* SWIG_From_dec(std::string)(const std::string& s) {
           }
         }
         return false;
+#elif defined(SWIGRUST)
+        // Numeric matrix (dense or sparse)
+        if (SWIG_Rust_IsNum(p)) {
+          if (p->elem==SWIG_RV_BOOL && !SWIG_Rust_IsScalar(p)) return false;
+          if (m) {
+            *m = DM(get_sparsity(p));
+            if (p->elem==SWIG_RV_F64) std::copy(p->f64.begin(), p->f64.end(), m->ptr());
+            else std::copy(p->i64.begin(), p->i64.end(), m->ptr());
+          }
+          return true;
+        }
+        if (p->kind!=SWIG_RV_LIST) return false;
+
+        // List of equally long numeric rows
+        if (!p->items.empty() && SWIG_Rust_IsVector(p->items[0]) && p->items[0]->numel()!=1) {
+          casadi_int ncol = p->items[0]->numel();
+          std::vector<double> rows, r;
+          for (SwigRV* e : p->items) {
+            if (!SWIG_Rust_IsVector(e) || e->numel()!=ncol || !swig::assign(e, &r)) return false;
+            rows.insert(rows.end(), r.begin(), r.end());
+          }
+          if (m) *m = DM::reshape(DM(rows), ncol, p->items.size()).T();
+          return true;
+        }
+
+        // List of numbers: a column
+        std::vector<double> col;
+        if (!swig::assign(p, m ? &col : 0)) return false;
+        if (m) *m = DM(col);
+        return true;
 #else
         // JS Array of numbers -> column vector; nested [[a,b],[c,d]] -> dense matrix, row-major in JS
         emscripten::val v = SWIG_WASMJS_Borrow(p);
@@ -2099,6 +2134,16 @@ SWIGINTERNINLINE mxArray* SWIG_From_dec(std::string)(const std::string& s) {
             }
             return true;
           }
+        }
+
+#elif defined(SWIGRUST)
+        // Integer or bool matrix (dense or sparse)
+        if (SWIG_Rust_IsNum(p) && p->elem!=SWIG_RV_F64) {
+          if (m) {
+            *m = IM(get_sparsity(p));
+            std::copy(p->i64.begin(), p->i64.end(), m->ptr());
+          }
+          return true;
         }
 
 #endif
@@ -2446,6 +2491,10 @@ SWIGINTERNINLINE mxArray* SWIG_From_dec(std::string)(const std::string& s) {
       case OT_NULL:
       case OT_VOIDPTR:
         return jl_nothing;
+#elif defined(SWIGRUST)
+      case OT_NULL:
+      case OT_VOIDPTR:
+        return new SwigRV();
 #endif
       default: return 0;
       }
