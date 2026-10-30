@@ -11,7 +11,9 @@ install(FILES ort_runtime.hpp
 
 casadi_plugin_link_libraries(Onnx ort onnxruntime::onnxruntime)
 
-target_include_directories(casadi_onnx_ort PRIVATE ${ONNX_RUNTIME_INCLUDE_DIR})
+if(ONNX_RUNTIME_INCLUDE_DIR)
+  target_include_directories(casadi_onnx_ort PRIVATE ${ONNX_RUNTIME_INCLUDE_DIR})
+endif()
 
 # Add the runtime sources to internal (installed separately)
 set(RUNTIME_SRC "ort_runtime.hpp")
