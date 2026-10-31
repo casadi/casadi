@@ -40,7 +40,7 @@ endif(NOT Eigen3_FIND_VERSION)
 macro(_eigen3_check_version)
   # If Eigen3_VERSION is defined, used it instead of trying to parse the version from headers
   if(DEFINED Eigen3_VERSION)
-    set(EIGEN3_VERSION Eigen3_VERSION)
+    set(EIGEN3_VERSION ${Eigen3_VERSION})
   else()
     file(READ "${EIGEN3_INCLUDE_DIR}/Eigen/src/Core/util/Macros.h" _eigen3_version_header)
   
@@ -86,9 +86,14 @@ else(EIGEN3_INCLUDE_DIR)
   endif(EIGEN3_INCLUDE_DIR)
 
   include(FindPackageHandleStandardArgs)
-  find_package_handle_standard_args(Eigen3 DEFAULT_MSG EIGEN3_INCLUDE_DIR EIGEN3_VERSION_OK)
+  find_package_handle_standard_args(EIGEN3 DEFAULT_MSG EIGEN3_INCLUDE_DIR EIGEN3_VERSION_OK)
 
   mark_as_advanced(EIGEN3_INCLUDE_DIR)
 
 endif(EIGEN3_INCLUDE_DIR)
 
+# The target of Eigen's own CMake package, for headers found without it
+if(EIGEN3_FOUND AND NOT TARGET Eigen3::Eigen)
+  add_library(Eigen3::Eigen INTERFACE IMPORTED)
+  set_target_properties(Eigen3::Eigen PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${EIGEN3_INCLUDE_DIR}")
+endif()
