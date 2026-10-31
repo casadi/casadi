@@ -54,7 +54,11 @@ namespace casadi {
 
     // Peform LU decomposition
     if (linsol_.sfact(arg[0], mem)) return 1;
-    if (linsol_.nfact(arg[0], mem)) return 1;
+    if (linsol_.nfact(arg[0], mem)) {
+      // Singular matrix
+      res[0][0] = 0;
+      return 0;
+    }
 
     // Compute determinant
     res[0][0] = linsol_.det(arg[0], mem);
