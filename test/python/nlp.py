@@ -2824,6 +2824,22 @@ class NLPtests(casadiTestCase):
     self.checkarray(solver_out["lam_g"], 4.4, digits=8)
     self.check_codegen(solver, solver_in, std="c99")
 
+  @requires_nlpsol("sqpmethod")
+  @requires_conic("qrqp")
+  def test_detect_simple_bounds_g(self):
+    # Scaled, offset and parametric simple bounds: g as without detection
+    x = ca.MX.sym("x", 2)
+    p = ca.MX.sym("p")
+    nlp = {"x": x, "p": p, "f": ca.sumsqr(x-3), "g": ca.vertcat(2*x[0]+1, x[1]-p, x[0]+x[1])}
+    opts = {"qpsol": "qrqp", "print_header": False, "print_iteration": False, "print_time": False,
+            "qpsol_options": {"print_iter": False, "print_header": False}}
+    solver_ref = ca.nlpsol("solver", "sqpmethod", nlp, opts)
+    solver = ca.nlpsol("solver", "sqpmethod", nlp, dict(opts, detect_simple_bounds=True))
+    for x0 in [[0, 0], [0.5, -1]]:
+      solver_in = {"x0": x0, "p": 1, "lbg": [-10, -10, -10], "ubg": [3, 0.5, 10]}
+      self.checkfunction_light(solver, solver_ref, inputs=solver_in, digits=8)
+      self.check_codegen(solver, solver_in, std="c99")
+
   def test_nlp_signature(self):
     x = ca.MX.sym("x")
     with self.assertInException("must have inputs (x, p) and outputs (f, g)"):

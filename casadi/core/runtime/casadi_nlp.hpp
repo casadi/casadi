@@ -257,8 +257,9 @@ int casadi_nlpsol_detect_bounds_after(casadi_nlpsol_data<T1>* d_nlp) {
     if (p_bounds->is_simple[i]) {
       casadi_int j = p_bounds->target_x[k];
       if (d_nlp->g) {
-        d_nlp->g[i] = d_bounds->a[k]*d_nlp->z[j]-d_bounds->b[k];
-        if (d_nlp->x0) d_nlp->g[i] += d_nlp->x0[j];
+        // b is g at x0
+        d_nlp->g[i] = d_bounds->a[k]*d_nlp->z[j]+d_bounds->b[k];
+        if (d_nlp->x0) d_nlp->g[i] -= d_bounds->a[k]*d_nlp->x0[j];
       }
       k++;
     } else {
