@@ -165,8 +165,8 @@ int casadi_nlpsol_detect_bounds_before(casadi_nlpsol_data<T1>* d_nlp) {
   d_bounds->arg[1] = d_nlp->p;
   d_bounds->res[0] = d_bounds->a;
   d_bounds->res[1] = d_bounds->b;
-  p_bounds->callback(d_bounds->arg, d_bounds->res,
-    d_bounds->iw, d_bounds->w, p_bounds->callback_data);
+  if (p_bounds->callback(d_bounds->arg, d_bounds->res,
+    d_bounds->iw, d_bounds->w, p_bounds->callback_data)) return 1;
 
   for (casadi_int i=0;i<p_bounds->nb;++i) {
     if (d_bounds->a[i]==0) {

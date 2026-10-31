@@ -2840,6 +2840,27 @@ class NLPtests(casadiTestCase):
       self.checkfunction_light(solver, solver_ref, inputs=solver_in, digits=8)
       self.check_codegen(solver, solver_in, std="c99")
 
+  @requires_nlpsol("sqpmethod")
+  @requires_conic("qrqp")
+  def test_detect_simple_bounds_failure(self):
+    # A failing evaluation of the bounds fails the solver, in generated code too
+    x = ca.MX.sym("x", 2)
+    p = ca.MX.sym("p")
+    q = p.attachAssert(p>=0, "p must be nonnegative")
+    nlp = {"x": x, "p": p, "f": ca.sumsqr(x-3), "g": x[0]-q}
+    opts = {"qpsol": "qrqp", "print_header": False, "print_iteration": False, "print_time": False,
+            "qpsol_options": {"print_iter": False, "print_header": False},
+            "detect_simple_bounds": True}
+    solver = ca.nlpsol("solver", "sqpmethod", nlp, opts)
+    with self.assertInException("p must be nonnegative"):
+      solver(p=-1, ubg=0)
+    cg = ca.CodeGenerator("detect_bounds_fail")
+    cg.add(solver)
+    F = ca.external("solver", ca.Importer(cg.generate(), "shell"))
+    self.checkarray(F(p=1, ubg=0)["x"], ca.DM([1, 3]), digits=6)
+    with self.assertRaises(RuntimeError):
+      F(p=-1, ubg=0)
+
   def test_nlp_signature(self):
     x = ca.MX.sym("x")
     with self.assertInException("must have inputs (x, p) and outputs (f, g)"):
