@@ -1370,7 +1370,7 @@ namespace casadi {
       g << "d->arg[3] = " << d_nlp << ".lam+" << str(nx_) << ";\n";
       g << "d->res[0] = " << (calc_f_ ? "&" + d_nlp + ".objective" : "0") << ";\n";
       g << "d->res[1] = " << (calc_g_ ? d_nlp + ".z+" + str(nx_) : "0") << ";\n";
-      g << "d->res[2] = " << (calc_lam_x_ ? d_nlp + ".lam+" + str(nx_) : "0") << ";\n";
+      g << "d->res[2] = " << (calc_lam_x_ ? d_nlp + ".lam" : "0") << ";\n";
       g << "d->res[3] = " << (calc_lam_p_ ? d_nlp + ".lam_p" : "0") << ";\n";
       std::string nlp_grad = g(get_function("nlp_grad"), "d->arg", "d->res", "d->iw", "d->w");
       g << "if (" << nlp_grad << ") return 1;\n";

@@ -2809,6 +2809,21 @@ class NLPtests(casadiTestCase):
     self.assertTrue(solver.stats()["success"])
     self.checkfunction_light(ref_solver.get_function("nlp_jac_g"),solver.get_function("nlp_jac_g"),inputs=[ca.vertcat(0.11,0.3,0.7),0])
     
+  @requires_nlpsol("sqpmethod")
+  @requires_conic("qrqp")
+  def test_calc_lam_x_codegen(self):
+    x = ca.MX.sym("x", 2)
+    nlp = {"x": x, "f": ca.sumsqr(x-3), "g": x[0]+x[1]}
+    opts = {"qpsol": "qrqp", "calc_lam_x": True, "print_header": False,
+            "print_iteration": False, "print_time": False,
+            "qpsol_options": {"print_iter": False, "print_header": False}}
+    solver = ca.nlpsol("solver", "sqpmethod", nlp, opts)
+    solver_in = {"x0": [0, 0], "lbx": [-10, -10], "ubx": [0.2, 10], "lbg": -10, "ubg": 1}
+    solver_out = solver(**solver_in)
+    self.checkarray(solver_out["lam_x"], ca.DM([1.2, 0]), digits=8)
+    self.checkarray(solver_out["lam_g"], 4.4, digits=8)
+    self.check_codegen(solver, solver_in, std="c99")
+
   def test_nlp_signature(self):
     x = ca.MX.sym("x")
     with self.assertInException("must have inputs (x, p) and outputs (f, g)"):

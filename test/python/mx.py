@@ -3732,6 +3732,13 @@ class MXtests(casadiTestCase):
     self.checkfunction(f,F,inputs=[x0])
     self.check_codegen(F,inputs=[x0])
 
+  def test_det_singular(self):
+    X = ca.MX.sym("x",3,3)
+    F = ca.Function('F',[X],[ca.det(X)])
+    for A in [numpy.zeros((3,3)), numpy.ones((3,3)), numpy.array([[1,2,3],[2,4,6],[0,0,1.]])]:
+      self.checkarray(F(A), 0, digits=12)
+      self.check_codegen(F,inputs=[A])
+
   @memory_heavy()
   def test_det_solvers(self):
     # Determinant through the linear-solver plugins, across sizes and a sparse pattern

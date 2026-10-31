@@ -34,8 +34,8 @@ void casadi_mtimes_dense(const T1* x, casadi_int nrow_x, casadi_int ncol_x,
   } else {
     // z(nrow_x, ncol_y) += x(nrow_x, ncol_x) * y(ncol_x, ncol_y)
     for (i=0; i<ncol_y; ++i) {
-      for (j=0; j<nrow_x; ++j) {
-        for (k=0; k<ncol_x; ++k) {
+      for (k=0; k<ncol_x; ++k) {
+        for (j=0; j<nrow_x; ++j) {
           z[j + i*nrow_x] += x[j + k*nrow_x] * y[k + i*ncol_x];
         }
       }
