@@ -88,7 +88,7 @@ namespace casadi {
     } else {
       // The row is in position 1+1+2+i (colind has length 2)
       g << "i<" << nnz << " ? " << g.sparsity(dep(0).sparsity()) << "[4+i] : "
-        << dep(0).size1() << "\n";
+        << dep(0).size1() << ";\n";
     }
   }
 
