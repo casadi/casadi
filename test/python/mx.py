@@ -3739,6 +3739,16 @@ class MXtests(casadiTestCase):
       self.checkarray(F(A), 0, digits=12)
       self.check_codegen(F,inputs=[A])
 
+  def test_find(self):
+    for sp, nz, ref in [(ca.Sparsity.dense(5, 1), [0, 0, 4, 0, 1], 2),
+                        (ca.Sparsity.triplet(5, 1, [1, 3], [0, 0]), [0, 7], 3),
+                        (ca.Sparsity.triplet(5, 1, [1, 3], [0, 0]), [0, 0], 5)]:
+      x = ca.MX.sym("x", sp)
+      f = ca.Function("f", [x], [ca.find(x)])
+      x0 = ca.DM(sp, nz)
+      self.checkarray(f(x0), ref)
+      self.check_codegen(f, inputs=[x0])
+
   @memory_heavy()
   def test_det_solvers(self):
     # Determinant through the linear-solver plugins, across sizes and a sparse pattern
