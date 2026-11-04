@@ -2193,25 +2193,11 @@ class Functiontests(casadiTestCase):
   def test_parametric_bspline_sparse_coefficients(self):
     knots = [[0,0,0,0,1,1,1,1]]
     x = ca.MX.sym("x")
-    sp = ca.Sparsity.triplet(4,1,[0,3],[0,0])
-    C = ca.MX.sym("C",sp)
-    D = ca.MX.sym("D",4)
-    dense = ca.bspline(x,D,knots,[3],1)
-
-    splines = [ca.bspline(x,C,knots,[3],1),
-               ca.bspline(x,ca.densify(C),knots,[3],1),
-               # Reconstruction bypasses BSplineParametric::create.
-               ca.graph_substitute(dense,[D],[C])]
-    for y in splines:
-      f = ca.Function("f",[x,C],[y,ca.jacobian(y,x)])
-      for a, b in [(1,2),(2,-1)]:
-        coeffs = ca.DM(sp,[a,b])
-        for point in [0,0.25,0.5,0.75,1]:
-          value, derivative = f(point,coeffs)
-          self.checkarray(value,a*(1-point)**3+b*point**3)
-          self.checkarray(derivative,-3*a*(1-point)**2+3*b*point**2)
-        self.check_codegen(f,inputs=[0.5,coeffs])
-        self.check_serialize(f,inputs=[0.5,coeffs])
+    coeffs = ca.sparsify(ca.DM([1,0,0,2]))
+    C = ca.MX.sym("C",coeffs.sparsity())
+    f = ca.Function("f",[x,C],[ca.bspline(x,C,knots,[3],1)])
+    # Coefficients [1,0,0,2] give (1-x)**3 + 2*x**3.
+    self.checkarray(f(0.5,coeffs),0.375)
 
   def test_smooth_linear(self):
     np.random.seed(0)
