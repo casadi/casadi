@@ -177,7 +177,8 @@ namespace casadi {
           const std::vector<casadi_int>& lookup_mode) :
           BSplineCommon(knots, offset, degree, m, lookup_mode) {
     casadi_assert_dev(x.size1()==degree.size());
-    set_dep(x, coeffs);
+    // The evaluation kernel indexes the full coefficient grid.
+    set_dep(x, densify(coeffs));
     set_sparsity(Sparsity::dense(m, 1));
   }
 

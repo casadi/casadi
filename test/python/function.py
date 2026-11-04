@@ -2190,6 +2190,15 @@ class Functiontests(casadiTestCase):
     self.check_codegen(F_pk,inputs=[ca.vertcat(0.3,0.4)],std="c99")
 
 
+  def test_parametric_bspline_sparse_coefficients(self):
+    knots = [[0,0,0,0,1,1,1,1]]
+    x = ca.MX.sym("x")
+    coeffs = ca.sparsify(ca.DM([1,0,0,2]))
+    C = ca.MX.sym("C",coeffs.sparsity())
+    f = ca.Function("f",[x,C],[ca.bspline(x,C,knots,[3],1)])
+    # Coefficients [1,0,0,2] give (1-x)**3 + 2*x**3.
+    self.checkarray(f(0.5,coeffs),0.375)
+
   def test_smooth_linear(self):
     np.random.seed(0)
 
