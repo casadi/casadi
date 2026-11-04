@@ -11,7 +11,18 @@ configuration:
 - Debug
 - Release
 
+environment:
+  CMAKE_VERSION: 3.16.9
+
+install:
+  - appveyor DownloadFile https://github.com/Kitware/CMake/releases/download/v%CMAKE_VERSION%/cmake-%CMAKE_VERSION%-win64-x64.zip -FileName cmake.zip
+  - 7z x cmake.zip -oC:\Tools > nul
+  - set PATH=C:\Tools\cmake-%CMAKE_VERSION%-win64-x64\bin;%PATH%
+  - cmake --version
+
 build_script:
+  - set PATH=C:\Tools\cmake-%CMAKE_VERSION%-win64-x64\bin;%PATH%
+  - cmake --version
   - set arch= Win64
   - set bitness=64
   - echo %arch%
