@@ -74,6 +74,10 @@ struct casadi_socp_prob {
   //   -p[map_P[i]]  if map_P[i] != -1
   //   0             otherwise
   const casadi_int *map_P;
+  // Nonzero pairs (-1: structural zero) of q (p) that must be equal:
+  // each block [Z I, X; X', Z] has a constant diagonal and is symmetric
+  casadi_int n_chk_q, n_chk_p;
+  const casadi_int *chk_q, *chk_p;
 
   // Derived (filled by casadi_socp_setup)
   casadi_int n_eq;
@@ -246,6 +250,26 @@ void casadi_socp_build(casadi_socp_data<T1>* d) {
     d->cone_start[b] = 0;
   }
   d->cone_start[p->n_blocks] = 0;
+}
+
+// SYMBOL "socp_pairs_differ"
+template<typename T1>
+int casadi_socp_pairs_differ(const T1* v, casadi_int n, const casadi_int* c) {
+  casadi_int k;
+  if (!v) return 0;
+  for (k = 0; k < n; ++k) {
+    if ((c[2*k] < 0 ? 0 : v[c[2*k]]) != (c[2*k+1] < 0 ? 0 : v[c[2*k+1]])) return 1;
+  }
+  return 0;
+}
+
+// SYMBOL "socp_check"
+// Nonzero if d->q / d->p are not exactly of the soc() form (see chk_q, chk_p)
+template<typename T1>
+int casadi_socp_check(const casadi_socp_data<T1>* d) {
+  const casadi_socp_prob<T1>* p = d->prob;
+  return casadi_socp_pairs_differ(d->q, p->n_chk_q, p->chk_q)
+      || casadi_socp_pairs_differ(d->p, p->n_chk_p, p->chk_p);
 }
 
 // SYMBOL "socp_cone_build"

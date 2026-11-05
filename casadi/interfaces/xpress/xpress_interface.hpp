@@ -208,6 +208,7 @@ namespace casadi {
     std::vector<casadi_int> socp_r_;
     std::vector<casadi_int> socp_mq_colind_, socp_mq_row_, socp_mq_data_;
     std::vector<casadi_int> socp_map_P_;
+    std::vector<casadi_int> socp_chk_q_, socp_chk_p_;
 
     // Build socp_ from the result of Conic::sdp_to_socp_init
     void build_socp_config();
