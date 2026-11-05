@@ -145,6 +145,9 @@ void GenericExternal::init_external() {
 
   // Sparsity patterns of Jacobians
   get_jac_sparsity_ = (sparsity_t)compiler_.get_function("jac_" + name_ + "_sparsity_out");
+
+  // Jump sparsity patterns
+  get_jump_sparsity_ = (sparsity_t)compiler_.get_function("jump_" + name_ + "_sparsity_out");
 }
 
 External::~External() {
@@ -262,6 +265,18 @@ Sparsity GenericExternal::get_jac_sparsity(casadi_int oind, casadi_int iind,
     // Fall back to base class
     return FunctionInternal::get_jac_sparsity(oind, iind, symmetric);
   }
+}
+
+bool GenericExternal::has_jump_sparsity(casadi_int oind, casadi_int iind) const {
+  casadi_int ind = iind + oind * n_in_;
+  return get_jump_sparsity_ || compiler_.has_meta("JUMP_" + name_ + "_SPARSITY_OUT", ind);
+}
+
+Sparsity GenericExternal::get_jump_sparsity(casadi_int oind, casadi_int iind) const {
+  casadi_int ind = iind + oind * n_in_;
+  if (get_jump_sparsity_) return Sparsity::compressed(get_jump_sparsity_(ind));
+  return Sparsity::compressed(
+    compiler_.meta_vector<casadi_int>("jump_" + name_ + "_SPARSITY_OUT", ind));
 }
 
 bool GenericExternal::get_diff_in(casadi_int i) {

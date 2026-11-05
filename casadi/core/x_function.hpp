@@ -1403,6 +1403,27 @@ namespace casadi {
     return ret;
   }
 
+  template<typename MatType>
+  std::vector<bool> _which_jump(const MatType &expr, const MatType &var, bool tr) {
+    // Short-circuit
+    if (expr.is_empty() || var.is_empty()) {
+      return std::vector<bool>(tr? expr.nnz() : var.nnz(), false);
+    }
+
+    Dict opts{{"max_io", 0}, {"allow_free", true}};
+    Function f = Function("tmp_which_jump", {var}, {expr}, opts);
+    std::vector<bvec_t> seed(tr? f.nnz_in(0) : f.nnz_out(0), 1);
+    std::vector<bvec_t> sens(tr? f.nnz_out(0) : f.nnz_in(0), 0);
+    if (tr) {
+      f.jump_fwd({get_ptr(seed)}, {get_ptr(sens)});
+    } else {
+      f.jump_rev({get_ptr(sens)}, {get_ptr(seed)});
+    }
+    std::vector<bool> ret(sens.size());
+    std::copy(sens.begin(), sens.end(), ret.begin());
+    return ret;
+  }
+
 } // namespace casadi
 /// \endcond
 #undef CASADI_THROW_ERROR

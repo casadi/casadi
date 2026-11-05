@@ -78,6 +78,10 @@ namespace casadi {
         \identifier{1gp} */
     casadi_int op() const override { return Add ? OP_ADDNONZEROS_PARAM : OP_SETNONZEROS_PARAM;}
 
+    /** \brief Jumps in the indices, which sp_forward drops */
+    bool has_jump(casadi_int i) const override { return i>=2;}
+    bool has_dense_jump() const override { return true;}
+
     /// Can the operation be performed inplace (i.e. overwrite the result)
     casadi_int n_inplace() const override { return 1;}
 
