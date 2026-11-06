@@ -29,6 +29,7 @@
 #include <casadi/interfaces/conopt/casadi_nlpsol_conopt_export.h>
 #include <conopt.h>
 #include <atomic>
+#include <map>
 #include <vector>
 #include <string>
 #include <utility>
@@ -82,6 +83,31 @@ namespace casadi {
     QuickModeTermination = 15
   };
 
+  // One instruction of an SX function's evaluation tape (copied from
+  // SXFunction::algorithm_; d is only meaningful for OP_CONST).
+  struct ConoptInstr {
+    int op, i0, i1, i2;
+    double d;
+  };
+
+  // Evaluation tape of an SX function, built in init() so that FDEvalIni can
+  // execute only the instructions the requested rows depend on.
+  struct ConoptTape {
+    std::vector<ConoptInstr> instr;
+    // Instruction that produced each operand of an instruction (-1: none)
+    std::vector<int> dep1, dep2;
+    // OP_OUTPUT instruction of each output nonzero, per output
+    std::vector<std::vector<int>> out_instr;
+    casadi_int sz_w = 0;
+  };
+
+  // Outcome of collecting the instructions for one set of row slots: either
+  // too much of the tape (evaluate in full) or the sorted instruction list.
+  struct ConoptRowSet {
+    bool heavy;
+    std::vector<int> instr;
+  };
+
   struct CASADI_NLPSOL_CONOPT_EXPORT ConoptMemory : public NlpsolMemory {
     const ConoptInterface& self;
     coiHandle_t cntvect;
@@ -99,7 +125,40 @@ namespace casadi {
     std::vector<double> cached_jac_g;
     std::atomic<bool> cache_valid{false};
     std::atomic<bool> cache_valid_jac{false};  // true only when cached_jac_g was computed
+    // Whether the cache holds values/Jacobian for cached_x from a previous
+    // single-row FDEvalIni. Unlike cache_valid*, these survive FDEvalEnd so a
+    // repeated single-row request at the same point can skip re-evaluation.
+    bool stored_fun = false;
+    bool stored_jac = false;
     bool nan_encountered;
+
+    // Row-subset evaluation state (only used when the interface has tapes).
+    // Row slots are CasADi constraint indices, with slot ng_ for the objective.
+    // A slot's values (derivatives) are cached for cached_x when its stamp_fun
+    // (stamp_jac) entry equals cur_stamp; bumping cur_stamp invalidates all.
+    std::vector<unsigned> stamp_fun;
+    std::vector<unsigned> stamp_jac;
+    std::vector<unsigned> queued;  // dedupes slots within one FDEvalIni
+    unsigned cur_stamp = 0;
+    unsigned cur_queue = 0;
+    std::vector<int> pending_rows;
+    std::vector<double> tape_w;
+    std::vector<char> tape_mark;   // all zero between evaluations
+    std::vector<int> tape_stack;
+    std::vector<int> tape_list;
+    // Row sets seen so far, keyed by sorted slots, per tape (0: fg, 1: fg_jac).
+    // Structural, so kept across solves; cleared when row_set_ints exceeds a cap.
+    std::map<std::vector<int>, ConoptRowSet> row_sets[2];
+    size_t row_set_ints = 0;
+    // Statistics
+    casadi_int n_eval_subset = 0;   // FDEvalIni calls evaluated on a row subset
+    casadi_int n_eval_full = 0;     // FDEvalIni calls evaluated in full
+    casadi_int n_eval_reused = 0;   // FDEvalIni calls answered from the cache
+    casadi_int n_eval_on_demand = 0;  // FDEval rows missing from the FDEvalIni list
+    double subset_instr_frac = 0;   // sum over subset evaluations of executed/total
+
+    // Invalidates the row-subset cache
+    void bump_stamp();
 
     // Options handling
     std::vector<std::pair<std::string, GenericType>> custom_options;
@@ -110,6 +169,14 @@ namespace casadi {
     std::vector<double> gradf_const_vals;
     // Scratch buffer for the linear part of G at x0 per row.
     std::vector<double> linear_at_x0;
+    // Point for evaluating the linear parts (x0 clamped to the bounds) and the
+    // outputs of nlp_lin
+    std::vector<double> x_lin;
+    std::vector<double> lin_jac_buf;
+    std::vector<double> lin_g_buf;
+    std::vector<double> lin_gradf_buf;
+    // nlp_hess_l output when the CONOPT Hessian structure is extended
+    std::vector<double> hess_buf;
 
     // Range-constraint expansion state (recomputed each solve)
     int ng_expanded;
@@ -167,6 +234,62 @@ namespace casadi {
     // size as each other) when they are full, used by solve()'s row-expansion loop.
     void ensure_row_capacity(ConoptMemory* m, casadi_int remaining_rows) const;
 
+    // Clears jacg_nlflag_/gradf_nlflag_ for columns absent from hesslag_sp_
+    // (CONOPT rejects nonlinear columns missing from the Hessian structure).
+    void refine_nlflags_with_hessian();
+
+    // Columns appearing in hesslag_sp_
+    std::vector<bool> hessian_columns() const;
+
+    // Marks rows classified as fully linear (and an affine objective) as
+    // nonlinear when their value depends on x through a discontinuous operation
+    // (floor, sign, comparisons, ...), whose zero derivative would otherwise
+    // freeze the term at its x0 value.
+    void mark_step_rows();
+
+    // Builds everything derived from the final NLFLAGs: the CSR structure, the
+    // Hessian structure passed to CONOPT, nlp_lin and the tapes.
+    void finalize_structure();
+
+    // Builds tape_fg_/tape_fg_jac_ when subset_eval_ is set and the evaluation
+    // functions are SX without calls; sets has_tape_.
+    void build_tapes();
+    static bool build_tape(const Function& f, ConoptTape& t);
+
+    // Evaluates the row slots in m->pending_rows at m->cached_x using the tapes.
+    // Returns 0 on success, 1 on an evaluation error (NaN/Inf), and -1 when the
+    // rows depend on so much of the tape that a full evaluation is cheaper.
+    int eval_rows(ConoptMemory* m, bool need_jac) const;
+
+    // Full evaluation at m->cached_x into the cache (nlp_fg or nlp_fg_jac)
+    int eval_full(ConoptMemory* m, bool need_jac) const;
+
+    // FDEvalIni when row-subset evaluation is active
+    int fdevalini_subset(ConoptMemory* m, const double X[], const int ROWLIST[],
+                         int MODE, int LISTSIZE) const;
+
+    // Hessian structure passed to CONOPT: hesslag_sp_ plus zero diagonal
+    // entries for nonlinear columns that nlp_hess_l does not cover (only after
+    // mark_step_rows). hess_nz_map_ maps nlp_hess_l nonzeros into it; it is
+    // empty when the two structures are the same.
+    Sparsity hess_sp_;
+    std::vector<casadi_int> hess_nz_map_;
+
+    // Linear parts, evaluated by nlp_lin in solve(): linear Jacobian nonzeros,
+    // rows without nonlinear entries, linear gradient nonzeros, and whether
+    // the objective is affine (then nlp_lin also returns f).
+    std::vector<casadi_int> lin_jac_nz_;
+    std::vector<casadi_int> lin_rows_;
+    std::vector<casadi_int> lin_gradf_nz_;
+    bool affine_obj_ = false;
+    bool has_lin_fcn_ = false;
+
+    // Evaluate only the rows CONOPT requests (see the 'subset_eval' option)
+    bool subset_eval_;
+    bool has_tape_ = false;
+    ConoptTape tape_fg_;      // nlp_fg: f, g
+    ConoptTape tape_fg_jac_;  // nlp_fg_jac: f, grad:f:x, g, jac:g:x
+
     // Sparsities for the problem components
     Sparsity gradf_sp_;
     Sparsity jacg_sp_;
@@ -176,6 +299,12 @@ namespace casadi {
     bool debug_;
     Dict opts_; // CONOPT specific options
     std::string optfile_; // Path to CONOPT option file (for string-valued CR-cells)
+
+    // License passed via the 'license' option; takes precedence over the
+    // CONOPT_LICENSE_* environment variables. Not serialized.
+    bool has_license_ = false;
+    int license_int_[3] = {0, 0, 0};
+    std::string license_text_;
 
     // Per-column flag: true if the objective gradient has a nonzero in that column
     std::vector<bool> gradf_col_flag_;
