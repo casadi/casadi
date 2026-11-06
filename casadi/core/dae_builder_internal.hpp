@@ -692,6 +692,10 @@ protected:
   // Read dependencies node
   std::vector<casadi_int> read_dependencies(const XmlNode& n);
 
+  // Read list of dependencies, with a default for a missing attribute
+  std::vector<casadi_int> read_dependencies(const XmlNode& n,
+    const std::vector<casadi_int>& default_dependencies);
+
   // Read dependenciesKind node
   std::vector<DependenciesKind> read_dependencies_kind(const XmlNode& n, size_t ndep);
 

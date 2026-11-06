@@ -30,6 +30,7 @@ import os
 import unittest
 from helpers import casadiTestCase, memory_heavy, requires_integrator, requires_modelicaparser, requires_nlpsol, requires_rootfinder
 import glob
+import re
 import gc
 
 class Daebuildertests(casadiTestCase):
@@ -175,6 +176,62 @@ class Daebuildertests(casadiTestCase):
 
     # Cleanup
     f = None
+    dae = None
+    gc.collect()
+    if os.path.exists(fmu_file):
+        os.remove(fmu_file)
+
+  @memory_heavy() # FMU has a memleak
+  def test_fmi_ls_dae_missing_dependencies(self):
+    # A missing 'dependencies' attribute means dependent on all knowns, also on parameters:
+    # a sparsity without them gives a wrong, zero derivative
+    feats = ca.CasadiMeta.feature_list()
+    if "ghc-filesystem" not in feats or "libzip" not in feats:
+        print("Skipping test_fmi_ls_dae_missing_dependencies: ghc-filesystem/libzip not available")
+        return
+    fmi_headers = os.path.abspath("../../external_packages/FMI-Standard-3.0/headers")
+    src = "../data/fmi_ls_dae/"
+    files = {}
+    for local, arc in [("lsdae_test.c", "sources/lsdae_test.c"),
+                       ("modelDescription.xml", "modelDescription.xml"),
+                       ("fmi-ls-manifest.xml",
+                        "extra/org.fmi-standard.fmi-ls-dae/fmi-ls-manifest.xml")]:
+        with open(src + local) as f_in, open(local, "w") as f_out:
+          text = f_in.read()
+          if local == "fmi-ls-manifest.xml":
+            # The second residual, 2*(der(x) + p*x - z), and an empty attribute on the first
+            text, n = re.subn(r'(<Residual valueReference="7") dependencies="[^"]*" dependenciesKind="[^"]*"', r"\1", text)
+            self.assertEqual(n, 1)
+            text, n = re.subn(r'(<Residual valueReference="6") dependencies="[^"]*" dependenciesKind="[^"]*"', r'\1 dependencies=""', text)
+            self.assertEqual(n, 1)
+          f_out.write(text)
+        files[local] = arc
+    try:
+        files = ca.DaeBuilder("lsdae_test").compile_fmu(files, {"include_dirs": [fmi_headers]})
+    except Exception as e:
+        for local in files.keys():
+            if os.path.exists(local): os.remove(local)
+        print("Skipping test_fmi_ls_dae_missing_dependencies: C compilation unavailable:", e)
+        return
+    fmu_file = ca.DaeBuilder("lsdae_test").pack_fmu(files, {"path": "lsdae_missing_deps.fmu"})
+
+    dae = ca.DaeBuilder("lsdae_test", fmu_file)
+    f = dae.create("f", ["x", "z", "p"], ["alg"])
+    J = f.factory("J", f.name_in(), ["jac:alg:p", "jac:alg:x", "jac:alg:z"])
+    x, z, p = 1.1, ca.DM([0.3, 0.7]), 2.5
+    [dp, dx, dz] = J(x, z, p)
+    # The missing attribute gives the true derivatives
+    self.checkarray(dp[1], 2 * x, digits=5)
+    self.checkarray(dx[1], 2 * p, digits=5)
+    self.checkarray(dz[1, :], ca.DM([[2, -2]]), digits=5)
+    # The empty attribute, however, is a promise of no dependencies at all
+    self.assertEqual(dp[0, :].nnz(), 0)
+    self.assertEqual(dx[0, :].nnz(), 0)
+    self.assertEqual(dz[0, :].nnz(), 0)
+
+    # Cleanup
+    f = None
+    J = None
     dae = None
     gc.collect()
     if os.path.exists(fmu_file):

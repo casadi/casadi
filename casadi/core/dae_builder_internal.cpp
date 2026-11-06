@@ -4135,6 +4135,11 @@ std::vector<casadi_int> DaeBuilderInternal::read_dependencies(const XmlNode& n) 
   return r;
 }
 
+std::vector<casadi_int> DaeBuilderInternal::read_dependencies(const XmlNode& n,
+    const std::vector<casadi_int>& default_dependencies) {
+  return n.has_attribute("dependencies") ? read_dependencies(n) : default_dependencies;
+}
+
 std::vector<DependenciesKind> DaeBuilderInternal::read_dependencies_kind(
     const XmlNode& n, size_t ndep) {
   // Quick return if node not provided
@@ -4197,6 +4202,23 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
 
     // Loop over ModelStructure elements
     const XmlNode& ms = has_lsdae ? lsdae_ms : n;
+
+    // Missing 'dependencies' attribute: dependent on all knowns (time, states, inputs, parameters
+    // and, with LS-DAE, algebraic variables). Get the states from ContinuousStateDerivative first.
+    // An empty attribute, on the other hand, means no dependencies.
+    std::vector<casadi_int> default_dependencies;
+    for (casadi_int i = 0; i < ms.size(); ++i) {
+      if (ms[i].name == "ContinuousStateDerivative") {
+        default_dependencies.push_back(
+          variable(vrmap_.at(ms[i].attribute<size_t>("valueReference"))).parent);
+      }
+    }
+    for (Category c : {Category::T, Category::U, Category::P, Category::Z}) {
+      default_dependencies.insert(default_dependencies.end(),
+        indices(c).begin(), indices(c).end());
+    }
+    std::sort(default_dependencies.begin(), default_dependencies.end());
+
     for (casadi_int i = 0; i < ms.size(); ++i) {
       const XmlNode& e = ms[i];
       try {
@@ -4207,7 +4229,7 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
           // Corresponding variable
           Variable& v = variable(indices(Category::Y).back());
           // Get dependencies
-          v.dependencies = read_dependencies(e);
+          v.dependencies = read_dependencies(e, default_dependencies);
           v.dependenciesKind = read_dependencies_kind(e, v.dependencies.size());
           // Mark interdependencies
           for (casadi_int d : v.dependencies) variable(d).dependency = true;
@@ -4225,7 +4247,7 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
           // Map der field to derivative variable
           variable(v.parent).der = der_.back();
           // Get dependencies
-          v.dependencies = read_dependencies(e);
+          v.dependencies = read_dependencies(e, default_dependencies);
           v.dependenciesKind = read_dependencies_kind(e, v.dependencies.size());
           // Mark interdependencies
           for (casadi_int d : v.dependencies) variable(d).dependency = true;
@@ -4237,7 +4259,9 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
           // Get index
           initial_unknowns_.push_back(vrmap_.at(e.attribute<size_t>("valueReference")));
           // Get dependencies
-          for (casadi_int d : read_dependencies(e)) variable(d).dependency = true;
+          for (casadi_int d : read_dependencies(e, default_dependencies)) {
+            variable(d).dependency = true;
+          }
         } else if (e.name == "EventIndicator") {
           // Event indicator
           indices(Category::ZERO).push_back(vrmap_.at(e.attribute<size_t>("valueReference")));
@@ -4260,7 +4284,7 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
               // Corresponding variable
               Variable& v = variable(indices(Category::ALG).back());
               // Get dependencies
-              v.dependencies = read_dependencies(f);
+              v.dependencies = read_dependencies(f, default_dependencies);
               v.dependenciesKind = read_dependencies_kind(f, v.dependencies.size());
             }
           }
