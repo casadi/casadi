@@ -1575,6 +1575,20 @@ class ConicTests(casadiTestCase):
     solver_qp = solver.find_function("solver_qp")
     self.checkarray(solver_qp(x=2)["H"],0.5)
     self.assertTrue(solver_qp.is_a("SXFunction"))
+
+  @requires_conic("osqp")
+  def test_osqp_reset_rho(self):
+
+    x=ca.MX.sym("x")
+    y=ca.MX.sym("y")
+
+    qp = {'x':ca.vertcat(x,y), 'f':x**2+y**2, 'g':x+y}
+    # a problem whose solution depends on rho, as max_iter is reached
+    for reset_rho in [True, False]:
+      solver = ca.qpsol("solver","osqp",qp,{"reset_rho":reset_rho,"error_on_fail":False,"osqp":{"rho":1e3,"adaptive_rho_interval":5,"max_iter":20}})
+      x1 = solver(lbg=1,ubg=1)["x"]
+      x2 = solver(lbg=1,ubg=1)["x"]
+      self.assertEqual(float(ca.norm_inf(x1-x2))==0, reset_rho)
     
         
 @requires_conic("xpress")
