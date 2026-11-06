@@ -82,7 +82,10 @@ namespace casadi {
         "Use x0 input to warmstart [Default: true]."}},
       {"warm_start_dual",
        {OT_BOOL,
-        "Use lam_a0 and lam_x0 input to warmstart [Default: true]."}}
+        "Use lam_a0 and lam_x0 input to warmstart [Default: true]."}},
+      {"reset_rho",
+       {OT_BOOL,
+        "Reset rho before every solve; false keeps rho as in CasADi < 3.8 [Default: true]."}}
      }
   };
 
@@ -105,6 +108,7 @@ namespace casadi {
 
     warm_start_primal_ = true;
     warm_start_dual_ = true;
+    reset_rho_ = true;
 
     // Read options
     for (auto&& op : opts) {
@@ -112,6 +116,8 @@ namespace casadi {
         warm_start_primal_ = op.second;
       } else if (op.first=="warm_start_dual") {
         warm_start_dual_ = op.second;
+      } else if (op.first=="reset_rho") {
+        reset_rho_ = op.second;
       } else if (op.first=="osqp") {
         const Dict& opts = op.second;
         for (auto&& op : opts) {
@@ -157,6 +163,13 @@ namespace casadi {
             settings_.scaled_termination = op.second;
           } else if (op.first=="check_termination") {
             settings_.check_termination = op.second;
+#ifdef WITH_OSQP_V1
+          } else if (op.first=="check_dualgap") {
+            settings_.check_dualgap = op.second;
+#else
+          } else if (op.first=="check_dualgap") {
+            casadi_error("OSQP option 'check_dualgap' requires OSQP >= 1.0.0.");
+#endif
           } else if (op.first=="warm_start" || op.first=="warm_starting") {
             casadi_error("OSQP's warm_start option is impure and therefore disabled. "
                          "Use CasADi options 'warm_start_primal' and 'warm_start_dual' instead.");
@@ -322,7 +335,9 @@ namespace casadi {
     osqp_cold_start(m->work);
 #endif
 
-    osqp_update_rho(m->work, rho_initial_);
+    if (reset_rho_) {
+      osqp_update_rho(m->work, rho_initial_);
+    }
 
     if (warm_start_primal_) {
 #ifdef WITH_OSQP_V1
@@ -470,6 +485,9 @@ namespace casadi {
     g << "settings.scaled_termination = " << settings_.scaled_termination << ";\n";
     g << "settings.check_termination = " << settings_.check_termination << ";\n";
 #ifdef WITH_OSQP_V1
+    g << "settings.check_dualgap = " << settings_.check_dualgap << ";\n";
+#endif
+#ifdef WITH_OSQP_V1
     g << "settings.warm_starting = " << settings_.warm_starting << ";\n";
 #else
     g << "settings.warm_start = " << settings_.warm_start << ";\n";
@@ -546,7 +564,9 @@ namespace casadi {
     g << "osqp_cold_start(work);\n";
   #endif
 
-    g << "osqp_update_rho(work, " << g.constant(rho_initial_) << ");\n";
+    if (reset_rho_) {
+      g << "osqp_update_rho(work, " << g.constant(rho_initial_) << ");\n";
+    }
 
     if (warm_start_primal_) {
   #ifdef WITH_OSQP_V1
@@ -611,7 +631,7 @@ namespace casadi {
   }
 
   OsqpInterface::OsqpInterface(DeserializingStream& s) : Conic(s) {
-    int version = s.version("OsqpInterface", 1, 2);
+    int version = s.version("OsqpInterface", 1, 3);
     s.unpack("OsqpInterface::nnzHupp", nnzHupp_);
     s.unpack("OsqpInterface::nnzA", nnzA_);
     s.unpack("OsqpInterface::warm_start_primal", warm_start_primal_);
@@ -651,12 +671,23 @@ namespace casadi {
     } else {
       rho_initial_ = settings_.rho;
     }
+    reset_rho_ = true;
+    if (version>=3) {
+      s.unpack("OsqpInterface::reset_rho", reset_rho_);
+#ifdef WITH_OSQP_V1
+      s.unpack("OsqpInterface::settings::check_dualgap", settings_.check_dualgap);
+#else
+      // OSQP < 1.0: read and discard check_dualgap
+      casadi_int check_dualgap;
+      s.unpack("OsqpInterface::settings::check_dualgap", check_dualgap);
+#endif
+    }
     //s.unpack("OsqpInterface::settings::time_limit", settings_.time_limit);
   }
 
   void OsqpInterface::serialize_body(SerializingStream &s) const {
     Conic::serialize_body(s);
-    s.version("OsqpInterface", 2);
+    s.version("OsqpInterface", 3);
     s.pack("OsqpInterface::nnzHupp", nnzHupp_);
     s.pack("OsqpInterface::nnzA", nnzA_);
     s.pack("OsqpInterface::warm_start_primal", warm_start_primal_);
@@ -697,6 +728,14 @@ namespace casadi {
     s.pack("OsqpInterface::settings::warm_start", static_cast<casadi_int>(settings_.warm_start));
 #endif
     s.pack("OsqpInterface::rho_initial", rho_initial_);
+    s.pack("OsqpInterface::reset_rho", reset_rho_);
+#ifdef WITH_OSQP_V1
+    s.pack("OsqpInterface::settings::check_dualgap",
+      static_cast<casadi_int>(settings_.check_dualgap));
+#else
+    // OSQP < 1.0 has no duality gap check: store 0 to reflect actual behaviour
+    s.pack("OsqpInterface::settings::check_dualgap", static_cast<casadi_int>(0));
+#endif
     //s.pack("OsqpInterface::settings::time_limit", settings_.time_limit);
   }
 
