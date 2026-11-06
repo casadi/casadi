@@ -1,0 +1,25 @@
+//! base 0.1.0
+package 'ResidualForms'
+  model 'ResidualForms' "Residuals that do not stay a difference of a left and a right-hand side"
+    Real 'a';
+    Real 'b';
+    Real 'c';
+    Real 'd';
+    Real 'e';
+    Real 'f';
+    Real 'g';
+    Real 'h';
+    Real 'i';
+  initial equation
+    'h' = -'i';
+    'i' = 3.0;
+  equation
+    'a' * 'b' = 6.0;
+    'c' * 'd' = 0.0;
+    sin('e') = 0.0;
+    'f' = -'g';
+    'g' = 0.0;
+    der('h') = 'h';
+    der('i') = 'i';
+  end 'ResidualForms';
+end 'ResidualForms';

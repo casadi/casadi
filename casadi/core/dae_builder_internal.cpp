@@ -896,33 +896,40 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
       bool is_init_eq = out_name.substr(0, 8) == "init_eq[";
       bool is_dyn_eq = out_name.substr(0, 3) == "eq[" && !is_init_eq;
 
-      if (is_dyn_eq || is_init_eq) {
-        // Equation residual: (lhs - rhs) = 0, so lhs = rhs
-        // Check if it's a subtraction with 2 dependencies
-        if (expr.n_dep() == 2) {
-          MX lhs = expr.dep(0);  // The left-hand side
-          MX rhs = expr.dep(1);  // The right-hand side
+      // Delays need a value from the past, which a DaeBuilder variable cannot express
+      casadi_assert(out_name.substr(0, 11) != "delay_expr[",
+        "The delay operator is not supported by DaeBuilder");
 
-          if (is_init_eq) {
-            // Initial equation: set initial value for the variable
-            if (lhs.is_symbolic()) {
-              std::string var_name = lhs.name();
-              set_init(var_name, rhs);
-            }
-          } else {
-            // Dynamic equation
-            if (lhs.is_symbolic()) {
-              // Simple variable on LHS: var = rhs (binding equation)
-              std::string var_name = lhs.name();
-              size_t var_ind = find(var_name);
-              Variable& var_ref = variable(var_ind);
-              var_ref.bind = assign(var_name, rhs).index;
-            } else {
-              // Complex expression on LHS (e.g., m*c_p*der(T))
-              // Use implicit residual form: 0 = lhs - rhs
-              eq(MX(0), lhs - rhs, Dict());
-            }
-          }
+      if (is_dyn_eq || is_init_eq) {
+        // Equation residual: (lhs - rhs) = 0. Read it as var = rhs if that is what it is, keeping
+        // in mind that expression simplification has been at work: x - 0 is x, x - (-y) is x + y,
+        // and a product or a call with two arguments is no difference at all.
+        MX lhs, rhs;
+        if (expr.is_symbolic()) {
+          lhs = expr;
+          rhs = MX::zeros(expr.sparsity());
+        } else if (expr.is_op(OP_SUB) && expr.dep(0).is_symbolic()) {
+          lhs = expr.dep(0);
+          rhs = expr.dep(1);
+        } else if (expr.is_op(OP_ADD) && expr.dep(0).is_symbolic()) {
+          lhs = expr.dep(0);
+          rhs = -expr.dep(1);
+        }
+
+        if (is_init_eq) {
+          // Initial equation: set initial value for the variable
+          casadi_assert(!lhs.is_empty(), "Only an initial equation of the form "
+            "variable = expression is supported: " + out_name);
+          set_init(lhs.name(), rhs);
+        } else if (!lhs.is_empty()) {
+          // Simple variable on LHS: var = rhs (binding equation)
+          std::string var_name = lhs.name();
+          size_t var_ind = find(var_name);
+          Variable& var_ref = variable(var_ind);
+          var_ref.bind = assign(var_name, rhs).index;
+        } else {
+          // Anything else (e.g., m*c_p*der(T) - h): use implicit residual form
+          eq(MX(0), expr, Dict());
         }
       } else if (out_name.substr(0, 6) == "start[") {
         // Start value: start[N] where N is the input index

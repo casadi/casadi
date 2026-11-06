@@ -952,6 +952,30 @@ class Daebuildertests(casadiTestCase):
     # Verify temp directory was cleaned up
     self.assertFalse(os.path.exists(temp_dir), "Temp dir not cleaned up: {}".format(temp_dir))
 
+  @requires_modelicaparser('lacemodelica')
+  def test_basemodelica_residual_forms(self):
+    """Simplification changes a residual: x*y - 0 is x*y, which is no difference of x and y."""
+    import numpy
+    dae = ca.DaeBuilder('forms', '../data/ResidualForms.bmo')
+
+    # a*b = 6, c*d = 0 and sin(e) = 0 stay implicit
+    alg = ca.vertcat(*dae.alg())
+    self.assertEqual(alg.numel(), 3)
+    syms = [dae.var(n) for n in 'abcde']
+    f = ca.Function('f', [ca.vertcat(*syms)], [ca.fabs(alg)])
+    self.checkarray(f(ca.DM([2, 3, 0, 5, 0])), ca.DM.zeros(3), 'at a solution')
+    self.checkarray(f(ca.DM([2, 4, 7, 5, 1])), ca.fabs(ca.DM([2, 35, numpy.sin(1)])), 'away from a solution')
+
+    # f = -g is not f = g, and g = 0 stays an equation when the residual is g
+    self.checkarray(ca.evalf(ca.substitute(dae.beq('f'), dae.var('g'), 2.0)), ca.DM(-2.0), 'f = -g')
+    self.checkarray(ca.evalf(dae.beq('g')), ca.DM(0.0), 'g = 0')
+
+    # The same goes for an initial equation
+    self.assertEqual([str(v) for v in dae.init_lhs()], ['h', 'i'])
+    [h_init, i_init] = dae.init_rhs()
+    self.checkarray(ca.evalf(ca.substitute(h_init, dae.var('i'), 2.0)), ca.DM(-2.0), 'h = -i')
+    self.checkarray(ca.evalf(i_init), ca.DM(3.0), 'i = 3')
+
 
 if __name__ == '__main__':
     unittest.main()
