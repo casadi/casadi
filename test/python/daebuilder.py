@@ -136,13 +136,28 @@ class Daebuildertests(casadiTestCase):
         return
     fmu_file = ca.DaeBuilder("lsdae_test").pack_fmu(files, {"path": "lsdae_test.fmu"})
 
+    # With the manifest: residuals as 'alg', der(x) and z as algebraic variables
+    dae = ca.DaeBuilder("lsdae_test", fmu_file)
+    self.assertEqual(dae.x(), ["x"])
+    self.assertEqual(dae.z(), ["der(x)", "z"])
+    self.assertEqual([str(r) for r in dae.alg()], ["_D_DAEres0", "_D_DAEres1"])
+    f = dae.create("f", ["x", "z"], ["alg"])
+    x = ca.SX.sym("x")
+    dx = ca.SX.sym("dx")
+    z = ca.SX.sym("z")
+    f_ref = ca.Function("f_ref", [x, ca.vertcat(dx, z)],
+      [ca.vertcat(z**3 + z - x, 2 * (dx + 2 * x - z))])
+    # Residual is evaluated in DAE mode: not zero at an inconsistent point
+    test_point = [1.1, ca.vertcat(0.3, 0.7)]
+    self.checkfunction(f, f_ref, inputs=test_point, digits=7, hessian=False,
+      sens_der=False, evals=1, digits_sens=5)
+    self.check_serialize(f, inputs=test_point)
+
     # Without the manifest: an ordinary ODE FMU, z solved internally
     dae = ca.DaeBuilder("lsdae_test", fmu_file, {"enable_ls_dae": False})
     self.assertEqual(dae.z(), [])
     f = dae.create("f", ["x", "p"], ["ode"])
     xdot = f(1.1, 2.5)
-    x = ca.SX.sym("x")
-    z = ca.SX.sym("z")
     zs = ca.rootfinder("zs", "newton", ca.Function("g", [z, x], [z**3 + z - x]))(0, 1.1)
     self.checkarray(xdot, -2.5 * 1.1 + zs, digits=10)
 
