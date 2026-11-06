@@ -75,6 +75,10 @@ void Fmu3::init(const DaeBuilderInternal* dae) {
   init_integer_.clear();
   init_boolean_.clear();
   init_string_.clear();
+  vr_enable_dae_.clear();
+  if (dae->enable_dae_vr_ >= 0) {
+    vr_enable_dae_.push_back(static_cast<fmi3ValueReference>(dae->enable_dae_vr_));
+  }
   for (size_t i = 0; i < dae->n_variables(); ++i) {
     const Variable& v = dae->variable(i);
     // Consitency check
@@ -176,6 +180,12 @@ void Fmu3::load_functions() {
     "fmi3InstantiateModelExchange");
   free_instance_ = load_function<fmi3FreeInstanceTYPE>("fmi3FreeInstance");
   reset_ = load_function<fmi3ResetTYPE>("fmi3Reset");
+  if (!vr_enable_dae_.empty()) {
+    enter_configuration_mode_ = load_function<fmi3EnterConfigurationModeTYPE>(
+      "fmi3EnterConfigurationMode");
+    exit_configuration_mode_ = load_function<fmi3ExitConfigurationModeTYPE>(
+      "fmi3ExitConfigurationMode");
+  }
   enter_initialization_mode_ = load_function<fmi3EnterInitializationModeTYPE>(
     "fmi3EnterInitializationMode");
   exit_initialization_mode_ = load_function<fmi3ExitInitializationModeTYPE>(
@@ -219,6 +229,19 @@ void* Fmu3::instantiate() const {
   fmi3Instance c = instantiate_model_exchange_(instanceName, instantiationToken, resourcePath,
     visible, logging_on_, instanceEnvironment, log_message_callback);
   if (c == nullptr) casadi_error("fmi3Instantiate failed");
+  // fmi-ls-dae: Enable DAE mode in Configuration Mode
+  if (!vr_enable_dae_.empty()) {
+    fmi3Boolean enable = fmi3True;
+    if (enter_configuration_mode_(c) != fmi3OK) {
+      casadi_error("fmi3EnterConfigurationMode failed");
+    }
+    if (set_boolean_(c, get_ptr(vr_enable_dae_), 1, &enable, 1) != fmi3OK) {
+      casadi_error("fmi3SetBoolean failed for the DAE mode parameter");
+    }
+    if (exit_configuration_mode_(c) != fmi3OK) {
+      casadi_error("fmi3ExitConfigurationMode failed");
+    }
+  }
   return c;
 }
 
@@ -498,6 +521,8 @@ Fmu3::Fmu3(const std::string& name,
   instantiate_model_exchange_ = nullptr;
   free_instance_ = nullptr;
   reset_ = nullptr;
+  enter_configuration_mode_ = nullptr;
+  exit_configuration_mode_ = nullptr;
   enter_initialization_mode_ = nullptr;
   exit_initialization_mode_ = nullptr;
   enter_continuous_time_mode_ = nullptr;
@@ -521,6 +546,8 @@ Fmu3::Fmu3(DeserializingStream& s) : FmuInternal(s) {
   instantiate_model_exchange_ = nullptr;
   free_instance_ = nullptr;
   reset_ = nullptr;
+  enter_configuration_mode_ = nullptr;
+  exit_configuration_mode_ = nullptr;
   enter_initialization_mode_ = nullptr;
   exit_initialization_mode_ = nullptr;
   enter_continuous_time_mode_ = nullptr;
@@ -532,7 +559,7 @@ Fmu3::Fmu3(DeserializingStream& s) : FmuInternal(s) {
   get_adjoint_derivative_ = nullptr;
   update_discrete_states_ = nullptr;
 
-  int version = s.version("Fmu3", 1, 2);
+  int version = s.version("Fmu3", 1, 3);
   s.unpack("Fmu3::vr_real", vr_real_);
   s.unpack("Fmu3::vr_integer", vr_integer_);
   s.unpack("Fmu3::vr_boolean", vr_boolean_);
@@ -562,13 +589,16 @@ Fmu3::Fmu3(DeserializingStream& s) : FmuInternal(s) {
     off_aux_boolean_ = range(vr_aux_boolean_.size() + 1);
     off_aux_string_ = range(vr_aux_string_.size() + 1);
   }
+  if (version >= 3) {
+    s.unpack("Fmu3::vr_enable_dae", vr_enable_dae_);
+  }
 }
 
 
 void Fmu3::serialize_body(SerializingStream &s) const {
   FmuInternal::serialize_body(s);
 
-  s.version("Fmu3", 2);
+  s.version("Fmu3", 3);
   s.pack("Fmu3::vr_real", vr_real_);
   s.pack("Fmu3::vr_integer", vr_integer_);
   s.pack("Fmu3::vr_boolean", vr_boolean_);
@@ -590,6 +620,7 @@ void Fmu3::serialize_body(SerializingStream &s) const {
   s.pack("Fmu3::off_aux_integer", off_aux_integer_);
   s.pack("Fmu3::off_aux_boolean", off_aux_boolean_);
   s.pack("Fmu3::off_aux_string", off_aux_string_);
+  s.pack("Fmu3::vr_enable_dae", vr_enable_dae_);
 }
 
 } // namespace casadi

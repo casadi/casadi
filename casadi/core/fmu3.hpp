@@ -85,6 +85,9 @@ class CASADI_EXPORT Fmu3 : public FmuInternal {
   std::vector<fmi3Boolean> init_boolean_;
   std::vector<std::string> init_string_;
 
+  // fmi-ls-dae: Boolean structural parameter set to true in Configuration Mode, if any
+  std::vector<fmi3ValueReference> vr_enable_dae_;
+
   // Auxilliary variables, by type
   std::vector<std::string> vn_aux_real_, vn_aux_integer_, vn_aux_boolean_, vn_aux_string_;
   std::vector<fmi3ValueReference> vr_aux_real_, vr_aux_integer_, vr_aux_boolean_, vr_aux_string_;
@@ -96,6 +99,8 @@ class CASADI_EXPORT Fmu3 : public FmuInternal {
   fmi3InstantiateModelExchangeTYPE* instantiate_model_exchange_;
   fmi3FreeInstanceTYPE* free_instance_;
   fmi3ResetTYPE* reset_;
+  fmi3EnterConfigurationModeTYPE* enter_configuration_mode_;
+  fmi3ExitConfigurationModeTYPE* exit_configuration_mode_;
   fmi3EnterInitializationModeTYPE* enter_initialization_mode_;
   fmi3ExitInitializationModeTYPE* exit_initialization_mode_;
   fmi3EnterContinuousTimeModeTYPE* enter_continuous_time_mode_;

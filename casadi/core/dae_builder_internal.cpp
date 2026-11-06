@@ -685,6 +685,7 @@ DaeBuilderInternal::DaeBuilderInternal(const std::string& name, const std::strin
   provides_directional_derivatives_ = false;
   provides_adjoint_derivatives_ = false;
   can_be_instantiated_only_once_per_process_ = false;
+  enable_dae_vr_ = -1;
   symbolic_ = true;
   detect_quad_ = false;
   start_time_ = nan;
@@ -4187,6 +4188,7 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
         // Use instead of original ModelStructure
         has_lsdae = true;
       } catch (const std::exception& e) {
+        enable_dae_vr_ = -1;
         casadi_warning("Failed to load LS-DAE manifest: " + std::string(e.what()));
       }
     }
@@ -4413,6 +4415,11 @@ XmlNode DaeBuilderInternal::import_ls_dae(const std::string& lsdae) {
   auto ls_version = ls_manifest.attribute<std::string>("fmi-ls:fmi-ls-version", "");
   casadi_assert(ls_version.empty() || ls_version == "1.0",
     "Unsupported LS-DAE version: " + ls_version);
+
+  // Parameter that enables DAE mode, to be set in Configuration Mode
+  if (ls_manifest.has_child("EnableDAEParameter")) {
+    enable_dae_vr_ = ls_manifest["EnableDAEParameter"].attribute<casadi_int>("valueReference");
+  }
 
   // Process algebraic variables
   casadi_assert(ls_manifest.has_child("AlgebraicVariables"), "Missing 'AlgebraicVariables'");

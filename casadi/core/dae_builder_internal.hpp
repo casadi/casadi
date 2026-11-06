@@ -219,6 +219,7 @@ struct CASADI_EXPORT Variable {
 class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   friend class DaeBuilder;
   friend class FmuInternal;
+  friend class Fmu3;
   friend class FmuFunction;
   friend class Variable;
 
@@ -526,6 +527,9 @@ protected:
   bool provides_adjoint_derivatives_;
   bool can_be_instantiated_only_once_per_process_;
   std::vector<std::string> source_files_;
+
+  // fmi-ls-dae: value reference of the parameter enabling DAE mode, -1 if none
+  casadi_int enable_dae_vr_;
 
   /// Name of instance
   std::string name_;
