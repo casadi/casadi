@@ -137,6 +137,7 @@ std::string to_string(Causality v) {
   case Causality::OUTPUT: return "output";
   case Causality::LOCAL: return "local";
   case Causality::INDEPENDENT: return "independent";
+  case Causality::STRUCTURAL_PARAMETER: return "structuralParameter";
   default: break;
   }
   return "";
@@ -378,7 +379,21 @@ void Variable::get_attribute(Attribute a, std::string* val) const {
   casadi_error("Cannot handle: " + to_string(a));
 }
 
+// A structural parameter can change the structure of the model, which is read once, on import.
+// So it stays at its start value, which is what the FMU has if it is not set.
+static void check_structural_parameter(const Variable& v, const std::vector<double>& val) {
+  for (size_t k = 0; k < v.start.size(); ++k) {
+    casadi_assert(val[val.size() == 1 ? 0 : k] == v.start[k], "Cannot change structural parameter "
+      + v.name + ": structural parameters are fixed at their start value");
+  }
+}
+
 void Variable::set_attribute(Attribute a, double val) {
+  if (causality == Causality::STRUCTURAL_PARAMETER
+      && (a == Attribute::START || a == Attribute::VALUE)) {
+    check_structural_parameter(*this, {val});
+    return;
+  }
   // Handle attributes
   switch (a) {
     case Attribute::MIN:
@@ -410,6 +425,11 @@ void Variable::set_attribute(Attribute a, const std::vector<double>& val) {
   }
   // If not scalar, size must be number of elements
   casadi_assert(val.size() == numel, "Wrong size for attribute " + to_string(a));
+  if (causality == Causality::STRUCTURAL_PARAMETER
+      && (a == Attribute::START || a == Attribute::VALUE)) {
+    check_structural_parameter(*this, val);
+    return;
+  }
   // Handle vector attributes
   switch (a) {
     case Attribute::START:
@@ -542,6 +562,7 @@ bool Variable::has_start() const {
   if (initial == Initial::EXACT || initial == Initial::APPROX) return true;
   if (initial == Initial::CALCULATED || causality == Causality::INDEPENDENT) return false;
   if (causality == Causality::PARAMETER) return true;
+  if (causality == Causality::STRUCTURAL_PARAMETER) return true;
   if (causality == Causality::INPUT) return true;
   if (variability == Variability::CONSTANT) return true;
   return false;
@@ -664,6 +685,7 @@ DaeBuilderInternal::DaeBuilderInternal(const std::string& name, const std::strin
   provides_directional_derivatives_ = false;
   provides_adjoint_derivatives_ = false;
   can_be_instantiated_only_once_per_process_ = false;
+  enable_dae_vr_ = -1;
   symbolic_ = true;
   detect_quad_ = false;
   start_time_ = nan;
@@ -3167,7 +3189,8 @@ Variability DaeBuilderInternal::default_variability(Causality causality, Type ty
   // Default variability per FMI 3.0.2, section 2.4.7.4
   // "The default for variables of causality parameter, structural parameter or
   // calculated parameter is fixed."
-  if (causality == Causality::PARAMETER || causality == Causality::CALCULATED_PARAMETER) {
+  if (causality == Causality::PARAMETER || causality == Causality::CALCULATED_PARAMETER
+      || causality == Causality::STRUCTURAL_PARAMETER) {
     return Variability::FIXED;
   }
   // "The default for variables of type Float32 and Float64 and causality other
@@ -3189,7 +3212,7 @@ Initial DaeBuilderInternal::default_initial(Causality causality, Variability var
   case Variability::FIXED:
     // Fall-through
   case Variability::TUNABLE:
-    if (causality == Causality::PARAMETER)
+    if (causality == Causality::PARAMETER || causality == Causality::STRUCTURAL_PARAMETER)
       return Initial::EXACT;
     else if (causality == Causality::CALCULATED_PARAMETER || causality == Causality::LOCAL)
       return Initial::CALCULATED;
@@ -3328,6 +3351,12 @@ Variable& DaeBuilderInternal::add(const std::string& name, Causality causality,
       } else {
         casadi_error("'parameter' causality requires 'fixed' or 'tunable' variability");
       }
+      break;
+    case Causality::STRUCTURAL_PARAMETER:
+      // Stays at its start value, so a constant, also if tunable
+      casadi_assert(variability == Variability::FIXED || variability == Variability::TUNABLE,
+          "'structuralParameter' causality requires 'fixed' or 'tunable' variability");
+      categorize(v.index, Category::C);
       break;
     case Causality::CALCULATED_PARAMETER:
       casadi_assert(variability == Variability::FIXED || variability == Variability::TUNABLE,
@@ -4000,6 +4029,8 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
     std::string causality_str = vnode.attribute<std::string>("causality", "local");
     if (fmi_major_ == 1 && causality_str == "internal") causality_str = "local";
     Causality causality = to_enum<Causality>(causality_str);
+    casadi_assert(causality != Causality::STRUCTURAL_PARAMETER || fmi_major_ >= 3,
+      "Causality 'structuralParameter' requires FMI 3.0 or newer");
 
     // Variability (FMI 1.0 -> FMI 2.0+)
     std::string variability_str = vnode.attribute<std::string>("variability",
@@ -4104,6 +4135,11 @@ std::vector<casadi_int> DaeBuilderInternal::read_dependencies(const XmlNode& n) 
   return r;
 }
 
+std::vector<casadi_int> DaeBuilderInternal::read_dependencies(const XmlNode& n,
+    const std::vector<casadi_int>& default_dependencies) {
+  return n.has_attribute("dependencies") ? read_dependencies(n) : default_dependencies;
+}
+
 std::vector<DependenciesKind> DaeBuilderInternal::read_dependencies_kind(
     const XmlNode& n, size_t ndep) {
   // Quick return if node not provided
@@ -4147,22 +4183,42 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
       try {
         // Import replacement ModelStructure
         lsdae_ms = import_ls_dae(lsdae);
-        // Append unchanged elements
+        // Append unchanged elements, unless restated in the manifest
+        std::set<std::string> restated = {"ContinuousStateDerivative", "Output"};
+        for (casadi_int i = 0; i < lsdae_ms.size(); ++i) restated.insert(lsdae_ms[i].name);
         for (casadi_int i = 0; i < n.size(); ++i) {
           const XmlNode& e = n[i];
-          if (e.name != "ContinuousStateDerivative" && e.name != "Output") {
+          if (restated.count(e.name) == 0) {
             lsdae_ms.children.push_back(e);
           }
         }
         // Use instead of original ModelStructure
         has_lsdae = true;
       } catch (const std::exception& e) {
+        enable_dae_vr_ = -1;
         casadi_warning("Failed to load LS-DAE manifest: " + std::string(e.what()));
       }
     }
 
     // Loop over ModelStructure elements
     const XmlNode& ms = has_lsdae ? lsdae_ms : n;
+
+    // Missing 'dependencies' attribute: dependent on all knowns (time, states, inputs, parameters
+    // and, with LS-DAE, algebraic variables). Get the states from ContinuousStateDerivative first.
+    // An empty attribute, on the other hand, means no dependencies.
+    std::vector<casadi_int> default_dependencies;
+    for (casadi_int i = 0; i < ms.size(); ++i) {
+      if (ms[i].name == "ContinuousStateDerivative") {
+        default_dependencies.push_back(
+          variable(vrmap_.at(ms[i].attribute<size_t>("valueReference"))).parent);
+      }
+    }
+    for (Category c : {Category::T, Category::U, Category::P, Category::Z}) {
+      default_dependencies.insert(default_dependencies.end(),
+        indices(c).begin(), indices(c).end());
+    }
+    std::sort(default_dependencies.begin(), default_dependencies.end());
+
     for (casadi_int i = 0; i < ms.size(); ++i) {
       const XmlNode& e = ms[i];
       try {
@@ -4173,7 +4229,7 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
           // Corresponding variable
           Variable& v = variable(indices(Category::Y).back());
           // Get dependencies
-          v.dependencies = read_dependencies(e);
+          v.dependencies = read_dependencies(e, default_dependencies);
           v.dependenciesKind = read_dependencies_kind(e, v.dependencies.size());
           // Mark interdependencies
           for (casadi_int d : v.dependencies) variable(d).dependency = true;
@@ -4185,12 +4241,13 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
           Variable& v = variable(der_.back());
           // Add to list of states and derivative to list of dependent variables
           casadi_assert(v.parent >= 0, "Error processing derivative info for " + v.name);
-          categorize(v.index, Category::W);
+          // Keep as algebraic variable if so classified by the LS-DAE manifest
+          if (v.category != Category::Z) categorize(v.index, Category::W);
           categorize(v.parent, Category::X);
           // Map der field to derivative variable
           variable(v.parent).der = der_.back();
           // Get dependencies
-          v.dependencies = read_dependencies(e);
+          v.dependencies = read_dependencies(e, default_dependencies);
           v.dependenciesKind = read_dependencies_kind(e, v.dependencies.size());
           // Mark interdependencies
           for (casadi_int d : v.dependencies) variable(d).dependency = true;
@@ -4202,7 +4259,9 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
           // Get index
           initial_unknowns_.push_back(vrmap_.at(e.attribute<size_t>("valueReference")));
           // Get dependencies
-          for (casadi_int d : read_dependencies(e)) variable(d).dependency = true;
+          for (casadi_int d : read_dependencies(e, default_dependencies)) {
+            variable(d).dependency = true;
+          }
         } else if (e.name == "EventIndicator") {
           // Event indicator
           indices(Category::ZERO).push_back(vrmap_.at(e.attribute<size_t>("valueReference")));
@@ -4210,9 +4269,11 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
         } else if (e.name == "Residual") {
           // Loop over formulations
           bool found = false;
-          for (casadi_int form = 0; form < e.size(); ++form) {
-            const XmlNode& f = e[form];
-            auto form_index = f.attribute<size_t>("index");
+          // fmi-ls-dae 1.0.0-alpha.1: attributes given directly in the Residual element
+          bool flat = e.has_attribute("valueReference");
+          for (casadi_int form = 0; form < (flat ? 1 : e.size()); ++form) {
+            const XmlNode& f = flat ? e : e[form];
+            auto form_index = flat ? 1 : f.attribute<size_t>("index");
             if (form_index == 1) {
               // Index-1 formulation
               casadi_assert(!found, "Duplicate index-1 formulations");
@@ -4223,7 +4284,7 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
               // Corresponding variable
               Variable& v = variable(indices(Category::ALG).back());
               // Get dependencies
-              v.dependencies = read_dependencies(f);
+              v.dependencies = read_dependencies(f, default_dependencies);
               v.dependenciesKind = read_dependencies_kind(f, v.dependencies.size());
             }
           }
@@ -4381,8 +4442,13 @@ XmlNode DaeBuilderInternal::import_ls_dae(const std::string& lsdae) {
 
   // Read attributes
   auto ls_version = ls_manifest.attribute<std::string>("fmi-ls:fmi-ls-version", "");
-  casadi_assert(ls_version.empty() || ls_version == "1.0",
+  casadi_assert(ls_version.empty() || ls_version == "1.0" || ls_version.rfind("1.0.", 0) == 0,
     "Unsupported LS-DAE version: " + ls_version);
+
+  // Parameter that enables DAE mode, to be set in Configuration Mode
+  if (ls_manifest.has_child("EnableDAEParameter")) {
+    enable_dae_vr_ = ls_manifest["EnableDAEParameter"].attribute<casadi_int>("valueReference");
+  }
 
   // Process algebraic variables
   casadi_assert(ls_manifest.has_child("AlgebraicVariables"), "Missing 'AlgebraicVariables'");

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Minimal fmi-ls-dae test FMU, laid out like an OpenModelica daeMode export:
+     der(x) = -p*x + z, 0 = z^3 + z - x -->
+<fmiModelDescription fmiVersion="3.0" modelName="lsdae_test"
+  instantiationToken="{8c4e810f-3df3-4a00-8276-176fa3c9f000}" generationTool="handwritten">
+  <ModelExchange modelIdentifier="lsdae_test"/>
+  <ModelVariables>
+    <Float64 name="time" valueReference="0" causality="independent" variability="continuous"/>
+    <Float64 name="x" valueReference="1" causality="local" variability="continuous" initial="exact" start="1"/>
+    <Float64 name="der(x)" valueReference="2" causality="local" variability="continuous" derivative="1" initial="calculated"/>
+    <Float64 name="z" valueReference="3" causality="local" variability="continuous" initial="calculated"/>
+    <Float64 name="p" valueReference="4" causality="parameter" variability="tunable" start="2"/>
+    <Boolean name="_D_daeMode" valueReference="5" causality="structuralParameter" variability="fixed" start="false"/>
+    <Float64 name="_D_DAEres0" valueReference="6" causality="local" variability="continuous" initial="calculated"/>
+    <Float64 name="_D_DAEres1" valueReference="7" causality="local" variability="continuous" initial="calculated"/>
+  </ModelVariables>
+  <ModelStructure>
+    <ContinuousStateDerivative valueReference="2" dependencies="1" dependenciesKind="dependent"/>
+    <InitialUnknown valueReference="2" dependencies="1" dependenciesKind="dependent"/>
+  </ModelStructure>
+</fmiModelDescription>

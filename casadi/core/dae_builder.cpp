@@ -338,10 +338,18 @@ void DaeBuilder::reorder(const std::string& cat, const std::vector<std::string>&
   }
 }
 
+// A generated FMU would not restrict a structural parameter to Configuration Mode
+static Causality causality_of_new_variable(const std::string& causality) {
+  Causality c = to_enum<Causality>(causality);
+  casadi_assert(c != Causality::STRUCTURAL_PARAMETER,
+    "Structural parameters can only come from an imported FMU");
+  return c;
+}
+
 MX DaeBuilder::add(const std::string& name, const std::string& causality,
     const std::string& variability, const Dict& opts) {
   try {
-    return (*this)->add(name, to_enum<Causality>(causality),
+    return (*this)->add(name, causality_of_new_variable(causality),
       to_enum<Variability>(variability), opts).v;
   } catch (std::exception& e) {
     THROW_ERROR("add", e.what());
@@ -351,7 +359,7 @@ MX DaeBuilder::add(const std::string& name, const std::string& causality,
 
 MX DaeBuilder::add(const std::string& name, const std::string& causality, const Dict& opts) {
   try {
-    return (*this)->add(name, to_enum<Causality>(causality), opts).v;
+    return (*this)->add(name, causality_of_new_variable(causality), opts).v;
   } catch (std::exception& e) {
     THROW_ERROR("add", e.what());
     return MX();
@@ -375,7 +383,7 @@ void DaeBuilder::add(const std::string& name, const std::string& causality,
     // Make sure name matches expression
     casadi_assert(name == expr.name(), "Name must match expression");
     // Add variable
-    (*this)->add(name, to_enum<Causality>(causality), to_enum<Variability>(variability),
+    (*this)->add(name, causality_of_new_variable(causality), to_enum<Variability>(variability),
       expr, opts);
   } catch (std::exception& e) {
     THROW_ERROR("add", e.what());

@@ -77,7 +77,7 @@
       2
     ],
     "Fmu3": [
-      2
+      3
     ],
     "FmuFunction": [
       6
@@ -417,16 +417,23 @@
     },
     "Fmu3": {
       "Fmu3::off_aux_boolean": [
-        2
+        2,
+        3
       ],
       "Fmu3::off_aux_integer": [
-        2
+        2,
+        3
       ],
       "Fmu3::off_aux_real": [
-        2
+        2,
+        3
       ],
       "Fmu3::off_aux_string": [
-        2
+        2,
+        3
+      ],
+      "Fmu3::vr_enable_dae": [
+        3
       ]
     },
     "FunctionInternal": {
@@ -974,7 +981,8 @@
     ],
     "Fmu3": [
       1,
-      2
+      2,
+      3
     ],
     "FmuFunction": [
       6
@@ -4262,7 +4270,7 @@
           "minimum": 1,
           "name": "Fmu3",
           "op": "version",
-          "value": 2
+          "value": 3
         },
         {
           "name": "Fmu3::vr_real",
@@ -4436,6 +4444,30 @@
             [
               "literal",
               2
+            ]
+          ],
+          "op": "if"
+        },
+        {
+          "body": [
+            {
+              "name": "Fmu3::vr_enable_dae",
+              "op": "field",
+              "type": {
+                "element": "unsignedint",
+                "name": "std::vector"
+              }
+            }
+          ],
+          "condition": [
+            "greater_equal",
+            [
+              "version",
+              "Fmu3"
+            ],
+            [
+              "literal",
+              3
             ]
           ],
           "op": "if"

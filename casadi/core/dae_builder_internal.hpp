@@ -46,7 +46,8 @@ enum class Type {FLOAT32, FLOAT64, INT8, UINT8, INT16, UINT16, INT32, UINT32, IN
   BOOLEAN, STRING, BINARY, ENUMERATION, CLOCK, NUMEL};
 
 /// Causality: FMI 2.0 specification, section 2.2.7 or FMI 3.0 specification, section 2.4.7.4
-enum class Causality {PARAMETER, CALCULATED_PARAMETER, INPUT, OUTPUT, LOCAL, INDEPENDENT, NUMEL};
+enum class Causality {PARAMETER, CALCULATED_PARAMETER, INPUT, OUTPUT, LOCAL, INDEPENDENT,
+  STRUCTURAL_PARAMETER, NUMEL};
 
 /// Variability: FMI 2.0 specification, section 2.2.7 or FMI 3.0 specification, section 2.4.7.4
 enum class Variability {CONSTANT, FIXED, TUNABLE, DISCRETE, CONTINUOUS, NUMEL};
@@ -218,6 +219,7 @@ struct CASADI_EXPORT Variable {
 class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   friend class DaeBuilder;
   friend class FmuInternal;
+  friend class Fmu3;
   friend class FmuFunction;
   friend class Variable;
 
@@ -526,6 +528,9 @@ protected:
   bool can_be_instantiated_only_once_per_process_;
   std::vector<std::string> source_files_;
 
+  // fmi-ls-dae: value reference of the parameter enabling DAE mode, -1 if none
+  casadi_int enable_dae_vr_;
+
   /// Name of instance
   std::string name_;
 
@@ -686,6 +691,10 @@ protected:
 
   // Read dependencies node
   std::vector<casadi_int> read_dependencies(const XmlNode& n);
+
+  // Read list of dependencies, with a default for a missing attribute
+  std::vector<casadi_int> read_dependencies(const XmlNode& n,
+    const std::vector<casadi_int>& default_dependencies);
 
   // Read dependenciesKind node
   std::vector<DependenciesKind> read_dependencies_kind(const XmlNode& n, size_t ndep);
