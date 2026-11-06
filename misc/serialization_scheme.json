@@ -636,6 +636,9 @@
       "OsqpInterface::rho_initial": [
         2,
         3
+      ],
+      "OsqpInterface::settings::check_dualgap": [
+        3
       ]
     },
     "ProtoFunction": {
@@ -8509,6 +8512,11 @@
               "name": "OsqpInterface::reset_rho",
               "op": "field",
               "type": "bool"
+            },
+            {
+              "name": "OsqpInterface::settings::check_dualgap",
+              "op": "field",
+              "type": "casadi_int"
             }
           ],
           "condition": [

@@ -163,6 +163,13 @@ namespace casadi {
             settings_.scaled_termination = op.second;
           } else if (op.first=="check_termination") {
             settings_.check_termination = op.second;
+#ifdef WITH_OSQP_V1
+          } else if (op.first=="check_dualgap") {
+            settings_.check_dualgap = op.second;
+#else
+          } else if (op.first=="check_dualgap") {
+            casadi_error("OSQP option 'check_dualgap' requires OSQP >= 1.0.0.");
+#endif
           } else if (op.first=="warm_start" || op.first=="warm_starting") {
             casadi_error("OSQP's warm_start option is impure and therefore disabled. "
                          "Use CasADi options 'warm_start_primal' and 'warm_start_dual' instead.");
@@ -478,6 +485,9 @@ namespace casadi {
     g << "settings.scaled_termination = " << settings_.scaled_termination << ";\n";
     g << "settings.check_termination = " << settings_.check_termination << ";\n";
 #ifdef WITH_OSQP_V1
+    g << "settings.check_dualgap = " << settings_.check_dualgap << ";\n";
+#endif
+#ifdef WITH_OSQP_V1
     g << "settings.warm_starting = " << settings_.warm_starting << ";\n";
 #else
     g << "settings.warm_start = " << settings_.warm_start << ";\n";
@@ -664,6 +674,13 @@ namespace casadi {
     reset_rho_ = true;
     if (version>=3) {
       s.unpack("OsqpInterface::reset_rho", reset_rho_);
+#ifdef WITH_OSQP_V1
+      s.unpack("OsqpInterface::settings::check_dualgap", settings_.check_dualgap);
+#else
+      // OSQP < 1.0: read and discard check_dualgap
+      casadi_int check_dualgap;
+      s.unpack("OsqpInterface::settings::check_dualgap", check_dualgap);
+#endif
     }
     //s.unpack("OsqpInterface::settings::time_limit", settings_.time_limit);
   }
@@ -712,6 +729,13 @@ namespace casadi {
 #endif
     s.pack("OsqpInterface::rho_initial", rho_initial_);
     s.pack("OsqpInterface::reset_rho", reset_rho_);
+#ifdef WITH_OSQP_V1
+    s.pack("OsqpInterface::settings::check_dualgap",
+      static_cast<casadi_int>(settings_.check_dualgap));
+#else
+    // OSQP < 1.0 has no duality gap check: store 0 to reflect actual behaviour
+    s.pack("OsqpInterface::settings::check_dualgap", static_cast<casadi_int>(0));
+#endif
     //s.pack("OsqpInterface::settings::time_limit", settings_.time_limit);
   }
 

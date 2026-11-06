@@ -1589,6 +1589,19 @@ class ConicTests(casadiTestCase):
       x1 = solver(lbg=1,ubg=1)["x"]
       x2 = solver(lbg=1,ubg=1)["x"]
       self.assertEqual(float(ca.norm_inf(x1-x2))==0, reset_rho)
+
+  @requires_conic("osqp")
+  def test_osqp_check_dualgap(self):
+
+    x=ca.MX.sym("x",2)
+
+    # a problem where the duality gap check changes the termination point
+    qp = {'x':x, 'f':0.5*ca.bilin(ca.DM([[0.008,-0.01],[-0.01,0.018]]),x,x)+ca.dot(ca.DM([0.9,0.4]),x), 'g':ca.mtimes(ca.DM([[-0.5,0.6],[0.4,0.3]]),x)}
+    sol = {}
+    for check_dualgap in [True, False]:
+      solver = ca.qpsol("solver","osqp",qp,{"osqp":{"check_dualgap":check_dualgap}})
+      sol[check_dualgap] = solver(lbg=-1,ubg=1,lbx=-10,ubx=10)["x"]
+    self.assertTrue(float(ca.norm_inf(sol[True]-sol[False]))>0)
     
         
 @requires_conic("xpress")
