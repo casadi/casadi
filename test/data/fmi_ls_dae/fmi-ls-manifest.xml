@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- fmi-ls-dae 1.0.0-alpha.1: flat Residual elements; each der(x) is an algebraic variable -->
+<fmiDAEManifest
+  xmlns:fmi-ls="http://fmi-standard.org/fmi-ls-manifest"
+  fmi-ls:fmi-ls-name="org.fmi-standard.fmi-ls-dae"
+  fmi-ls:fmi-ls-version="1.0.0-alpha.1"
+  fmi-ls:fmi-ls-description="Layered standard for DAE support in FMI.">
+  <EnableDAEParameter valueReference="5"/>
+  <AlgebraicVariables>
+    <AlgebraicVariable valueReference="2"/>
+    <AlgebraicVariable valueReference="3"/>
+  </AlgebraicVariables>
+  <ModelStructure>
+    <ContinuousStateDerivative valueReference="2" dependencies="2" dependenciesKind="constant"/>
+    <InitialUnknown valueReference="2" dependencies="1" dependenciesKind="dependent"/>
+    <Residual valueReference="6" dependencies="1 3" dependenciesKind="dependent dependent"/>
+    <Residual valueReference="7" dependencies="1 2 3" dependenciesKind="dependent constant dependent"/>
+  </ModelStructure>
+</fmiDAEManifest>

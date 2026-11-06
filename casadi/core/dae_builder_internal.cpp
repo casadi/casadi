@@ -137,6 +137,7 @@ std::string to_string(Causality v) {
   case Causality::OUTPUT: return "output";
   case Causality::LOCAL: return "local";
   case Causality::INDEPENDENT: return "independent";
+  case Causality::STRUCTURAL_PARAMETER: return "structuralParameter";
   default: break;
   }
   return "";
@@ -378,7 +379,21 @@ void Variable::get_attribute(Attribute a, std::string* val) const {
   casadi_error("Cannot handle: " + to_string(a));
 }
 
+// A structural parameter can change the structure of the model, which is read once, on import.
+// So it stays at its start value, which is what the FMU has if it is not set.
+static void check_structural_parameter(const Variable& v, const std::vector<double>& val) {
+  for (size_t k = 0; k < v.start.size(); ++k) {
+    casadi_assert(val[val.size() == 1 ? 0 : k] == v.start[k], "Cannot change structural parameter "
+      + v.name + ": structural parameters are fixed at their start value");
+  }
+}
+
 void Variable::set_attribute(Attribute a, double val) {
+  if (causality == Causality::STRUCTURAL_PARAMETER
+      && (a == Attribute::START || a == Attribute::VALUE)) {
+    check_structural_parameter(*this, {val});
+    return;
+  }
   // Handle attributes
   switch (a) {
     case Attribute::MIN:
@@ -410,6 +425,11 @@ void Variable::set_attribute(Attribute a, const std::vector<double>& val) {
   }
   // If not scalar, size must be number of elements
   casadi_assert(val.size() == numel, "Wrong size for attribute " + to_string(a));
+  if (causality == Causality::STRUCTURAL_PARAMETER
+      && (a == Attribute::START || a == Attribute::VALUE)) {
+    check_structural_parameter(*this, val);
+    return;
+  }
   // Handle vector attributes
   switch (a) {
     case Attribute::START:
@@ -542,6 +562,7 @@ bool Variable::has_start() const {
   if (initial == Initial::EXACT || initial == Initial::APPROX) return true;
   if (initial == Initial::CALCULATED || causality == Causality::INDEPENDENT) return false;
   if (causality == Causality::PARAMETER) return true;
+  if (causality == Causality::STRUCTURAL_PARAMETER) return true;
   if (causality == Causality::INPUT) return true;
   if (variability == Variability::CONSTANT) return true;
   return false;
@@ -3167,7 +3188,8 @@ Variability DaeBuilderInternal::default_variability(Causality causality, Type ty
   // Default variability per FMI 3.0.2, section 2.4.7.4
   // "The default for variables of causality parameter, structural parameter or
   // calculated parameter is fixed."
-  if (causality == Causality::PARAMETER || causality == Causality::CALCULATED_PARAMETER) {
+  if (causality == Causality::PARAMETER || causality == Causality::CALCULATED_PARAMETER
+      || causality == Causality::STRUCTURAL_PARAMETER) {
     return Variability::FIXED;
   }
   // "The default for variables of type Float32 and Float64 and causality other
@@ -3189,7 +3211,7 @@ Initial DaeBuilderInternal::default_initial(Causality causality, Variability var
   case Variability::FIXED:
     // Fall-through
   case Variability::TUNABLE:
-    if (causality == Causality::PARAMETER)
+    if (causality == Causality::PARAMETER || causality == Causality::STRUCTURAL_PARAMETER)
       return Initial::EXACT;
     else if (causality == Causality::CALCULATED_PARAMETER || causality == Causality::LOCAL)
       return Initial::CALCULATED;
@@ -3328,6 +3350,12 @@ Variable& DaeBuilderInternal::add(const std::string& name, Causality causality,
       } else {
         casadi_error("'parameter' causality requires 'fixed' or 'tunable' variability");
       }
+      break;
+    case Causality::STRUCTURAL_PARAMETER:
+      // Stays at its start value, so a constant, also if tunable
+      casadi_assert(variability == Variability::FIXED || variability == Variability::TUNABLE,
+          "'structuralParameter' causality requires 'fixed' or 'tunable' variability");
+      categorize(v.index, Category::C);
       break;
     case Causality::CALCULATED_PARAMETER:
       casadi_assert(variability == Variability::FIXED || variability == Variability::TUNABLE,
@@ -4000,6 +4028,8 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
     std::string causality_str = vnode.attribute<std::string>("causality", "local");
     if (fmi_major_ == 1 && causality_str == "internal") causality_str = "local";
     Causality causality = to_enum<Causality>(causality_str);
+    casadi_assert(causality != Causality::STRUCTURAL_PARAMETER || fmi_major_ >= 3,
+      "Causality 'structuralParameter' requires FMI 3.0 or newer");
 
     // Variability (FMI 1.0 -> FMI 2.0+)
     std::string variability_str = vnode.attribute<std::string>("variability",

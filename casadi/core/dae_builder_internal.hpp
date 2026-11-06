@@ -46,7 +46,8 @@ enum class Type {FLOAT32, FLOAT64, INT8, UINT8, INT16, UINT16, INT32, UINT32, IN
   BOOLEAN, STRING, BINARY, ENUMERATION, CLOCK, NUMEL};
 
 /// Causality: FMI 2.0 specification, section 2.2.7 or FMI 3.0 specification, section 2.4.7.4
-enum class Causality {PARAMETER, CALCULATED_PARAMETER, INPUT, OUTPUT, LOCAL, INDEPENDENT, NUMEL};
+enum class Causality {PARAMETER, CALCULATED_PARAMETER, INPUT, OUTPUT, LOCAL, INDEPENDENT,
+  STRUCTURAL_PARAMETER, NUMEL};
 
 /// Variability: FMI 2.0 specification, section 2.2.7 or FMI 3.0 specification, section 2.4.7.4
 enum class Variability {CONSTANT, FIXED, TUNABLE, DISCRETE, CONTINUOUS, NUMEL};
