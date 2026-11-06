@@ -83,8 +83,9 @@ void Fmu3::init(const DaeBuilderInternal* dae) {
     const Variable& v = dae->variable(i);
     // Consitency check
     casadi_assert(v.numel == v.value.size(), "Size mismatch for " + v.name);
-    // Skip if the wrong type
-    if (v.causality != Causality::PARAMETER && v.causality != Causality::INPUT) continue;
+    // Skip if the wrong type: parameters, inputs or variables with an initial value
+    if (v.causality != Causality::PARAMETER && v.causality != Causality::INPUT
+      && v.initial != Initial::EXACT && v.initial != Initial::APPROX) continue;
     // Variable has not been set - keep default value
     if (!v.is_set()) continue;
     // Value reference
