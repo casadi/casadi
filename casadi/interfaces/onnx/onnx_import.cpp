@@ -437,9 +437,50 @@ namespace casadi {
         }
         continue;
 
-      // ========== Control Flow Operations (not supported) ==========
+      // ========== Loop: a counted loop, unrolled ==========
       } else if (op_type == "Loop") {
-        casadi_error("ONNX import: 'Loop' control flow operator is not supported.");
+        const onnx::GraphProto* body = get_graph_attribute(node, "body");
+        casadi_assert(body != nullptr, "Loop node requires a 'body' subgraph");
+        casadi_assert(node_inputs.size() >= 2 && node_inputs[0].is_constant()
+          && !node_inputs[0].is_empty(), "ONNX import: only a Loop with a constant trip count "
+          "is supported.");
+        casadi_assert(node_inputs[1].is_empty() || (node_inputs[1].is_constant()
+          && static_cast<DM>(node_inputs[1]).scalar() != 0),
+          "ONNX import: only a Loop with a constant true initial condition is supported.");
+        casadi_int trip_count = static_cast<casadi_int>(static_cast<DM>(node_inputs[0]).scalar());
+
+        // Body: (iteration, condition, carried...) -> (condition, carried..., scan outputs...)
+        std::vector<MX> carried(node_inputs.begin() + 2, node_inputs.end());
+        casadi_int n_scan = node.output_size() - static_cast<casadi_int>(carried.size());
+        casadi_assert(body->input_size() == 2 + static_cast<casadi_int>(carried.size())
+          && n_scan >= 0 && body->output_size() == 1 + node.output_size(),
+          "Loop body inputs and outputs do not match the node");
+        std::vector<std::vector<MX>> scan(n_scan);
+        for (casadi_int it = 0; it < trip_count; ++it) {
+          std::map<std::string, MX> scope = value_map;
+          scope[body->input(0).name()] = MX(static_cast<double>(it));
+          scope[body->input(1).name()] = MX(1);
+          for (casadi_int j = 0; j < static_cast<casadi_int>(carried.size()); ++j) {
+            scope[body->input(2 + j).name()] = carried[j];
+          }
+          std::vector<MX> out = eval_captured_subgraph(*body, scope);
+          casadi_assert(out[0].is_constant() && static_cast<DM>(out[0]).scalar() != 0,
+            "ONNX import: a Loop that can exit early is not supported.");
+          for (casadi_int j = 0; j < static_cast<casadi_int>(carried.size()); ++j) {
+            carried[j] = out[1 + j];
+          }
+          for (casadi_int j = 0; j < n_scan; ++j) {
+            scan[j].push_back(out[1 + carried.size() + j]);
+          }
+        }
+        for (casadi_int j = 0; j < static_cast<casadi_int>(carried.size()); ++j) {
+          value_map[node.output(j)] = carried[j];
+        }
+        // Scan outputs stack along ONNX axis 0, which is CasADi columns as in Concat
+        for (casadi_int j = 0; j < n_scan; ++j) {
+          value_map[node.output(carried.size() + j)] = horzcat(scan[j]);
+        }
+        continue;
 
       // ========== Standard Operations (delegated to helper) ==========
       } else {
@@ -1046,6 +1087,12 @@ namespace casadi {
       casadi_int axis = axes[0] < 0 ? axes[0] + 2 : axes[0];
       output = axis == 0 ? reshape(node_inputs[0], node_inputs[0].numel(), 1) :
         reshape(node_inputs[0], 1, node_inputs[0].numel());
+
+    } else if (op_type == "Squeeze") {
+      // Only the vector case: a 1-D tensor is a CasADi column, whichever axis had size 1
+      casadi_assert(!node_inputs.empty() && node_inputs[0].is_vector(),
+        "Squeeze: only scalar and vector operands are supported");
+      output = reshape(node_inputs[0], node_inputs[0].numel(), 1);
 
     } else if (op_type == "Concat") {
       // Transpose-rep: ONNX axis 0 is CasADi columns (horzcat), axis 1 is CasADi rows (vertcat)

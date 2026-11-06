@@ -2828,6 +2828,86 @@ class GraphBuilderSymbolicTests(casadiTestCase):
             self.checkarray(numpy.array(y).ravel(), net(x).detach().numpy().ravel(), name,
                             digits=6)
 
+  def save_loop_model(self, nodes, inputs, outputs, name):
+    model = helper.make_model(helper.make_graph(nodes, "g", inputs, outputs),
+                              opset_imports=[helper.make_opsetid("", 13)])
+    model.ir_version = 8
+    onnx.checker.check_model(model)
+    onnx.save(model, name)
+    self.addCleanup(os.remove, name)
+    return name
+
+  @unittest.skipUnless(have_onnx, "needs the onnx python package")
+  def test_import_loop(self):
+    self.message("a counted Loop is unrolled on import: scan outputs and carried values")
+    double = TensorProto.DOUBLE
+    scalar = lambda n, t=double: helper.make_tensor_value_info(n, t, [])
+    # out[i] = x * (i + 1), and s the sum of these, for i in 0:2
+    body = helper.make_graph(
+      [helper.make_node("Constant", [], ["one"], value=helper.make_tensor("v", TensorProto.INT64, [], [1])),
+       helper.make_node("Add", ["i", "one"], ["i1"]),
+       helper.make_node("Cast", ["i1"], ["id"], to=double),
+       helper.make_node("Mul", ["x", "id"], ["y"]),
+       helper.make_node("Add", ["s_in", "y"], ["s_out"]),
+       helper.make_node("Unsqueeze", ["y", "axes"], ["scan"]),
+       helper.make_node("Identity", ["c_in"], ["c_out"])],
+      "body",
+      [scalar("i", TensorProto.INT64), scalar("c_in", TensorProto.BOOL), scalar("s_in")],
+      [scalar("c_out", TensorProto.BOOL), scalar("s_out"), helper.make_tensor_value_info("scan", double, [1])],
+      [numpy_helper.from_array(numpy.array([0], numpy.int64), "axes")])
+    nodes = [
+      helper.make_node("Constant", [], ["n"], value=helper.make_tensor("v", TensorProto.INT64, [], [3])),
+      helper.make_node("Constant", [], ["cond"], value=helper.make_tensor("v", TensorProto.BOOL, [], [True])),
+      helper.make_node("Constant", [], ["s0"], value=helper.make_tensor("v", double, [], [0.0])),
+      helper.make_node("Constant", [], ["sq"], value=helper.make_tensor("v", TensorProto.INT64, [1], [1])),
+      helper.make_node("Loop", ["n", "cond", "s0"], ["s", "stacked"], body=body),
+      helper.make_node("Squeeze", ["stacked", "sq"], ["array"]),
+      helper.make_node("Constant", [], ["k"], value=helper.make_tensor("v", TensorProto.INT64, [], [1])),
+      helper.make_node("Gather", ["array", "k"], ["second"], axis=0)]
+    path = self.save_loop_model(nodes, [scalar("x")],
+      [scalar("s"), helper.make_tensor_value_info("array", double, [3]), scalar("second")], "loop_import.onnx")
+    f = ca.GraphBuilder(path).create("f", {"symbolic": True})
+    [s, array, second] = f(ca.DM(2.0))
+    self.checkarray(s, ca.DM(12.0), "carried value")
+    self.checkarray(array, ca.DM([2.0, 4.0, 6.0]), "scan output, as a column")
+    self.checkarray(second, ca.DM(4.0), "element of the scan output")
+    # It is an expression, so derivatives come for free
+    x = ca.MX.sym("x")
+    jac_f = ca.Function("jac_f", [x], [ca.jacobian(f(x)[0], x)])
+    self.checkarray(jac_f(2.0), ca.DM(6.0), "derivative through the loop")
+
+  @unittest.skipUnless(have_onnx, "needs the onnx python package")
+  def test_import_loop_rejected(self):
+    self.message("a Loop that is not counted gets an error")
+    double = TensorProto.DOUBLE
+    scalar = lambda n, t=double: helper.make_tensor_value_info(n, t, [])
+    # The trip count is an input
+    body = helper.make_graph(
+      [helper.make_node("Identity", ["c_in"], ["c_out"]), helper.make_node("Identity", ["v_in"], ["v_out"])], "body",
+      [scalar("i", TensorProto.INT64), scalar("c_in", TensorProto.BOOL), scalar("v_in")],
+      [scalar("c_out", TensorProto.BOOL), scalar("v_out")])
+    nodes = [
+      helper.make_node("Constant", [], ["cond"], value=helper.make_tensor("v", TensorProto.BOOL, [], [True])),
+      helper.make_node("Loop", ["n", "cond", "x"], ["y"], body=body)]
+    path = self.save_loop_model(nodes, [scalar("n", TensorProto.INT64), scalar("x")], [scalar("y")], "loop_rejected.onnx")
+    with self.assertRaisesRegex(RuntimeError, "constant trip count"):
+      ca.GraphBuilder(path).create("f", {"symbolic": True})
+
+    # The condition can turn false
+    body = helper.make_graph(
+      [helper.make_node("Constant", [], ["two"], value=helper.make_tensor("v", double, [], [2.0])),
+       helper.make_node("Less", ["v_in", "two"], ["c_out"]),
+       helper.make_node("Identity", ["v_in"], ["v_out"])], "body",
+      [scalar("i", TensorProto.INT64), scalar("c_in", TensorProto.BOOL), scalar("v_in")],
+      [scalar("c_out", TensorProto.BOOL), scalar("v_out")])
+    nodes = [
+      helper.make_node("Constant", [], ["n"], value=helper.make_tensor("v", TensorProto.INT64, [], [3])),
+      helper.make_node("Constant", [], ["cond"], value=helper.make_tensor("v", TensorProto.BOOL, [], [True])),
+      helper.make_node("Loop", ["n", "cond", "x"], ["y"], body=body)]
+    path = self.save_loop_model(nodes, [scalar("x")], [scalar("y")], "loop_rejected2.onnx")
+    with self.assertRaisesRegex(RuntimeError, "exit early"):
+      ca.GraphBuilder(path).create("f", {"symbolic": True})
+
 
 if __name__ == '__main__':
   unittest.main()
