@@ -56,6 +56,9 @@ namespace casadi {
     // Jacobian
     double *jacF;
 
+    // State at the start of the event iterations, to integrate again from
+    double t_rewind, *q_rewind;
+
     /// Stats, forward integration
     long nsteps, nfevals, nlinsetups, netfails;
     int qlast, qcur;
@@ -162,6 +165,9 @@ namespace casadi {
 
     /** \brief Reset stats */
     void reset_stats(SundialsMemory* m) const;
+
+    /// Integrate again from the start of the event iterations when going back past the last step
+    void rewind(SundialsMemory* m) const;
 
     /** \brief Save stats offsets before reset */
     void save_offsets(SundialsMemory* m) const;

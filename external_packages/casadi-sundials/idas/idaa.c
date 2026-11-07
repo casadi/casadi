@@ -2137,6 +2137,9 @@ static int IDAAdataStore(IDAMem IDA_mem, CkpntMem ck_mem)
     flag = IDASolve(IDA_mem, t1_, &t, yyTmp, ypTmp, IDA_ONE_STEP);
     if (flag < 0) return(IDA_FWD_FAIL);
 
+    /* IDASolveF records a step ending at a TSTOP with the time TSTOP */
+    if (SUNRabs(t1_ - t) <= HUNDRED*uround*(SUNRabs(t) + SUNRabs(hh))) t = t1_;
+
     dt_mem[i]->t = t;
     IDAADJ_mem->ia_storePnt(IDA_mem, dt_mem[i]);
 
