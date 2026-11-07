@@ -1493,6 +1493,67 @@ class ConicTests(casadiTestCase):
       self.checkarray(res["x"],ca.DM([0.7,0.6,1.1]),digits=6)
       self.checkarray(res["lam_a"],ca.DM([0,1.4,-0.7]),digits=6)
 
+  @requires_conic("proxqp")
+  def test_proxqp_warm_start(self):
+    H = ca.DM.eye(2)
+    A = ca.DM([[1, 1], [1, -1]])
+    structure = {"h": H.sparsity(), "a": A.sparsity()}
+    inputs = dict(h=H, g=[-1, 0], a=A, lba=[1, -3], uba=[1, 3])
+    seeds = dict(x0=ca.DM([2, -1]), lam_a0=ca.DM([3, -4]), lam_x0=ca.DM([5, -6]))
+    for backend in ["sparse", "dense"]:
+      # With zero iterations, the outputs expose initialization directly.
+      opts = {"proxqp": {"backend": backend, "max_iter": 0}, "error_on_fail": False}
+      cold = ca.conic("cold", "proxqp", structure,
+                      dict(opts, warm_start_primal=False, warm_start_dual=False))
+      expected = cold(**inputs)
+      res = cold(**inputs, **seeds)
+      for name in ["x", "lam_a", "lam_x"]:
+        self.checkarray(res[name], expected[name], backend, digits=9)
+      solver = ca.conic("solver", "proxqp", structure, opts)
+      # Both warm starts are enabled by default; omitted guesses default to zero.
+      for guesses in [{}, seeds]:
+        res = solver(**inputs, **guesses)
+        for name in ["x", "lam_a", "lam_x"]:
+          self.checkarray(res[name], guesses.get(name+"0", ca.DM.zeros(2)), backend, digits=9)
+      for primal, dual in [(True, False), (False, True)]:
+        with self.subTest(backend=backend, primal=primal, dual=dual):
+          solver = ca.conic("solver", "proxqp", structure,
+                            dict(opts, warm_start_primal=primal, warm_start_dual=dual))
+          res = solver(**inputs, **seeds)
+          self.checkarray(res["x"], seeds["x0"] if primal else ca.DM.zeros(2), digits=9)
+          self.checkarray(res["lam_a"], seeds["lam_a0"] if dual else ca.DM.zeros(2), digits=9)
+          self.checkarray(res["lam_x"], seeds["lam_x0"] if dual else ca.DM.zeros(2), digits=9)
+
+  @requires_conic("proxqp")
+  def test_proxqp_warm_start_mixed_multipliers(self):
+    H = ca.diag(ca.DM([1, 2, 3]))
+    A = ca.DM([[1, 1, 0], [0, 1, -1], [1, 0, 1], [1, -1, 0]])
+    x = ca.DM([1, -2, 3])
+    lam_x = ca.DM([2, -3, 0])
+    for backend in ["sparse", "dense"]:
+      solver = ca.conic("solver", "proxqp", {"h": H.sparsity(), "a": A.sparsity()},
+                        {"proxqp": {"backend": backend, "max_iter": 1,
+                                    "eps_abs": 1e-10, "eps_rel": 0},
+                         "error_on_fail": False})
+      # Change the equality/inequality split between calls to the same solver.
+      for equalities in [[1, 3], [0, 2], [], [0, 1, 2, 3]]:
+        with self.subTest(backend=backend, equalities=equalities):
+          lam_a = ca.DM([-1, 2, 3, -4])
+          lba, uba = A @ x, A @ x
+          for k in range(4):
+            if k not in equalities:
+              if lam_a[k] < 0:
+                uba[k] = ca.inf
+              else:
+                lba[k] = -ca.inf
+          res = solver(h=H, g=-H @ x-A.T @ lam_a-lam_x, a=A,
+                       lba=lba, uba=uba, lbx=[0, -2, -ca.inf], ubx=[1, 0, ca.inf],
+                       x0=x, lam_a0=lam_a, lam_x0=lam_x)
+          self.assertTrue(solver.stats()["success"])
+          self.checkarray(res["x"], x, digits=9)
+          self.checkarray(res["lam_a"], lam_a, digits=9)
+          self.checkarray(res["lam_x"], lam_x, digits=9)
+
   @requires_conic("qrqp")
   def test_sensitivity(self):
     x = ca.MX.sym("x",4)
