@@ -2908,6 +2908,151 @@ class GraphBuilderSymbolicTests(casadiTestCase):
     with self.assertRaisesRegex(RuntimeError, "exit early"):
       ca.GraphBuilder(path).create("f", {"symbolic": True})
 
+  def if_model(self, name, op="And", initializers=(), unbuilt=()):
+    # y = (a op b) ? (c ? 2*x : x+10) : -x, a nested If as lacemodelica writes for guards.
+    # The leaves named in unbuilt ("twice", "plus", "minus") get an op the importer does not
+    # support, so the import fails if that branch is built. Initializers are (name, value).
+    double, boolean = TensorProto.DOUBLE, TensorProto.BOOL
+    scalar = lambda n, t=double: helper.make_tensor_value_info(n, t, [])
+    const = lambda n, v: helper.make_node("Constant", [], [n], value=helper.make_tensor("v", double, [], [v]))
+    def leaf(kind, out):
+      if kind in unbuilt: return [helper.make_node("Unique", ["x"], [out])]
+      if kind == "twice": return [const("two", 2.0), helper.make_node("Mul", ["x", "two"], [out])]
+      if kind == "plus": return [const("ten", 10.0), helper.make_node("Add", ["x", "ten"], [out])]
+      return [helper.make_node("Neg", ["x"], [out])]
+    branch = lambda nodes, out: helper.make_graph(nodes, out + "_branch", [], [scalar(out)])
+    inner = helper.make_node("If", ["c"], ["yt"], then_branch=branch(leaf("twice", "yi"), "yi"),
+                             else_branch=branch(leaf("plus", "yi"), "yi"))
+    nodes = [helper.make_node(op, ["a", "b"], ["ab"]),
+             helper.make_node("If", ["ab"], ["y"], then_branch=branch([inner], "yt"),
+                              else_branch=branch(leaf("minus", "ye"), "ye"))]
+    init_names = [n for n, _ in initializers]
+    inputs = [scalar("x")] + [scalar(n, boolean) for n in "abc" if n not in init_names]
+    graph = helper.make_graph(nodes, "g", inputs, [scalar("y")],
+      [numpy_helper.from_array(numpy.array(v, numpy.float64), n) for n, v in initializers])
+    model = helper.make_model(graph, opset_imports=[helper.make_opsetid("", 13)])
+    model.ir_version = 8
+    if not hasattr(self, "if_folder"):
+      self.if_folder = tempfile.TemporaryDirectory()
+      self.addCleanup(self.if_folder.cleanup)
+    path = os.path.join(self.if_folder.name, "%d_%s" % (len(os.listdir(self.if_folder.name)), name))
+    onnx.save(model, path)
+    return path
+
+  @staticmethod
+  def n_conditionals(f):
+    return sum(f.instruction_id(k) == ca.OP_IF_ELSE_ZERO for k in range(f.n_instructions()))
+
+  @staticmethod
+  def if_reference(x, a, b, c, op="And"):
+    taken = (a and b) if op == "And" else (a or b)
+    return (2*x if c else x + 10) if taken else -x
+
+  @unittest.skipUnless(have_onnx, "needs the onnx python package")
+  def test_set_resolves_if(self):
+    self.message("an input fixed with set is a constant; an If it decides keeps only the taken branch")
+    # Nothing set: every input stays symbolic and both branches of each If are built
+    f = ca.GraphBuilder(self.if_model("if_set_none.onnx")).create("f", {"symbolic": True})
+    self.assertEqual(list(f.name_in()), ["x", "a", "b", "c"])
+    self.assertGreater(self.n_conditionals(f), 0)
+    for a, b, c in [(i & 1, i >> 1 & 1, i >> 2 & 1) for i in range(8)]:
+      self.checkarray(f(3.0, a, b, c), ca.DM(self.if_reference(3.0, a, b, c)), "unset %d%d%d" % (a, b, c))
+
+    # A condition And(a, b) of two set inputs, top-level and nested If; the branches not
+    # taken are not built (they would fail the import)
+    for values, unbuilt in [({"a": 1, "b": 1, "c": 1}, ("plus", "minus")),
+                            ({"a": 1, "b": 1, "c": 0}, ("twice", "minus")),
+                            ({"a": 1, "b": 0}, ("twice", "plus")),
+                            ({"a": 0, "b": 1, "c": 1}, ("twice", "plus"))]:
+      with self.subTest(values=values):
+        gb = ca.GraphBuilder(self.if_model("if_set.onnx", unbuilt=unbuilt))
+        for n, v in values.items(): gb.set(n, float(v))
+        g = gb.create("g", {"symbolic": True})
+        self.assertEqual(list(g.name_in()), ["x"] + [n for n in "abc" if n not in values])
+        self.assertEqual(self.n_conditionals(g), 0)
+        x = ca.DM(numpy.random.rand())
+        args = [x] + [ca.DM(0)] * (len(values) == 2)  # c, where it stays an (unused) input
+        expected = self.if_reference(x, values["a"], values["b"], values.get("c", 0))
+        self.checkarray(g(*args), expected, "set %s" % values)
+        self.checkarray(g(*args), f(x, values["a"], values["b"], values.get("c", 0)), "same as unset")
+
+    # Partly known: And(1, b) is not a constant, so the If stays a conditional on b
+    gb = ca.GraphBuilder(self.if_model("if_set_partial.onnx"))
+    gb.set("a", 1.0)
+    g = gb.create("g", {"symbolic": True})
+    self.assertEqual(list(g.name_in()), ["x", "b", "c"])
+    self.assertGreater(self.n_conditionals(g), 0)
+    for b, c in [(0, 0), (0, 1), (1, 0), (1, 1)]:
+      self.checkarray(g(3.0, b, c), ca.DM(self.if_reference(3.0, 1, b, c)), "partial %d%d" % (b, c))
+    gb = ca.GraphBuilder(self.if_model("if_set_partial.onnx", unbuilt=("twice",)))
+    gb.set("a", 1.0)
+    with self.assertRaisesRegex(RuntimeError, "Unsupported operation 'Unique'"):
+      gb.create("g", {"symbolic": True})
+    # ... but And(0, b) and Or(1, b) are known
+    for op, a, unbuilt in [("And", 0.0, ("twice", "plus")), ("Or", 1.0, ("minus",))]:
+      gb = ca.GraphBuilder(self.if_model("if_set_partial.onnx", op=op, unbuilt=unbuilt))
+      gb.set("a", a)
+      g = gb.create("g", {"symbolic": True})
+      self.assertEqual(list(g.name_in()), ["x", "b", "c"])
+      # the If on c, inside the taken branch of Or, stays
+      (self.assertEqual if op == "And" else self.assertGreater)(self.n_conditionals(g), 0)
+      for b, c in [(0, 0), (1, 1)]:
+        self.checkarray(g(3.0, b, c), ca.DM(self.if_reference(3.0, a, b, c, op)), op)
+
+  @unittest.skipUnless(have_onnx, "needs the onnx python package")
+  def test_initializer_resolves_if(self):
+    self.message("an If decided by initializers keeps only the taken branch, with no set call")
+    # lacemodelica writes an Evaluate=true parameter as an initializer, Booleans as doubles
+    path = self.if_model("if_init.onnx", initializers=[("a", 1.0), ("b", 1.0), ("c", 1.0)],
+                         unbuilt=("plus", "minus"))
+    f = ca.GraphBuilder(path).create("f", {"symbolic": True})
+    self.assertEqual(list(f.name_in()), ["x"])
+    self.assertEqual(self.n_conditionals(f), 0)
+    self.checkarray(f(3.0), ca.DM(6.0), "then, then")
+    # The outer If is known, the inner one on input c is not
+    path = self.if_model("if_init.onnx", initializers=[("a", 1.0), ("b", 0.0)], unbuilt=("twice", "plus"))
+    f = ca.GraphBuilder(path).create("f", {"symbolic": True})
+    self.assertEqual(list(f.name_in()), ["x", "c"])
+    self.assertEqual(self.n_conditionals(f), 0)
+    self.checkarray(f(3.0, 1), ca.DM(-3.0), "else")
+
+  @unittest.skipUnless(have_onnx, "needs the onnx python package")
+  def test_set_symbolic_values(self):
+    self.message("set in symbolic mode: value layout, size and type checks")
+    double = TensorProto.DOUBLE
+    # y = M @ v + k, M (2, 3) row-major as ONNX lays it out, k an integer
+    nodes = [helper.make_node("MatMul", ["M", "v"], ["Mv"]),
+             helper.make_node("Cast", ["k"], ["kd"], to=double),
+             helper.make_node("Add", ["Mv", "kd"], ["y"])]
+    path = self.save_loop_model(nodes, [helper.make_tensor_value_info("M", double, [2, 3]),
+      helper.make_tensor_value_info("v", double, [3, 1]), helper.make_tensor_value_info("k", TensorProto.INT64, [])],
+      [helper.make_tensor_value_info("y", double, [2, 1])], "set_values.onnx")
+    M = numpy.array([[1., 2., 3.], [4., 5., 6.]])
+    v = numpy.array([1., -1., 2.])
+    reference = ca.GraphBuilder(path).create("f", {"symbolic": True})
+    gb = ca.GraphBuilder(path)
+    gb.set("M", list(M.ravel()))
+    gb.set("k", 3.0)
+    f = gb.create("f", {"symbolic": True})
+    self.assertEqual(list(f.name_in()), ["v"])
+    self.checkarray(f(v), ca.DM(M @ v + 3), "row-major value")
+    self.checkarray(f(v), reference(M, v, 3), "same as unset")
+
+    with self.assertRaisesRegex(RuntimeError, "not found"):
+      ca.GraphBuilder(path).set("y", 1.0)  # an output, not an input
+    gb = ca.GraphBuilder(path)
+    gb.set("v", [1.0, 2.0])
+    with self.assertRaisesRegex(RuntimeError, "Baked value for 'v' has 2 elements, expected 3"):
+      gb.create("f", {"symbolic": True})
+    gb = ca.GraphBuilder(path)
+    gb.set("k", 1.5)
+    with self.assertRaisesRegex(RuntimeError, "integer input 'k' must be an integer"):
+      gb.create("f", {"symbolic": True})
+    gb = ca.GraphBuilder(self.if_model("if_set_bool.onnx"))
+    gb.set("a", 0.5)
+    with self.assertRaisesRegex(RuntimeError, "Boolean input 'a' must be 0 or 1"):
+      gb.create("f", {"symbolic": True})
+
 
 if __name__ == '__main__':
   unittest.main()

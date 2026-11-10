@@ -115,12 +115,49 @@ namespace casadi {
     }
   }
 
+  // The constant for a graph input fixed with GraphBuilder::set. The value is in ONNX row-major
+  // order, which is the column-major order of the transposed stored form sp. All values are
+  // doubles here, so a Boolean or integer input must be given a value that its type can hold
+  // exactly: the numeric backend would convert it, and the two paths would then disagree.
+  static MX baked_input(const std::string& name, int32_t elem_type, const Sparsity& sp,
+                        const std::vector<double>& value) {
+    casadi_assert(static_cast<casadi_int>(value.size()) == sp.numel(),
+                  "Baked value for '" + name + "' has " + str(value.size())
+                  + " elements, expected " + str(sp.numel()));
+    bool is_bool = elem_type == onnx::TensorProto::BOOL;
+    bool is_unsigned = elem_type == onnx::TensorProto::UINT8
+      || elem_type == onnx::TensorProto::UINT16 || elem_type == onnx::TensorProto::UINT32
+      || elem_type == onnx::TensorProto::UINT64;
+    bool is_integer = is_unsigned || elem_type == onnx::TensorProto::INT8
+      || elem_type == onnx::TensorProto::INT16 || elem_type == onnx::TensorProto::INT32
+      || elem_type == onnx::TensorProto::INT64;
+    for (double v : value) {
+      if (is_bool) {
+        casadi_assert(v == 0 || v == 1, "Baked value for Boolean input '" + name
+                      + "' must be 0 or 1, got " + str(v));
+      } else if (is_integer) {
+        casadi_assert(std::isfinite(v) && v == std::floor(v) && (!is_unsigned || v >= 0),
+                      "Baked value for integer input '" + name + "' must be "
+                      + (is_unsigned ? "a nonnegative" : "an") + " integer, got " + str(v));
+      }
+    }
+    DM d = reshape(DM(value), sp.size1(), sp.size2());
+    if (!sp.is_dense()) {
+      // A sparse input pattern: entries outside it are structural zeros of the model
+      casadi_assert(norm_inf(d - project(d, sp)).scalar() == 0,
+                    "Baked value for '" + name + "' is nonzero outside the input's sparsity");
+      d = project(d, sp);
+    }
+    return MX(d);
+  }
+
   // Create MX symbols for graph inputs
   void Onnx::process_graph_inputs(
       const onnx::GraphProto& graph,
       std::map<std::string, MX>& value_map,
       std::vector<MX>& func_inputs,
       std::vector<std::string>& input_names,
+      const BakedValues& baked,
       bool verbose) const {
 
     for (int i = 0; i < graph.input_size(); ++i) {
@@ -155,9 +192,20 @@ namespace casadi {
       // (c,r); a rank<2 input [n] is a column (n,1), matching tensor_to_dm for initializers so
       // that e.g. a 1-D Gemm bias broadcasts the same whether it is an initializer or an input.
       Sparsity ov = input_pattern(graph, input_name);
-      MX mx_input = !ov.is_null() ? MX::sym(input_name, ov)
-                  : shape.dim_size() < 2 ? MX::sym(input_name, rows, cols)
-                  : MX::sym(input_name, cols, rows);
+      Sparsity sp = !ov.is_null() ? ov
+                  : shape.dim_size() < 2 ? Sparsity::dense(rows, cols)
+                  : Sparsity::dense(cols, rows);
+
+      // An input fixed with GraphBuilder::set is a constant, not a Function input
+      auto bv = baked.find(input_name);
+      if (bv != baked.end()) {
+        value_map[input_name] = baked_input(input_name, input.type().tensor_type().elem_type(),
+                                            sp, bv->second);
+        if (verbose) uout() << "  Input '" << input_name << "' is baked" << std::endl;
+        continue;
+      }
+
+      MX mx_input = MX::sym(input_name, sp);
       value_map[input_name] = mx_input;
       func_inputs.push_back(mx_input);
       input_names.push_back(input_name);
@@ -429,9 +477,19 @@ namespace casadi {
         const onnx::GraphProto* then_b = get_graph_attribute(node, "then_branch");
         const onnx::GraphProto* else_b = get_graph_attribute(node, "else_branch");
         casadi_assert(then_b && else_b, "If node requires then_branch and else_branch");
+        MX cond = node_inputs[0];
+        // A condition known at import (from initializers, Constant nodes or inputs fixed with
+        // GraphBuilder::set) selects a branch: the other one is not built
+        if (cond.is_constant()) {
+          casadi_assert(cond.numel() == 1, "If: the condition must have one element, got "
+                        + cond.dim());
+          bool taken = densify(static_cast<DM>(cond)).scalar() != 0;
+          std::vector<MX> r = eval_captured_subgraph(taken ? *then_b : *else_b, value_map);
+          for (int j = 0; j < node.output_size(); ++j) value_map[node.output(j)] = r[j];
+          continue;
+        }
         std::vector<MX> t = eval_captured_subgraph(*then_b, value_map);
         std::vector<MX> e = eval_captured_subgraph(*else_b, value_map);
-        MX cond = node_inputs[0];
         for (int j = 0; j < node.output_size(); ++j) {
           value_map[node.output(j)] = if_else(cond, t[j], e[j]);
         }
@@ -590,10 +648,10 @@ namespace casadi {
     return false;
   }
 
-  Function Onnx::create(const std::string& name) {
+  Function Onnx::create(const std::string& name, const BakedValues& baked) {
     casadi_assert(has_model_, "No ONNX model loaded. Call load() first.");
     if (!has_unresolved_negative_axis(model_.graph())) {
-      return function_from_graph(model_.graph(), name);
+      return function_from_graph(model_.graph(), name, baked);
     }
     // Exporters need not declare the shapes of intermediate tensors (PyTorch's TorchScript
     // exporter doesn't). Infer them on a copy, leaving model_ as loaded, so that negative axes
@@ -604,13 +662,14 @@ namespace casadi {
         onnx::ShapeInferenceOptions(false, 0, true));
     } catch (const std::exception& e) {
       if (verbose_) uout() << "ONNX shape inference failed: " << e.what() << std::endl;
-      return function_from_graph(model_.graph(), name);
+      return function_from_graph(model_.graph(), name, baked);
     }
-    return function_from_graph(inferred.graph(), name);
+    return function_from_graph(inferred.graph(), name, baked);
   }
 
   Function Onnx::function_from_graph(const onnx::GraphProto& graph,
-                                              const std::string& name) {
+                                              const std::string& name,
+                                              const BakedValues& baked) {
     std::map<std::string, MX> value_map;
     std::vector<MX> inputs, outputs;
     std::vector<std::string> input_names, output_names;
@@ -623,7 +682,7 @@ namespace casadi {
     }
 
     process_graph_initializers(graph, value_map, verbose_);
-    process_graph_inputs(graph, value_map, inputs, input_names, verbose_);
+    process_graph_inputs(graph, value_map, inputs, input_names, baked, verbose_);
     process_graph_nodes(graph, value_map, verbose_);
     collect_graph_outputs(graph, value_map, outputs, output_names, verbose_);
 
@@ -897,6 +956,14 @@ namespace casadi {
     } else if (op_type == "Or") {
       casadi_assert(node_inputs.size() >= 2, "Or requires 2 inputs");
       output = logic_or(node_inputs[0], node_inputs[1]);
+      // Or with a constant true operand is known (as And with a constant false one already is),
+      // so that an If on it resolves to one branch
+      for (const MX& a : {node_inputs[0], node_inputs[1]}) {
+        if (!output.is_constant() && a.is_constant() && a.is_scalar(true)
+            && densify(static_cast<DM>(a)).scalar() != 0) {
+          output = MX::ones(output.size());
+        }
+      }
 
     } else if (op_type == "Where") {
       casadi_assert(node_inputs.size() >= 3, "Where requires 3 inputs");

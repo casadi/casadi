@@ -120,7 +120,8 @@ namespace casadi {
 
   Function Onnx::import_symbolic(const GraphBuilderInternal& gb, const std::string& name) {
     for (auto&& b : gb.dim_bindings()) set_dimension(b.first, b.second);
-    Function f = create(name);
+    // Inputs fixed with set() become constants, so that e.g. an If they decide is resolved
+    Function f = create(name, gb.input_values_);
     // CasADi exports use reversed axes; external models expose their declared ONNX shapes.
     if (model_.producer_name() == "CasADi") return f;
     std::vector<MX> inputs, args, outputs;

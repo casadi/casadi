@@ -95,7 +95,10 @@ namespace casadi {
     void bind_dim(const std::string& param, casadi_int value);
     /// Pin the full shape of an input
     void bind_shape(const std::string& input_name, const std::vector<casadi_int>& shape);
-    /// Bake a fixed value into an input; it is fed at create() and not exposed as a Function input
+    /// Bake a fixed value into an input; it is fed at create() and not exposed as a Function input.
+    /// The value is in ONNX (row-major) order. With "symbolic", it is a constant of the expression,
+    /// so an If it decides is replaced by the branch taken; a Boolean input then takes 0 or 1 and
+    /// an integer input an integer.
     void set(const std::string& input_name, const std::vector<double>& value);
     /// Bake a scalar value into an input
     void set(const std::string& input_name, double value);

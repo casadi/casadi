@@ -61,6 +61,9 @@ namespace casadi {
       */
   class CASADI_GRAPHMODEL_ONNX_EXPORT Onnx : public GraphModelInternal {
   public:
+    /// Values of graph inputs fixed with GraphBuilder::set, by input name, ONNX row-major
+    using BakedValues = std::map<std::string, std::vector<double>>;
+
     explicit Onnx(const std::vector<uint8_t>& model_data);
     ~Onnx() override;
 
@@ -97,8 +100,10 @@ namespace casadi {
     /** \brief Set dimension for a symbolic variable */
     void set_dimension(const std::string& name, casadi_int dim);
 
-    /** \brief Create a CasADi Function from the loaded ONNX graph */
-    Function create(const std::string& name);
+    /** \brief Create a CasADi Function from the loaded ONNX graph
+
+        Graph inputs named in baked become constants instead of Function inputs */
+    Function create(const std::string& name, const BakedValues& baked = BakedValues());
 
     /** \brief Load a graph from serialized ONNX bytes */
     void load_bytes(const std::vector<uint8_t>& data);
@@ -136,6 +141,7 @@ namespace casadi {
         std::map<std::string, MX>& value_map,
         std::vector<MX>& func_inputs,
         std::vector<std::string>& input_names,
+        const BakedValues& baked,
         bool verbose) const;
 
     void process_graph_nodes(
@@ -292,7 +298,8 @@ namespace casadi {
                           const std::string& output, const std::string& uniq);
 
     /** \brief Build a CasADi Function from an ONNX graph (the whole model or a subgraph) */
-    Function function_from_graph(const onnx::GraphProto& graph, const std::string& name);
+    Function function_from_graph(const onnx::GraphProto& graph, const std::string& name,
+                                 const BakedValues& baked = BakedValues());
 
     /** \brief Emit an If node for a CasADi Switch (2-way if_else only) */
     template<typename Container>
