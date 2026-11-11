@@ -360,7 +360,7 @@ namespace casadi {
     // Problem has not been solved at this point
     m->return_status = -1;
 
-    // Maxiumum number of working set changes
+    // Maximum number of working set changes
     int nWSR = max_nWSR_;
     double cputime = max_cputime_;
     double *cputime_ptr = cputime<=0 ? nullptr : &cputime;
@@ -510,7 +510,7 @@ namespace casadi {
     case qpOASES::RET_AVAILABLE_WITH_LINUX_ONLY:
       return "This function is available under Linux only.";
     case qpOASES::RET_UNKNOWN_BUG:
-      return "The error occured is not yet known.";
+      return "The error occurred is not yet known.";
     case qpOASES::RET_PRINTLEVEL_CHANGED:
       return "Print level changed.";
     case qpOASES::RET_NOT_YET_IMPLEMENTED:
@@ -587,11 +587,11 @@ namespace casadi {
     case qpOASES::RET_QP_INFEASIBLE:
       return "QP is infeasible.";
     case qpOASES::RET_QP_NOT_SOLVED:
-      return "Problems occured while solving QP with standard solver.";
+      return "Problems occurred while solving QP with standard solver.";
     case qpOASES::RET_QP_SOLVED:
       return "QP successfully solved.";
     case qpOASES::RET_UNABLE_TO_SOLVE_QP:
-      return "Problems occured while solving QP.";
+      return "Problems occurred while solving QP.";
     case qpOASES::RET_INITIALISATION_STARTED:
       return "Starting problem initialisation.";
     case qpOASES::RET_HOTSTART_FAILED:
@@ -672,9 +672,9 @@ namespace casadi {
     case qpOASES::RET_LINEARLY_INDEPENDENT:
       return "New bound/constraint is linearly independent.";
     case qpOASES::RET_LI_RESOLVED:
-      return "Linear indepence of active contraint matrix successfully resolved.";
+      return "Linear independence of active constraint matrix successfully resolved.";
     case qpOASES::RET_ENSURELI_FAILED:
-      return "Failed to ensure linear indepence of active contraint matrix.";
+      return "Failed to ensure linear independence of active constraint matrix.";
     case qpOASES::RET_ENSURELI_FAILED_TQ:
       return "Abnormal termination due to TQ factorisation.";
     case qpOASES::RET_ENSURELI_FAILED_NOINDEX:
@@ -704,7 +704,7 @@ namespace casadi {
     case qpOASES::RET_DISABLECONSTRAINTS_FAILED:
       return "Unable to disbable constraints.";
     case qpOASES::RET_ENABLECONSTRAINTS_FAILED:
-      return "Unable to enbable constraints.";
+      return "Unable to enable constraints.";
     case qpOASES::RET_ALREADY_ENABLED:
       return "Bound or constraint is already enabled.";
     case qpOASES::RET_ALREADY_DISABLED:

@@ -113,13 +113,13 @@ namespace casadi {
     // Initialize the solver
     void init(const Dict& opts) override;
 
-    // Initialize dependant read-only members of class
+    // Initialize dependent read-only members of class
     void init_dependent();
 
     /** \brief Create memory block */
     void* alloc_mem() const override { return new MosekMemory();}
 
-    /** \brief Initalize memory block */
+    /** \brief Initialize memory block */
     int init_mem(void* mem) const override;
 
     /** \brief Free memory block */

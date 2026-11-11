@@ -75,7 +75,7 @@ namespace casadi {
         "Print info [true]."}},
       {"print_lincomb",
        {OT_BOOL,
-        "Print dependant linear combinations of constraints [false]. "
+        "Print dependent linear combinations of constraints [false]. "
         "Printed numbers are 0-based indices into the vector of [simple bounds;linear bounds]"}},
       {"min_lam",
        {OT_DOUBLE,

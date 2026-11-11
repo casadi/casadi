@@ -4192,8 +4192,8 @@ namespace casadi {
      * It holds that:
      * substitute(expr_ret,symbols,parametric) == expr
      *
-     * parametric is only dependant on par
-     * expr_ret is not dependant on par, but is dependant on symbols
+     * parametric is only dependent on par
+     * expr_ret is not dependent on par, but is dependent on symbols
      *
      * Example:
      * [expr_ret, symbols, parametric] = extract_parametric((x-sqrt(p))*y+cos(p)**2, p)
@@ -4337,7 +4337,7 @@ namespace casadi {
     * A post condition is that the following holds:
     * expr = expr_const + expr_lin + expr_nonlin
     *
-    * Here, expr_const is only dependant on sym_const,
+    * Here, expr_const is only dependent on sym_const,
     *       expr_lin is linear in sym_lin (with coefficients that may depend on sym_const)
     *
     * Example:

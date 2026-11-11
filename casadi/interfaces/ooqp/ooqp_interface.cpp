@@ -427,7 +427,7 @@ namespace casadi {
       }
     }
 
-    // Retreive eliminated dual variables (linear bounds)
+    // Retrieve eliminated dual variables (linear bounds)
     for (casadi_int j=na_-1; j>=0; --j) {
       casadi_int jj = c_index_[j];
       if (jj==0) {
@@ -439,7 +439,7 @@ namespace casadi {
       }
     }
 
-    // Retreive eliminated dual variables (simple bounds)
+    // Retrieve eliminated dual variables (simple bounds)
     for (casadi_int i=nx_-1; i>=0; --i) {
       casadi_int ii = x_index_[i];
       if (ii<0) {

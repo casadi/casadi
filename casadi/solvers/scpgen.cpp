@@ -543,7 +543,7 @@ namespace casadi {
       std::string name = cname.substr(0, cname.find_first_of('.'));
       gen.generate();
 
-      // Complile and run
+      // Compile and run
       if (verbose_) {
         uout() << "Starting compilation"  << std::endl;
       }
@@ -812,7 +812,7 @@ namespace casadi {
     // Reset iteration message
     m->iteration_note = nullptr;
 
-    // MAIN OPTIMZATION LOOP
+    // MAIN OPTIMIZATION LOOP
     while (true) {
 
       // Evaluate the vectors in the condensed QP

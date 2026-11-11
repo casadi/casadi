@@ -52,7 +52,7 @@ namespace casadi {
 
     scoped_checkout<Linsol> mem(linsol_);
 
-    // Peform LU decomposition
+    // Perform LU decomposition
     if (linsol_.sfact(arg[0], mem)) return 1;
     if (linsol_.nfact(arg[0], mem)) {
       // Singular matrix

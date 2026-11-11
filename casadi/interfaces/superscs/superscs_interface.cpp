@@ -154,7 +154,7 @@ namespace casadi {
       }
     }
 
-    // Create a helper function that trasforms the Hessian into
+    // Create a helper function that transforms the Hessian into
     // a factorised representation
     //
     // 1/2 x' H x ->  1/2 || F x ||_2^2

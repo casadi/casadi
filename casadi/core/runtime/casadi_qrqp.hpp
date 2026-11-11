@@ -1024,7 +1024,7 @@ void casadi_qrqp_linesearch(casadi_qrqp_data<T1>* d) {
   casadi_qrqp_take_step(d);
   // Handle dual blocking constraints
   if (du_index >= 0) {
-    // Sensititivity in decreasing du_index
+    // Sensitivity in decreasing du_index
     casadi_qrqp_calc_sens(d, du_index);
     // Find corresponding index
     casadi_qrqp_du_index(d);

@@ -32,7 +32,7 @@ namespace casadi {
                  const std::vector<Function>& f, const Function& f_def)
     : FunctionInternal(name), f_(f), f_def_(f_def) {
 
-    // Consitency check
+    // Consistency check
     casadi_assert_dev(!f_.empty());
   }
 

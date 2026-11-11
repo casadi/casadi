@@ -265,7 +265,7 @@ Integrator::Integrator(const std::string& name, const Function& oracle,
     double t0, const std::vector<double>& tout)
     : OracleFunction(name, oracle), t0_(t0), tout_(tout) {
 
-  // Negative number of parameters for consistancy checking
+  // Negative number of parameters for consistency checking
   np_ = -1;
 
   // Default options
@@ -1660,7 +1660,7 @@ Function Integrator::get_forward(casadi_int nfwd, const std::string& name,
   }
   std::vector<MX> integrator_out = aug_int(integrator_in);
 
-  // Collect forward sensitivites
+  // Collect forward sensitivities
   std::vector<MX> ret_out;
   ret_out.reserve(INTEGRATOR_NUM_OUT);
   for (casadi_int i = 0; i < INTEGRATOR_NUM_OUT; ++i) {
@@ -1810,7 +1810,7 @@ Function Integrator::get_reverse(casadi_int nadj, const std::string& name,
   }
   std::vector<MX> integrator_out = aug_int(integrator_in);
 
-  // Collect adjoint sensitivites
+  // Collect adjoint sensitivities
   std::vector<MX> ret_out;
   ret_out.reserve(INTEGRATOR_NUM_IN);
   for (casadi_int i = 0; i < INTEGRATOR_NUM_IN; ++i) {

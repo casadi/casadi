@@ -220,7 +220,7 @@ namespace casadi {
     }
   }
 
-  /** \brief Initalize memory block */
+  /** \brief Initialize memory block */
   int SLEQPInterface::init_mem(void* mem) const {
     if (Nlpsol::init_mem(mem)) return 1;
 

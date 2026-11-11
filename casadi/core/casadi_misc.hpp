@@ -96,7 +96,7 @@ private:
   /// Checks if s starts with p
   CASADI_EXPORT bool startswith(const std::string& s, const std::string& p);
 
-  /// Replace all occurences of p with r in s
+  /// Replace all occurrences of p with r in s
   CASADI_EXPORT std::string replace(const std::string& s,
     const std::string& p, const std::string& r);
 

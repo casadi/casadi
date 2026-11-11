@@ -132,7 +132,7 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   std::string get_name_out(casadi_int i) override { return integrator_out(i);}
   /// @}
 
-  /** \brief Initalize memory block
+  /** \brief Initialize memory block
 
       \identifier{1lw} */
   int init_mem(void* mem) const override;
@@ -598,7 +598,7 @@ class CASADI_EXPORT FixedStepIntegrator : public Integrator {
       \identifier{1mj} */
   void* alloc_mem() const override { return new FixedStepMemory();}
 
-  /** \brief Initalize memory block
+  /** \brief Initialize memory block
 
       \identifier{1mk} */
   int init_mem(void* mem) const override;

@@ -487,7 +487,7 @@ namespace casadi {
     FunctionInternal::finalize();
   }
 
-  /** \brief Initalize memory block */
+  /** \brief Initialize memory block */
   int Conic::init_mem(void* mem) const {
     if (ProtoFunction::init_mem(mem)) return 1;
 

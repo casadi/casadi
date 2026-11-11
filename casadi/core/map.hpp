@@ -112,7 +112,7 @@ namespace casadi {
     /// Evaluate the function numerically
     int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
 
-    /// Type of parallellization
+    /// Type of parallelization
     virtual std::string parallelization() const { return "serial"; }
 
     /** \brief  evaluate symbolically while also propagating directional derivatives
@@ -255,7 +255,7 @@ namespace casadi {
         \identifier{hr} */
     void init(const Dict& opts) override;
 
-    /// Type of parallellization
+    /// Type of parallelization
     std::string parallelization() const override { return "openmp"; }
 
     /** \brief Generate code for the body of the C function
@@ -306,7 +306,7 @@ namespace casadi {
         \identifier{hx} */
     void init(const Dict& opts) override;
 
-    /// Type of parallellization
+    /// Type of parallelization
     std::string parallelization() const override { return "thread"; }
 
     /** \brief Generate code for the declarations of the C function

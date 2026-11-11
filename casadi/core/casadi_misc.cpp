@@ -330,7 +330,7 @@ int simple_mkstemps_fd(const std::string& prefix, const std::string& suffix, std
 #ifdef _WIN32
       int fd = _sopen(result.c_str(),
         _O_BINARY | _O_CREAT | _O_EXCL | _O_RDWR, _SH_DENYNO, _S_IREAD | _S_IWRITE);
-      // Could add _O_TEMPORARY, but then no possiblity of !cleanup_
+      // Could add _O_TEMPORARY, but then no possibility of !cleanup_
 #else
       int fd = open(result.c_str(), O_RDWR | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR);
 #endif

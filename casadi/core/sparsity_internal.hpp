@@ -179,7 +179,7 @@ namespace casadi {
     static casadi_int postorder_dfs(casadi_int j, casadi_int k, casadi_int* head,
         const casadi_int* next, casadi_int* post, casadi_int* stack);
 
-    /** \brief Calculate the postorder permuation
+    /** \brief Calculate the postorder permutation
 
       * Ref: Chapter 4, Direct Methods for Sparse Linear Systems by Tim Davis
       * len[w] >= 3*n
@@ -648,7 +648,7 @@ namespace casadi {
     /// Enlarge the matrix along the second dimension (i.e. insert columns)
     Sparsity _enlargeColumns(casadi_int ncol, const std::vector<casadi_int>& cc, bool ind1) const;
 
-    /// Make a patten dense
+    /// Make a pattern dense
     Sparsity makeDense(std::vector<casadi_int>& mapping) const;
 
     /// Erase rows and/or columns - does bounds checking
@@ -659,10 +659,10 @@ namespace casadi {
     Sparsity _erase(const std::vector<casadi_int>& rr, bool ind1,
                       std::vector<casadi_int>& mapping) const;
 
-    /// Append another sparsity patten vertically (vectors only)
+    /// Append another sparsity pattern vertically (vectors only)
     Sparsity _appendVector(const SparsityInternal& sp) const;
 
-    /// Append another sparsity patten horizontally
+    /// Append another sparsity pattern horizontally
     Sparsity _appendColumns(const SparsityInternal& sp) const;
 
     /** \brief Get a submatrix

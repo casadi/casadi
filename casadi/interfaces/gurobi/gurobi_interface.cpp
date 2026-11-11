@@ -619,7 +619,7 @@ namespace casadi {
               break;
             }
           default:
-            casadi_error("Not implememented : " + str(ret));
+            casadi_error("Not implemented : " + str(ret));
         }
         casadi_assert(!flag, GRBgeterrormsg(m->env));
       }

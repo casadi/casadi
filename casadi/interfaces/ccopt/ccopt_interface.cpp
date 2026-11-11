@@ -352,7 +352,7 @@ Dict MadmpecInterface::get_stats(void* mem) const {
 }
 
 void MadmpecInterface::set_ccopt_prob() {
-  // assign pointer to internal structur casadi_nlp_prob
+  // assign pointer to internal structure casadi_nlp_prob
   // p_nlp_ ~ casadi_nlp_prob casadi internal
   p_.nlp = &p_nlp_;
   // p_ casadi_ccopt_prob

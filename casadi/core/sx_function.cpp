@@ -682,7 +682,7 @@ namespace casadi {
           call_.el.emplace_back(f);
 
           // Make sure we have enough space to evaluate the Function call,
-          // noting that we wil only ever evaluate one call at a time.
+          // noting that we will only ever evaluate one call at a time.
           call_.sz_arg = std::max(call_.sz_arg, f.sz_arg());
           call_.sz_res = std::max(call_.sz_res, f.sz_res());
           call_.sz_iw  = std::max(call_.sz_iw, f.sz_iw());

@@ -178,7 +178,7 @@ namespace casadi {
     // Get the implicit variable
     casadi_copy(m->x, n_, m->ires[iout_]);
 
-    // Check if any auxilary outputs to evaluate
+    // Check if any auxiliary outputs to evaluate
     bool has_aux = false;
     for (casadi_int i=0; i<n_out_; ++i) {
       if (i!=iout_ && m->ires[i]) {
@@ -187,7 +187,7 @@ namespace casadi {
       }
     }
 
-    // Evaluate auxilary outputs, if necessary
+    // Evaluate auxiliary outputs, if necessary
     if (has_aux) {
       std::copy_n(m->iarg, n_in_, m->arg);
       m->arg[iin_] = m->x;

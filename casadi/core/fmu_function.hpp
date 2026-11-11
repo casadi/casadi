@@ -243,7 +243,7 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   ///@}
 
   /// @{
-  /** \brief Retreive sparsities
+  /** \brief Retrieve sparsities
 
       \identifier{ym} */
   Sparsity get_sparsity_in(casadi_int i) override;
@@ -251,7 +251,7 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   /// @}
 
   /// @{
-  /** \brief Retreive nominal values
+  /** \brief Retrieve nominal values
 
       \identifier{yn} */
   std::vector<double> get_nominal_in(casadi_int i) const override;
@@ -338,7 +338,7 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
       \identifier{yr} */
   void* alloc_mem() const override;
 
-  /** \brief Initalize memory block
+  /** \brief Initialize memory block
 
       \identifier{ys} */
   int init_mem(void* mem) const override;

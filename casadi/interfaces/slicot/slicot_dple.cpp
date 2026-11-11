@@ -175,7 +175,7 @@ namespace casadi {
   }
 
 
-  /** \brief Initalize memory block */
+  /** \brief Initialize memory block */
   int SlicotDple::init_mem(void* mem) const {
     if (Dple::init_mem(mem)) return 1;
     auto m = static_cast<SlicotDpleMemory*>(mem);

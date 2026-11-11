@@ -473,9 +473,9 @@ namespace casadi {
       Bab bb;
       bb(bonmin);
     } catch (CoinError& e) {
-      casadi_error("CoinError occured: " + to_str(e));
+      casadi_error("CoinError occurred: " + to_str(e));
     } catch (TNLPSolver::UnsolvedError& e) {
-      casadi_error("TNLPSolver::UnsolvedError occured" + to_str(e));
+      casadi_error("TNLPSolver::UnsolvedError occurred" + to_str(e));
     } catch (...) {
       casadi_error("Uncaught error in Bonmin");
     }
@@ -516,7 +516,7 @@ namespace casadi {
         } else {
           if (iter==0) {
             uerr()
-              << "Warning: intermediate_callback is disfunctional in your installation. "
+              << "Warning: intermediate_callback is dysfunctional in your installation. "
               "You will only be able to use stats(). "
               "See https://github.com/casadi/casadi/wiki/enableBonminCallback to enable it."
               << std::endl;

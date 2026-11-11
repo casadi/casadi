@@ -166,7 +166,7 @@ class CASADI_EXPORT Fmu
       \identifier{2dn} */
   FmuMemory* alloc_mem(const FmuFunction& f) const;
 
-  /** \brief Initalize memory block
+  /** \brief Initialize memory block
 
       \identifier{26x} */
   int init_mem(FmuMemory* m) const;

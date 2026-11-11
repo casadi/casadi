@@ -556,7 +556,7 @@ void Feasiblesqpmethod::anderson_acc_step_update(void* mem, casadi_int iter_inde
   auto d = &m->d;
 
   if (sz_anderson_memory_ == 1) {
-    // Calculte gamma
+    // Calculate gamma
     casadi_copy(d->dx_feas, nx_, d->z_tmp);
     casadi_axpy(nx_, -1.0, d->anderson_memory_step, d->z_tmp);
     *d->gamma = casadi_dot(nx_, d->dx_feas, d->z_tmp) / casadi_dot(nx_, d->z_tmp, d->z_tmp);

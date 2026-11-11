@@ -97,7 +97,7 @@ namespace casadi {
     /// Apply concrete length
     Slice apply(casadi_int len, bool ind1=false) const;
 
-    /// Substract
+    /// Subtract
     Slice operator-(casadi_int i) const;
 
     // Multiply

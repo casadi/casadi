@@ -640,7 +640,7 @@ void FmuInternal::finalize() {
       }
     }
   }
-  // Get auxilliary variables
+  // Get auxiliary variables
   if (get_aux(c)) {
     casadi_error("FmuInternal::get_aux failed");
   }
@@ -920,7 +920,7 @@ int FmuInternal::eval_ad(FmuMemory* m) const {
     std::fill(m->d_out_.begin(), m->d_out_.end(), 0);
     return 0;
   }
-  // Evalute (should not be necessary)
+  // Evaluate (should not be necessary)
   if (get_real(m->instance, get_ptr(m->vr_out_), n_unknown, get_ptr(m->v_out_), n_unknown, m)) {
     casadi_warning("FMU evaluation failed");
     return 1;
@@ -956,7 +956,7 @@ int FmuInternal::eval_fd(FmuMemory* m, bool independent_seeds) const {
     std::fill(m->d_out_.begin(), m->d_out_.end(), 0);
     return 0;
   }
-  // Evalute (should not be necessary)
+  // Evaluate (should not be necessary)
   if (get_real(m->instance, get_ptr(m->vr_out_), n_unknown, get_ptr(m->v_out_), n_unknown, m)) {
     casadi_warning("Evaluating FMU failed");
     return 1;
@@ -1073,7 +1073,7 @@ int FmuInternal::eval_fd(FmuMemory* m, bool independent_seeds) const {
 
   // If seeds are dependent, quick return
   if (!independent_seeds) {
-    // Simpy copy the results to output (no validation)
+    // Simply copy the results to output (no validation)
     for (size_t ind = 0; ind < m->id_out_.size(); ++ind) {
       m->osens_[m->id_out_[ind]] = m->d_out_[ind];
     }

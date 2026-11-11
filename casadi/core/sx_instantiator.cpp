@@ -55,7 +55,7 @@ namespace casadi {
     // Create a dense n-by-m matrix
     std::vector<SXElem> retv;
 
-    // Check if individial names have been provided
+    // Check if individual names have been provided
     if (name[0]=='[') {
 
       // Make a copy of the string and modify it as to remove the special characters
@@ -513,7 +513,7 @@ namespace casadi {
 
     // Assert consistent dimensions
     if (v.size()!=vdef.size()) {
-      casadi_warning("subtitute: number of symbols to replace ( " + str(v.size()) + ") "
+      casadi_warning("substitute: number of symbols to replace ( " + str(v.size()) + ") "
                      "must match number of expressions (" + str(vdef.size()) + ") "
                      "to replace them with.");
     }
@@ -688,9 +688,9 @@ namespace casadi {
     std::vector< SXElem > w(ff->worksize_);
 
     // Status of the expression:
-    // 0: dependant on constants only
-    // 1: dependant on parameters/constants only
-    // 2: dependant on non-parameters
+    // 0: dependent on constants only
+    // 1: dependent on parameters/constants only
+    // 2: dependent on non-parameters
     std::vector< char > expr_status(ff->worksize_, 0);
 
     // Iterator to the binary operations

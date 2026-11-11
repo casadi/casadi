@@ -255,7 +255,7 @@ const Options FmuFunction::options_
       "Definitions of the scheme variables"}},
     {"aux",
      {OT_STRINGVECTOR,
-      "Auxilliary variables"}},
+      "Auxiliary variables"}},
     {"enable_ad",
      {OT_BOOL,
       "[DEPRECATED] Renamed uses_directional_derivatives"}},
@@ -1210,7 +1210,7 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
       }
     }
   }
-  // Evalute extended Jacobian and/or adjoint derivatives
+  // Evaluate extended Jacobian and/or adjoint derivatives
   if (need_jac || (need_adj && !uses_adjoint_derivatives_)) {
     if (enable_forward_jacobian_) {
       // Forward Jacobian calculation, possibly with coloring
@@ -1706,7 +1706,7 @@ Dict FmuFunction::get_stats(void *mem) const {
   Dict stats = FunctionInternal::get_stats(mem);
   // Get memory object
   FmuMemory* m = static_cast<FmuMemory*>(mem);
-  // Get auxilliary variables from Fmu
+  // Get auxiliary variables from Fmu
   fmu_.get_stats(m, &stats, name_in_, get_ptr(in_));
   // Return stats
   return stats;

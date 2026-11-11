@@ -52,7 +52,7 @@ namespace casadi {
     /** \brief Create memory block */
     void* alloc_mem() const override { return new AlpaqaMemory();}
 
-    /** \brief Initalize memory block */
+    /** \brief Initialize memory block */
     int init_mem(void* mem) const override;
 
     /** \brief Free memory block */

@@ -218,7 +218,7 @@ namespace casadi {
     }
 
     // Logger singletons are lazily instantiated on first uout()/uerr() calls
-    // This instantation may lead to a data race with potential instatiations in plugin
+    // This instantiation may lead to a data race with potential instantiations in plugin
     // To be safe, trigger instantatin before any plugin loading
     uout();
     uerr();

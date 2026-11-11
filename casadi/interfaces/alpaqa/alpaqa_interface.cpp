@@ -135,7 +135,7 @@ namespace casadi {
       {"x", "p", "y", "sigma", "s", "zl", "zu", "v"}, {"hess_psi_prod"});
   }
 
-  /** \brief Initalize memory block */
+  /** \brief Initialize memory block */
   int AlpaqaInterface::init_mem(void* mem) const {
     if (Nlpsol::init_mem(mem)) return 1;
 

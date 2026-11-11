@@ -169,9 +169,9 @@ namespace casadi {
   void MX::get(MX& m, bool ind1, const Matrix<casadi_int>& rr, const Matrix<casadi_int>& cc) const {
     // Make sure dense vectors
     casadi_assert(rr.is_dense() && rr.is_vector(),
-                          "Marix::get: First index must be a dense vector");
+                          "Matrix::get: First index must be a dense vector");
     casadi_assert(cc.is_dense() && cc.is_vector(),
-                          "Marix::get: Second index must be a dense vector");
+                          "Matrix::get: Second index must be a dense vector");
 
     // Get the sparsity pattern - does bounds checking
     std::vector<casadi_int> mapping;
@@ -1597,7 +1597,7 @@ namespace casadi {
     std::vector<bool> tainted(swork.size());
 
     // Construct lookup table for expressions,
-    // giving priority to first occurances
+    // giving priority to first occurrences
     std::map<const MXNode*, casadi_int> expr_lookup;
     for (casadi_int i=0;i<v.size();++i) {
       auto it = expr_lookup.find(v[i].operator->());
@@ -1825,7 +1825,7 @@ namespace casadi {
       vdef.reserve(replace.size());
       // Quick return
       if (replace.empty()) return;
-      // Sort the elements to be replaced in the order of appearence in the algorithm
+      // Sort the elements to be replaced in the order of appearance in the algorithm
       sort(replace.begin(), replace.end());
       std::vector<std::pair<casadi_int, casadi_int> >::const_iterator replace_it=replace.begin();
       // Arguments for calling the atomic operations
@@ -2828,9 +2828,9 @@ namespace casadi {
     std::vector< MX > w(ff->workloc_.size()-1);
 
     // Status of the expression:
-    // 0: dependant on constants only
-    // 1: dependant on parameters/constants only
-    // 2: dependant on non-parameters
+    // 0: dependent on constants only
+    // 1: dependent on parameters/constants only
+    // 2: dependent on non-parameters
     std::vector< char > expr_status(ff->workloc_.size()-1, 0);
 
     // Split up inputs analogous to symbolic primitives
@@ -3156,7 +3156,7 @@ namespace casadi {
     std::vector<casadi_int> x_dims;
     for (auto e : x) x_dims.push_back(e.numel());
 
-    // Determine multipicity of output
+    // Determine multiplicity of output
     casadi_int n_out = v.numel()/product(x_dims);
     casadi_assert(n_out*product(x_dims)==v.numel(),
       "Dimension mismatch: coefficients (" + str(v.numel()) + ") should be "

@@ -113,7 +113,7 @@ class CASADI_EXPORT FmuInternal : public SharedObjectInternal {
   // Copy values set in DaeBuilder to FMU
   virtual int set_values(void* instance) const = 0;
 
-  // Retrieve auxilliary variables from FMU
+  // Retrieve auxiliary variables from FMU
   virtual int get_aux(void* instance) = 0;
 
   // Finalize
@@ -147,7 +147,7 @@ class CASADI_EXPORT FmuInternal : public SharedObjectInternal {
   Sparsity hess_sparsity(const std::vector<size_t>& r, const std::vector<size_t>& c) const;
 
   /// @{
-  /** \brief Retreive nominal values
+  /** \brief Retrieve nominal values
 
       \identifier{26r} */
   std::vector<double> all_nominal_in(size_t i) const;
@@ -184,7 +184,7 @@ class CASADI_EXPORT FmuInternal : public SharedObjectInternal {
   // Iteration to update discrete states
   int discrete_states_iter(void* instance) const;
 
-  /** \brief Initalize memory block
+  /** \brief Initialize memory block
 
       \identifier{271} */
   virtual int init_mem(FmuMemory* m) const;
@@ -313,7 +313,7 @@ class CASADI_EXPORT FmuInternal : public SharedObjectInternal {
   std::vector<std::string> scheme_in_, scheme_out_;
   std::map<std::string, std::vector<size_t>> scheme_;
 
-  // Auxilliary outputs
+  // Auxiliary outputs
   std::vector<std::string> aux_;
 
   // Path to the FMU resource directory

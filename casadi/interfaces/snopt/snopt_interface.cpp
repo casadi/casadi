@@ -473,7 +473,7 @@ std::map<int, std::string> SnoptInterface::secondary_status_ =
           m->xk2[k] = x[k];
         }
 
-        // Evaluate jacG with the linear variabes put to zero
+        // Evaluate jacG with the linear variables put to zero
         const double** arg = m->arg;
         *arg++ = m->xk2;
         *arg++ = d_nlp->p;

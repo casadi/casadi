@@ -296,7 +296,7 @@ namespace casadi {
     // Project Hessian
     casadi_tri_project(arg[CONIC_H], H_, w, false);
 
-    // Get contraint matrix
+    // Get constraint matrix
     const casadi_int* colind = A_.colind();
     double* A = w + nnzHupp_;
     // Get constraint matrix

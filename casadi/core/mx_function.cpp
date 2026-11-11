@@ -968,7 +968,7 @@ namespace casadi {
         }
       }
 
-      // Allocate splited forward sensitivities
+      // Allocate split forward sensitivities
       std::vector<std::vector<std::vector<MX>>> fsens_split(nfwd);
       for (casadi_int d=0; d<nfwd; ++d) {
         fsens_split[d].resize(out_.size());
@@ -1136,7 +1136,7 @@ namespace casadi {
         }
       }
 
-      // Allocate splited adjoint sensitivities
+      // Allocate split adjoint sensitivities
       std::vector<std::vector<std::vector<MX>>> asens_split(nadj);
       for (casadi_int d=0; d<nadj; ++d) {
         asens_split[d].resize(in_.size());

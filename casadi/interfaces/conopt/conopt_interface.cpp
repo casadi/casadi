@@ -301,7 +301,7 @@ namespace casadi {
     // Handle Options
     m->custom_options.clear();
     for (auto&& op : opts_) {
-        // Explictly catch C API options defined in conopt.h
+        // Explicitly catch C API options defined in conopt.h
         if (op.first == "itlim") COIDEF_ItLim(m->cntvect, op.second.to_int());
         else if (op.first == "errlim") COIDEF_ErrLim(m->cntvect, op.second.to_int());
         else if (op.first == "reslim" || op.first == "timelim")

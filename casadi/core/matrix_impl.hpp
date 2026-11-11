@@ -127,9 +127,9 @@ namespace casadi {
 
     // Make sure dense vectors
     casadi_assert(rr.is_dense() && rr.is_vector(),
-                          "Marix::get: First index must be a dense vector");
+                          "Matrix::get: First index must be a dense vector");
     casadi_assert(cc.is_dense() && cc.is_vector(),
-                          "Marix::get: Second index must be a dense vector");
+                          "Matrix::get: Second index must be a dense vector");
 
     // Get the sparsity pattern - does bounds checking
     std::vector<casadi_int> mapping;
@@ -1756,7 +1756,7 @@ namespace casadi {
       if (!casadi_limits<Scalar>::is_equal(e, *y_it++, depth)) return false;
     }
 
-    // True if reched this point
+    // True if reached this point
     return true;
   }
 

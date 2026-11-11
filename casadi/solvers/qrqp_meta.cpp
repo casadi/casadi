@@ -56,7 +56,7 @@
 "+-----------------+-----------+--------------------------------------------+\n"
 "| print_iter      | OT_BOOL   | Print iterations [true].                   |\n"
 "+-----------------+-----------+--------------------------------------------+\n"
-"| print_lincomb   | OT_BOOL   | Print dependant linear combinations of     |\n"
+"| print_lincomb   | OT_BOOL   | Print dependent linear combinations of     |\n"
 "|                 |           | constraints [false]. Printed numbers are   |\n"
 "|                 |           | 0-based indices into the vector of [simple |\n"
 "|                 |           | bounds;linear bounds]                      |\n"

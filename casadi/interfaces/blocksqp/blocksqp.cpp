@@ -427,7 +427,7 @@ namespace casadi {
 
     // Setup feasibility restoration phase
     if (restore_feas_) {
-      // get orignal nlp
+      // get original nlp
       Function nlp = oracle_;
       std::vector<MX> resv;
       std::vector<MX> argv = nlp.mx_in();
@@ -671,7 +671,7 @@ namespace casadi {
     if (hess_lim_mem_ && hess_memsize_ == 0)
       const_cast<Blocksqp*>(this)->hess_memsize_ = maxblocksize;
 
-    // Reset the SQP metod
+    // Reset the SQP method
     reset_sqp(m);
 
     // Free existing memory, if any
@@ -850,7 +850,7 @@ namespace casadi {
             m->steptype = -1;
 
           // Heuristic 2: Try to reduce constraint violation by closing
-          // continuity gaps to produce an admissable iterate
+          // continuity gaps to produce an admissible iterate
           if (lsError && m->cNorm > 0.01 * nlinfeastol_ && m->steptype < 2) {
             // Don't do this twice in a row!
             print("***WARNING: Steplength too short. "

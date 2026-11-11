@@ -330,7 +330,7 @@ void casadi_hpipm_set_work(casadi_hpipm_data<T1>* d, const T1*** arg, T1*** res,
   casadi_hpipm_ptr_block(p->N+1, d->hug, d->ug, p->lug, 0);
   casadi_hpipm_ptr_block(p->N, d->hb, d->b, p->b, 0);
 
-  // Slack variables featues not currently interfaced
+  // Slack variables features not currently interfaced
   for(i=0;i<p->N+1;++i) d->hZl[i] = 0;
   for(i=0;i<p->N+1;++i) d->hZu[i] = 0;
   for(i=0;i<p->N+1;++i) d->hzl[i] = 0;

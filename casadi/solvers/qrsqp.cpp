@@ -294,7 +294,7 @@ namespace casadi {
     // Number of line-search iterations
     casadi_int ls_iter = 0;
 
-    // Last linesearch successfull
+    // Last linesearch successful
     bool ls_success = true;
 
     // Reset
@@ -378,7 +378,7 @@ namespace casadi {
         m->res[0] = m->Bk;
         if (calc_function(m, "nlp_hess_l")) return 1;
 
-        // Determing regularization parameter with Gershgorin theorem
+        // Determining regularization parameter with Gershgorin theorem
         if (regularize_) {
           m->reg = std::fmin(0, -casadi_lb_eig(Hsp_, m->Bk));
           if (m->reg > 0) casadi_regularize(Hsp_, m->Bk, m->reg);
@@ -400,7 +400,7 @@ namespace casadi {
       casadi_copy(d_nlp->ubz, nx_+ng_, m->ubdz);
       casadi_axpy(nx_+ng_, -1., d_nlp->z, m->ubdz);
 
-      // Intitial guess
+      // Initial guess
       casadi_copy(d_nlp->lam, nx_ + ng_, m->dlam);
       casadi_clear(m->dz, nx_);
 
