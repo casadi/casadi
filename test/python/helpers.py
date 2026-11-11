@@ -832,13 +832,13 @@ class casadiTestCase(unittest.TestCase):
     if bad_symbols:
       self.fail("Found %d bad symbol exported in shared library (missing CASADI_PREFIX): %s" % (len(bad_symbols),str(bad_symbols[:10]) ))
 
-  def check_codegen(self,F,inputs=None, opts=None,std="c89",extralibs="",extralibdirs=[],check_serialize=False,extra_options=None,main=False,with_external=True,main_return_code=0,valgrind=False,helgrind=False,definitions=None,with_jac_sparsity=False,external_opts=None,with_reverse=False,with_forward=False,extra_include=[],digits=15,debug_mode=False,main_output_check=True):
-    # type: (Any, Any, Any, str, Union[str, list], list, bool, Union[str, list, None], bool, bool, Any, bool, bool, Union[str, list, None], bool, Optional[dict], bool, bool, list, int, bool, bool) -> Any
+  def check_codegen(self,F,inputs=None, opts=None,std="c89",extralibs="",extralibdirs=[],check_serialize=False,extra_options=None,main=False,with_external=True,main_return_code=0,valgrind=False,helgrind=False,definitions=None,with_jac_sparsity=False,external_opts=None,with_reverse=False,with_forward=False,extra_include=[],digits=15,debug_mode=False,main_output_check=True,with_jump_sparsity=False):
+    # type: (Any, Any, Any, str, Union[str, list], list, bool, Union[str, list, None], bool, bool, Any, bool, bool, Union[str, list, None], bool, Optional[dict], bool, bool, list, int, bool, bool, bool) -> Any
     ret = {}
     if not isinstance(main_return_code,list):
         main_return_code = [main_return_code]
     if args.run_slow:
-      plain = not (opts or main or extralibs or extralibdirs or check_serialize or extra_options or not with_external or definitions or with_jac_sparsity or external_opts or with_reverse or with_forward or extra_include or debug_mode)
+      plain = not (opts or main or extralibs or extralibdirs or check_serialize or extra_options or not with_external or definitions or with_jac_sparsity or with_jump_sparsity or external_opts or with_reverse or with_forward or extra_include or debug_mode)
       if self._codegen_batch is not None and plain and not isinstance(F, list):
         self._codegen_batch.setdefault(std, []).append((F, inputs, digits))
         return ret
@@ -856,9 +856,10 @@ class casadiTestCase(unittest.TestCase):
       cg_names = []
       cg = ca.CodeGenerator(name,opts)
       for f in ([e[0] for e in batched] if batched else [F]):
-        cg.add(f,with_jac_sparsity)
+        cg.add(f,with_jac_sparsity,with_jump_sparsity)
         cg_names.append(f.name())
       if with_jac_sparsity: cg_names.append("jac_"+F.name())
+      if with_jump_sparsity: cg_names.append("jump_"+F.name())
       if with_reverse:
         Frev = F.reverse(1)
         cg.add(Frev, with_jac_sparsity)

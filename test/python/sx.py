@@ -1429,6 +1429,17 @@ class SXtests(casadiTestCase):
       warnings.simplefilter("ignore")
       is_smooth(x)  # pyright: ignore[reportUndefinedVariable]
 
+  def test_is_smooth_call(self):
+    x = ca.SX.sym("x")
+    F = ca.Function("F",[x],[ca.floor(x)])
+    G = ca.Function("G",[x],[ca.sin(x)])
+    xm = ca.MX.sym("x")
+    H = ca.Function("H",[xm],[ca.floor(xm)])
+    self.assertFalse(F.call([x],False,True)[0].is_smooth())
+    self.assertTrue(G.call([x],False,True)[0].is_smooth())
+    self.assertFalse(H.call([x],False,True)[0].is_smooth())
+    self.assertFalse(ca.Function("FF",[x],[F(x)]).call([x],False,True)[0].is_smooth())
+
   def test_which_depends(self):
     for X in [ca.SX,ca.MX]:
       x = X.sym("x")
@@ -1470,6 +1481,121 @@ class SXtests(casadiTestCase):
 
       self.checkarray(ca.which_depends(e, ca.vertcat(x,y,p),2,True),[True, False])
       self.checkarray(ca.which_depends(e, ca.vertcat(x,y,p),2,False),[True, False, True])
+
+  def test_which_jump(self):
+    for X in [ca.SX,ca.MX]:
+      x = X.sym("x")
+      y = X.sym("y")
+      p = X.sym("p")
+      z = X.sym("z")
+
+      e = ca.vertcat(0, x+y, ca.floor(x)+y, x*ca.floor(p), ca.sign(x)*y,
+                     ca.if_else(x>0, y, 2*y), ca.fabs(x), ca.sin(x), ca.fmod(x, 1), 1/x)
+      self.checkarray(ca.which_jump(e, ca.vertcat(x,y), True),[0, 0, 1, 0, 1, 1, 0, 0, 1, 0])
+      self.checkarray(ca.which_jump(e, ca.vertcat(x,y,p), True),[0, 0, 1, 1, 1, 1, 0, 0, 1, 0])
+
+      e = ca.vertcat(ca.floor(x)+y, x*ca.floor(p), ca.sin(y))
+      self.checkarray(ca.which_jump(e, ca.vertcat(x,y,p,z)),[True, False, True, False])
+      self.checkarray(ca.which_jump(e, ca.vertcat(x,y,p,z), False),[True, False, True, False])
+
+      # Jumps upstream of an operation propagate
+      e = ca.sin(ca.floor(x))*y
+      self.checkarray(ca.which_jump(e, ca.vertcat(x,y), True),[1])
+      self.checkarray(ca.which_jump(e, ca.vertcat(x,y), False),[True, False])
+
+      self.assertTrue(ca.jumps_in(ca.floor(x)+y, x))
+      self.assertFalse(ca.jumps_in(ca.floor(x)+y, y))
+      self.assertFalse(ca.jumps_in(ca.floor(p)*x, x))
+      self.assertFalse(ca.jumps_in(ca.fabs(x)+ca.fmax(x, y), ca.vertcat(x,y)))
+      self.assertFalse(ca.jumps_in(X(2,1), x))
+
+      # Per-argument jumps
+      self.checkarray(ca.which_jump(ca.if_else(x>0, y, 2*y), ca.vertcat(x,y)),[True, False])
+      self.checkarray(ca.which_jump(ca.copysign(x, y), ca.vertcat(x,y)),[False, True])
+      self.checkarray(ca.which_jump(ca.fmod(x, y), ca.vertcat(x,y)),[True, True])
+
+    # Nodes whose sparsity propagation drops the dependency
+    x = ca.MX.sym("x",3)
+    i = ca.MX.sym("i")
+    for e in [x[i], ca.low(x, i)]:
+      self.checkarray(ca.which_jump(e, i, True),[1]*e.nnz())
+    self.checkarray(ca.which_jump(ca.find(x), i, True),[0])
+    self.checkarray(ca.which_jump(x[i], x), [False]*3)
+    self.checkarray(ca.which_jump(x[i], i), [True])
+    self.checkarray(ca.which_jump(ca.find(x), x), [True]*3)
+    self.checkarray(ca.which_jump(ca.low(x, i), ca.vertcat(x,i)), [True]*4)
+    y = ca.MX.zeros(3,1)
+    y.nz[i] = x[0]
+    self.checkarray(ca.which_jump(y, ca.vertcat(x,i)), [False, False, False, True])
+    self.checkarray(ca.which_jump(ca.floor(ca.find(x))*i, ca.vertcat(x,i)), [True]*3+[False])
+
+    # Dependencies hidden from derivatives (is_diff_in) count as jumps
+    for X in [ca.SX, ca.MX]:
+      x = X.sym("x")
+      y = X.sym("y")
+      if X is ca.MX:
+        for e in [ca.floor(ca.stop_diff(x, 1)), ca.stop_diff(ca.floor(x), 1), x*ca.stop_diff(x, 1)]:
+          self.assertTrue(ca.jumps_in(e, x))
+          self.assertTrue(ca.jumps_in(e+y, x))
+          self.assertFalse(ca.jumps_in(e+y, y))
+      a = X.sym("a")
+      b = X.sym("b")
+      f = ca.Function("f",[a,b],[a*b],{"is_diff_in":[False,True]})
+      e = f.call([x, y], False, True)[0]
+      self.checkarray(ca.which_jump(e, ca.vertcat(x,y)), [True, False])
+      self.checkarray(ca.which_jump(e, ca.vertcat(x,y), True), [1])
+      self.checkarray(ca.which_jump(e, y, True), [0])
+
+    # Function calls
+    a = ca.MX.sym("a")
+    b = ca.MX.sym("b")
+    f_jump = ca.Function("f_jump",[a],[ca.floor(a)])
+    f_smooth = ca.Function("f_smooth",[a],[ca.sin(a)])
+    f_par = ca.Function("f_par",[a,b],[a*ca.floor(b)])
+    for f in [f_jump, f_smooth, f_par]:
+      for F in [f, f.expand()]:
+        x = ca.MX.sym("x")
+        y = ca.MX.sym("y")
+        if f is f_par:
+          e = ca.vertcat(F(x,y), F(y,x))
+          ref_fwd = [True, True]
+          ref_rev = [True, True]
+          self.checkarray(ca.which_jump(F(x,y), ca.vertcat(x,y), False),[False, True])
+          self.checkarray(ca.which_jump(F(x,y), x, True),[False])
+        else:
+          e = ca.vertcat(F(x)+y, F(ca.floor(y))*x)
+          ref_fwd = [f is f_jump, True]
+          ref_rev = [f is f_jump, True]
+        self.checkarray(ca.which_jump(e, ca.vertcat(x,y), True), ref_fwd)
+        self.checkarray(ca.which_jump(e, ca.vertcat(x,y), False), ref_rev)
+        # Same through an SX call node
+        xs = ca.SX.sym("x")
+        ys = ca.SX.sym("y")
+        for G in [ca.Function("g",[x,y],[e]), ca.Function("g",[x,y],[e]).expand()]:
+          es = G.call([xs, ys], False, True)[0]
+          self.checkarray(ca.which_jump(es, ca.vertcat(xs,ys), True), ref_fwd)
+          self.checkarray(ca.which_jump(es, ca.vertcat(xs,ys), False), ref_rev)
+
+    # Map and MapSum
+    x = ca.MX.sym("x",3)
+    p = ca.MX.sym("p")
+    f = ca.Function("f",[a,b],[a*ca.floor(b), ca.floor(a)+b])
+    fm = f.map(3)
+    e = ca.veccat(*fm(x.T, p))
+    self.checkarray(ca.which_jump(e, x, True),[0, 0, 0, 1, 1, 1])
+    self.checkarray(ca.which_jump(e, x, False),[True, True, True])
+    self.checkarray(ca.which_jump(e, p, True),[1, 1, 1, 0, 0, 0])
+    self.checkarray(ca.which_jump(e, p, False),[True])
+    fs = f.map("fs","serial",3,[1],[0])
+    e = ca.veccat(*fs(x.T, p))
+    self.checkarray(ca.which_jump(e, x, True),[0, 1, 1, 1])
+    self.checkarray(ca.which_jump(e, p, True),[1, 0, 0, 0])
+    self.checkarray(ca.which_jump(e[0], x, False),[False, False, False])
+    self.checkarray(ca.which_jump(e[0], p, False),[True])
+
+    # Opaque functions: sound fallback, every dependency may jump
+    lut = ca.interpolant("lut","linear",[[0,1,2]],[0,1,4])
+    self.assertTrue(ca.jumps_in(lut(x[0]), x))
 
   def test_if_else_zero_sens(self):
 
@@ -1581,6 +1707,24 @@ class SXtests(casadiTestCase):
       self.assertFalse(ca.is_linear(x**2*p**4,x))
       self.assertTrue(ca.is_linear(x*p**4,x))
       self.assertTrue(ca.is_linear(5*p**4,x))
+
+      # issue #4443: a zero derivative does not make a jump linear
+      xv = X.sym("x",2)
+      xs = ca.SX.sym("x")
+      F = ca.Function("F",[xs],[ca.floor(xs)])
+      for e,v in [(ca.floor(x),x),(ca.sign(x),x),(x>0,x),(ca.if_else(x>0,1,2),x),
+                  (ca.copysign(x,p),x),(ca.floor(xv),xv),(F(x),x)]:
+        self.assertFalse(ca.is_linear(e,v))
+      if X is ca.MX:
+        self.assertFalse(ca.is_linear(ca.floor(ca.stop_diff(x,1)),x))
+        self.assertFalse(ca.is_linear(ca.find(xv),xv))
+      self.assertTrue(ca.is_linear(ca.floor(p)+x,x))
+      self.assertTrue(ca.is_linear(ca.if_else(p>0,x,2*x),x))
+      self.assertFalse(ca.is_quadratic(ca.floor(x),x))
+      self.assertFalse(ca.is_quadratic(x*ca.fabs(x),x))
+      self.assertTrue(ca.is_quadratic(x**2*ca.floor(p),x))
+      with self.assertInException("non-linear"):
+        ca.linear_coeff(ca.floor(x),x,True)
 
 
 

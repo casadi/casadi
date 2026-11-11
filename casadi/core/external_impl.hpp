@@ -268,7 +268,7 @@ class CASADI_EXPORT External : public FunctionInternal {
 
 class CASADI_EXPORT GenericExternal : public External {
   // Sparsities
-  sparsity_t get_sparsity_in_, get_sparsity_out_, get_jac_sparsity_;
+  sparsity_t get_sparsity_in_, get_sparsity_out_, get_jac_sparsity_, get_jump_sparsity_;
   // Differentiability
   diff_t get_diff_in_, get_diff_out_;
 
@@ -311,6 +311,12 @@ class CASADI_EXPORT GenericExternal : public External {
       \identifier{203} */
   bool has_jac_sparsity(casadi_int oind, casadi_int iind) const override;
   Sparsity get_jac_sparsity(casadi_int oind, casadi_int iind, bool symmetric) const override;
+  ///@}
+
+  ///@{
+  /// Jump sparsity of an output with respect to an input
+  bool has_jump_sparsity(casadi_int oind, casadi_int iind) const override;
+  Sparsity get_jump_sparsity(casadi_int oind, casadi_int iind) const override;
   ///@}
 
   /// @{

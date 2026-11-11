@@ -122,6 +122,14 @@ namespace casadi {
         \identifier{6w} */
     int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
+    /** \brief Propagate jumps forward (recurses into the callee) */
+    int sp_forward_jump(const bvec_t** arg, const bvec_t** arg_j,
+      bvec_t** res, bvec_t** res_j, casadi_int* iw, bvec_t* w) const override;
+
+    /** \brief Propagate jumps backwards (recurses into the callee) */
+    int sp_reverse_jump(bvec_t** arg, bvec_t** arg_j,
+      bvec_t** res, bvec_t** res_j, casadi_int* iw, bvec_t* w) const override;
+
     /** \brief  Get called function
 
         \identifier{6x} */

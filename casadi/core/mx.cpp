@@ -2006,6 +2006,10 @@ namespace casadi {
     return _which_depends(expr, var, order, tr);
   }
 
+  std::vector<bool> MX::which_jump(const MX &expr, const MX &var, bool tr) {
+    return _which_jump(expr, var, tr);
+  }
+
   Sparsity MX::jacobian_sparsity(const MX &f, const MX &x) {
     return _jacobian_sparsity(f, x);
   }

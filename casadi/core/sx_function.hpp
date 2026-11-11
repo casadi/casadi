@@ -376,6 +376,14 @@ class CASADI_EXPORT SXFunction :
       \identifier{v7} */
   int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, void* mem) const override;
 
+  /** \brief Propagate jumps forward */
+  int sp_forward_jump(const bvec_t** arg, bvec_t** res,
+                      casadi_int* iw, bvec_t* w, void* mem) const override;
+
+  /** \brief Propagate jumps backwards */
+  int sp_reverse_jump(bvec_t** arg, bvec_t** res,
+                      casadi_int* iw, bvec_t* w, void* mem) const override;
+
   /** *\brief get SX expression associated with instructions
 
        \identifier{v8} */
@@ -420,6 +428,12 @@ protected:
 
   template<typename T>
   void call_rev(const AlgEl& e, T** arg, T** res, casadi_int* iw, T* w) const;
+
+  // Jump propagation through a call node; wj: jump plane of the work vector
+  void call_fwd_jump(const AlgEl& e, const bvec_t** arg, bvec_t** res,
+                     casadi_int* iw, bvec_t* w, bvec_t* wj) const;
+  void call_rev_jump(const AlgEl& e, bvec_t** arg, bvec_t** res,
+                     casadi_int* iw, bvec_t* w, bvec_t* wj) const;
 
   template<typename T, typename CT>
   void call_setup(const ExtendedAlgEl& m,
