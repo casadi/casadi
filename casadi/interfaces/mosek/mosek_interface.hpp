@@ -39,7 +39,7 @@ namespace casadi {
     \par
 
       Interface to the MOSEK Optimizer for sparse Linear, Quadratic,
-      Mixed-Integer and Second-Order Cone Programs.  See
+      Mixed-Integer, Second-Order Cone and Semidefinite Programs.  See
       https://www.mosek.com for details and the MOSEK reference manual
       for the list of parameters that may be passed via the ``mosek``
       option dict (e.g. ``MSK_IPAR_LOG``, ``MSK_DPAR_INTPNT_QO_TOL_REL_GAP``).
@@ -182,9 +182,20 @@ namespace casadi {
     std::vector<casadi_int> socp_r_;
     std::vector<casadi_int> socp_mq_colind_, socp_mq_row_, socp_mq_data_;
     std::vector<casadi_int> socp_map_P_;
+    std::vector<casadi_int> socp_chk_q_, socp_chk_p_;
 
     // Build socp_ from the result of Conic::sdp_to_socp_init
     void build_socp_config();
+
+    // Generic psd support, used when the psd constraints are not of SOCP form
+    std::vector<int> psd_r_, psd_afe_, psd_var_, psd_map_q_, psd_map_p_;
+    std::vector<double> psd_scale_;
+
+    // Build the generic psd mapping
+    void build_psd_config();
+
+    // SOCP mapping if detected, generic psd mapping otherwise
+    void init_psd(bool detect_socp);
   };
 } // end namespace casadi
 /// \endcond

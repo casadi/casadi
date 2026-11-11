@@ -117,7 +117,7 @@ namespace casadi {
     bool integer_support() const override { return true;}
 
     /// Can psd constraints be treated
-    bool psd_support() const override { return true;}
+    bool psd_support() const override { return false;}
 
     /// A documentation string
     static const std::string meta_doc;

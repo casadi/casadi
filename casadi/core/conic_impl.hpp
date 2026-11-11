@@ -230,12 +230,35 @@ namespace casadi {
       // Aggregate SOCP helper constraints (rhs)
       std::vector<casadi_int> map_P;
 
+      // Nonzero pairs (-1: structural zero) of Q and P that must be equal
+      std::vector<casadi_int> chk_Q, chk_P;
+
       // Maximum size of ind/val vectors
       casadi_int indval_size;
     };
 
     /// SDP to SOCP conversion initialization
     void sdp_to_socp_init(SDPToSOCPMem& mem) const;
+
+    /// SOCP form check pairs: each block [Z I, X; X', Z] has a constant diagonal and is symmetric
+    void sdp_to_socp_check_init(SDPToSOCPMem& mem) const;
+
+    /// Generic psd constraints as F x + g in svec psd cones, one per block
+    struct SDPSvecMem {
+      // Block dimensions
+      std::vector<casadi_int> dim;
+      // Offsets of the blocks in svec space (dim.size()+1)
+      std::vector<casadi_int> r;
+      // Sparsity of F
+      Sparsity F;
+      // Nonzeros of Q -> nonzeros of F, nonzeros of P -> entries of g
+      std::vector<casadi_int> map_Q, map_P;
+      // Scaling per svec entry, applied after summing over map_Q / map_P
+      std::vector<double> scale;
+    };
+
+    /// Generic psd constraints initialization
+    void sdp_svec_init(SDPSvecMem& mem) const;
 
     void serialize(SerializingStream &s, const SDPToSOCPMem& m) const;
     void deserialize(DeserializingStream &s, SDPToSOCPMem& m);
