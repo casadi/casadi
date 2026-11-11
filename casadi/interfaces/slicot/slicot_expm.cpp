@@ -95,7 +95,7 @@ namespace casadi {
   }
 
 
-  /** \brief Initalize memory block */
+  /** \brief Initialize memory block */
   int SlicotExpm::init_mem(void* mem) const {
     return Expm::init_mem(mem);
   }

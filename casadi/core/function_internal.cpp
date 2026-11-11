@@ -1659,7 +1659,7 @@ namespace casadi {
 
       // There may be false positives here that are not present
       // in the reverse mode that precedes it.
-      // This can lead to an assymetrical result
+      // This can lead to an asymmetrical result
       //  cf. #1522
       r=r*r.T();
 
@@ -2767,7 +2767,7 @@ namespace casadi {
     }
     g << "}\n\n";
 
-    // Number of inputs and outptus
+    // Number of inputs and outputs
     g << g.declare("casadi_int " + name_ + "_n_in(void)")
       << " { return " << n_in_ << ";}\n\n"
       << g.declare("casadi_int " + name_ + "_n_out(void)")

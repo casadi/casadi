@@ -298,7 +298,7 @@ class CASADI_EXPORT GenericExternal : public External {
   void init(const Dict& opts) override;
 
   /// @{
-  /** \brief Retreive sparsities
+  /** \brief Retrieve sparsities
 
       \identifier{202} */
   Sparsity get_sparsity_in(casadi_int i) override;
@@ -314,7 +314,7 @@ class CASADI_EXPORT GenericExternal : public External {
   ///@}
 
   /// @{
-  /** \brief Retreive differentiability
+  /** \brief Retrieve differentiability
 
       \identifier{204} */
   bool get_diff_in(casadi_int i) override;

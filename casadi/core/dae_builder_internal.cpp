@@ -609,7 +609,7 @@ MX Variable::get_der(const DaeBuilderInternal& self) const {
     return 1;
   } else if (needs_der()) {
     casadi_assert(der >= 0, "Variable " + name + " has no time derivative");
-    // Should have a derviative expression
+    // Should have a derivative expression
     return self.variable(der).v;
   } else {
     // Constant or piecewise constant variable
@@ -1185,7 +1185,7 @@ XmlNode DaeBuilderInternal::generate_model_structure(bool dae) const {
 void DaeBuilderInternal::update_dependencies() const {
   // Get oracle function
   const Function& oracle = this->oracle(false, true);
-  // Dependendencies of the ODE right-hand-side
+  // Dependencies of the ODE right-hand-side
   Sparsity dode_dxT = oracle.jac_sparsity(oracle.index_out("ode"), oracle.index_in("x")).T();
   Sparsity dode_duT = oracle.jac_sparsity(oracle.index_out("ode"), oracle.index_in("u")).T();
   Sparsity dode_dzT = oracle.jac_sparsity(oracle.index_out("ode"), oracle.index_in("z")).T();
@@ -1210,7 +1210,7 @@ void DaeBuilderInternal::update_dependencies() const {
       xdot.dependencies.push_back(variable(Category::U, j).value_reference);
     }
   }
-  // Dependendencies of the outputs and event indicators
+  // Dependencies of the outputs and event indicators
   for (Category cat : {Category::ALG, Category::Y, Category::ZERO}) {
     auto catname = to_string(cat);
     const std::vector<size_t>& oind = indices(cat);
@@ -3071,7 +3071,7 @@ Function DaeBuilderInternal::fmu_fun(const std::string& name,
     scheme["alg"] = indices(Category::ALG);
     scheme["y"] = indices(Category::Y);
   }
-  // Auxilliary variables, if any
+  // Auxiliary variables, if any
   std::vector<std::string> aux;
   it = opts.find("aux");
   if (it != opts.end()) {
@@ -4414,7 +4414,7 @@ void DaeBuilderInternal::import_binding_equations(const XmlNode& eqs) {
         // Set the binding equation
         var.bind = assign(var.name, read_expr(eq[1][0])).index;
       } else {
-        // OpenModelica 1.17 occationally generates integer values without type specifier (bug?)
+        // OpenModelica 1.17 occasionally generates integer values without type specifier (bug?)
         casadi_assert(eq[1].size() == 0, "Not implemented");
         casadi_int val;
         eq[1].get(&val);
@@ -4505,7 +4505,7 @@ void DaeBuilderInternal::import_dynamic_equations(const XmlNode& eqs) {
           }
           cond_name = cond_name.substr(when_prefix.size());
           casadi_int ind = std::stoi(cond_name) - 1;
-          // Ensure consequitive for now
+          // Ensure consecutive for now
           casadi_assert(ind == when_.size(), "Non-consequitive when conditions");
           // Create a when equation with no equations
           when(beq, {}, Dict());
@@ -4550,7 +4550,7 @@ void DaeBuilderInternal::import_initial_equations(const XmlNode& eqs) {
         const XmlNode& lhs = eq[0][0];
         const XmlNode& rhs = eq[0][1];
 
-        // Ignore initalizations of when equation indicators
+        // Ignore initializations of when equation indicators
         if (lhs.size() > 0
             && lhs[0].attribute<std::string>("name").rfind("$whenCondition", 0) == 0) {
           continue;

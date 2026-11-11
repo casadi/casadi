@@ -157,7 +157,7 @@ public:
   void callback_class();
   bool has_callback_class() const;
 
-  /// return true if expression is only dependant on Opti parameters, not variables
+  /// return true if expression is only dependent on Opti parameters, not variables
   bool is_parametric(const MX& expr) const;
 
   /// @{

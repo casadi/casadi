@@ -39,7 +39,7 @@ struct CASADI_EXPORT Fmu3Memory : public FmuMemory {
 int Fmu3::init_mem(FmuMemory* mem) const {
   if (FmuInternal::init_mem(mem)) return 1;
   auto *m = static_cast<Fmu3Memory*>(mem);
-  /// Allocate numerical values for initial auxilliary variables
+  /// Allocate numerical values for initial auxiliary variables
   m->aux_value.v_real.resize(off_aux_real_.back());
   m->aux_value.v_integer.resize(off_aux_integer_.back());
   m->aux_value.v_boolean.resize(off_aux_boolean_.back());
@@ -77,7 +77,7 @@ void Fmu3::init(const DaeBuilderInternal* dae) {
   init_string_.clear();
   for (size_t i = 0; i < dae->n_variables(); ++i) {
     const Variable& v = dae->variable(i);
-    // Consitency check
+    // Consistency check
     casadi_assert(v.numel == v.value.size(), "Size mismatch for " + v.name);
     // Skip if the wrong type
     if (v.causality != Causality::PARAMETER && v.causality != Causality::INPUT) continue;
@@ -110,7 +110,7 @@ void Fmu3::init(const DaeBuilderInternal* dae) {
     }
   }
 
-  // Collect auxilliary variables
+  // Collect auxiliary variables
   vn_aux_real_.clear();
   vn_aux_integer_.clear();
   vn_aux_boolean_.clear();
@@ -161,7 +161,7 @@ void Fmu3::init(const DaeBuilderInternal* dae) {
 }
 
 void Fmu3::finalize() {
-  /// Allocate numerical values for initial auxilliary variables
+  /// Allocate numerical values for initial auxiliary variables
   aux_value_.v_real.resize(off_aux_real_.back());
   aux_value_.v_integer.resize(off_aux_integer_.back());
   aux_value_.v_boolean.resize(off_aux_boolean_.back());
@@ -392,7 +392,7 @@ int Fmu3::get_aux(void* instance) {
 
 int Fmu3::get_aux_impl(void* instance, Value& aux_value) const {
   auto *c = static_cast<fmi3Instance>(instance);
-  // Get real auxilliary variables
+  // Get real auxiliary variables
   if (!vr_aux_real_.empty()) {
     fmi3Status status = get_float64_(c, get_ptr(vr_aux_real_), vr_aux_real_.size(),
       get_ptr(aux_value.v_real), off_aux_real_.back());
@@ -402,7 +402,7 @@ int Fmu3::get_aux_impl(void* instance, Value& aux_value) const {
     }
   }
 
-  // Get integer/enum auxilliary variables
+  // Get integer/enum auxiliary variables
   if (!vr_aux_integer_.empty()) {
     fmi3Status status = get_int32_(c, get_ptr(vr_aux_integer_), vr_aux_integer_.size(),
       get_ptr(aux_value.v_integer), off_aux_integer_.back());
@@ -412,7 +412,7 @@ int Fmu3::get_aux_impl(void* instance, Value& aux_value) const {
     }
   }
 
-  // Get boolean auxilliary variables
+  // Get boolean auxiliary variables
   casadi_assert(vr_aux_boolean_.size() == aux_value.v_boolean.size(),
     "Vector valued variables not supported");
   for (size_t k = 0; k < vr_aux_boolean_.size(); ++k) {
@@ -425,7 +425,7 @@ int Fmu3::get_aux_impl(void* instance, Value& aux_value) const {
     aux_value.v_boolean[k] = value;
   }
 
-  // Get string auxilliary variables
+  // Get string auxiliary variables
   for (size_t k = 0; k < vr_aux_string_.size(); ++k) {
     fmi3ValueReference vr = vr_aux_string_[k];
     fmi3String value = aux_value.v_string.at(k).c_str();
@@ -442,7 +442,7 @@ void Fmu3::get_stats(FmuMemory* m, Dict* stats,
     const std::vector<std::string>& name_in, const InputStruct* in) const {
   Value& v = static_cast<Fmu3Memory*>(m)->aux_value;
   get_aux_impl(m->instance, v);
-  // Collect auxilliary variables
+  // Collect auxiliary variables
   Dict aux;
   // Real
   for (size_t k = 0; k < vn_aux_real_.size(); ++k) {
@@ -556,7 +556,7 @@ Fmu3::Fmu3(DeserializingStream& s) : FmuInternal(s) {
     s.unpack("Fmu3::off_aux_boolean", off_aux_boolean_);
     s.unpack("Fmu3::off_aux_string", off_aux_string_);
   } else {
-    // Version 1 only had scalar auxilliary variables
+    // Version 1 only had scalar auxiliary variables
     off_aux_real_ = range(vr_aux_real_.size() + 1);
     off_aux_integer_ = range(vr_aux_integer_.size() + 1);
     off_aux_boolean_ = range(vr_aux_boolean_.size() + 1);

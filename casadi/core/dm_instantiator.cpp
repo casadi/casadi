@@ -188,7 +188,7 @@ namespace casadi {
 
     // Cast nonzeros in correct shape
     if (is_dense()) {
-      // Special case for dense (for readibility of exported code)
+      // Special case for dense (for readability of exported code)
       stream << indent << name << " = reshape(";
       stream << name << "_nz, ";
       stream << size1() << ", " << size2() << ");" << std::endl;

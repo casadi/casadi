@@ -412,7 +412,7 @@ namespace IndexReduction {
   /*
   struct VariableStruct {
     std::vector<struct EquationStruct*> eqs;
-    // Eligability to serve as candidate, one for each pass during phase 1
+    // Eligibility to serve as candidate, one for each pass during phase 1
     std::vector<bool> eligible1;
     struct EquationStruct* assign;
     // Which variable is this variable's derivative?
@@ -420,7 +420,7 @@ namespace IndexReduction {
     // Which variable produces this variable by differentiation?
     struct VariableStruct* ;
     bool visited;
-    // Eligability to serve as candidate during phase 2
+    // Eligibility to serve as candidate during phase 2
     bool eligible2;
   };*/
 

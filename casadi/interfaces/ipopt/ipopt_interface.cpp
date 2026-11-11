@@ -358,7 +358,7 @@ namespace casadi {
 
     }
 
-    // Intialize the IpoptApplication and process the options
+    // Initialize the IpoptApplication and process the options
     Ipopt::ApplicationReturnStatus status = (*app)->Initialize();
     casadi_assert(status == Solve_Succeeded, "Error during IPOPT initialization");
 
@@ -526,7 +526,7 @@ namespace casadi {
         } else {
           if (iter==0) {
             uerr()
-              << "Warning: intermediate_callback is disfunctional in your installation. "
+              << "Warning: intermediate_callback is dysfunctional in your installation. "
               "You will only be able to use stats(). "
               "See https://github.com/casadi/casadi/wiki/enableIpoptCallback to enable it."
               << std::endl;

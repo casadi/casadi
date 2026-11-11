@@ -273,7 +273,7 @@ Dict MadnlpInterface::get_stats(void* mem) const {
 }
 
 void MadnlpInterface::set_madnlp_prob() {
-  // assign pointer to internal structur casadi_nlp_prob
+  // assign pointer to internal structure casadi_nlp_prob
   // p_nlp_ ~ casadi_nlp_prob casadi internal
   p_.nlp = &p_nlp_;
   // p_ casadi_madnlp_prob

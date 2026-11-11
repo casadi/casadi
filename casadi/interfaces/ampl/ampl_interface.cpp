@@ -156,14 +156,14 @@ namespace casadi {
     nl_init_ << v.size() << " " // both
        << 0 << " " // constraints
        << 0 << " " // objective
-       << 0 << " " // c1 - constaint, but linear?
+       << 0 << " " // c1 - constraint, but linear?
        << 0 << "\n"; // o1 - objective, but linear?
 
     // Create a function which evaluates f and g
     Function F("F", {vertcat(v), x}, {vertcat(vdef), f, g},
               {"v", "x"}, {"vdef", "f", "g"});
 
-    // Iterate over the algoritm
+    // Iterate over the algorithm
     std::vector<std::string> work(F.sz_w());
 
     // Loop over the algorithm
@@ -286,7 +286,7 @@ namespace casadi {
     if (verbose_) casadi_message("Opened " + nlname);
     nl << nl_init_.str();
 
-    // Primal intial guess
+    // Primal initial guess
     nl << "x" << nx_ << "\n";
     for (casadi_int i=0; i<nx_; ++i) {
       nl << i << " " << d_nlp->z[i] << "\n";

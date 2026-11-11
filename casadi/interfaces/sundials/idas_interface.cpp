@@ -78,7 +78,7 @@ const Options IdasInterface::options_
       "Absolute tolerarance for each component"}},
     {"max_step_size",
       {OT_DOUBLE,
-      "Maximim step size"}},
+      "Maximum step size"}},
     {"first_time",
       {OT_DOUBLE,
       "First requested time as a fraction of the time interval"}},
@@ -254,7 +254,7 @@ int IdasInterface::init_mem(void* mem) const {
   // Include algebraic variables in error testing
   THROWING(IDASetSuppressAlg, m->mem, suppress_algebraic_);
 
-  // Maxinum order for the multistep method
+  // Maximum order for the multistep method
   THROWING(IDASetMaxOrd, m->mem, max_multistep_order_);
 
   // Initial step size
@@ -610,7 +610,7 @@ void IdasInterface::retreat(IntegratorMemory* mem, const double* u,
 }
 
 void IdasInterface::idas_error(const char* module, int flag) {
-  // Successfull return or warning
+  // Successful return or warning
   if (flag>=IDA_SUCCESS) return;
   // Construct error message
   char* flagname = IDAGetReturnFlagName(flag);

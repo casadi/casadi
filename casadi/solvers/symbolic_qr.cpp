@@ -188,7 +188,7 @@ namespace casadi {
     // Permute back the solution
     x = xperm(inv_rowperm, Slice()); // NOLINT(cppcoreguidelines-slicing)
 
-    // Mofify the QR solve function
+    // Modify the QR solve function
     solveT_ = Function("QR_solv_T", solv_in, {x}, fopts_);
   }
 

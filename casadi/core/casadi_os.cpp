@@ -203,10 +203,10 @@ int close_shared_library(handle_t handle) {
 
 handle_t open_shared_library(const std::string& lib, const std::vector<std::string> &search_paths,
         std::string& resultpath, const std::string& caller, bool global) {
-    // Alocate a handle
+    // Allocate a handle
     handle_t handle = nullptr;
 
-    // Alocate a handle pointer
+    // Allocate a handle pointer
     #ifndef _WIN32
         int flag;
         if (global) {

@@ -163,7 +163,7 @@ namespace casadi {
           }
         }
 
-        // Peform call
+        // Perform call
         std::vector<X> res;
         f.call(f_args, res, false, false);
 
@@ -590,7 +590,7 @@ namespace casadi {
     np_ = nnz_in(NLPSOL_P);
     ng_ = oracle_.sparsity_out(NL_G).numel();
 
-    // No need to calculate non-existant quantities
+    // No need to calculate non-existent quantities
     if (np_==0) calc_lam_p_ = false;
     if (ng_==0) calc_g_ = false;
 
@@ -752,7 +752,7 @@ namespace casadi {
     }
 
     // Make sure enough degrees of freedom
-    using casadi::str; // Workaround, MingGW bug, cf. CasADi issue #890
+    using casadi::str; // Workaround, MinGW bug, cf. CasADi issue #890
     if (n_eq> nx_) {
       casadi_warning("NLP is overconstrained: There are " + str(n_eq) +
       " equality constraints but only " + str(nx_) + " variables.");
@@ -844,7 +844,7 @@ namespace casadi {
     // Join statistics (introduced for parallel oracle facilities)
     join_results(m);
 
-    // Calculate multiplers
+    // Calculate multipliers
     if ((calc_f_ || calc_g_ || calc_lam_x_ || calc_lam_p_) && !flag) {
       const double lam_f = 1.;
       m->arg[0] = d_nlp->z;
@@ -862,7 +862,7 @@ namespace casadi {
       if (calc_lam_p_) casadi_scal(np_, -1., d_nlp->lam_p);
     }
 
-    // Make sure that an optimal solution is consistant with bounds
+    // Make sure that an optimal solution is consistent with bounds
     if (bound_consistency_ && !flag) {
       bound_consistency(nx_+ng_, d_nlp->z, d_nlp->lam, d_nlp->lbz, d_nlp->ubz);
     }

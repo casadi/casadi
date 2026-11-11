@@ -733,7 +733,7 @@ namespace casadi {
       // Copy function output to input
       std::copy_n(res.begin(), n_accum, arg.begin());
       for (casadi_int i=0; i<n_accum; ++i) {
-        // Ony get last component (allows nested calls)
+        // Only get last component (allows nested calls)
         casadi_int ncol_out=f.size2_out(i), ncol_in=size2_in(i);
         if (ncol_out>ncol_in) {
           arg[i] = horzsplit(arg[i], {0, ncol_out-ncol_in, ncol_out}).back();
@@ -836,7 +836,7 @@ namespace casadi {
     // Floored division
     casadi_int d = n/max_num_threads;
     if (d*max_num_threads==n) {
-      // Easy when n is divisable by max_num_threads
+      // Easy when n is divisible by max_num_threads
       return map(d, "serial").map(max_num_threads, parallelization);
     } else {
       // Create a base map that computes a bit too much
@@ -1360,7 +1360,7 @@ namespace casadi {
 
   void Function::change_option(const std::string& option_name, const GenericType& option_value) {
     try {
-      // Assert existance
+      // Assert existence
       if (!has_option(option_name))
         casadi_error("Option '" + option_name + "' does not exist");
       // Call internal class
@@ -1717,7 +1717,7 @@ namespace casadi {
 #endif // WITH_EXTRA_CHECKS
       int ret = (*this)->eval_gen(arg, res, iw, w, memory(mem), false, false);
 #ifdef WITH_EXTRA_CHECKS
-      // Consitency check
+      // Consistency check
       casadi_assert_dev(call_depth_==depth);
       call_depth_--;
 #endif // WITH_EXTRA_CHECKS

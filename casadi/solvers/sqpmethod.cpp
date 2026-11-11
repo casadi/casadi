@@ -409,10 +409,10 @@ int Sqpmethod::solve(void* mem) const {
   // Number of line-search iterations
   casadi_int ls_iter = 0;
 
-  // Last linesearch successfull
+  // Last linesearch successful
   bool ls_success = true;
 
-  // Last second order correction successfull
+  // Last second order correction successful
   bool so_succes = false;
 
   // Reset
@@ -546,7 +546,7 @@ int Sqpmethod::solve(void* mem) const {
     casadi_copy(d_nlp->lam, nx_+ng_, d->dlam);
     casadi_clear(d->dx, nx_);
 
-    // Make initial guess feasable
+    // Make initial guess feasible
     /*if (init_feasible_) {
       for (casadi_int i = 0; i < nx_; ++i) {
         if (d->lbdz[i] > 0) d->dx[i] = d->lbdz[i];

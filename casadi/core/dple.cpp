@@ -185,7 +185,7 @@ namespace casadi {
         "has eigenvalues greater than 1-eps_unstable"}},
       {"eps_unstable",
         {OT_DOUBLE,
-        "A margin for unstability detection"}}
+        "A margin for instability detection"}}
      }
   };
 

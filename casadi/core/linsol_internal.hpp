@@ -72,7 +72,7 @@ namespace casadi {
         \identifier{e6} */
     void* alloc_mem() const override { return new LinsolMemory();}
 
-    /** \brief Initalize memory block
+    /** \brief Initialize memory block
 
         \identifier{e7} */
     int init_mem(void* mem) const override;

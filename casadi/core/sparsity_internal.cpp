@@ -616,7 +616,7 @@ namespace casadi {
     top = size2();
     casadi_int nb = size2();
 
-    // dfs(A') to find strongly connnected comp
+    // dfs(A') to find strongly connected comp
     for (casadi_int k=0 ; k < size2() ; ++k) {
       // get i in reverse order of finish times
       casadi_int i = xi[k];
@@ -2631,7 +2631,7 @@ namespace casadi {
       // Update non-zero counter
       nz = new_colind[i];
 
-      // Update colindex for old colums
+      // Update colindex for old columns
       new_colind[cc[i]] = nz;
     }
 
@@ -2821,7 +2821,7 @@ namespace casadi {
         // Skip if duplicate
         if (ret_row[k] == lastrow) continue;
 
-        // update last row encounterd on the col
+        // update last row encountered on the col
         lastrow = ret_row[k];
 
         // Update mapping

@@ -85,7 +85,7 @@ class CASADI_NLPSOL_MADNLP_EXPORT MadnlpInterface : public Nlpsol {
   /** \brief Create memory block */
   void* alloc_mem() const override { return new MadnlpMemory();}
 
-  /** \brief Initalize memory block */
+  /** \brief Initialize memory block */
   int init_mem(void* mem) const override;
 
   /** \brief Free memory block */

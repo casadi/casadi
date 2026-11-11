@@ -97,7 +97,7 @@ namespace casadi {
     // Finalize the object creation
     void finalize() override;
 
-    /** \brief Initalize memory block
+    /** \brief Initialize memory block
 
         \identifier{1ja} */
     int init_mem(void* mem) const override;
@@ -220,7 +220,7 @@ namespace casadi {
       // Block partition vector for SOCP (block i runs from r[i] to r[i+1])
       std::vector<casadi_int> r;
 
-      // Tranpose of A, and corresponding mapping
+      // Transpose of A, and corresponding mapping
       Sparsity AT;
       std::vector<casadi_int> A_mapping;
 

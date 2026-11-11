@@ -86,12 +86,12 @@ namespace casadi {
       {"compiler_setup",
        {OT_STRING,
         "Compiler setup command. Intended to be fixed."
-        " The 'flag' option is the prefered way to set"
+        " The 'flag' option is the preferred way to set"
         " custom flags."}},
       {"linker_setup",
        {OT_STRING,
         "Linker setup command. Intended to be fixed."
-        " The 'flag' option is the prefered way to set"
+        " The 'flag' option is the preferred way to set"
         " custom flags."}},
       {"compiler_flags",
        {OT_STRINGVECTOR,

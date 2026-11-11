@@ -99,7 +99,7 @@ namespace casadi {
     /// Initialize
     void init(const Dict& opts) override;
 
-    /** \brief Initalize memory block
+    /** \brief Initialize memory block
 
         \identifier{1od} */
     int init_mem(void* mem) const override;

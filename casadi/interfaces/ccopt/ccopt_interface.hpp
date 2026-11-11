@@ -85,7 +85,7 @@ class CASADI_NLPSOL_CCOPT_EXPORT MadmpecInterface : public Nlpsol {
   /** \brief Create memory block */
   void* alloc_mem() const override { return new MadmpecMemory();}
 
-  /** \brief Initalize memory block */
+  /** \brief Initialize memory block */
   int init_mem(void* mem) const override;
 
   /** \brief Free memory block */

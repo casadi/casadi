@@ -300,7 +300,7 @@ namespace casadi {
         \identifier{si} */
     bool avoid_stack() const { return avoid_stack_;}
 
-    /** \brief Emit thead safe code chekout/release?
+    /** \brief Emit thead safe code checkout/release?
 
         \identifier{2f7} */
     bool thread_safe() const { return thread_safe_; }
@@ -871,17 +871,17 @@ namespace casadi {
     void print_vector(std::ostream &s, const std::string& name,
                              const std::vector<std::string>& v);
 
-    /** \brief Print canonical representaion of a matrix
+    /** \brief Print canonical representation of a matrix
 
         \identifier{2dk} */
     std::string print_canonical(const Sparsity& sp, const std::string& arg);
 
-    /** \brief Print canonical representaion of a vector
+    /** \brief Print canonical representation of a vector
 
         \identifier{2dl} */
     std::string print_vector(casadi_int sz, const std::string& arg);
 
-    /** \brief Print canonical representaion of a scalar
+    /** \brief Print canonical representation of a scalar
 
         \identifier{2dm} */
     std::string print_scalar(const std::string& arg);

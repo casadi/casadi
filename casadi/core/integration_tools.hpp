@@ -264,7 +264,7 @@ namespace casadi {
   * \param[in] init_solver_options NLP solver options to be passed to nlpsol
   *
   * \return init_gen A function to generate a consistent initial guess that can
-  *             be used to pass to an integrator constructed from a semi explict reduced DAE
+  *             be used to pass to an integrator constructed from a semi explicit reduced DAE
   *             Inputs:
   *               - x_impl, dx_impl, z: initial guesses in the original DAE space
   *               - p: parameters

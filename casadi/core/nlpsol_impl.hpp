@@ -184,7 +184,7 @@ namespace casadi {
         \identifier{1nu} */
     void* alloc_mem() const override { return new NlpsolMemory();}
 
-    /** \brief Initalize memory block
+    /** \brief Initialize memory block
 
         \identifier{1nv} */
     int init_mem(void* mem) const override;

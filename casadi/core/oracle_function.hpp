@@ -229,12 +229,12 @@ namespace casadi {
         \identifier{l} */
     void* alloc_mem() const override { return new OracleMemory();}
 
-    /** \brief Initalize memory block
+    /** \brief Initialize memory block
 
         \identifier{m} */
     int local_init_mem(void* mem) const;
 
-    /** \brief Initalize memory block
+    /** \brief Initialize memory block
 
         \identifier{n} */
     int init_mem(void* mem) const override;

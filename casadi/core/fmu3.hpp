@@ -57,7 +57,7 @@ class CASADI_EXPORT Fmu3 : public FmuInternal {
   // Initialize
   void init(const DaeBuilderInternal* dae) override;
 
-  /** \brief Initalize memory block
+  /** \brief Initialize memory block
 
       \identifier{2dr} */
   int init_mem(FmuMemory* m) const override;
@@ -85,7 +85,7 @@ class CASADI_EXPORT Fmu3 : public FmuInternal {
   std::vector<fmi3Boolean> init_boolean_;
   std::vector<std::string> init_string_;
 
-  // Auxilliary variables, by type
+  // Auxiliary variables, by type
   std::vector<std::string> vn_aux_real_, vn_aux_integer_, vn_aux_boolean_, vn_aux_string_;
   std::vector<fmi3ValueReference> vr_aux_real_, vr_aux_integer_, vr_aux_boolean_, vr_aux_string_;
   std::vector<casadi_int> off_aux_real_, off_aux_integer_, off_aux_boolean_, off_aux_string_;
@@ -173,10 +173,10 @@ class CASADI_EXPORT Fmu3 : public FmuInternal {
   // Copy values set in DaeBuilder to FMU
   int set_values(void* instance) const override;
 
-  // Retrieve auxilliary variables from FMU
+  // Retrieve auxiliary variables from FMU
   int get_aux(void* instance) override;
 
-  // Retrieve auxilliary variables from FMU, implementation
+  // Retrieve auxiliary variables from FMU, implementation
   int get_aux_impl(void* instance, Value& aux_value) const;
 
   /** \brief Get stats

@@ -393,7 +393,7 @@ void CvodesInterface::retreat(IntegratorMemory* mem, const double* u,
 }
 
 void CvodesInterface::cvodes_error(const char* module, int flag) {
-  // Successfull return or warning
+  // Successful return or warning
   if (flag>=CV_SUCCESS) return;
   // Construct error message
   char* flagname = CVodeGetReturnFlagName(flag);

@@ -170,7 +170,7 @@ namespace casadi {
     /// Memory objects
     void* memory(int ind) const;
 
-    /// Check for existance of memory object
+    /// Check for existence of memory object
     bool has_memory(int ind) const;
 
     /** \brief Check for validatity of memory object count
@@ -185,7 +185,7 @@ namespace casadi {
         \identifier{jn} */
     virtual void* alloc_mem() const { return new ProtoFunctionMemory(); }
 
-    /** \brief Initalize memory block
+    /** \brief Initialize memory block
 
         \identifier{jo} */
     virtual int init_mem(void* mem) const;
@@ -714,12 +714,12 @@ namespace casadi {
         \identifier{l4} */
     bool has_derivative() const;
 
-    /** \brief  Weighting factor for chosing forward/reverse mode
+    /** \brief  Weighting factor for choosing forward/reverse mode
 
         \identifier{l5} */
     virtual double ad_weight() const;
 
-    /** \brief  Weighting factor for chosing forward/reverse mode,
+    /** \brief  Weighting factor for choosing forward/reverse mode,
 
         sparsity propagation
 

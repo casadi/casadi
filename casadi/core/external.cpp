@@ -59,7 +59,7 @@ Function external(const std::string& name, const std::string& bin_name,
 External::External(const std::string& name, const Importer& li,
                     const std::vector<std::string> config_args)
   : FunctionInternal(name), config_args_(config_args) {
-  // compiler_ isntance not in use (has_codegen()==false)
+  // compiler_ instance not in use (has_codegen()==false)
   casadi_assert_dev(!has_codegen());
   compiler_ = li;
   External::init_external();

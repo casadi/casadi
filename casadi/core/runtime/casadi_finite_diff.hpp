@@ -52,7 +52,7 @@ void casadi_central_diff(const T1** yk, T1* J, T1 h, casadi_int n_y) {
   yb = yk[0];
   yc = yk[1];
   yf = yk[2];
-  // Set u and stencils to zero (also supresses warnings)
+  // Set u and stencils to zero (also suppresses warnings)
   for (i = 0; i < n_y; ++i) {
     if (isfinite(yb[i])) {
       if (isfinite(yf[i])) {
@@ -135,7 +135,7 @@ void casadi_smoothing_diff(const T1** yk, T1* J, T1 h, casadi_int n_y, T1 smooth
   // Local variables
   T1 Jk, wk, sw, ui, sm;
   casadi_int i, k;
-  // Set stencils to zero (also supresses warnings)
+  // Set stencils to zero (also suppresses warnings)
   yf = yc = yb = 0;
   for (i = 0; i < n_y; ++i) {
     // Reset derivative estimate, sum of weights, error estimate
@@ -179,7 +179,7 @@ T1 casadi_smoothing_diff_err(const T1** yk, T1 h, casadi_int n_y, casadi_int i,
   // Local variables
   T1 wk, sw, ui, err_trunc, err_round, sm;
   casadi_int k;
-  // Set stencils to zero (also supresses warnings)
+  // Set stencils to zero (also suppresses warnings)
   yf = yc = yb = 0;
   // Reset derivative estimate, sum of weights, error estimate
   sw = ui = 0;
@@ -252,7 +252,7 @@ T1 casadi_central_diff_old(T1** yk, T1* y0, T1* J,
   // Local variables
   T1 err_trunc, err_round;
   casadi_int i;
-  // Set u and stencils to zero (also supresses warnings)
+  // Set u and stencils to zero (also suppresses warnings)
   yf = yc = yb = u = 0;
   for (i=0; i<n_y; ++i) {
     // Copy to local variables, return -1 if invalid entry
@@ -284,7 +284,7 @@ T1 casadi_smoothing_diff_old(T1** yk, T1* y0, T1* J,
   // Local variables
   T1 Jk, wk, sw, ui, err_trunc, err_round, sm;
   casadi_int i, k;
-  // Set u and stencils to zero (also supresses warnings)
+  // Set u and stencils to zero (also suppresses warnings)
   yf = yc = yb = u = 0;
   for (i=0; i<n_y; ++i) {
     // Reset derivative estimate, sum of weights, error estimate

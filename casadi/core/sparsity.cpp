@@ -919,7 +919,7 @@ namespace casadi {
       // Find the range of patterns equal to the key (normally only zero or one)
       std::pair<CachingMap::iterator, CachingMap::iterator> eq = cache.equal_range(h);
 
-      // Loop over maching patterns
+      // Loop over matching patterns
       for (CachingMap::iterator i=eq.first; i!=eq.second; ++i) {
 
         // Get a weak reference to the cached sparsity pattern

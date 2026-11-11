@@ -41,7 +41,7 @@ struct Fmu2Memory : public FmuMemory {
 int Fmu2::init_mem(FmuMemory* mem) const {
   if (FmuInternal::init_mem(mem)) return 1;
   auto *m = static_cast<Fmu2Memory*>(mem);
-  /// Allocate numerical values for initial auxilliary variables
+  /// Allocate numerical values for initial auxiliary variables
   m->aux_value.v_real.resize(vn_aux_real_.size());
   m->aux_value.v_integer.resize(vn_aux_integer_.size());
   m->aux_value.v_boolean.resize(vn_aux_boolean_.size());
@@ -128,7 +128,7 @@ void Fmu2::init(const DaeBuilderInternal* dae) {
     }
   }
 
-  // Collect auxilliary variables
+  // Collect auxiliary variables
   vn_aux_real_.clear();
   vn_aux_integer_.clear();
   vn_aux_boolean_.clear();
@@ -171,7 +171,7 @@ void Fmu2::init(const DaeBuilderInternal* dae) {
 }
 
 void Fmu2::finalize() {
-  /// Allocate numerical values for initial auxilliary variables
+  /// Allocate numerical values for initial auxiliary variables
   aux_value_.v_real.resize(vn_aux_real_.size());
   aux_value_.v_integer.resize(vn_aux_integer_.size());
   aux_value_.v_boolean.resize(vn_aux_boolean_.size());
@@ -448,7 +448,7 @@ int Fmu2::set_values(void* instance) const {
 
 int Fmu2::get_aux_impl(void* instance, Value& aux_value) const {
   auto *c = static_cast<fmi2Component>(instance);
-  // Get real auxilliary variables
+  // Get real auxiliary variables
   if (!vr_aux_real_.empty()) {
     fmi2Status status = get_real_(c, get_ptr(vr_aux_real_), vr_aux_real_.size(),
       get_ptr(aux_value.v_real));
@@ -457,7 +457,7 @@ int Fmu2::get_aux_impl(void* instance, Value& aux_value) const {
       return 1;
     }
   }
-  // Get integer/enum auxilliary variables
+  // Get integer/enum auxiliary variables
   if (!vr_aux_integer_.empty()) {
     fmi2Status status = get_integer_(c, get_ptr(vr_aux_integer_), vr_aux_integer_.size(),
       get_ptr(aux_value.v_integer));
@@ -466,7 +466,7 @@ int Fmu2::get_aux_impl(void* instance, Value& aux_value) const {
       return 1;
     }
   }
-  // Get boolean auxilliary variables
+  // Get boolean auxiliary variables
   if (!vr_aux_boolean_.empty()) {
     fmi2Status status = get_boolean_(c, get_ptr(vr_aux_boolean_), vr_aux_boolean_.size(),
       get_ptr(aux_value.v_boolean));
@@ -475,7 +475,7 @@ int Fmu2::get_aux_impl(void* instance, Value& aux_value) const {
       return 1;
     }
   }
-  // Get string auxilliary variables
+  // Get string auxiliary variables
   for (size_t k = 0; k < vr_aux_string_.size(); ++k) {
     fmi2ValueReference vr = vr_aux_string_[k];
     fmi2String value = aux_value.v_string.at(k).c_str();
@@ -496,7 +496,7 @@ void Fmu2::get_stats(FmuMemory* m, Dict* stats,
     const std::vector<std::string>& name_in, const InputStruct* in) const {
   Value& v = static_cast<Fmu2Memory*>(m)->aux_value;
   get_aux_impl(m->instance, v);
-  // Collect auxilliary variables
+  // Collect auxiliary variables
   Dict aux;
   // Real
   for (size_t k = 0; k < vn_aux_real_.size(); ++k) {

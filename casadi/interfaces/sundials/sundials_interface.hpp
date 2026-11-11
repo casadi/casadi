@@ -110,7 +110,7 @@ namespace casadi {
     void set_work(void* mem, const double**& arg, double**& res,
       casadi_int*& iw, double*& w) const override;
 
-    /** \brief Initalize memory block */
+    /** \brief Initialize memory block */
     int init_mem(void* mem) const override;
 
     /** \brief Get relative tolerance */

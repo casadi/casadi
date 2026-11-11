@@ -514,7 +514,7 @@ namespace casadi {
     std::vector<std::thread> threads;
     for (casadi_int i=0; i<n_; ++i) {
       // Why the lambda function?
-      // Because it was the first iteration to pass tests on MingGW
+      // Because it was the first iteration to pass tests on MinGW
       // using mingw-std-threads.
       threads.emplace_back(
         [i, fenv](const Function& f, const double** arg, double** res,

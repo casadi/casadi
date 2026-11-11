@@ -47,10 +47,10 @@ const Options SundialsInterface::options_
       "Maximum number of integrator steps"}},
     {"reltol",
       {OT_DOUBLE,
-      "Relative tolerence for the IVP solution"}},
+      "Relative tolerance for the IVP solution"}},
     {"abstol",
       {OT_DOUBLE,
-      "Absolute tolerence for the IVP solution"}},
+      "Absolute tolerance for the IVP solution"}},
     {"newton_scheme",
       {OT_STRING,
       "Linear solver scheme in the Newton method: DIRECT|gmres|bcgstab|tfqmr"}},
@@ -249,7 +249,7 @@ void SundialsInterface::init(const Dict& opts) {
     }
   }
 
-  // Attach functions for jacobian information, foward problem
+  // Attach functions for jacobian information, forward problem
   if (newton_scheme_ != SD_DIRECT || (nfwd_ > 0 && second_order_correction_)) {
     create_function("jtimesF", {"t", "x", "z", "p", "u", "fwd:x", "fwd:z"},
       {"fwd:ode", "fwd:alg"});
