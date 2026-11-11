@@ -9509,7 +9509,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L301-L
 
 %feature("docstring")  casadi::CodeGenerator::thread_safe() const "
 
-Emit thead safe code chekout/release?
+Emit thead safe code checkout/release?
 
 Extra doc: https://github.com/casadi/casadi/wiki/L_2f7
 
@@ -10360,7 +10360,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L1188-
 %feature("docstring")  casadi::CodeGenerator::print_vector(casadi_int sz,
 const std::string &arg) "
 
-Print canonical representaion of a vector.
+Print canonical representation of a vector.
 
 Extra doc: https://github.com/casadi/casadi/wiki/L_2dl
 
@@ -10373,7 +10373,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L1200-
 %feature("docstring")  casadi::CodeGenerator::print_canonical(const Sparsity
 &sp, const std::string &arg) "
 
-Print canonical representaion of a matrix.
+Print canonical representation of a matrix.
 
 Extra doc: https://github.com/casadi/casadi/wiki/L_2dk
 
@@ -10386,7 +10386,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L1193-
 %feature("docstring")  casadi::CodeGenerator::print_scalar(const std::string
 &arg) "
 
-Print canonical representaion of a scalar.
+Print canonical representation of a scalar.
 
 Extra doc: https://github.com/casadi/casadi/wiki/L_2dm
 
@@ -47293,8 +47293,8 @@ on parameters.
 For any: [expr_ret, symbols, parametric] = extract_parametric(expr, par) It
 holds that: substitute(expr_ret,symbols,parametric) == expr
 
-parametric is only dependant on par expr_ret is not dependant on par, but is
-dependant on symbols
+parametric is only dependent on par expr_ret is not dependent on par, but is
+dependent on symbols
 
 Example: [expr_ret, symbols, parametric] =
 extract_parametric((x-sqrt(p))*y+cos(p)**2, p)
@@ -47394,8 +47394,8 @@ on parameters.
 For any: [expr_ret, symbols, parametric] = extract_parametric(expr, par) It
 holds that: substitute(expr_ret,symbols,parametric) == expr
 
-parametric is only dependant on par expr_ret is not dependant on par, but is
-dependant on symbols
+parametric is only dependent on par expr_ret is not dependent on par, but is
+dependent on symbols
 
 Example: [expr_ret, symbols, parametric] =
 extract_parametric((x-sqrt(p))*y+cos(p)**2, p)
@@ -47496,8 +47496,8 @@ on parameters.
 For any: [expr_ret, symbols, parametric] = extract_parametric(expr, par) It
 holds that: substitute(expr_ret,symbols,parametric) == expr
 
-parametric is only dependant on par expr_ret is not dependant on par, but is
-dependant on symbols
+parametric is only dependent on par expr_ret is not dependent on par, but is
+dependent on symbols
 
 Example: [expr_ret, symbols, parametric] =
 extract_parametric((x-sqrt(p))*y+cos(p)**2, p)
@@ -47609,7 +47609,7 @@ otherwise an error about free variables is raised.
 A post condition is that the following holds: expr = expr_const + expr_lin +
 expr_nonlin
 
-Here, expr_const is only dependant on sym_const, expr_lin is linear in
+Here, expr_const is only dependent on sym_const, expr_lin is linear in
 sym_lin (with coefficients that may depend on sym_const)
 
 Example:
@@ -47692,7 +47692,7 @@ otherwise an error about free variables is raised.
 A post condition is that the following holds: expr = expr_const + expr_lin +
 expr_nonlin
 
-Here, expr_const is only dependant on sym_const, expr_lin is linear in
+Here, expr_const is only dependent on sym_const, expr_lin is linear in
 sym_lin (with coefficients that may depend on sym_const)
 
 Example:
@@ -47775,7 +47775,7 @@ otherwise an error about free variables is raised.
 A post condition is that the following holds: expr = expr_const + expr_lin +
 expr_nonlin
 
-Here, expr_const is only dependant on sym_const, expr_lin is linear in
+Here, expr_const is only dependent on sym_const, expr_lin is linear in
 sym_lin (with coefficients that may depend on sym_const)
 
 Example:
@@ -50238,7 +50238,7 @@ Extra doc: https://github.com/casadi/casadi/wiki/L_22w
 +-----------------------+-----------------+--------------------------------+
 | compiler_setup        | OT_STRING       | Compiler setup command.        |
 |                       |                 | Intended to be fixed. The      |
-|                       |                 | 'flag' option is the prefered  |
+|                       |                 | 'flag' option is the preferred |
 |                       |                 | way to set custom flags.       |
 +-----------------------+-----------------+--------------------------------+
 | directory             | OT_STRING       | Directory to put temporary     |
@@ -50270,7 +50270,7 @@ Extra doc: https://github.com/casadi/casadi/wiki/L_22w
 +-----------------------+-----------------+--------------------------------+
 | linker_setup          | OT_STRING       | Linker setup command. Intended |
 |                       |                 | to be fixed. The 'flag' option |
-|                       |                 | is the prefered way to set     |
+|                       |                 | is the preferred way to set    |
 |                       |                 | custom flags.                  |
 +-----------------------+-----------------+--------------------------------+
 | name                  | OT_STRING       | The file name used to write    |
@@ -117391,7 +117391,7 @@ Parameters:
 
 
 Returns:
-    init_gen A function to generate a consistent initial guess that can be used to pass to an integrator constructed from a semi explict reduced DAE Inputs: x_impl, dx_impl, z: initial guesses in the original DAE space p: parameters t: time Outputs: x0, z0: (semi explicit) integrator states and algebraic variables; typically used as input for integrators x_impl, dx_impl, z: initial guesses in the original DAE space p: parameters t: time Outputs: x0, z0: (semi explicit) integrator states and algebraic variables; typically used as input for integrators
+    init_gen A function to generate a consistent initial guess that can be used to pass to an integrator constructed from a semi explicit reduced DAE Inputs: x_impl, dx_impl, z: initial guesses in the original DAE space p: parameters t: time Outputs: x0, z0: (semi explicit) integrator states and algebraic variables; typically used as input for integrators x_impl, dx_impl, z: initial guesses in the original DAE space p: parameters t: time Outputs: x0, z0: (semi explicit) integrator states and algebraic variables; typically used as input for integrators
 
 
 
@@ -117976,7 +117976,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.cpp#L224-L230
 %feature("docstring")  casadi::replace(const std::string &s, const
 std::string &p, const std::string &r) "
 
-Replace all occurences of p with r in s.
+Replace all occurrences of p with r in s.
 
 Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L232
@@ -120442,7 +120442,7 @@ Extra doc: https://github.com/casadi/casadi/wiki/L_22y
 +-----------------+-----------+--------------------------------------------+
 | print_iter      | OT_BOOL   | Print iterations [true].                   |
 +-----------------+-----------+--------------------------------------------+
-| print_lincomb   | OT_BOOL   | Print dependant linear combinations of     |
+| print_lincomb   | OT_BOOL   | Print dependent linear combinations of     |
 |                 |           | constraints [false]. Printed numbers are   |
 |                 |           | 0-based indices into the vector of [simple |
 |                 |           | bounds;linear bounds]                      |
@@ -121203,7 +121203,7 @@ General information
 |                  |                 | [default: true]  |                  |
 +------------------+-----------------+------------------+------------------+
 | eps_unstable     | OT_DOUBLE       | A margin for     | casadi::Dple     |
-|                  |                 | unstability      |                  |
+|                  |                 | instability      |                  |
 |                  |                 | detection        |                  |
 +------------------+-----------------+------------------+------------------+
 | error_on_fail    | OT_BOOL         | Throw exceptions | casadi::ProtoFun |
@@ -123601,7 +123601,7 @@ Extra doc: https://github.com/casadi/casadi/wiki/L_228
 +-----------------------------+-----------+--------------------------------+
 |             Id              |   Type    |          Description           |
 +=============================+===========+================================+
-| abstol                      | OT_DOUBLE | Absolute tolerence for the IVP |
+| abstol                      | OT_DOUBLE | Absolute tolerance for the IVP |
 |                             |           | solution                       |
 +-----------------------------+-----------+--------------------------------+
 | always_recalculate_jacobian | OT_BOOL   | Recalculate Jacobian before    |
@@ -123659,7 +123659,7 @@ Extra doc: https://github.com/casadi/casadi/wiki/L_228
 | quad_err_con                | OT_BOOL   | Should the quadratures affect  |
 |                             |           | the step size control          |
 +-----------------------------+-----------+--------------------------------+
-| reltol                      | OT_DOUBLE | Relative tolerence for the IVP |
+| reltol                      | OT_DOUBLE | Relative tolerance for the IVP |
 |                             |           | solution                       |
 +-----------------------------+-----------+--------------------------------+
 | scale_abstol                | OT_BOOL   | Scale absolute tolerance by    |
@@ -123704,7 +123704,7 @@ Extra doc: https://github.com/casadi/casadi/wiki/L_225
 +---------------------------+-----------------+----------------------------+
 |            Id             |      Type       |        Description         |
 +===========================+=================+============================+
-| abstol                    | OT_DOUBLE       | Absolute tolerence for the |
+| abstol                    | OT_DOUBLE       | Absolute tolerance for the |
 |                           |                 | IVP solution               |
 +---------------------------+-----------------+----------------------------+
 | abstolv                   | OT_DOUBLEVECTOR | Absolute tolerarance for   |
@@ -123766,7 +123766,7 @@ Extra doc: https://github.com/casadi/casadi/wiki/L_225
 +---------------------------+-----------------+----------------------------+
 | max_order                 | OT_DOUBLE       | Maximum order              |
 +---------------------------+-----------------+----------------------------+
-| max_step_size             | OT_DOUBLE       | Maximim step size          |
+| max_step_size             | OT_DOUBLE       | Maximum step size          |
 +---------------------------+-----------------+----------------------------+
 | newton_scheme             | OT_STRING       | Linear solver scheme in    |
 |                           |                 | the Newton method:         |
@@ -123779,7 +123779,7 @@ Extra doc: https://github.com/casadi/casadi/wiki/L_225
 |                           |                 | affect the step size       |
 |                           |                 | control                    |
 +---------------------------+-----------------+----------------------------+
-| reltol                    | OT_DOUBLE       | Relative tolerence for the |
+| reltol                    | OT_DOUBLE       | Relative tolerance for the |
 |                           |                 | IVP solution               |
 +---------------------------+-----------------+----------------------------+
 | scale_abstol              | OT_BOOL         | Scale absolute tolerance   |

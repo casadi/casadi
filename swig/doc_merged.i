@@ -11103,7 +11103,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L301-L
 
 %feature("docstring") casadi::CodeGenerator::thread_safe "
 
-Emit thead safe code chekout/release?
+Emit thead safe code checkout/release?
 
 Extra doc: https://github.com/casadi/casadi/wiki/L_2f7
 
@@ -11833,7 +11833,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L1145-
 
 %feature("docstring") casadi::CodeGenerator::print_vector "
 
-Print canonical representaion of a vector.
+Print canonical representation of a vector.
 
 Extra doc: https://github.com/casadi/casadi/wiki/L_2dl
 
@@ -11845,7 +11845,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L1200-
 >  std::string casadi::CodeGenerator::print_vector(casadi_int sz, const std::string &arg)
 ------------------------------------------------------------------------
 
-Print canonical representaion of a vector.
+Print canonical representation of a vector.
 
 Extra doc: https://github.com/casadi/casadi/wiki/L_2dl
 
@@ -11860,7 +11860,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L1200-
 
 %feature("docstring") casadi::CodeGenerator::print_canonical "
 
-Print canonical representaion of a matrix.
+Print canonical representation of a matrix.
 
 Extra doc: https://github.com/casadi/casadi/wiki/L_2dk
 
@@ -11872,7 +11872,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L1193-
 
 %feature("docstring") casadi::CodeGenerator::print_scalar "
 
-Print canonical representaion of a scalar.
+Print canonical representation of a scalar.
 
 Extra doc: https://github.com/casadi/casadi/wiki/L_2dm
 
@@ -40847,7 +40847,7 @@ Extra doc: https://github.com/casadi/casadi/wiki/L_22w
 +-----------------------+-----------------+--------------------------------+
 | compiler_setup        | OT_STRING       | Compiler setup command.        |
 |                       |                 | Intended to be fixed. The      |
-|                       |                 | 'flag' option is the prefered  |
+|                       |                 | 'flag' option is the preferred |
 |                       |                 | way to set custom flags.       |
 +-----------------------+-----------------+--------------------------------+
 | directory             | OT_STRING       | Directory to put temporary     |
@@ -40879,7 +40879,7 @@ Extra doc: https://github.com/casadi/casadi/wiki/L_22w
 +-----------------------+-----------------+--------------------------------+
 | linker_setup          | OT_STRING       | Linker setup command. Intended |
 |                       |                 | to be fixed. The 'flag' option |
-|                       |                 | is the prefered way to set     |
+|                       |                 | is the preferred way to set    |
 |                       |                 | custom flags.                  |
 +-----------------------+-----------------+--------------------------------+
 | name                  | OT_STRING       | The file name used to write    |
@@ -99261,7 +99261,7 @@ Parameters:
 
 
 Returns:
-    init_gen A function to generate a consistent initial guess that can be used to pass to an integrator constructed from a semi explict reduced DAE Inputs: x_impl, dx_impl, z: initial guesses in the original DAE space p: parameters t: time Outputs: x0, z0: (semi explicit) integrator states and algebraic variables; typically used as input for integrators x_impl, dx_impl, z: initial guesses in the original DAE space p: parameters t: time Outputs: x0, z0: (semi explicit) integrator states and algebraic variables; typically used as input for integrators
+    init_gen A function to generate a consistent initial guess that can be used to pass to an integrator constructed from a semi explicit reduced DAE Inputs: x_impl, dx_impl, z: initial guesses in the original DAE space p: parameters t: time Outputs: x0, z0: (semi explicit) integrator states and algebraic variables; typically used as input for integrators x_impl, dx_impl, z: initial guesses in the original DAE space p: parameters t: time Outputs: x0, z0: (semi explicit) integrator states and algebraic variables; typically used as input for integrators
 
 
 
@@ -99292,7 +99292,7 @@ Parameters:
 
 
 Returns:
-    init_gen A function to generate a consistent initial guess that can be used to pass to an integrator constructed from a semi explict reduced DAE Inputs: x_impl, dx_impl, z: initial guesses in the original DAE space p: parameters t: time Outputs: x0, z0: (semi explicit) integrator states and algebraic variables; typically used as input for integrators x_impl, dx_impl, z: initial guesses in the original DAE space p: parameters t: time Outputs: x0, z0: (semi explicit) integrator states and algebraic variables; typically used as input for integrators
+    init_gen A function to generate a consistent initial guess that can be used to pass to an integrator constructed from a semi explicit reduced DAE Inputs: x_impl, dx_impl, z: initial guesses in the original DAE space p: parameters t: time Outputs: x0, z0: (semi explicit) integrator states and algebraic variables; typically used as input for integrators x_impl, dx_impl, z: initial guesses in the original DAE space p: parameters t: time Outputs: x0, z0: (semi explicit) integrator states and algebraic variables; typically used as input for integrators
 
 
 
@@ -99827,7 +99827,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.cpp#L224-L230
 
 %feature("docstring") casadi::IndexReduction::replace "
 
-Replace all occurences of p with r in s.
+Replace all occurrences of p with r in s.
 
 Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L232
@@ -102274,7 +102274,7 @@ Extra doc: https://github.com/casadi/casadi/wiki/L_22y
 +-----------------+-----------+--------------------------------------------+
 | print_iter      | OT_BOOL   | Print iterations [true].                   |
 +-----------------+-----------+--------------------------------------------+
-| print_lincomb   | OT_BOOL   | Print dependant linear combinations of     |
+| print_lincomb   | OT_BOOL   | Print dependent linear combinations of     |
 |                 |           | constraints [false]. Printed numbers are   |
 |                 |           | 0-based indices into the vector of [simple |
 |                 |           | bounds;linear bounds]                      |
@@ -102964,7 +102964,7 @@ General information
 |                  |                 | [default: true]  |                  |
 +------------------+-----------------+------------------+------------------+
 | eps_unstable     | OT_DOUBLE       | A margin for     | casadi::Dple     |
-|                  |                 | unstability      |                  |
+|                  |                 | instability      |                  |
 |                  |                 | detection        |                  |
 +------------------+-----------------+------------------+------------------+
 | error_on_fail    | OT_BOOL         | Throw exceptions | casadi::ProtoFun |
@@ -103521,7 +103521,7 @@ General information
 |                  |                 | [default: true]  |                  |
 +------------------+-----------------+------------------+------------------+
 | eps_unstable     | OT_DOUBLE       | A margin for     | casadi::Dple     |
-|                  |                 | unstability      |                  |
+|                  |                 | instability      |                  |
 |                  |                 | detection        |                  |
 +------------------+-----------------+------------------+------------------+
 | error_on_fail    | OT_BOOL         | Throw exceptions | casadi::ProtoFun |
