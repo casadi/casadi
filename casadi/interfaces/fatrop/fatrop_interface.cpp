@@ -555,8 +555,9 @@ namespace casadi {
   int FatropInterface::solve(void* mem) const {
     auto m = static_cast<FatropMemory*>(mem);
 
-    // Cache the solver: presolve (re)creates it only when needed
-    bool new_solver = (m->d.solver == 0);
+    // Cache the solver: presolve (re)creates it only when needed,
+    // i.e. on the first call and whenever the equality/inequality structure changes
+    bool new_solver;
     // fatrop's solve repoints a process-wide singleton stream via
     // fatrop::OutputStreamManager::set_stream, which is not thread-safe.
     // Serialize across threads.
@@ -565,10 +566,10 @@ namespace casadi {
       static std::mutex mutex_fatrop_create;
       std::lock_guard<std::mutex> lock(mutex_fatrop_create);
 #endif //CASADI_WITH_THREAD
-      casadi_fatrop_presolve(&m->d);
+      new_solver = casadi_fatrop_presolve(&m->d);
     }
 
-    // Set options only when a new solver was created (options persist across solves)
+    // Set options whenever a new solver was created (options persist across solves)
     if (new_solver) {
       for (const auto& kv : opts_) {
         switch (fatrop_ocp_c_option_type(kv.first.c_str())) {
@@ -701,9 +702,10 @@ void FatropInterface::codegen_body(CodeGenerator& g) const {
   g << "casadi_fatrop_set_work(d, &arg, &res, &iw, &w);\n";
   g << "casadi_oracle_set_work(d->nlp->oracle, &arg, &res, &iw, &w);\n";
 
-  // Cache the solver: presolve (re)creates it only when needed
+  // Cache the solver: presolve (re)creates it only when needed,
+  // i.e. on the first call and whenever the equality/inequality structure changes
   g << "{\n";
-  g << "int new_solver = (d->solver == 0);\n";
+  g << "int new_solver;\n";
   // fatrop's solve repoints a process-wide singleton stream via
   // fatrop::OutputStreamManager::set_stream, which is not thread-safe.
   // Serialize across threads.
@@ -713,10 +715,10 @@ void FatropInterface::codegen_body(CodeGenerator& g) const {
     g.define_local_mutex(F, mutex_name);
     std::string mtx = g.local_mutex(F, mutex_name);
     g << "CASADI_MUTEX_LOCK(&" << mtx << ");\n";
-    g << "casadi_fatrop_presolve(d);\n";
+    g << "new_solver = casadi_fatrop_presolve(d);\n";
     g << "CASADI_MUTEX_UNLOCK(&" << mtx << ");\n";
   } else {
-    g << "casadi_fatrop_presolve(d);\n";
+    g << "new_solver = casadi_fatrop_presolve(d);\n";
   }
   g << "if (new_solver) {\n";
 
