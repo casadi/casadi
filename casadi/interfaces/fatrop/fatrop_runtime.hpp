@@ -800,7 +800,7 @@ void casadi_fatrop_set_work(casadi_fatrop_data<T1>* d, const T1*** arg, T1*** re
 
 // SYMBOL "fatrop_presolve"
 template<typename T1>
-void casadi_fatrop_presolve(casadi_fatrop_data<T1>* d) {
+int casadi_fatrop_presolve(casadi_fatrop_data<T1>* d) {
   casadi_int k, i, start, stop, nx;
   // Problem structure
   const casadi_fatrop_prob<T1>* p = d->prob;
@@ -892,9 +892,10 @@ void casadi_fatrop_presolve(casadi_fatrop_data<T1>* d) {
       d->solver = 0;
     }
   }
-  if (!d->solver) {
-    d->solver = fatrop_ocp_c_create(&d->ocp_interface, p->write, p->flush);
-  }
+  // Return whether a solver was (re)created: a new solver has default options
+  if (d->solver) return 0;
+  d->solver = fatrop_ocp_c_create(&d->ocp_interface, p->write, p->flush);
+  return 1;
 }
 
 // SYMBOL "fatrop_solve"

@@ -981,6 +981,33 @@ class OCPtests(casadiTestCase):
 
         solver = ca.nlpsol("solver","fatrop",{"x":x,"g":x-2},opts)
         self.assertAlmostEqual(solver(lbg=3,ubg=3)["x"],5,5)
+
+  @requires_nlpsol("fatrop")
+  def test_fatrop_options_structure_change(self):
+    # The cached solver is rebuilt when a bound switches between inequality
+    # and equality. The rebuilt solver must get the fatrop options again.
+
+    # Two-step OCP: x[k+1] = x[k]+u[k]
+    x0 = ca.MX.sym("x0")
+    u0 = ca.MX.sym("u0")
+    x1 = ca.MX.sym("x1")
+    u1 = ca.MX.sym("u1")
+    x2 = ca.MX.sym("x2")
+    nlp = {"x": ca.vertcat(x0,u0,x1,u1,x2), "f": (x2-1)**2+u0**2+u1**2, "g": ca.vertcat(x1-x0-u0,x2-x1-u1)}
+
+    opts = {"expand": True, "structure_detection": "auto", "equality": [True,True], "fatrop": {"max_iter": 2}}
+    solver = ca.nlpsol("solver","fatrop",nlp,opts)
+
+    # Bound on x2: inequality, equality, inequality.
+    # The inequality-constrained solves need more than max_iter iterations.
+    for lb_x2, success in [(0,False),(0.5,True),(0,False)]:
+        args = dict(x0=0,lbx=[0,-inf,-inf,-inf,lb_x2],ubx=[0,inf,inf,inf,0.5],lbg=0,ubg=0)
+        solver(**args)
+        fresh = ca.nlpsol("solver","fatrop",nlp,opts)
+        fresh(**args)
+        self.assertEqual(fresh.stats()["success"],success)
+        self.assertEqual(solver.stats()["success"],success)
+        self.assertEqual(solver.stats()["iter_count"],fresh.stats()["iter_count"])
         
   
 if __name__ == '__main__':
