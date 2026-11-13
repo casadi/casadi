@@ -2,6 +2,8 @@
 #   [ci:run_slow]  Run the full matrix. Without this tag the workflow skips
 #                  Python builds/tests for versions < 3.11 and == 3.13,
 #                  and skips macOS code-signing/notarization.
+#   [ci:sign]      Authenticode-sign the Windows binaries. Implied by
+#                  [ci:run_slow] on release- branches.
 #                  Python 3.13 (abi3-tested off the 3.11 wheel) is *only*
 #                  included in test-python when this tag is present.
 
@@ -26,6 +28,8 @@ env:
   build_flags_aarch64: "-DWITH_BONMIN=OFF DWITH_BUILD_BONMIN=OFF -DWITH_CLP=OFF -DWITH_BUILD_CLP=OFF -DWITH_CBC=OFF -DWITH_BUILD_CBC=OFF -DWITH_SPRAL=OFF -DWITH_BUILD_SPRAL=OFF -DWITH_HIGHS=OFF -DWITH_BUILD_HIGHS=OFF -DWITH_SLEQP=OFF -DWITH_BUILD_SLEQP=OFF -DWITH_MADNLP=OFF -DWITH_BUILD_MADNLP=OFF -DWITH_LACEMODELICA=OFF -DWITH_BUILD_LACEMODELICA=OFF -DWITH_ONNX=OFF -DWITH_BUILD_ONNX=OFF -DWITH_PROTOBUF=OFF -DWITH_BUILD_PROTOBUF=OFF -DWITH_ONNX_RUNTIME=OFF -DWITH_MOCKUP_ONNX_RUNTIME=OFF"
   build_flags_wasm: "-DENABLE_STATIC=ON -DENABLE_SHARED=OFF -DWITH_EXAMPLES=OFF -DWITH_THREAD=OFF -DWITH_OPENMP=OFF -DWITH_PYTHON=OFF -DWITH_MATLAB=OFF -DWITH_BUILD_REQUIRED=ON -DWITH_LAPACK=ON -DWITH_BUILD_LAPACK=ON -DBUILD_LAPACK_GIT_REPO=https://github.com/Reference-LAPACK/lapack.git -DBUILD_LAPACK_VERSION=v3.12.0 -DWITH_BUILD_METIS=ON -DWITH_IPOPT=ON -DWITH_BUILD_IPOPT=ON -DWITH_MUMPS=ON -DWITH_BUILD_MUMPS=ON -DWITH_SUNDIALS=ON -DWITH_BUILD_SUNDIALS=ON -DWITH_HIGHS=ON -DWITH_BUILD_HIGHS=ON -DWITH_OSQP=ON -DWITH_BUILD_OSQP=ON -DWITH_QPOASES=ON -DWITH_HPIPM=ON -DWITH_BUILD_HPIPM=ON -DWITH_BLASFEO=ON -DWITH_BUILD_BLASFEO=ON -DWITH_FATROP=ON -DWITH_BUILD_FATROP=ON -DWITH_DAQP=ON -DWITH_BUILD_DAQP=ON -DWITH_CSPARSE=ON -DWITH_BUILD_CSPARSE=ON -DWITH_BUILD_EIGEN3=ON -DWITH_BUILD_SIMDE=ON -DWITH_CLARABEL=OFF -DWITH_BUILD_CLARABEL=OFF"
   cmake_flags_wasm: "-DCMAKE_Fortran_COMPILER=/opt/flang/host/bin/flang -DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY"
+  jsign_version: "7.6"
+  jsign_sha256: 6cf58aa080e7ff82656f320cff8d4a3bff30408df8766806dcba3740dd839fa5
   CMAKE_BUILD_TYPE: Release
   PYTHONUNBUFFERED: "1"
 
@@ -50,6 +54,7 @@ jobs:
     outputs:
       casadi: ${{ env.CASADI_VERSION }}
       wheel: ${{ env.WHEEL_VERSION }}
+      sign_windows: ${{ github.event_name != 'pull_request' && vars.AZURE_CLIENT_ID != '' && (contains(github.event.head_commit.message, '[ci:sign]') || (contains(github.ref, 'release-') && contains(github.event.head_commit.message, '[ci:run_slow]'))) }}
 
   swig:
     runs-on: ubuntu-24.04
@@ -459,7 +464,12 @@ jobs:
           retention-days: 5
 
   core-dockcross:
+    needs: [version]
     runs-on: ubuntu-24.04
+    environment: ${{ needs.version.outputs.sign_windows == 'true' && contains(matrix.target, 'windows') && 'windows-signing' || '' }}
+    permissions:
+      contents: read
+      id-token: write          # OIDC token, required for Azure Artifact Signing
     strategy:
       fail-fast: false
       matrix:
@@ -500,6 +510,23 @@ jobs:
           # In MXE land, (cross).pkg-config does not listen to PKG_CONFIG_PATH straight see https://mxe.cc/#tutorial-4
           # Needed to make CoinUtils work
           ./dockcross --args "--env PKG_CONFIG_PATH_x86_64_w64_mingw32_shared_posix=/work/build/external_projects/lib64/pkgconfig:/work/build/external_projects/lib/pkgconfig:/work/build/external_projects/share/pkgconfig" -- /work/.github/workflows/patch_toolchain cmake --build build -v
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          allow-no-subscriptions: true
+        if: needs.version.outputs.sign_windows == 'true' && contains(matrix.target, 'windows')
+      - name: Sign Windows binaries
+        run: |
+          wget -q https://github.com/ebourg/jsign/releases/download/${{ env.jsign_version }}/jsign-${{ env.jsign_version }}.jar
+          echo "${{ env.jsign_sha256 }}  jsign-${{ env.jsign_version }}.jar" | sha256sum -c
+          export AZURE_SIGNING_TOKEN=$(az account get-access-token --resource https://codesigning.azure.net --query accessToken -o tsv)
+          echo "::add-mask::$AZURE_SIGNING_TOKEN"
+          # Sign the binaries that get installed, in the build tree shared by the wrapper jobs
+          ./dockcross cmake --install build --prefix /work/stage > /dev/null
+          python misc/sign_windows.py build jsign-${{ env.jsign_version }}.jar ${{ vars.AZURE_SIGNING_ENDPOINT }} ${{ vars.AZURE_SIGNING_ACCOUNT }}/${{ vars.AZURE_SIGNING_PROFILE }} stage
+          rm -rf stage jsign-${{ env.jsign_version }}.jar
+        if: needs.version.outputs.sign_windows == 'true' && contains(matrix.target, 'windows')
       - run: tar --format=posix -czf ${{github.job}}-${{matrix.target}}.tar.gz build
       - uses: actions/upload-artifact@v7.0.1
         with:
@@ -840,6 +867,10 @@ jobs:
   matlab-dockcross:
     needs: [core-dockcross,swig,version]
     runs-on: ubuntu-24.04
+    environment: ${{ needs.version.outputs.sign_windows == 'true' && contains(matrix.arch, 'windows') && 'windows-signing' || '' }}
+    permissions:
+      contents: write
+      id-token: write          # OIDC token, required for Azure Artifact Signing
     strategy:
       fail-fast: false
       matrix:
@@ -903,6 +934,20 @@ jobs:
           bitness: ${{env.bitness}}
       - run: ./dockcross bash -c 'cp `rustc --target=$CARGO_BUILD_TARGET --print target-libdir`/*.dll /work/install/casadi'
         if: contains(matrix.arch, 'windows')
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          allow-no-subscriptions: true
+        if: needs.version.outputs.sign_windows == 'true' && contains(matrix.arch, 'windows')
+      - name: Sign Windows binaries
+        run: |
+          wget -q https://github.com/ebourg/jsign/releases/download/${{ env.jsign_version }}/jsign-${{ env.jsign_version }}.jar
+          echo "${{ env.jsign_sha256 }}  jsign-${{ env.jsign_version }}.jar" | sha256sum -c
+          export AZURE_SIGNING_TOKEN=$(az account get-access-token --resource https://codesigning.azure.net --query accessToken -o tsv)
+          echo "::add-mask::$AZURE_SIGNING_TOKEN"
+          python misc/sign_windows.py install jsign-${{ env.jsign_version }}.jar ${{ vars.AZURE_SIGNING_ENDPOINT }} ${{ vars.AZURE_SIGNING_ACCOUNT }}/${{ vars.AZURE_SIGNING_PROFILE }}
+        if: needs.version.outputs.sign_windows == 'true' && contains(matrix.arch, 'windows')
       - run: |
              cd install/casadi
              zip -rq ../../casadi-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip .
@@ -935,6 +980,10 @@ jobs:
   python-dockcross:
     needs: [core-dockcross,matrix-arch-py2,swig,version]
     runs-on: ubuntu-24.04
+    environment: ${{ needs.version.outputs.sign_windows == 'true' && contains(matrix.arch, 'windows') && 'windows-signing' || '' }}
+    permissions:
+      contents: write
+      id-token: write          # OIDC token, required for Azure Artifact Signing
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.matrix-arch-py2.outputs.matrix) }}
@@ -1009,6 +1058,20 @@ jobs:
           bitness: ${{env.bitness}}
       - run: ./dockcross bash -c 'cp `rustc --target=$CARGO_BUILD_TARGET --print target-libdir`/*.dll /work/install/casadi'
         if: contains(matrix.arch, 'windows')
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          allow-no-subscriptions: true
+        if: needs.version.outputs.sign_windows == 'true' && contains(matrix.arch, 'windows')
+      - name: Sign Windows binaries
+        run: |
+          wget -q https://github.com/ebourg/jsign/releases/download/${{ env.jsign_version }}/jsign-${{ env.jsign_version }}.jar
+          echo "${{ env.jsign_sha256 }}  jsign-${{ env.jsign_version }}.jar" | sha256sum -c
+          export AZURE_SIGNING_TOKEN=$(az account get-access-token --resource https://codesigning.azure.net --query accessToken -o tsv)
+          echo "::add-mask::$AZURE_SIGNING_TOKEN"
+          python misc/sign_windows.py install jsign-${{ env.jsign_version }}.jar ${{ vars.AZURE_SIGNING_ENDPOINT }} ${{ vars.AZURE_SIGNING_ACCOUNT }}/${{ vars.AZURE_SIGNING_PROFILE }}
+        if: needs.version.outputs.sign_windows == 'true' && contains(matrix.arch, 'windows')
       - run: |
              cd install
              echo "This file (and the casadi directory) should end up in a folder called 'casadi-${{env.os}}${{env.suffix}}${{ matrix.manylinux_target != '' && format('-{0}', matrix.manylinux_target) || '' }}-py${{matrix.py2}}'" > dummy.txt
@@ -1061,7 +1124,7 @@ jobs:
   test-matlab:
     if: ${{ !cancelled() && (needs.matlab-dockcross.result == 'success' || needs.matlab-osx.result == 'success') }}
     runs-on: ${{matrix.image}}
-    needs: [matlab-dockcross,matlab-osx]
+    needs: [matlab-dockcross,matlab-osx,version]
     env:
       SKIP_MADNLP_TESTS: ON
       SKIP_CCOPT_TESTS: ON
@@ -1100,6 +1163,13 @@ jobs:
       - run: ls
       - name: Unpack source
         run: unzip casadi-${{env.os}}${{env.suffix}}-matlab${{matrix.matlab}}.zip -d casadi
+      - name: Verify Authenticode signatures
+        run: |
+          $bad = Get-ChildItem casadi -Recurse -Include *.dll,*.exe,*.pyd,*.mexw64,*.mex,*.oct | Get-AuthenticodeSignature | Where-Object Status -ne 'Valid'
+          $bad | Format-Table Path,Status,StatusMessage
+          if ($bad) { exit 1 }
+        shell: pwsh
+        if: contains(matrix.image, 'windows') && needs.version.outputs.sign_windows == 'true'
       - run: echo "MATLABPATH=${{ github.workspace }}/casadi" >> $GITHUB_ENV
         if: "!contains(env.os, 'windows')"
       - run: echo "MATLABPATH=${{ github.workspace }}\casadi" >> $env:GITHUB_ENV
@@ -1146,7 +1216,7 @@ jobs:
 
   test-octave:
     runs-on: ${{matrix.image}}
-    needs: [matlab-dockcross,matlab-osx]
+    needs: [matlab-dockcross,matlab-osx,version]
     strategy:
      fail-fast: false
      matrix:
@@ -1173,6 +1243,13 @@ jobs:
       - run: ls
       - name: Unpack source
         run: unzip casadi-${{env.os}}${{env.suffix}}-octave${{matrix.version}}.zip -d casadi
+      - name: Verify Authenticode signatures
+        run: |
+          $bad = Get-ChildItem casadi -Recurse -Include *.dll,*.exe,*.pyd,*.mexw64,*.mex,*.oct | Get-AuthenticodeSignature | Where-Object Status -ne 'Valid'
+          $bad | Format-Table Path,Status,StatusMessage
+          if ($bad) { exit 1 }
+        shell: pwsh
+        if: contains(matrix.image, 'windows') && needs.version.outputs.sign_windows == 'true'
       - run: echo "/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin" >> $GITHUB_PATH
         if: "contains(env.os, 'linux')"
       - run: brew install octave
@@ -1346,7 +1423,7 @@ jobs:
 
   test-python:
     runs-on: ${{ matrix.image }}
-    needs: [python-osx,python-dockcross,matrix-test-python]
+    needs: [python-osx,python-dockcross,matrix-test-python,version]
     strategy:
      fail-fast: false
      matrix: ${{ fromJson(needs.matrix-test-python.outputs.matrix) }}
@@ -1373,6 +1450,13 @@ jobs:
       - run: ls
       - name: Unpack source
         run: unzip casadi-${{env.os}}${{env.suffix}}${{ matrix.manylinux_target != '' && format('-{0}', matrix.manylinux_target) || '' }}-py${{ (matrix.py2 == '313' || matrix.py2 == '314') && '311' || matrix.py2 }}.zip -d casadi
+      - name: Verify Authenticode signatures
+        run: |
+          $bad = Get-ChildItem casadi -Recurse -Include *.dll,*.exe,*.pyd,*.mexw64,*.mex,*.oct | Get-AuthenticodeSignature | Where-Object Status -ne 'Valid'
+          $bad | Format-Table Path,Status,StatusMessage
+          if ($bad) { exit 1 }
+        shell: pwsh
+        if: contains(matrix.image, 'windows') && needs.version.outputs.sign_windows == 'true'
       - id: get-id
         uses: actions/github-script@v9.0.0
         env:
