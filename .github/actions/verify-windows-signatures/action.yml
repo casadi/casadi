@@ -1,0 +1,16 @@
+name: Verify Authenticode signatures
+description: Check that all Windows binaries in a directory carry a valid Authenticode signature
+
+inputs:
+  dir:
+    description: Directory to verify
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - shell: pwsh
+      run: |
+        $bad = Get-ChildItem ${{ inputs.dir }} -Recurse -Include *.dll,*.exe,*.pyd,*.mexw64,*.mex,*.oct | Get-AuthenticodeSignature | Where-Object Status -ne 'Valid'
+        $bad | Format-Table Path,Status,StatusMessage
+        if ($bad) { exit 1 }

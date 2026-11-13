@@ -1,0 +1,30 @@
+name: Sign Windows binaries
+description: Authenticode-sign the unsigned Windows binaries in a directory with Azure Artifact Signing
+
+inputs:
+  dir:
+    description: Directory to sign
+    required: true
+  like:
+    description: Only sign binaries that also occur in this directory
+    default: ""
+
+runs:
+  using: composite
+  steps:
+    - uses: azure/login@v2
+      with:
+        client-id: ${{ env.AZURE_CLIENT_ID }}
+        tenant-id: ${{ env.AZURE_TENANT_ID }}
+        allow-no-subscriptions: true
+    - uses: jgillis/fetch-gh-release-asset@codex/bump-runtime-node24
+      with:
+        repo: ebourg/jsign
+        version: tags/7.6
+        file: jsign-7.6.jar
+    - shell: bash
+      run: |
+        echo "6cf58aa080e7ff82656f320cff8d4a3bff30408df8766806dcba3740dd839fa5  jsign-7.6.jar" | sha256sum -c
+        export AZURE_SIGNING_TOKEN=$(az account get-access-token --resource https://codesigning.azure.net --query accessToken -o tsv)
+        echo "::add-mask::$AZURE_SIGNING_TOKEN"
+        python misc/sign_windows.py ${{ inputs.dir }} jsign-7.6.jar $AZURE_SIGNING_ENDPOINT $AZURE_SIGNING_ACCOUNT/$AZURE_SIGNING_PROFILE ${{ inputs.like }}
