@@ -2371,5 +2371,20 @@ class Integrationtests(casadiTestCase):
         with self.assertInException("need max_tape_steps for code generation"):
           ca.CodeGenerator("tape_cg.c").add(G)
 
+  def test_second_order_correction_x_independent(self):
+    self.message("Forward sensitivities, ode independent of x, chained calls")
+    # Second order correction must not pick up work vector entries of an earlier call
+    x = ca.MX.sym("x")
+    u = ca.MX.sym("u")
+    for plugin in ["cvodes", "idas"]:
+      if not ca.has_integrator(plugin): continue
+      F = ca.integrator("F", plugin, {"x": x, "p": u, "ode": 3*u})
+      x0 = ca.MX.sym("x0")
+      p = ca.MX.sym("p", 2)
+      xf = F(x0=F(x0=x0, p=p[0])["xf"], p=p[1])["xf"]
+      w = ca.vertcat(x0, p)
+      J = ca.Function("J", [w], [ca.jtimes(xf, w, ca.DM(ca.Sparsity.diag(3), [1, 10, 100]))])
+      self.checkarray(J([0.7, -1, -1]), ca.DM([[1, 30, 300]]), plugin, digits=8)
+
 if __name__ == '__main__':
     unittest.main()
