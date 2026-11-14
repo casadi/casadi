@@ -737,6 +737,10 @@ int SundialsInterface::calc_jtimesF(SundialsMemory* m, double t, const double* x
   m->arg[JTIMESF_FWD_Z] = fwd_z;  // fwd:z
   m->res[JTIMESF_FWD_ODE] = fwd_ode;  // fwd:ode
   m->res[JTIMESF_FWD_ALG] = fwd_alg;  // fwd:alg
+  // Zero-init when fwd:* output is structurally empty (e.g. ode independent of x)
+  const Function& jtimesF = get_function("jtimesF");
+  if (fwd_ode && !jtimesF.nnz_out(JTIMESF_FWD_ODE)) casadi_clear(fwd_ode, nx1_);
+  if (fwd_alg && !jtimesF.nnz_out(JTIMESF_FWD_ALG)) casadi_clear(fwd_alg, nz1_);
   if (calc_function(m, "jtimesF")) return 1;
   // Evaluate sensitivities
   if (nfwd_ > 0) {
@@ -751,6 +755,11 @@ int SundialsInterface::calc_jtimesF(SundialsMemory* m, double t, const double* x
     m->arg[JTIMESF_NUM_IN + JTIMESF_NUM_OUT + JTIMESF_FWD_Z] = fwd_z + nz1_;  // fwd:fwd:z
     m->res[JTIMESF_FWD_ODE] = fwd_ode + nx1_;  // fwd:fwd:ode
     m->res[JTIMESF_FWD_ALG] = fwd_alg + nz1_;  // fwd:fwd:alg
+    const Function& fwd_jtimesF = get_function(forward_name("jtimesF", nfwd_));
+    if (fwd_ode && !fwd_jtimesF.nnz_out(JTIMESF_FWD_ODE))
+      casadi_clear(fwd_ode + nx1_, nx1_ * nfwd_);
+    if (fwd_alg && !fwd_jtimesF.nnz_out(JTIMESF_FWD_ALG))
+      casadi_clear(fwd_alg + nz1_, nz1_ * nfwd_);
     if (calc_function(m, forward_name("jtimesF", nfwd_))) return 1;
   }
   // Successful return
