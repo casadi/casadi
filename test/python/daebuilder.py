@@ -148,6 +148,42 @@ class Daebuildertests(casadiTestCase):
     self.checkfunction(f,f_ref,inputs=test_point,digits=4,hessian=False,evals=1)
     print(f.stats())
       
+  @memory_heavy() # FMU has a memleak
+  def test_fmu_unlisted_known(self):
+    # FMI 3.0 allows a known in a directional or adjoint derivative only if the dependencies
+    # list it. Time is an input of the Function, but the FMU lists it for no unknown: its
+    # seed must not reach the FMU, which then reports an error.
+    feats = ca.CasadiMeta.feature_list()
+    if "ghc-filesystem" not in feats or "libzip" not in feats:
+        print("Skipping test_fmu_unlisted_known: ghc-filesystem/libzip not available")
+        return
+    fmi_headers = os.path.abspath("../../external_packages/FMI-Standard-3.0/headers")
+    src = "../data/fmu_unlisted_known/"
+    files = {}
+    for local, arc in [("unlisted_known.c", "sources/unlisted_known.c"),
+                       ("modelDescription.xml", "modelDescription.xml")]:
+        with open(src + local) as f_in, open(local, "w") as f_out: f_out.write(f_in.read())
+        files[local] = arc
+    try:
+        files = ca.DaeBuilder("unlisted_known").compile_fmu(files, {"include_dirs": [fmi_headers]})
+    except Exception as e:
+        for local in files.keys():
+            if os.path.exists(local): os.remove(local)
+        print("Skipping test_fmu_unlisted_known: C compilation unavailable:", e)
+        return
+    fmu_file = ca.DaeBuilder("unlisted_known").pack_fmu(files, {"path": "unlisted_known.fmu"})
+    dae = ca.DaeBuilder("unlisted_known", fmu_file)
+    t = ca.SX.sym("t")
+    x = ca.SX.sym("x", 2)
+    u = ca.SX.sym("u")
+    f_ref = ca.Function("f_ref", [t, x, u], [ca.vertcat(2 * x[1], 3 * x[0] + 5 * x[1] + u)])
+    test_point = [0.5, ca.vertcat(1.1, 0.3), 0.7]
+    for adjoint in [False, True]:
+        f = dae.create("f", ["t", "x", "u"], ["ode"],
+          {"uses_directional_derivatives": True, "uses_adjoint_derivatives": adjoint})
+        self.checkfunction(f, f_ref, inputs=test_point, digits=10, hessian=False,
+          sens_der=False, evals=1)
+
   def test_fmi2_independent_var_order(self):
     # Check FMI index conversion without a platform-specific FMU binary (#4270).
     import tempfile

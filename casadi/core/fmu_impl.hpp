@@ -240,6 +240,9 @@ class CASADI_EXPORT FmuInternal : public SharedObjectInternal {
   // Calculate forward directional derivatives
   int eval_fwd(FmuMemory* m, bool independent_seeds) const;
 
+  // Does an unknown that is calculated depend on an input?
+  bool is_dependency(FmuMemory* m, size_t id_in) const;
+
   // Calculate forward directional derivatives using AD
   int eval_ad(FmuMemory* m) const;
 
