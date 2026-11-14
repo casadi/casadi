@@ -170,7 +170,7 @@
       3
     ],
     "OsqpInterface": [
-      2
+      3
     ],
     "PiqpInterface": [
       1
@@ -630,8 +630,15 @@
       ]
     },
     "OsqpInterface": {
+      "OsqpInterface::reset_rho": [
+        3
+      ],
       "OsqpInterface::rho_initial": [
-        2
+        2,
+        3
+      ],
+      "OsqpInterface::settings::check_dualgap": [
+        3
       ]
     },
     "ProtoFunction": {
@@ -1094,7 +1101,8 @@
     ],
     "OsqpInterface": [
       1,
-      2
+      2,
+      3
     ],
     "PiqpInterface": [
       1
@@ -8360,7 +8368,7 @@
           "minimum": 1,
           "name": "OsqpInterface",
           "op": "version",
-          "value": 2
+          "value": 3
         },
         {
           "name": "OsqpInterface::nnzHupp",
@@ -8494,6 +8502,32 @@
             [
               "literal",
               2
+            ]
+          ],
+          "op": "if"
+        },
+        {
+          "body": [
+            {
+              "name": "OsqpInterface::reset_rho",
+              "op": "field",
+              "type": "bool"
+            },
+            {
+              "name": "OsqpInterface::settings::check_dualgap",
+              "op": "field",
+              "type": "casadi_int"
+            }
+          ],
+          "condition": [
+            "greater_equal",
+            [
+              "version",
+              "OsqpInterface"
+            ],
+            [
+              "literal",
+              3
             ]
           ],
           "op": "if"
