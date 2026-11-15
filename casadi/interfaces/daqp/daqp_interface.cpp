@@ -57,10 +57,12 @@ namespace casadi {
   = {{&Conic::options_},
      {{"warm_start_previous",
        {OT_BOOL,
-        "Reuse the previous active set and primal state when no explicit warm start is supplied. Default: false."}},
+        "Reuse the previous active set and primal state when no explicit warm start "
+        "is supplied. Default: false."}},
       {"warm_start",
        {OT_BOOL,
-        "Use x0 as a primal start (MIQP incumbent) and lam_x0/lam_a0 as an active-set start. Default: false."}},
+        "Use x0 as a primal start (MIQP incumbent) and lam_x0/lam_a0 as an active-set "
+        "start. Default: false."}},
       {"daqp",
        {OT_DICT,
         "Options to be passed to Daqp."
@@ -171,6 +173,8 @@ namespace casadi {
         g << "p.settings.w_soft = " << g.constant(op.second.to_double()) << ";\n";
       } else if (op.first=="eq_reduction") {
         g << "p.settings.eq_reduction = " << op.second.to_int() << ";\n";
+      } else if (op.first=="presolve") {
+        g << "p.settings.presolve = " << op.second.to_int() << ";\n";
       } else {
         casadi_error("Unknown option '" + op.first + "'.");
       }
@@ -234,6 +238,8 @@ namespace casadi {
         settings->w_soft = op.second.to_double();
       } else if (op.first=="eq_reduction") {
         settings->eq_reduction = op.second.to_int();
+      } else if (op.first=="presolve") {
+        settings->presolve = op.second.to_int();
       } else {
         casadi_error("Unknown option '" + op.first + "'.");
       }

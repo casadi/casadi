@@ -101,7 +101,8 @@ void casadi_daqp_free_mem(casadi_daqp_data<T1>* d) {
 
 // SYMBOL "daqp_work"
 template<typename T1>
-void casadi_daqp_work(const casadi_daqp_prob<T1>* p, casadi_int* sz_arg, casadi_int* sz_res, casadi_int* sz_iw, casadi_int* sz_w) {
+void casadi_daqp_work(const casadi_daqp_prob<T1>* p, casadi_int* sz_arg, casadi_int* sz_res,
+    casadi_int* sz_iw, casadi_int* sz_w) {
   casadi_qp_work(p->qp, sz_arg, sz_res, sz_iw, sz_w);
   // Only multipliers need a per-evaluation scratch buffer.
   *sz_w = p->qp->nz;
@@ -294,6 +295,8 @@ void casadi_daqp_init_start(casadi_daqp_data<T1>* d, int cold_start) {
 
 // SYMBOL "daqp_store_result"
 // DAQP exit flags (see daqp/constants.h):
+//   5: integer-feasible, optimality not proven (BnB stopped early)
+//   4: optimal, inexact, 3: constrained point (hierarchical)
 //   2: soft optimal, 1: optimal
 //  -1: infeasible, -2: cycle, -3: unbounded, -4: iteration limit
 //  -5: nonconvex, -6: overdetermined initial active set
@@ -320,7 +323,8 @@ void casadi_daqp_store_result(casadi_daqp_data<T1>* d) {
   if (d_qp->success) {
     d_qp->unified_return_status = SOLVER_RET_SUCCESS;
   } else if (d->res.exitflag == DAQP_EXIT_ITERLIMIT ||
-             d->res.exitflag == DAQP_EXIT_TIMELIMIT) {
+             d->res.exitflag == DAQP_EXIT_TIMELIMIT ||
+             d->res.exitflag == DAQP_EXIT_FEASIBLE) {
     d_qp->unified_return_status = SOLVER_RET_LIMITED;
   } else if (d->res.exitflag == DAQP_EXIT_INFEASIBLE) {
     d_qp->unified_return_status = SOLVER_RET_INFEASIBLE;
