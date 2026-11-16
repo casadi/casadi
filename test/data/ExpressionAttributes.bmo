@@ -1,0 +1,15 @@
+//! base 0.1.0
+package 'ExpressionAttributes'
+  model 'ExpressionAttributes' "Attributes given by expressions of parameters"
+    parameter Real 'p' = 2.0;
+    parameter Real 'q' = 3.0 * 'p';
+    parameter Real 'r';
+    Real 'x'(min = 'p', max = 2.0 * 'p', nominal = 'q', start = 'p' + 1.0);
+    Real 'y'(min = 0.0, start = 4.0);
+    Real 'z';
+  equation
+    der('x') = -'x';
+    'y' = 'x' + 'r';
+    'z' = 'y';
+  end 'ExpressionAttributes';
+end 'ExpressionAttributes';

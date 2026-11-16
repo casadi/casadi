@@ -26,6 +26,7 @@
 #ifndef CASADI_DAE_BUILDER_INTERNAL_HPP
 #define CASADI_DAE_BUILDER_INTERNAL_HPP
 
+#include <map>
 #include <unordered_map>
 
 #include "dae_builder.hpp"
@@ -157,6 +158,9 @@ struct CASADI_EXPORT Variable {
 
   /// Initial equation (to be removed and moved to a separate dependent variable)
   MX ieq;
+
+  /// Attributes given by an expression (min, max, nominal, start), one element per element
+  std::map<Attribute, MX> attribute_expr;
 
   /// Total number of elements for a particular attribute
   casadi_int size(Attribute a) const;
@@ -737,6 +741,12 @@ protected:
   /// Get by attribute name
   double attribute(Attribute a, const std::string& name) const;
   std::vector<double> attribute(Attribute a, const std::vector<std::string>& name) const;
+  ///@}
+
+  ///@{
+  /// Attribute given by an expression, empty if none
+  MX attribute_expr(Attribute a, const std::string& name) const;
+  void set_attribute_expr(Attribute a, const std::string& name, const MX& val);
   ///@}
 
   ///@{

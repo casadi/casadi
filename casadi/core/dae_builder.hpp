@@ -4145,6 +4145,21 @@ class CASADI_EXPORT DaeBuilder
   ///@}
 
   ///@{
+  /** \brief Get/set an attribute given by an expression
+
+      The `"min"`, `"max"`, `"nominal"` or `"start"` attribute of a variable when it is an
+      expression of other variables, typically parameters, as `h_b` in the Base Modelica
+      declaration `Real h(min = h_b)`: one element per element of the variable. Empty for an
+      attribute without expression, given by `attribute` instead. The import of a `.bmo` model
+      gives a constant attribute with `set_attribute` and any other with
+      `set_attribute_expr`; `set_attribute` removes the expression.
+
+      \sa attribute, set_attribute */
+  MX attribute_expr(const std::string& a, const std::string& name) const;
+  void set_attribute_expr(const std::string& a, const std::string& name, const MX& val);
+  ///@}
+
+  ///@{
   /** \brief Get/set the type
 
       The variable type in FMI 3 naming (`"Float64"`, `"Float32"`, `"Int32"`, `"Boolean"`,

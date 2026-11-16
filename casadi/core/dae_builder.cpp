@@ -560,6 +560,24 @@ void DaeBuilder::set_value_reference(const std::string& name, casadi_int val) {
   (*this)->variable(name).value_reference = val;
 }
 
+MX DaeBuilder::attribute_expr(const std::string& a, const std::string& name) const {
+  try {
+    return (*this)->attribute_expr(to_enum<Attribute>(a), name);
+  } catch (std::exception& e) {
+    THROW_ERROR("attribute_expr", e.what());
+    return MX();  // never reached
+  }
+}
+
+void DaeBuilder::set_attribute_expr(const std::string& a, const std::string& name,
+    const MX& val) {
+  try {
+    (*this)->set_attribute_expr(to_enum<Attribute>(a), name, val);
+  } catch (std::exception& e) {
+    THROW_ERROR("set_attribute_expr", e.what());
+  }
+}
+
 std::string DaeBuilder::description(const std::string& name) const {
   return (*this)->variable(name).description;
 }
