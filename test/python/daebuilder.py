@@ -912,6 +912,16 @@ class Daebuildertests(casadiTestCase):
     )
     print(dae.export_fmu())
 
+  def test_has_beq(self):
+    dae = ca.DaeBuilder('m')
+    x = dae.add('x')
+    w = dae.add('w')
+    dae.eq(w, ca.sin(x))
+    self.assertTrue(dae.has_beq('w'))
+    self.assertFalse(dae.has_beq('x'))
+    with self.assertRaisesRegex(RuntimeError, "'x' has no binding equation"):
+      dae.beq('x')
+
   @requires_modelicaparser('lacemodelica')
   def test_basemodelica(self):
     """Test loading .bmo files via the LaceModelica plugin."""

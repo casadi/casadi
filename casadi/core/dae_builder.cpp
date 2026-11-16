@@ -510,7 +510,7 @@ std::vector<std::string> DaeBuilder::pre(const std::vector<std::string>& name) c
 
 bool DaeBuilder::has_beq(const std::string& name) const {
   try {
-    return !(*this)->variable(name).has_beq();
+    return (*this)->variable(name).has_beq();
   } catch (std::exception& e) {
     THROW_ERROR("has_beq", e.what());
     return false;  // never reached
@@ -520,6 +520,7 @@ bool DaeBuilder::has_beq(const std::string& name) const {
 MX DaeBuilder::beq(const std::string& name) const {
   try {
     const Variable& v = (*this)->variable(name);
+    casadi_assert(v.has_beq(), "'" + name + "' has no binding equation");
     return (*this)->variable(v.bind).v;
   } catch (std::exception& e) {
     THROW_ERROR("beq", e.what());
