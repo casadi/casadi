@@ -1293,7 +1293,8 @@ class CASADI_EXPORT DaeBuilder
       \param variability `"constant"`, `"fixed"`, `"tunable"`, `"discrete"` or
         `"continuous"`
       \param opts Attributes (any other key is an error):
-        - `"dimension"` (list of int, `[1]`): shape; all entries must be positive
+        - `"dimension"` (list of int, `[1]`): shape; a zero entry gives an array without
+          elements
         - `"type"` (string, `"Float64"`): FMI 3 type, e.g. `"Float32"`, `"Int32"`,
           `"Boolean"`, `"String"`
         - `"start"` (double or list): start value, scalar is broadcast; also sets the

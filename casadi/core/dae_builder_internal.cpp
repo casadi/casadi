@@ -441,7 +441,7 @@ Variable::Variable(casadi_int index, const std::string& name,
     : index(index), name(name), dimension(dimension), v(expr) {
   // Consistency checks
   casadi_assert(dimension.size() > 0, "Variable must have at least one dimension");
-  for (casadi_int d : dimension) casadi_assert(d > 0, "Dimensions must be positive");
+  for (casadi_int d : dimension) casadi_assert(d >= 0, "Dimensions must be nonnegative");
   // Number of elements
   numel = 1;
   for (casadi_int d : dimension) numel *= d;

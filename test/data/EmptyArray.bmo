@@ -1,0 +1,10 @@
+//! base 0.1.0
+package 'EmptyArray'
+  model 'EmptyArray' "An array without elements"
+    parameter Real 'p' = 2.0;
+    Real 'e'[0](nominal = fill('p', 0));
+    Real 'x';
+  equation
+    'x' = 'p';
+  end 'EmptyArray';
+end 'EmptyArray';

@@ -922,6 +922,21 @@ class Daebuildertests(casadiTestCase):
     with self.assertRaisesRegex(RuntimeError, "'x' has no binding equation"):
       dae.beq('x')
 
+  def test_empty_dimension(self):
+    dae = ca.DaeBuilder('m')
+    e = dae.add('e', dict(dimension=[0]))
+    self.assertEqual(e.shape, (0, 1))
+    self.assertEqual(dae.numel('e'), 0)
+    self.assertEqual(dae.start('e'), [])
+
+  @requires_modelicaparser('lacemodelica')
+  def test_basemodelica_empty_array(self):
+    """An array without elements is a variable without elements."""
+    dae = ca.DaeBuilder('m', '../data/EmptyArray.bmo')
+    self.assertEqual(dae.numel('e'), 0)
+    self.assertEqual(dae.var('e').shape, (0, 1))
+    self.assertEqual(dae.numel('x'), 1)
+
   @requires_modelicaparser('lacemodelica')
   def test_basemodelica(self):
     """Test loading .bmo files via the LaceModelica plugin."""
