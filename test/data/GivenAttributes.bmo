@@ -1,0 +1,15 @@
+//! base 0.1.0
+package 'GivenAttributes'
+  model 'GivenAttributes' "Attributes given with their default value, and not given"
+    parameter Real 'p' = 2.0;
+    parameter Integer 'n' = 1;
+    parameter Integer 'm'(min = 0, max = 5) = 1;
+    Real 'x'(nominal = 1.0, start = 0.0, min = 'p');
+    Real 'y'(nominal = 'p');
+    Real 'z';
+  equation
+    der('x') = -'x';
+    'y' = 'x';
+    'z' = 'y';
+  end 'GivenAttributes';
+end 'GivenAttributes';

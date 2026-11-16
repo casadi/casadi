@@ -578,6 +578,15 @@ void DaeBuilder::set_attribute_expr(const std::string& a, const std::string& nam
   }
 }
 
+bool DaeBuilder::has_attribute(const std::string& a, const std::string& name) const {
+  try {
+    return (*this)->has_attribute(to_enum<Attribute>(a), name);
+  } catch (std::exception& e) {
+    THROW_ERROR("has_attribute", e.what());
+    return false;  // never reached
+  }
+}
+
 std::string DaeBuilder::description(const std::string& name) const {
   return (*this)->variable(name).description;
 }

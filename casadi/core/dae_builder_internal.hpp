@@ -27,6 +27,7 @@
 #define CASADI_DAE_BUILDER_INTERNAL_HPP
 
 #include <map>
+#include <set>
 #include <unordered_map>
 
 #include "dae_builder.hpp"
@@ -161,6 +162,9 @@ struct CASADI_EXPORT Variable {
 
   /// Attributes given by an expression (min, max, nominal, start), one element per element
   std::map<Attribute, MX> attribute_expr;
+
+  /// Attributes given (min, max, nominal, start), by a number or an expression
+  std::set<Attribute> given;
 
   /// Total number of elements for a particular attribute
   casadi_int size(Attribute a) const;
@@ -748,6 +752,9 @@ protected:
   MX attribute_expr(Attribute a, const std::string& name) const;
   void set_attribute_expr(Attribute a, const std::string& name, const MX& val);
   ///@}
+
+  /// Is an attribute given, by a number or an expression, rather than defaulted?
+  bool has_attribute(Attribute a, const std::string& name) const;
 
   ///@{
   /// Set by attribute name

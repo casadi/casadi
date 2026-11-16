@@ -4159,6 +4159,17 @@ class CASADI_EXPORT DaeBuilder
   void set_attribute_expr(const std::string& a, const std::string& name, const MX& val);
   ///@}
 
+  /** \brief Is an attribute given, rather than defaulted?
+
+      Whether the `"min"`, `"max"`, `"nominal"` or `"start"` attribute of a variable is given,
+      by a number or by an expression (`attribute_expr`), as opposed to having its default
+      value: `-inf`, `inf`, `1` and `0`. True when the model (the `modelDescription.xml` of an
+      FMU, a `.bmo` model), an option of `add` or `set_attribute`/`set_attribute_expr` gives
+      it, so that `nominal = 1` in the model is told from no nominal.
+
+      \sa attribute, attribute_expr, add */
+  bool has_attribute(const std::string& a, const std::string& name) const;
+
   ///@{
   /** \brief Get/set the type
 

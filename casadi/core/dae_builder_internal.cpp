@@ -381,6 +381,8 @@ void Variable::get_attribute(Attribute a, std::string* val) const {
 void Variable::set_attribute(Attribute a, double val) {
   // A number replaces an expression
   attribute_expr.erase(a);
+  if (a == Attribute::MIN || a == Attribute::MAX || a == Attribute::NOMINAL
+      || a == Attribute::START) given.insert(a);
   // Handle attributes
   switch (a) {
     case Attribute::MIN:
@@ -3249,6 +3251,7 @@ Variable& DaeBuilderInternal::add(const std::string& name, Causality causality,
   std::vector<casadi_int> dimension = {1};
   double min = -casadi::inf, max = casadi::inf, nominal = 1;
   std::vector<double> start;
+  std::set<Attribute> given;
   // Read options
   for (auto&& op : opts) {
     if (op.first=="dimension") {
@@ -3261,11 +3264,15 @@ Variable& DaeBuilderInternal::add(const std::string& name, Causality causality,
       display_unit = op.second.to_string();
     } else if (op.first=="min") {
       min = op.second.to_double();
+      given.insert(Attribute::MIN);
     } else if (op.first=="max") {
       max = op.second.to_double();
+      given.insert(Attribute::MAX);
     } else if (op.first=="nominal") {
       nominal = op.second.to_double();
+      given.insert(Attribute::NOMINAL);
     } else if (op.first=="start") {
+      given.insert(Attribute::START);
       if (op.second.can_cast_to(OT_DOUBLE)) {
         start.resize(1, op.second.to_double());
       } else {
@@ -3331,6 +3338,7 @@ Variable& DaeBuilderInternal::add(const std::string& name, Causality causality,
   if (min != -casadi::inf) v.min = min;
   if (max != casadi::inf) v.max = max;
   v.nominal = nominal;
+  v.given = given;
   // Handle different categories
   switch (causality) {
     case Causality::PARAMETER:
@@ -3980,10 +3988,13 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
         // Floating point valued variables
         opts["unit"] = vnode.attribute<std::string>("unit", "");
         opts["display_unit"] = vnode.attribute<std::string>("displayUnit", "");
-        opts["min"] = vnode.attribute<double>("min", -inf);
-        opts["max"] = vnode.attribute<double>("max", inf);
-        opts["nominal"] = vnode.attribute<double>("nominal", 1.);
-        opts["start"] = vnode.attribute<std::vector<double>>("start", std::vector<double>{0.});
+        // Only attributes given, which has_attribute tells
+        for (const char* a : {"min", "max", "nominal"}) {
+          if (vnode.has_attribute(a)) opts[a] = vnode.attribute<double>(a);
+        }
+        if (vnode.has_attribute("start")) {
+          opts["start"] = vnode.attribute<std::vector<double>>("start");
+        }
         derivative = vnode.attribute<casadi_int>("derivative", -1);
         break;
       case Type::INT8:  // fall-through
@@ -3995,8 +4006,9 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
       case Type::INT64:  // fall-through
       case Type::UINT64:  // fall-through
         // Integer valued variables
-        opts["min"] = vnode.attribute<double>("min", -inf);
-        opts["max"] = vnode.attribute<double>("max", inf);
+        for (const char* a : {"min", "max"}) {
+          if (vnode.has_attribute(a)) opts[a] = vnode.attribute<double>(a);
+        }
         break;
       default:
         break;
@@ -4014,16 +4026,16 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
         const XmlNode& props = vnode["Real"];
         opts["unit"] = props.attribute<std::string>("unit", "");
         opts["display_unit"] = props.attribute<std::string>("displayUnit", "");
-        opts["min"] = props.attribute<double>("min", -inf);
-        opts["max"] = props.attribute<double>("max", inf);
-        opts["nominal"] = props.attribute<double>("nominal", 1.);
-        opts["start"] = props.attribute<double>("start", 0.);
+        for (const char* a : {"min", "max", "nominal", "start"}) {
+          if (props.has_attribute(a)) opts[a] = props.attribute<double>(a);
+        }
         derivative = props.attribute<casadi_int>("derivative", -1);
       } else if (vnode.has_child("Integer")) {
         type = Type::INT32;
         const XmlNode& props = vnode["Integer"];
-        opts["min"] = props.attribute<double>("min", -inf);
-        opts["max"] = props.attribute<double>("max", inf);
+        for (const char* a : {"min", "max"}) {
+          if (props.has_attribute(a)) opts[a] = props.attribute<double>(a);
+        }
         std::vector<double> start = read_discrete_start(props);
         if (!start.empty()) opts["start"] = start;
       } else if (vnode.has_child("Boolean")) {
@@ -4782,7 +4794,14 @@ void DaeBuilderInternal::set_attribute_expr(Attribute a, const std::string& name
     + " of " + name + " must be scalar or have " + str(v.numel) + " elements");
   // Only model variables in the expression
   (void)find(symvar(val));
+  v.given.insert(a);
   v.attribute_expr[a] = val.is_scalar() ? repmat(val, v.numel, 1) : vec(val);
+}
+
+bool DaeBuilderInternal::has_attribute(Attribute a, const std::string& name) const {
+  casadi_assert(a == Attribute::MIN || a == Attribute::MAX || a == Attribute::NOMINAL
+    || a == Attribute::START, "has_attribute not available for " + to_string(a));
+  return variable(name).given.count(a) > 0;
 }
 
 void DaeBuilderInternal::set_attribute(Attribute a, const std::string& name, double val) {

@@ -1025,6 +1025,34 @@ class Daebuildertests(casadiTestCase):
     self.assertTrue(math.isnan(dae.start('r')[0]))
     self.assertTrue(math.isnan(dae.start('z')[0]))
 
+  def test_has_attribute(self):
+    dae = ca.DaeBuilder('m')
+    dae.add('x', dict(nominal=1, min=-ca.inf))
+    dae.add('y')
+    self.assertEqual([dae.has_attribute(a, 'x') for a in ['min', 'max', 'nominal', 'start']],
+                     [True, False, True, False])
+    self.assertFalse(any(dae.has_attribute(a, 'y') for a in ['min', 'max', 'nominal', 'start']))
+    dae.set_attribute('start', 'y', 0)
+    self.assertTrue(dae.has_attribute('start', 'y'))
+    p = dae.add('p', 'parameter', 'tunable')
+    dae.set_attribute_expr('max', 'y', p)
+    self.assertTrue(dae.has_attribute('max', 'y'))
+    with self.assertRaisesRegex(RuntimeError, 'has_attribute not available for value'):
+      dae.has_attribute('value', 'y')
+
+  @requires_modelicaparser('lacemodelica')
+  def test_basemodelica_has_attribute(self):
+    """An attribute given with its default value is given."""
+    dae = ca.DaeBuilder('m', '../data/GivenAttributes.bmo')
+    attrs = ['min', 'max', 'nominal', 'start']
+    self.assertEqual([dae.has_attribute(a, 'x') for a in attrs], [True, False, True, True])
+    self.assertEqual(dae.nominal('x'), 1)
+    self.assertEqual([dae.has_attribute(a, 'y') for a in attrs], [False, False, True, False])
+    self.assertEqual([dae.has_attribute(a, 'z') for a in attrs], [False] * 4)
+    self.assertTrue(dae.has_attribute('start', 'p'))
+    self.assertEqual([dae.has_attribute(a, 'n') for a in attrs], [False, False, False, True])
+    self.assertEqual([dae.has_attribute(a, 'm') for a in attrs], [True, True, False, True])
+
   def test_attribute_expr(self):
     dae = ca.DaeBuilder('m')
     p = dae.add('p', 'parameter', 'tunable')
