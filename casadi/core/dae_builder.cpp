@@ -81,6 +81,9 @@ std::vector<MX> DaeBuilder::inputs(const std::string& cat) const {
 
 std::vector<MX> DaeBuilder::outputs(const std::string& cat) const {
   try {
+    // Arguments of the delays: no category
+    if (cat == "delay_expr") return (*this)->delay_expr_;
+    if (cat == "delay_time") return (*this)->delay_time_;
     return (*this)->outputs(to_enum<Category>(cat));
   } catch (std::exception& e) {
     THROW_ERROR("outputs", e.what());
@@ -558,6 +561,12 @@ casadi_int DaeBuilder::value_reference(const std::string& name) const {
 
 void DaeBuilder::set_value_reference(const std::string& name, casadi_int val) {
   (*this)->variable(name).value_reference = val;
+}
+
+std::vector<std::string> DaeBuilder::delayed() const {
+  std::vector<std::string> r;
+  for (casadi_int k : (*this)->delayed_) r.push_back((*this)->variable(k).name);
+  return r;
 }
 
 std::string DaeBuilder::description(const std::string& name) const {

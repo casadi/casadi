@@ -747,7 +747,8 @@ class CASADI_EXPORT DaeBuilder
       input category: `"ode"` (right-hand sides of the states `x`), `"alg"` (residuals),
       `"quad"` (right-hand sides of `q`), `"zero"` (zero-crossing functions of the when
       equations), `"ddef"` and `"wdef"` (binding expressions of `d` and `w`), `"y"`
-      (expressions of the outputs).
+      (expressions of the outputs). `"delay_expr"` and `"delay_time"` give the arguments of
+      the delays of a `.bmo` model, see `delayed`.
 
       \param cat One of the output categories above; an input category is an error
       \return List of expressions, empty when the category is empty
@@ -4143,6 +4144,16 @@ class CASADI_EXPORT DaeBuilder
   std::string description(const std::string& name) const;
   void set_description(const std::string& name, const std::string& val);
   ///@}
+
+  /** \brief Variables holding the value of a delay
+
+      For each `delay(expr, time)` of a `.bmo` model, an input variable that holds its value,
+      the value of `expr` time `time` ago. `outputs("delay_expr")` and
+      `outputs("delay_time")` give `expr` and `time`, in the same order. DaeBuilder does not
+      evaluate delays: the history of `expr` is for the user to supply.
+
+      \sa outputs, u */
+  std::vector<std::string> delayed() const;
 
   ///@{
   /** \brief Get/set the type

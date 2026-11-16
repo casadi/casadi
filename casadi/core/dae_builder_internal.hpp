@@ -526,6 +526,10 @@ protected:
   bool can_be_instantiated_only_once_per_process_;
   std::vector<std::string> source_files_;
 
+  // Variables holding the value of delay(delay_expr, delay_time), ONNX import
+  std::vector<casadi_int> delayed_;
+  std::vector<MX> delay_expr_, delay_time_;
+
   /// Name of instance
   std::string name_;
 

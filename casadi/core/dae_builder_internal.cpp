@@ -871,6 +871,31 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
       input_var_names.push_back(oracle.name_in(i));
     }
 
+    // The value of delay(expr, time) number N is the input __delay_N, an input variable whose
+    // value is given by the outputs delay_expr[N] and delay_time[N], not by the equations
+    for (casadi_int i = 0; i < oracle.n_in(); ++i) {
+      const std::string& n = input_var_names[i];
+      if (n.rfind("__delay_", 0) != 0) continue;
+      size_t k = std::stoul(n.substr(8));
+      if (k >= delayed_.size()) delayed_.resize(k + 1, -1);
+      if (has(n)) {
+        // A local variable of the model description
+        Variable& v = variable(n);
+        v.causality = Causality::INPUT;
+        v.initial = Initial::NA;
+        categorize(v.index, Category::U);
+        delayed_[k] = v.index;
+      } else {
+        delayed_[k] = add(n, Causality::INPUT, Variability::CONTINUOUS,
+          {{"dimension", std::vector<casadi_int>{oracle.numel_in(i)}}}).index;
+      }
+    }
+    for (casadi_int k : delayed_) {
+      casadi_assert(k >= 0, "Inputs __delay_N not numbered 0, 1, ...");
+    }
+    delay_expr_.resize(delayed_.size());
+    delay_time_.resize(delayed_.size());
+
     // Get all substitutions: map oracle variables to DaeBuilder variables
     std::vector<MX> v, vdef;
     for (auto& arg : oracle_in) {
@@ -902,9 +927,15 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
       bool is_init_eq = out_name.substr(0, 8) == "init_eq[";
       bool is_dyn_eq = out_name.substr(0, 3) == "eq[" && !is_init_eq;
 
-      // Delays need a value from the past, which a DaeBuilder variable cannot express
-      casadi_assert(out_name.substr(0, 11) != "delay_expr[",
-        "The delay operator is not supported by DaeBuilder");
+      // Delayed expression and delay time of delay number N
+      bool is_delay_expr = out_name.rfind("delay_expr[", 0) == 0;
+      if (is_delay_expr || out_name.rfind("delay_time[", 0) == 0) {
+        size_t k = std::stoul(out_name.substr(11, out_name.find(']') - 11));
+        casadi_assert(k < delayed_.size() && delayed_[k] >= 0,
+          "Output " + out_name + " without input __delay_" + str(k));
+        (is_delay_expr ? delay_expr_ : delay_time_).at(k) = expr;
+        continue;
+      }
 
       if (is_dyn_eq || is_init_eq) {
         // Equation residual: (lhs - rhs) = 0. Read it as var = rhs if that is what it is, keeping

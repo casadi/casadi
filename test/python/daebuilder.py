@@ -991,6 +991,19 @@ class Daebuildertests(casadiTestCase):
     self.checkarray(ca.vertcat(*f(3, 4, 5, 6, 7)), ca.DM([0, 0, 0, 2]))
 
   @requires_modelicaparser('lacemodelica')
+  def test_basemodelica_delay(self):
+    """y = 2*delay(u, d): the delayed value is an input, with the arguments of delay."""
+    dae = ca.DaeBuilder('m', '../data/Delay.bmo')
+    self.assertEqual(dae.delayed(), ['__delay_0'])
+    self.assertEqual(dae.u(), ['u', '__delay_0'])
+    [expr] = dae.outputs('delay_expr')
+    [time] = dae.outputs('delay_time')
+    self.assertTrue(ca.is_equal(expr, dae.var('u')))
+    self.assertTrue(ca.is_equal(time, dae.var('d')))
+    f = ca.Function('f', [dae.var('y'), dae.var('__delay_0')], [dae.var('y') - dae.beq('y')])
+    self.checkarray(f(6, 3), ca.DM(0))
+
+  @requires_modelicaparser('lacemodelica')
   def test_basemodelica(self):
     """Test loading .bmo files via the LaceModelica plugin."""
     # Load from BMO file
