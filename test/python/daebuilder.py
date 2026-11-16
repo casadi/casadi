@@ -991,6 +991,80 @@ class Daebuildertests(casadiTestCase):
     self.checkarray(ca.vertcat(*f(3, 4, 5, 6, 7)), ca.DM([0, 0, 0, 2]))
 
   @requires_modelicaparser('lacemodelica')
+  def test_basemodelica_residuals(self):
+    """explicit_equations false: the equations of the model as residuals, unknowns in z."""
+    import numpy
+    dae = ca.DaeBuilder('forms', '../data/ResidualForms.bmo', dict(explicit_equations=False))
+    self.assertEqual(dae.x(), ['h', 'i'])
+    self.assertEqual(sorted(dae.z()), sorted(list('abcdefg') + ['der(h)', 'der(i)']))
+    self.assertEqual(dae.w(), [])
+    self.assertEqual(dae.init_lhs(), [])
+    names = list('abcdefghi') + ['der(h)', 'der(i)']
+    val = dict(zip(names, [2, 4, 7, 5, 1, 3, -2, 6, 8, 9, 10]))
+    f = ca.Function('f', [dae.var(n) for n in names],
+      [ca.vertcat(*dae.alg()), ca.vertcat(*dae.outputs('ialg'))])
+    alg, ialg = f(*[val[n] for n in names])
+    # a*b = 6, c*d = 0, sin(e) = 0, f = -g, g = 0, der(h) = h, der(i) = i
+    ref = [2*4 - 6, 7*5, numpy.sin(1), 3 + -2, -2, 9 - 6, 10 - 8]
+    self.checkarray(ca.fabs(alg), ca.fabs(ca.DM(ref)))
+    # h = -i, i = 3
+    self.checkarray(ca.fabs(ialg), ca.fabs(ca.DM([6 + 8, 8 - 3])))
+    # A DAE function of the residual form
+    g = dae.create('g', ['x', 'z'], ['alg'])
+    self.assertEqual(g.size1_out(0), 7)
+
+  def test_eq_residuals(self):
+    """explicit_equations false: eq() keeps the equations as written."""
+    def build(opts):
+      dae = ca.DaeBuilder('m', '', opts)
+      x = dae.add('x')
+      y = dae.add('y')
+      u = dae.add('u', 'input')
+      dae.eq(dae.der(x) * y, -x + u)
+      dae.eq(y, x ** 2 + 1)
+      return dae
+    # Default: y = x^2 + 1 is the binding equation of y, the other equation a residual
+    dae = build({})
+    self.assertEqual(dae.x(), [])
+    self.assertEqual(dae.z(), ['x', 'der(x)'])
+    self.assertEqual(dae.w(), ['y'])
+    self.assertEqual(len(dae.alg()), 1)
+    # Kept as written: two residuals, x a state, its derivative and y in z
+    dae = build(dict(explicit_equations=False))
+    self.assertEqual(dae.x(), ['x'])
+    self.assertEqual(dae.z(), ['y', 'der(x)'])
+    self.assertEqual(dae.w(), [])
+    self.assertEqual(dae.u(), ['u'])
+    names = ['x', 'y', 'der(x)', 'u']
+    f = ca.Function('f', [dae.var(n) for n in names],
+      [ca.vertcat(*dae.alg()), ca.vertcat(*dae.ode())])
+    alg, ode = f(2, 3, 5, 7)
+    self.checkarray(alg, ca.DM([5 * 3 - (-2 + 7), 3 - (2 ** 2 + 1)]))
+    self.checkarray(ode, ca.DM([5]))
+    # A DAE function of the residual form
+    g = dae.create('g', ['x', 'z', 'u'], ['ode', 'alg'])
+    r = g(x=2, z=ca.vertcat(3, 5), u=7)
+    self.checkarray(r['ode'], ca.DM([5]))
+    self.checkarray(r['alg'], ca.DM([10, -2]))
+    # der(x) on the right-hand side: by default a new variable der_x with der(x) = der_x
+    for opts in [{}, dict(explicit_equations=False)]:
+      dae = ca.DaeBuilder('m', '', opts)
+      x = dae.add('x')
+      y = dae.add('y')
+      dae.eq(y, dae.der(x) + x)
+      dae.eq(0, y - 1)
+      self.assertEqual(dae.x(), ['x'])
+      if opts:
+        self.assertEqual(dae.z(), ['y', 'der(x)'])
+        self.assertEqual(dae.w(), [])
+        self.assertFalse(dae.has('der_x'))
+        self.assertEqual(len(dae.alg()), 2)
+      else:
+        self.assertEqual(dae.z(), ['der_x'])
+        self.assertEqual(dae.w(), ['der(x)', 'y'])
+        self.assertEqual(len(dae.alg()), 1)
+
+  @requires_modelicaparser('lacemodelica')
   def test_basemodelica(self):
     """Test loading .bmo files via the LaceModelica plugin."""
     # Load from BMO file

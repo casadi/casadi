@@ -502,6 +502,8 @@ protected:
   double fmutol_;
   bool ignore_time_;
   bool enable_ls_dae_, enable_ls_serialization_;
+  // Rewrite the equations of eq() and of a .bmo model into an explicit form where possible
+  bool explicit_equations_;
 
   // FMI attributes
   std::string fmi_version_;
@@ -525,6 +527,9 @@ protected:
   bool provides_adjoint_derivatives_;
   bool can_be_instantiated_only_once_per_process_;
   std::vector<std::string> source_files_;
+
+  // Initial equation residuals of a .bmo model with explicit_equations false, output "ialg"
+  std::vector<size_t> ialg_;
 
   /// Name of instance
   std::string name_;
@@ -655,6 +660,12 @@ protected:
 
   /// Set a initial equation
   void set_init(const std::string& name, const MX& init_rhs);
+
+  /// Add an equation residual, to outputs("alg"), or to outputs("ialg") if initial
+  Variable& add_residual(const MX& res, bool initial = false);
+
+  /// Fully implicit form (explicit_equations false): what no equation defines is in z
+  void residual_categories();
 
   /// Linear combinations of output expressions
   Function::AuxOut lc_;

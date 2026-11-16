@@ -204,6 +204,14 @@ class CASADI_EXPORT DaeBuilder
         - `"enable_ls_dae"` (bool, true): honour the DAE layered standard of an FMU
         - `"enable_ls_serialization"` (bool, true): honour the serialization layered
           standard of an FMU
+        - `"explicit_equations"` (bool, true): rewrite the equations into an explicit form
+          where possible. An equation `v = expr` of `eq` or of a `.bmo` model becomes the
+          binding equation of `v`, `der(x) = expr` the ODE of `x`, and an initial equation
+          `v = expr` of a `.bmo` model the initial equation of `v` (`init_lhs`, `init_rhs`).
+          With false, the equations are kept as written: residuals `lhs - rhs` in
+          `outputs("alg")` and initial equation residuals of a `.bmo` model in
+          `outputs("ialg")`; the states are in `x`, and their derivatives and the other
+          unknowns in `z`. This also applies to the equations of an FMUX model
 
       \lang{python}
       \doctest
@@ -747,7 +755,8 @@ class CASADI_EXPORT DaeBuilder
       input category: `"ode"` (right-hand sides of the states `x`), `"alg"` (residuals),
       `"quad"` (right-hand sides of `q`), `"zero"` (zero-crossing functions of the when
       equations), `"ddef"` and `"wdef"` (binding expressions of `d` and `w`), `"y"`
-      (expressions of the outputs).
+      (expressions of the outputs). `"ialg"` gives the residuals of the initial equations of a
+      `.bmo` model imported with the option `explicit_equations` false.
 
       \param cat One of the output categories above; an input category is an error
       \return List of expressions, empty when the category is empty
@@ -1485,6 +1494,11 @@ class CASADI_EXPORT DaeBuilder
       DAE semi-explicit. Scalar sides are broadcast to the length of the other side;
       sparse sides are densified. Variables appearing in `rhs` are marked as used, so a
       quadrature state `q` referenced there becomes a regular state `x`.
+
+      With the option `explicit_equations` false, the equation is kept as written: the
+      residual `lhs - rhs` is added to `outputs("alg")`, without any of the rewriting
+      above. A state whose derivative appears moves from `z` to `x`; the derivative and
+      the other variables stay in `z`.
 
       \param lhs Column vector expression; a parameter, constant or state as left-hand
         side is an error

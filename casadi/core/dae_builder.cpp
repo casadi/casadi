@@ -81,6 +81,8 @@ std::vector<MX> DaeBuilder::inputs(const std::string& cat) const {
 
 std::vector<MX> DaeBuilder::outputs(const std::string& cat) const {
   try {
+    // Initial equation residuals: no category
+    if (cat == "ialg") return (*this)->var((*this)->ialg_);
     return (*this)->outputs(to_enum<Category>(cat));
   } catch (std::exception& e) {
     THROW_ERROR("outputs", e.what());
