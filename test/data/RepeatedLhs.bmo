@@ -1,0 +1,15 @@
+//! base 0.1.0
+package 'RepeatedLhs'
+  model 'RepeatedLhs' "Equations with the same left-hand side"
+    input Real 'u';
+    Real 'a';
+    Real 'b';
+    Real 'c';
+    Real 'x'(start = 1.0);
+  equation
+    'a' = 'b';
+    'a' = 'c';
+    'c' = 2.0 * 'u';
+    der('x') = 'a' - 'x';
+  end 'RepeatedLhs';
+end 'RepeatedLhs';

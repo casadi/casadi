@@ -699,6 +699,12 @@ DaeBuilderInternal::DaeBuilderInternal(const std::string& name, const std::strin
   indices_.resize(enum_traits<Category>::n_enum);
 }
 
+// A variable that an imported equation var = expr can define: a dependent or algebraic
+// variable without binding equation
+static bool is_unbound_dependent(const Variable& v) {
+  return (v.category == Category::W || v.category == Category::Z) && !v.has_beq();
+}
+
 void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
   // Check if file exists
   if (!Filesystem::exists(filename)) {
@@ -921,12 +927,12 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
           casadi_assert(!lhs.is_empty(), "Only an initial equation of the form "
             "variable = expression is supported: " + out_name);
           set_init(lhs.name(), rhs);
-        } else if (!lhs.is_empty()) {
-          // Simple variable on LHS: var = rhs (binding equation)
-          std::string var_name = lhs.name();
-          size_t var_ind = find(var_name);
-          Variable& var_ref = variable(var_ind);
-          var_ref.bind = assign(var_name, rhs).index;
+        } else if (!lhs.is_empty() && is_unbound_dependent(variable(lhs.name()))) {
+          // Simple variable on LHS: var = rhs (binding equation). Only one per variable: in
+          // a = b, a = c, the second equation stays a residual.
+          Variable& var_ref = variable(lhs.name());
+          if (var_ref.category == Category::Z) categorize(var_ref.index, Category::W);
+          var_ref.bind = assign(var_ref.name, rhs).index;
         } else {
           // Anything else (e.g., m*c_p*der(T) - h): use implicit residual form
           eq(MX(0), expr, Dict());

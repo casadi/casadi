@@ -938,6 +938,16 @@ class Daebuildertests(casadiTestCase):
     self.assertEqual(dae.numel('x'), 1)
 
   @requires_modelicaparser('lacemodelica')
+  def test_basemodelica_repeated_lhs(self):
+    """a = b and a = c: one binding equation for a, the other equation stays a residual."""
+    dae = ca.DaeBuilder('m', '../data/RepeatedLhs.bmo')
+    a, b, c, u, x = [dae.var(n) for n in ['a', 'b', 'c', 'u', 'x']]
+    self.assertEqual(len(dae.alg()), 1)
+    f = ca.Function('f', [a, b, c, u, x],
+      [dae.beq('a') - b, dae.beq('c') - 2 * u, dae.beq('der(x)') - (a - x), ca.fabs(dae.alg()[0])])
+    self.checkarray(ca.vertcat(*f(3, 4, 5, 6, 7)), ca.DM([0, 0, 0, 2]))
+
+  @requires_modelicaparser('lacemodelica')
   def test_basemodelica(self):
     """Test loading .bmo files via the LaceModelica plugin."""
     # Load from BMO file
