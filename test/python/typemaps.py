@@ -1293,6 +1293,17 @@ class typemaptests(casadiTestCase):
     with self.assertRaises(TypeError if systemswig else NotImplementedError):
       ca.Function("tmp", [x],[Foo()])  # pyright: ignore[reportCallIssue,reportArgumentType]
 
+  def test_raising_hook_leaves_no_error(self):
+    self.message("a conversion hook that raises during dispatch leaves no error set")
+    x = ca.SX.sym("x")
+
+    class Foo:
+      def __SX__(self):
+        raise Exception("15")
+
+    with self.assertRaises(TypeError):
+      x * Foo()  # pyright: ignore[reportOperatorIssue]
+
   def test_shape_attr_no_refleak(self):
     self.message("the 1-D shape probe must not leak its shape tuple")
     # to_ptr(vector) reads .shape to reject 2-D operands; it used to Py_DECREF

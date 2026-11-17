@@ -1003,6 +1003,21 @@ namespace std {
       return false;
     }
 
+#ifdef SWIGPYTHON
+    // Type of p if p is a DM, SX or MX, but not a subclass, else 0.
+    // These classes define no conversion hooks, so their type alone decides
+    // which conversions can succeed.
+    swig_type_info* exact_matrix_type(GUESTOBJECT *p) {
+      static swig_type_info* const types[] = {$descriptor(casadi::Matrix<double>*),
+        $descriptor(casadi::Matrix<casadi::SXElem>*), $descriptor(casadi::MX*)};
+      for (swig_type_info* t : types) {
+        SwigPyClientData* cd = static_cast<SwigPyClientData*>(t->clientdata);
+        if (cd && reinterpret_cast<PyObject*>(Py_TYPE(p)) == cd->klass) return t;
+      }
+      return 0;
+    }
+#endif // SWIGPYTHON
+
 #ifdef SWIGMATLAB
     Sparsity get_sparsity(const mxArray* p) {
       // Get sparsity pattern
@@ -1095,6 +1110,13 @@ namespace std {
       // Treat Null
       if (is_null(p)) return false;
 
+#ifdef SWIGPYTHON
+      if (exact_matrix_type(p)) {
+        if (PyErr_Occurred()) PyErr_Clear();
+        return false;
+      }
+#endif // SWIGPYTHON
+
       // long long
       {
         long long tmp;
@@ -1157,6 +1179,13 @@ namespace std {
     bool to_ptr(GUESTOBJECT *p, double** m) {
       // Treat Null
       if (is_null(p)) return false;
+
+#ifdef SWIGPYTHON
+      if (exact_matrix_type(p)) {
+        if (PyErr_Occurred()) PyErr_Clear();
+        return false;
+      }
+#endif // SWIGPYTHON
 
       // Standard typemaps
       if (SWIG_IsOK(SWIG_AsVal(double)(p, m ? *m : 0))) return true;
@@ -1525,6 +1554,11 @@ namespace std {
       }
 #endif
 #ifdef SWIGPYTHON
+
+      if (exact_matrix_type(p)) {
+        if (PyErr_Occurred()) PyErr_Clear();
+        return false;
+      }
 
       // Some built-in types are iterable
       // bytes is iterable but yields ints; walking it as a vector of numbers
@@ -2322,6 +2356,13 @@ namespace std {
       // Treat Null
       if (is_null(p)) return false;
 
+#ifdef SWIGPYTHON
+      if (exact_matrix_type(p) == $descriptor(casadi::MX*)) {
+        if (PyErr_Occurred()) PyErr_Clear();
+        return false;
+      }
+#endif // SWIGPYTHON
+
       // SX already?
       if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(m),
                                     $descriptor(casadi::Matrix<casadi::SXElem>*), 0))) {
@@ -2407,6 +2448,13 @@ namespace std {
     bool to_ptr(GUESTOBJECT *p, MX** m) {
       // Treat Null
       if (is_null(p)) return false;
+
+#ifdef SWIGPYTHON
+      if (exact_matrix_type(p) == $descriptor(casadi::Matrix<casadi::SXElem>*)) {
+        if (PyErr_Occurred()) PyErr_Clear();
+        return false;
+      }
+#endif // SWIGPYTHON
 
       // MX already?
       if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(m),
@@ -2500,6 +2548,16 @@ namespace std {
     bool to_ptr(GUESTOBJECT *p, DM** m) {
       // Treat Null
       if (is_null(p)) return false;
+
+#ifdef SWIGPYTHON
+      {
+        swig_type_info* t = exact_matrix_type(p);
+        if (t && t != $descriptor(casadi::Matrix<double>*)) {
+          if (PyErr_Occurred()) PyErr_Clear();
+          return false;
+        }
+      }
+#endif // SWIGPYTHON
 
       // DM already?
       if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(m),
@@ -2659,6 +2717,10 @@ namespace std {
     bool to_ptr(GUESTOBJECT *p, Sparsity** m) {
       // Treat Null
       if (is_null(p)) return false;
+
+#ifdef SWIGPYTHON
+      if (exact_matrix_type(p)) return false;
+#endif // SWIGPYTHON
 
       // Sparsity already?
       if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(m),
