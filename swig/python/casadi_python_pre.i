@@ -488,6 +488,14 @@ SWIG_Python_AppendOutput_Tuple(PyObject* result, PyObject* obj, int is_void) {
       return true;
     }
 
+    // Copy a row-major nrow-by-ncol array into a dense column-major one
+    template<typename T>
+    void copy_row_major(const std::vector<T>& data, casadi_int nrow, casadi_int ncol, T* d) {
+      for (casadi_int i = 0; i < nrow; ++i) {
+        for (casadi_int j = 0; j < ncol; ++j) d[i + j * nrow] = data[j + i * ncol];
+      }
+    }
+
     bool SX_from_array_conv(GUESTOBJECT *p, casadi::SX** m) {
       std::vector<SXElem> data;
       if (!swig::assign(PyTuple_GetItem(p, 2), &data)) return false;
@@ -495,7 +503,7 @@ SWIG_Python_AppendOutput_Tuple(PyObject* result, PyObject* obj, int is_void) {
       casadi_int ncol; swig::assign(PyTuple_GetItem(p, 1), &ncol);
       if (m) {
         **m = casadi::SX::zeros(nrow, ncol);
-        casadi_densify(get_ptr(data), (**m).sparsity().T(), (**m).ptr(), true);
+        copy_row_major(data, nrow, ncol, (**m).ptr());
       }
       return true;
     }
@@ -508,7 +516,7 @@ SWIG_Python_AppendOutput_Tuple(PyObject* result, PyObject* obj, int is_void) {
       if (!from_bytes(PyTuple_GetItem(p, 3), nrow * ncol, &data)
           && !swig::assign(PyTuple_GetItem(p, 2), &data)) return false;
       **m = IM::zeros(nrow, ncol);
-      casadi_densify(get_ptr(data), (**m).sparsity().T(), (**m).ptr(), true);
+      copy_row_major(data, nrow, ncol, (**m).ptr());
       return true;
     }
 
@@ -519,7 +527,7 @@ SWIG_Python_AppendOutput_Tuple(PyObject* result, PyObject* obj, int is_void) {
       std::vector<double> data;
       if (!from_bytes(PyTuple_GetItem(p, 2), nrow * ncol, &data)) return false;
       **m = DM::zeros(nrow, ncol);
-      casadi_densify(get_ptr(data), (**m).sparsity().T(), (**m).ptr(), true);
+      copy_row_major(data, nrow, ncol, (**m).ptr());
       return true;
     }
 
