@@ -1573,17 +1573,20 @@ namespace std {
       // would silently turn b"ab" into [97, 98] instead of raising.
       if (PyDict_Check(p) || PyBytes_Check(p) || PySet_Check(p) || PyUnicode_Check(p)) return false;
 
+      // Plain lists and tuples have neither conversion hooks nor a shape
+      bool plain = PyList_CheckExact(p) || PyTuple_CheckExact(p);
+
       // An object exposing a casadi conversion hook is a SINGLE matrix, not
       // a sequence of them -- don't iterate it as a vector.  (A 1-D numeric-
       // like iterable such as the experimental NumpyArray would otherwise be
       // walked element-by-element with float()/int(), which throws on a
       // symbolic element and can crash the interpreter mid-iteration.)
-      if (PyObject_HasAttrString(p, "__MX__") || PyObject_HasAttrString(p, "__SX__")
-          || PyObject_HasAttrString(p, "__DM__")) return false;
+      if (!plain && (PyObject_HasAttrString(p, "__MX__") || PyObject_HasAttrString(p, "__SX__")
+          || PyObject_HasAttrString(p, "__DM__"))) return false;
 
       // Make sure shape is 1D, if defined.
       if (PyErr_Occurred()) PyErr_Clear(); // Clear pending exception before type check
-      if (PyObject_HasAttrString(p, "shape")) {
+      if (!plain && PyObject_HasAttrString(p, "shape")) {
         PyObject * shape = PyObject_GetAttrString(p, "shape");
         if (!shape) { PyErr_Clear(); return false; }
         bool is_1d = PyTuple_Check(shape) && PyTuple_Size(shape)==1;
