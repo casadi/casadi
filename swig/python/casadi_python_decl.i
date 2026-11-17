@@ -27,7 +27,7 @@ def DM_from_array(m, check_only=True):
     else:
       shape = m.shape + (1, 1)
       nrow, ncol = shape[0], shape[1]
-      return (nrow,ncol,m.flat)
+      return (nrow,ncol,m.tobytes())
   return False
 
 def IM_from_array(m, check_only=True):
@@ -44,7 +44,7 @@ def IM_from_array(m, check_only=True):
     else:
       shape = m.shape + (1, 1)
       nrow, ncol = shape[0], shape[1]
-      return (nrow,ncol,m.flat)
+      return (nrow,ncol,m.flat,m.tobytes())
   return False
 
 def SX_from_array(m, check_only=True):
