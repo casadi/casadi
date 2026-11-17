@@ -303,7 +303,7 @@ fatrop_int casadi_fatrop_eval_BAbt(const double *states_kp1, const double *input
   blasfeo_pack_tran_dmat(p->nx[k+1], p->nu[k], d->AB+p->AB_offsets[k]+p->nx[k]*p->nx[k+1], p->nx[k+1], res, 0, 0);
 
   for (i=0; i<p->nx[k+1]; ++i) {
-    BLASFEO_DMATEL(res, p->nx[k]+p->nu[k], i) = lbg_k[i]-g_k[i];
+    blasfeo_dgein1(lbg_k[i]-g_k[i], res, p->nx[k]+p->nu[k], i);
   }
 
   return 0;
@@ -456,7 +456,7 @@ fatrop_int casadi_fatrop_eval_Ggt(
     blasfeo_pack_tran_dmat(1, p->nu[k],
       d->CD+p->CD_offsets[k]+(d->a_eq[i]-p->CD[k].offset_r)+p->nx[k]*p->CD[k].rows,
       p->CD[k].rows, res, 0,        column);
-    BLASFEO_DMATEL(res, p->nx[k]+p->nu[k], column) = d->g[d->a_eq[i]]-d->nlp->lbz[p->nlp->nx+d->a_eq[i]];
+    blasfeo_dgein1(d->g[d->a_eq[i]]-d->nlp->lbz[p->nlp->nx+d->a_eq[i]], res, p->nx[k]+p->nu[k], column);
     column++;
   }
   for (i=d->x_eq_idx[k];i<d->x_eq_idx[k+1];++i) {
@@ -466,8 +466,8 @@ fatrop_int casadi_fatrop_eval_Ggt(
     } else {
       j += p->nu[k];
     }
-    BLASFEO_DMATEL(res, j, column) = 1;
-    BLASFEO_DMATEL(res, p->nx[k]+p->nu[k], column) = d->x[d->x_eq[i]]-d->nlp->lbz[d->x_eq[i]];
+    blasfeo_dgein1(1, res, j, column);
+    blasfeo_dgein1(d->x[d->x_eq[i]]-d->nlp->lbz[d->x_eq[i]], res, p->nx[k]+p->nu[k], column);
     column++;
   }
 
@@ -508,7 +508,7 @@ fatrop_int  casadi_fatrop_eval_Ggt_ineq(
     blasfeo_pack_tran_dmat(1, p->nu[k],
       d->CD+p->CD_offsets[k]+(d->a_ineq[i]-p->CD[k].offset_r)+p->nx[k]*p->CD[k].rows,
       p->CD[k].rows, res, 0,        column);
-    BLASFEO_DMATEL(res, p->nx[k]+p->nu[k], column) = d->g[d->a_ineq[i]];
+    blasfeo_dgein1(d->g[d->a_ineq[i]], res, p->nx[k]+p->nu[k], column);
     column++;
   }
   for (i=d->x_ineq_idx[k];i<d->x_ineq_idx[k+1];++i) {
@@ -518,8 +518,8 @@ fatrop_int  casadi_fatrop_eval_Ggt_ineq(
     } else {
       j += p->nu[k];
     }
-    BLASFEO_DMATEL(res, j, column) = 1;
-    BLASFEO_DMATEL(res, p->nx[k]+p->nu[k], column) = d->x[d->x_ineq[i]];
+    blasfeo_dgein1(1, res, j, column);
+    blasfeo_dgein1(d->x[d->x_ineq[i]], res, p->nx[k]+p->nu[k], column);
     column++;
   }
 
