@@ -1304,6 +1304,12 @@ class typemaptests(casadiTestCase):
     with self.assertRaises(TypeError):
       x * Foo()  # pyright: ignore[reportOperatorIssue]
 
+    class Bar(ca.SX):
+      def __DM__(self):
+        raise Exception("15")
+
+    self.assertEqual(str(2.5 * Bar(x)), str(2.5 * x))
+
   def test_shape_attr_no_refleak(self):
     self.message("the 1-D shape probe must not leak its shape tuple")
     # to_ptr(vector) reads .shape to reject 2-D operands; it used to Py_DECREF

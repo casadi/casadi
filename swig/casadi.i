@@ -1016,6 +1016,14 @@ namespace std {
       }
       return 0;
     }
+
+    // A float or int, but not a subclass, that fits in a double: the full
+    // DM/SX/MX conversion of such an object yields the same scalar.
+    bool python_scalar(GUESTOBJECT *p, double* m) {
+      if (!(PyFloat_CheckExact(p) || PyLong_CheckExact(p)) || !to_val(p, m)) return false;
+      if (PyErr_Occurred()) PyErr_Clear();
+      return true;
+    }
 #endif // SWIGPYTHON
 
 #ifdef SWIGMATLAB
@@ -2357,6 +2365,14 @@ namespace std {
       if (is_null(p)) return false;
 
 #ifdef SWIGPYTHON
+      {
+        double tmp;
+        if (python_scalar(p, m ? &tmp : 0)) {
+          if (m) **m = DM(tmp);
+          return true;
+        }
+      }
+
       if (exact_matrix_type(p) == $descriptor(casadi::MX*)) {
         if (PyErr_Occurred()) PyErr_Clear();
         return false;
@@ -2450,6 +2466,14 @@ namespace std {
       if (is_null(p)) return false;
 
 #ifdef SWIGPYTHON
+      {
+        double tmp;
+        if (python_scalar(p, m ? &tmp : 0)) {
+          if (m) **m = DM(tmp);
+          return true;
+        }
+      }
+
       if (exact_matrix_type(p) == $descriptor(casadi::Matrix<casadi::SXElem>*)) {
         if (PyErr_Occurred()) PyErr_Clear();
         return false;
@@ -2550,6 +2574,14 @@ namespace std {
       if (is_null(p)) return false;
 
 #ifdef SWIGPYTHON
+      {
+        double tmp;
+        if (python_scalar(p, m ? &tmp : 0)) {
+          if (m) **m = tmp;
+          return true;
+        }
+      }
+
       {
         swig_type_info* t = exact_matrix_type(p);
         if (t && t != $descriptor(casadi::Matrix<double>*)) {
