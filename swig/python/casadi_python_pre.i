@@ -497,6 +497,15 @@ SWIG_Python_AppendOutput_Tuple(PyObject* result, PyObject* obj, int is_void) {
       return ret;
     }
 
+    // False unless bytes holds exactly n values of type T
+    template<typename T>
+    bool from_bytes(PyObject* bytes, casadi_int n, std::vector<T>* data) {
+      if (PyBytes_Size(bytes) != n * static_cast<casadi_int>(sizeof(T))) return false;
+      data->resize(n);
+      if (n) std::memcpy(data->data(), PyBytes_AsString(bytes), n * sizeof(T));
+      return true;
+    }
+
     bool SX_from_array_conv(GUESTOBJECT *p, casadi::SX** m) {
       std::vector<SXElem> data;
       if (!swig::assign(PyTuple_GetItem(p, 2), &data)) return false;
@@ -511,10 +520,11 @@ SWIG_Python_AppendOutput_Tuple(PyObject* result, PyObject* obj, int is_void) {
 
     bool IM_from_array_conv(GUESTOBJECT *p, casadi::IM** m) {
       if (!m) return true;
-      std::vector<casadi_int> data;
-      if (!swig::assign(PyTuple_GetItem(p, 2), &data)) return false;
       casadi_int nrow; swig::assign(PyTuple_GetItem(p, 0), &nrow);
       casadi_int ncol; swig::assign(PyTuple_GetItem(p, 1), &ncol);
+      std::vector<casadi_int> data;
+      if (!from_bytes(PyTuple_GetItem(p, 3), nrow * ncol, &data)
+          && !swig::assign(PyTuple_GetItem(p, 2), &data)) return false;
       **m = IM::zeros(nrow, ncol);
       casadi_densify(get_ptr(data), (**m).sparsity().T(), (**m).ptr(), true);
       return true;
@@ -522,10 +532,10 @@ SWIG_Python_AppendOutput_Tuple(PyObject* result, PyObject* obj, int is_void) {
 
     bool DM_from_array_conv(GUESTOBJECT *p, casadi::DM** m) {
       if (!m) return true;
-      std::vector<double> data;
-      if (!swig::assign(PyTuple_GetItem(p, 2), &data)) return false;
       casadi_int nrow; swig::assign(PyTuple_GetItem(p, 0), &nrow);
       casadi_int ncol; swig::assign(PyTuple_GetItem(p, 1), &ncol);
+      std::vector<double> data;
+      if (!from_bytes(PyTuple_GetItem(p, 2), nrow * ncol, &data)) return false;
       **m = DM::zeros(nrow, ncol);
       casadi_densify(get_ptr(data), (**m).sparsity().T(), (**m).ptr(), true);
       return true;
