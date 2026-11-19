@@ -928,7 +928,13 @@ jobs:
           bitness: ${{env.bitness}}
       - run: ./dockcross bash -c 'cp `rustc --target=$CARGO_BUILD_TARGET --print target-libdir`/*.dll /work/install/casadi'
         if: contains(matrix.arch, 'windows')
-      - uses: ./.github/actions/sign-windows
+      # The source archive does not carry .github
+      - uses: actions/checkout@v6.0.2
+        with:
+          sparse-checkout: .github/actions
+          path: ci
+        if: needs.version.outputs.sign_windows == 'true' && contains(matrix.arch, 'windows')
+      - uses: ./ci/.github/actions/sign-windows
         with:
           dir: install
         if: needs.version.outputs.sign_windows == 'true' && contains(matrix.arch, 'windows')
@@ -1042,7 +1048,13 @@ jobs:
           bitness: ${{env.bitness}}
       - run: ./dockcross bash -c 'cp `rustc --target=$CARGO_BUILD_TARGET --print target-libdir`/*.dll /work/install/casadi'
         if: contains(matrix.arch, 'windows')
-      - uses: ./.github/actions/sign-windows
+      # The source archive does not carry .github
+      - uses: actions/checkout@v6.0.2
+        with:
+          sparse-checkout: .github/actions
+          path: ci
+        if: needs.version.outputs.sign_windows == 'true' && contains(matrix.arch, 'windows')
+      - uses: ./ci/.github/actions/sign-windows
         with:
           dir: install
         if: needs.version.outputs.sign_windows == 'true' && contains(matrix.arch, 'windows')
