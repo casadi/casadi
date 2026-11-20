@@ -32,6 +32,7 @@ from numpy import random
 from helpers import args, casadiTestCase, hessian_old, jacobian_old, memory_heavy, requiresPlugin, requires_conic, requires_expm, requires_nlpsol, skip, toSX_fun
 import pickle
 import os
+import shutil
 import re
 import sys
 from casadi.tools import capture_stdout
@@ -2526,6 +2527,32 @@ class Functiontests(casadiTestCase):
     finally:
       del os.environ["CASADI_TEST_CC"]
       del os.environ["CASADI_TEST_LD"]
+
+  @requiresPlugin(ca.Importer,"shell")
+  def test_jit_directory_spaces(self):
+    if not args.run_slow: return
+    if os.name!='nt': return
+    # Working directories with spaces and punctuation
+    x = ca.MX.sym("x")
+    null = "nul" if os.name=='nt' else "/dev/null"
+    base = tempfile.mkdtemp()
+    cwd = os.getcwd()
+    try:
+      for name in ["with space", "O'Brien", "R&D", "R&D (x86)"]:
+        d = os.path.join(base, name)
+        os.mkdir(d)
+        os.chdir(d)
+        for extra in [{}, {"flags": [">" + null]}]:
+          opts = {"include_dirs": [d, '"' + d + '"']}
+          if os.name!='nt': opts["include_dirs"] += ["'" + d + "'", "$PWD", "${PWD}"]
+          opts.update(extra)
+          f = ca.Function('f',[x],[x**2],{"jit":True,"compiler":"shell","jit_options":opts})
+          self.checkarray(f(3),9)
+          f = None
+        os.chdir(cwd)
+    finally:
+      os.chdir(cwd)
+      shutil.rmtree(base, ignore_errors=True)
 
   @requires_nlpsol("ipopt")
   @requiresPlugin(ca.Importer,"shell")
