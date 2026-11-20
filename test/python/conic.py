@@ -145,6 +145,359 @@ print(conics)
 
 class ConicTests(casadiTestCase):
 
+  def test_daqp_warm_start(self):
+    if "SKIP_DAQP_TESTS" in os.environ or not ca.has_conic("daqp"):
+      return
+    # A binary problem whose continuous relaxation is fractional.
+    structure = {"h": ca.Sparsity.dense(2, 2), "a": ca.Sparsity.dense(1, 2)}
+    inputs = dict(h=ca.DM.eye(2), g=[-0.8, -0.3], a=ca.DM([[1, 1]]),
+                  lbx=[0, 0], ubx=[1, 1], lba=1, uba=1)
+    for discrete in ([False, False], [True, True]):
+      cold = ca.conic("cold", "daqp", structure,
+                      {"discrete": discrete})
+      expected = cold(**inputs)
+      warm = ca.conic("warm", "daqp", structure,
+                      {"discrete": discrete, "warm_start": True,
+                       "daqp": {"time_limit": 0}})
+      # Cover primal, dual, combined and infeasible incumbent starts.
+      for start in ({"x0": expected["x"]},
+                    {"lam_x0": expected["lam_x"], "lam_a0": expected["lam_a"]},
+                    {"x0": expected["x"], "lam_x0": expected["lam_x"],
+                     "lam_a0": expected["lam_a"]},
+                    {"x0": ca.DM([0.5, 0.5])}):
+        arguments = dict(inputs, **start)
+        actual = warm(**arguments)
+        self.checkarray(actual["x"], expected["x"])
+        self.checkarray(actual["cost"], expected["cost"])
+        self.assertTrue(warm.stats()["success"])
+      arguments = dict(inputs, x0=expected["x"])
+      self.check_serialize(warm, arguments)
+      self.check_codegen(warm, arguments, extralibs=["daqp"], std="c99")
+
+  def test_daqp_workspace_reuse(self):
+    if "SKIP_DAQP_TESTS" in os.environ or not ca.has_conic("daqp"):
+      return
+    structure = {"h": ca.Sparsity.dense(2, 2), "a": ca.Sparsity.dense(1, 2)}
+    initial = dict(h=ca.DM.eye(2), g=[-0.8, -0.3], a=ca.DM([[1, 1]]),
+                   lbx=[0, 0], ubx=[1, 1], lba=0.9, uba=1.1)
+    for binary in (False, True):
+      for reduction in (0, 1):
+        options = {"discrete": [binary, binary], "daqp": {"eq_reduction": reduction}}
+        reused = ca.conic("reused", "daqp", structure,
+                          options)
+        # Reallocated input objects and changing work buffers must not invalidate the cache.
+        changes = ({}, {}, {"g": [-1.2, -0.4]}, {"lba": 1, "uba": 1},
+                   {"a": ca.DM([[1, 0.5]]), "lba": 0.4, "uba": 1.2},
+                   {"h": ca.DM([[2, 0.2], [0.2, 1]])},
+                   {"h": ca.DM.eye(2)}, {"g": [-0.2, -0.2], "lba": 0, "uba": 2},
+                   {"g": [-1.2, -0.4], "lba": 1, "uba": 1},
+                   {"lba": 1-1e-12, "uba": 1}, {"lba": 0, "uba": 2})
+        codegen_solver = ca.conic("reused_codegen", "daqp", structure,
+                                 options)
+        generated = self.check_codegen(codegen_solver, initial, extralibs=["daqp"], std="c99")
+        if not binary:
+          changes += ({"h": ca.DM([[1, 0], [0, 0]])},
+                      {"h": ca.DM.eye(2)})
+        arguments = dict(initial)
+        for i, change in enumerate(changes):
+          arguments.update(change)
+          cold = ca.conic("cold", "daqp", structure, options)
+          expected = cold(**arguments)
+          actual = reused(**arguments)
+          self.checkarray(actual["x"], expected["x"])
+          self.checkarray(actual["cost"], expected["cost"])
+          self.assertTrue(reused.stats()["success"])
+          self.assertEqual(reused.stats()["workspace_reused"], i > 0)
+          if i in (1, 2, 3):
+            # No Hessian factorization or constraint-matrix update for these calls.
+            self.assertEqual(reused.stats()["daqp_update_mask"] & 3, 0)
+          if generated:
+            result = generated["F"](**arguments)
+            self.checkarray(result["x"], expected["x"])
+            self.checkarray(result["cost"], expected["cost"])
+        self.check_serialize(reused, arguments)
+        self.check_thread_safety(reused, arguments, N=4)
+
+  def test_daqp_reuse_equality_hessian_changes(self):
+    if "SKIP_DAQP_TESTS" in os.environ or not ca.has_conic("daqp"):
+      return
+    structure = {"h": ca.Sparsity.dense(2, 2), "a": ca.Sparsity.dense(2, 2)}
+    solver = ca.conic("reuse_equality", "daqp", structure,
+                      {"error_on_fail": False,
+                       "daqp": {"eq_reduction": 1}})
+    inputs = dict(h=ca.DM.eye(2), g=[-0.8, -0.3], a=ca.DM([[1, 1], [0, 0]]),
+                  lbx=[0, 0], ubx=[1, 1], lba=[1, 0], uba=[1, 0])
+    generated = self.check_codegen(solver, inputs, extralibs=["daqp"], std="c99")
+    evaluators = [solver] + ([generated["F"]] if generated else [])
+    for evaluate in evaluators:
+      for unused in range(3):
+        # Equality reduction must refresh saved pointers when H switches representation.
+        self.checkarray(evaluate(**inputs)["x"], ca.DM([0.75, 0.25]))
+        dense = dict(inputs, h=ca.DM([[4, 1], [1, 2]]), g=[-2, 0.5])
+        result = evaluate(**dense)
+        self.checkarray(result["x"], ca.DM([0.875, 0.125]))
+        self.checkarray(result["cost"], ca.DM([-0.03125]))
+      impossible = dict(inputs, lba=[1, 1], uba=[1, 1])
+      if evaluate is solver:
+        evaluate(**impossible)
+        self.assertFalse(solver.stats()["success"])
+        # DAQP >= 0.11 reports an inconsistent dependent equality as
+        # overdetermined (-6) when found while forming the working set.
+        self.assertIn(solver.stats()["return_status"], (-1, -6))
+      else:
+        with self.assertRaises(RuntimeError):
+          evaluate(**impossible)
+      # A failed solve must not poison the next workspace.
+      self.checkarray(evaluate(**inputs)["x"], ca.DM([0.75, 0.25]))
+
+  def test_daqp_reuse_unrelated_problems(self):
+    if "SKIP_DAQP_TESTS" in os.environ or not ca.has_conic("daqp"):
+      return
+    rng = numpy.random.default_rng(48271)
+    n, m = 8, 5
+    structure = {"h": ca.Sparsity.dense(n, n), "a": ca.Sparsity.dense(m, n)}
+    for reduction in (-1, 0, 1):
+      for binary in (False, True):
+        nb = 3 if binary else 0
+        options = {"discrete": [True]*nb+[False]*(n-nb),
+                   "daqp": {"eq_reduction": reduction}}
+        reused = ca.conic("reuse_random", "daqp", structure,
+                          options)
+        for k in range(30):
+          b = rng.normal(size=(n, n))
+          h = numpy.diag(rng.uniform(0.2, 3, n)) if k%2 else b.T@b+numpy.eye(n)
+          a = rng.normal(size=(m, n))
+          witness = rng.uniform(-0.7, 0.7, n)
+          witness[:nb] = rng.integers(0, 2, nb)
+          center = a@witness
+          lower, upper = center-0.4, center+0.6
+          if k%3 == 0:
+            lower[:2] = upper[:2] = center[:2]
+          inputs = dict(h=h, a=a, g=-h@rng.normal(size=n),
+                        lbx=[0]*nb+[-1]*(n-nb), ubx=[1]*n, lba=lower, uba=upper)
+          cold = ca.conic("cold", "daqp", structure, options)
+          expected, actual = cold(**inputs), reused(**inputs)
+          self.assertTrue(reused.stats()["success"])
+          self.checkarray(actual["x"], expected["x"])
+          self.checkarray(actual["cost"], expected["cost"])
+          x = numpy.array(actual["x"]).ravel()
+          self.assertLessEqual(float(numpy.max(lower-a@x)), 1e-6)
+          self.assertLessEqual(float(numpy.max(a@x-upper)), 1e-6)
+
+  def test_daqp_reuse_limit_recovery(self):
+    if "SKIP_DAQP_TESTS" in os.environ or not ca.has_conic("daqp"):
+      return
+    rng = numpy.random.default_rng(7935)
+    n, m = 64, 40
+    b = rng.normal(size=(n, n))/numpy.sqrt(n)
+    h = b.T@b+numpy.eye(n)
+    inputs = dict(h=h, a=rng.normal(size=(m, n))/numpy.sqrt(n),
+                  g=-h@rng.normal(size=n)*2, lbx=[-1]*n, ubx=[1]*n,
+                  lba=[-0.5]*m, uba=[0.5]*m)
+    for settings, status in (({"iter_limit": 3}, -4), ({"time_limit": 1e-9}, -7)):
+      solver = ca.conic("limited", "daqp",
+                        {"h": ca.Sparsity.dense(n, n), "a": ca.Sparsity.dense(m, n)},
+                        {"error_on_fail": False, "daqp": settings})
+      solver(**inputs)
+      self.assertEqual(solver.stats()["return_status"], status)
+      self.assertEqual(solver.stats()["unified_return_status"], "SOLVER_RET_LIMITED")
+      easy = dict(inputs, h=numpy.eye(n), g=numpy.zeros(n), a=numpy.zeros((m, n)),
+                  lba=[-1]*m, uba=[1]*m)
+      self.checkarray(solver(**easy)["x"], ca.DM.zeros(n))
+      self.assertTrue(solver.stats()["success"])
+      self.assertFalse(solver.stats()["workspace_reused"])
+
+  def test_daqp_cold_workspace_reuse(self):
+    if "SKIP_DAQP_TESTS" in os.environ or not ca.has_conic("daqp"):
+      return
+    rng = numpy.random.default_rng(81375)
+    n, m = 8, 5
+    structure = {"h": ca.Sparsity.dense(n, n), "a": ca.Sparsity.dense(m, n)}
+    for binary in (False, True):
+      options = {"discrete": [binary]*3+[False]*(n-3), "error_on_fail": False,
+                 "daqp": {"iter_limit": 10}}
+      # Defaults reuse allocations but do not reuse the previous solve's state.
+      reused = ca.conic("cold_reuse", "daqp", structure, options)
+      b = rng.normal(size=(n, n))
+      h, a = b.T@b+numpy.eye(n), rng.normal(size=(m, n))
+      for k in range(20):
+        if k%4 == 0:
+          b = rng.normal(size=(n, n))
+          h, a = b.T@b+numpy.eye(n), rng.normal(size=(m, n))
+        inputs = dict(h=h, a=a, g=-h@rng.normal(size=n),
+                      lbx=[0]*3+[-1]*(n-3) if binary else [-1]*n, ubx=[1]*n,
+                      lba=[-0.5]*m, uba=[0.5]*m)
+        fresh = ca.conic("fresh", "daqp", structure, options)
+        expected, actual = fresh(**inputs), reused(**inputs)
+        self.assertEqual(reused.stats()["return_status"], fresh.stats()["return_status"])
+        self.assertEqual(reused.stats()["iter_count"], fresh.stats()["iter_count"])
+        if fresh.stats()["success"]:
+          self.checkarray(actual["x"], expected["x"])
+          self.checkarray(actual["cost"], expected["cost"])
+      # Codegen exercises the same cold reset on repeated evaluations.
+      unlimited = ca.conic("cold_codegen", "daqp", structure,
+                            {"discrete": options["discrete"]})
+      generated = self.check_codegen(unlimited, inputs, extralibs=["daqp"], std="c99")
+      if generated:
+        for scale in (0.5, 1, 0.7, 1.2):
+          changed = dict(inputs, g=inputs["g"]*scale)
+          self.checkarray(generated["F"](**changed)["x"], unlimited(**changed)["x"])
+
+  def test_daqp_zero_row_infeasibility(self):
+    if "SKIP_DAQP_TESTS" in os.environ or not ca.has_conic("daqp"):
+      return
+    structure = {"h": ca.Sparsity.dense(1, 1), "a": ca.Sparsity.dense(1, 1)}
+    inputs = dict(h=1, g=-0.25, a=0, lbx=-1, ubx=1, lba=-1, uba=1)
+    for previous in (False, True):
+      for reduction in (-1, 0, 1):
+        solver = ca.conic("zero_row", "daqp", structure,
+                          {"error_on_fail": False, "warm_start_previous": previous,
+                           "daqp": {"eq_reduction": reduction}})
+        generated = self.check_codegen(solver, inputs, extralibs=["daqp"], std="c99")
+        for evaluate in [solver] + ([generated["F"]] if generated else []):
+          self.checkarray(evaluate(**inputs)["x"], ca.DM([0.25]))
+          impossible = dict(inputs, lba=1, uba=1)
+          if evaluate is solver:
+            evaluate(**impossible)
+            self.assertEqual(solver.stats()["return_status"], -1)
+            self.assertFalse(solver.stats()["success"])
+          else:
+            with self.assertRaises(RuntimeError):
+              evaluate(**impossible)
+          self.checkarray(evaluate(**inputs)["x"], ca.DM([0.25]))
+
+  def test_daqp_invalid_binary_bounds_recovery(self):
+    if "SKIP_DAQP_TESTS" in os.environ or not ca.has_conic("daqp"):
+      return
+    structure = {"h": ca.Sparsity.dense(2, 2), "a": ca.Sparsity.dense(1, 2)}
+    options = {"discrete": [True, True]}
+    solver = ca.conic("binary_recovery", "daqp", structure, options)
+    inputs = dict(h=ca.DM.eye(2), g=[-0.8, -0.3], a=ca.DM([[1, 1]]),
+                  lbx=[0, 0], ubx=[1, 1], lba=0, uba=2)
+    generated = self.check_codegen(solver, inputs, extralibs=["daqp"], std="c99")
+    changed = dict(inputs, h=ca.DM.eye(2)*3, g=[-1, -2], a=ca.DM([[1, 0.5]]))
+    expected = ca.conic("fresh", "daqp", structure, options)(**changed)
+    for evaluate in [solver] + ([generated["F"]] if generated else []):
+      evaluate(**inputs)
+      with self.assertRaises(RuntimeError):
+        evaluate(**dict(changed, lbx=[0.1, 0]))
+      # The valid call repeats the rejected call's H/A: stale cache values
+      # must not suppress recomputation of the old workspace factors.
+      actual = evaluate(**changed)
+      self.checkarray(actual["x"], expected["x"])
+      self.checkarray(actual["cost"], expected["cost"])
+      if evaluate is solver:
+        self.assertFalse(solver.stats()["workspace_reused"])
+
+  def test_daqp_sparse_matrix_updates(self):
+    if "SKIP_DAQP_TESTS" in os.environ or not ca.has_conic("daqp"):
+      return
+    h = ca.DM([[2, 0.2, 0], [0.2, 2, 0.3], [0, 0.3, 2]])
+    a = ca.DM([[1, 0, 0.5], [0, 1, -0.2]])
+    structure = {"h": ca.sparsify(h).sparsity(), "a": ca.sparsify(a).sparsity()}
+    inputs = dict(h=h, a=a, g=[-1, -0.5, 0.2], lbx=[-1]*3, ubx=[1]*3,
+                  lba=[-0.2]*2, uba=[0.2]*2)
+    solver = ca.conic("sparse_updates", "daqp", structure, {})
+    generated = self.check_codegen(solver, inputs, extralibs=["daqp"], std="c99")
+    changes = ({}, {}, {"a": a*0}, {"a": a},
+               {"h": ca.DM.eye(3)*2}, {"h": h}, {"a": a*0.7}, {})
+    arguments = dict(inputs)
+    for k, change in enumerate(changes):
+      arguments.update(change)
+      # New caller-owned objects must not affect value-based cache detection.
+      arguments["h"], arguments["a"] = ca.DM(arguments["h"]), ca.DM(arguments["a"])
+      fresh = ca.conic("fresh", "daqp", structure, {})
+      expected, actual = fresh(**arguments), solver(**arguments)
+      self.checkarray(actual["x"], expected["x"])
+      self.checkarray(actual["cost"], expected["cost"])
+      if k in (1, 7):
+        self.assertEqual(solver.stats()["daqp_update_mask"] & 3, 0)
+      if generated:
+        self.checkarray(generated["F"](**arguments)["x"], expected["x"])
+
+  def test_daqp_bound_classification(self):
+    if "SKIP_DAQP_TESTS" in os.environ or not ca.has_conic("daqp"):
+      return
+    structure = {"h": ca.Sparsity.dense(2, 2), "a": ca.Sparsity.dense(1, 2)}
+    inputs = dict(h=ca.DM.eye(2), a=ca.DM([[1, 1]]), g=[-0.8, -0.3],
+                  lbx=[0, 0], ubx=[1, 1], lba=0, uba=2)
+    for previous in (False, True):
+      for reduction in (-1, 0, 1):
+        options = {"warm_start_previous": previous, "error_on_fail": False,
+                   "daqp": {"eq_reduction": reduction, "zero_tol": 1e-9}}
+        solver = ca.conic("bounds", "daqp", structure, options)
+        generated = self.check_codegen(solver, inputs, extralibs=["daqp"], std="c99")
+        # Equalities are inferred by DAQP, then removed when bounds widen.
+        changes = ({}, {"lba": 1, "uba": 1+1e-10},
+                   {"h": ca.DM([[2, 0.2], [0.2, 1]])},
+                   {"lba": 0, "uba": 2},
+                   {"lbx": [0.4, 0], "ubx": [0.4+1e-10, 1]}, {},
+                   {"lbx": [0, 0], "ubx": [1, 1]},
+                   {"lba": 3, "uba": 4}, {"lba": 0, "uba": 2})
+        arguments = dict(inputs)
+        for change in changes:
+          arguments.update(change)
+          fresh = ca.conic("fresh", "daqp", structure, options)
+          expected, actual = fresh(**arguments), solver(**arguments)
+          self.assertEqual(solver.stats()["return_status"], fresh.stats()["return_status"], (previous, reduction, change))
+          if fresh.stats()["success"]:
+            self.checkarray(actual["x"], expected["x"])
+            self.checkarray(actual["cost"], expected["cost"])
+            if generated:
+              self.checkarray(generated["F"](**arguments)["x"], expected["x"])
+          elif generated:
+            with self.assertRaises(RuntimeError):
+              generated["F"](**arguments)
+
+  def test_daqp_previous_warm_start(self):
+    if "SKIP_DAQP_TESTS" in os.environ or not ca.has_conic("daqp"):
+      return
+    structure = {"h": ca.Sparsity.dense(2, 2), "a": ca.Sparsity.dense(1, 2)}
+    cold = ca.conic("cold", "daqp", structure, {})
+    hot = ca.conic("hot", "daqp", structure, {"warm_start_previous": True})
+    inputs = dict(h=ca.DM.eye(2), a=ca.DM([[1, 1]]), g=[-0.8, -0.3],
+                  lbx=[0, 0], ubx=[1, 1], lba=1.2, uba=ca.inf)
+    hot(**inputs)
+    expected, actual = cold(**inputs), hot(**inputs)
+    self.checkarray(actual["x"], expected["x"])
+    self.assertLess(hot.stats()["iter_count"], cold.stats()["iter_count"])
+    generated = self.check_codegen(hot, inputs, extralibs=["daqp"], std="c99")
+    if generated:
+      for g in ([-0.82, -0.31], [-0.7, -0.1]):
+        arguments = dict(inputs, g=g)
+        self.checkarray(generated["F"](**arguments)["x"], cold(**arguments)["x"])
+    self.check_serialize(hot, inputs)
+
+  def test_daqp_cold_reuse_proximal(self):
+    if "SKIP_DAQP_TESTS" in os.environ or not ca.has_conic("daqp"):
+      return
+    structure = {"h": ca.Sparsity.dense(2, 2), "a": ca.Sparsity.dense(1, 2)}
+    reused = ca.conic("reused", "daqp", structure, {})
+    # The null direction makes the proximal initial center affect iteration count.
+    inputs = dict(h=ca.DM([[1, 0], [0, 0]]), a=ca.DM([[1, 1]]),
+                  lbx=[-1, -1], ubx=[1, 1], lba=-1, uba=1)
+    for g in ([0.5, 1], [0.5, -1], [0.5, -1], [-0.5, 1]):
+      arguments = dict(inputs, g=g)
+      fresh = ca.conic("fresh", "daqp", structure, {})
+      expected, actual = fresh(**arguments), reused(**arguments)
+      self.checkarray(actual["x"], expected["x"])
+      self.checkarray(actual["cost"], expected["cost"])
+      self.assertEqual(reused.stats()["iter_count"], fresh.stats()["iter_count"])
+
+  def test_daqp_setup_failure(self):
+    if "SKIP_DAQP_TESTS" in os.environ or not ca.has_conic("daqp"):
+      return
+    solver = ca.conic("solver", "daqp", {"h": ca.Sparsity.dense(1, 1)},
+                      {"error_on_fail": False, "daqp": {"eps_prox": 0}})
+    solver(h=1, g=-0.5, lbx=-1, ubx=1)
+    for unused in range(2):
+      solver(h=-1, g=0, lbx=-1, ubx=1)
+      self.assertFalse(solver.stats()["success"])
+      self.assertEqual(solver.stats()["return_status"], -5)
+    result = solver(h=1, g=-0.5, lbx=-1, ubx=1)
+    self.assertTrue(solver.stats()["success"])
+    self.checkarray(result["x"], ca.DM([0.5]))
+
   @memory_heavy()
   def test_binary(self):
     ca.DM.rng(1)
@@ -547,7 +900,9 @@ class ConicTests(casadiTestCase):
       self.assertAlmostEqual(solver_out["cost"][0],-6.264669320767,max(1,6-less_digits),str(conic))
 
       if aux_options["codegen"]:
-        self.check_codegen(solver,solver_in,**aux_options["codegen"])
+        # DAQP equality inference can change roundoff between fresh/reused calls.
+        self.check_codegen(solver,solver_in,digits=13 if conic=="daqp" else 15,
+                           **aux_options["codegen"])
 
   def test_general_nonconvex_dense(self):
     self.message("Non convex dense QP with solvers: " + str([conic for conic,options,aux_options in conics]))

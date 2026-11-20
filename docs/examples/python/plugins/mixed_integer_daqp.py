@@ -26,12 +26,19 @@ blower = -20 * rng.random((m, 1))
 # Using casadi qpsol
 solver = ca.qpsol('solver', 'daqp',
                   {'f': 0.5*x.T@H@x + f.T @ x, 'x': x, "g": A@x},
-                  {'discrete': [1] * ms + [0] * (n-ms)}
+                  {'discrete': [1] * ms + [0] * (n-ms), 'warm_start': True}
                   )
 daqp_sol = solver(lbx=[0] * ms + [-10] * (n-ms), ubx=[1] * ms + [10] * (n-ms),
              lbg=blower, ubg=bupper)
 print(f"Optimal solution: {daqp_sol['x'].full().squeeze()}")
 print(f"Optimal objective: {float(daqp_sol['f'])}")
+
+# Retain the DAQP workspace between calls and supply an explicit incumbent.
+# Reuse a feasible integer solution as the incumbent for the next solve.
+warm_sol = solver(lbx=[0] * ms + [-10] * (n-ms),
+                  ubx=[1] * ms + [10] * (n-ms),
+                  lbg=blower, ubg=bupper, x0=daqp_sol['x'])
+assert np.allclose(float(warm_sol['f']), float(daqp_sol['f']))
 
 # Using casadi conic
 # solver = ca.conic('solver', 'daqp',
