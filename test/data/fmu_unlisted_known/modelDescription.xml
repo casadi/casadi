@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- der(a) = 2*b, der(b) = 3*a + 5*b + u; the dependencies do not list time -->
+<fmiModelDescription fmiVersion="3.0" modelName="unlisted_known"
+  instantiationToken="{5b0e4c3a-6f1d-4f7e-9a51-2d0c6e9b7a11}" generationTool="handwritten">
+  <ModelExchange modelIdentifier="unlisted_known" providesDirectionalDerivatives="true"
+    providesAdjointDerivatives="true"/>
+  <ModelVariables>
+    <Float64 name="time" valueReference="0" causality="independent" variability="continuous"/>
+    <Float64 name="a" valueReference="1" causality="local" variability="continuous" initial="exact" start="1"/>
+    <Float64 name="b" valueReference="2" causality="local" variability="continuous" initial="exact" start="1"/>
+    <Float64 name="der(a)" valueReference="3" causality="local" variability="continuous" derivative="1"/>
+    <Float64 name="der(b)" valueReference="4" causality="local" variability="continuous" derivative="2"/>
+    <Float64 name="u" valueReference="5" causality="input" variability="continuous" start="0"/>
+  </ModelVariables>
+  <ModelStructure>
+    <ContinuousStateDerivative valueReference="3" dependencies="2" dependenciesKind="dependent"/>
+    <ContinuousStateDerivative valueReference="4" dependencies="1 2 5" dependenciesKind="dependent dependent dependent"/>
+  </ModelStructure>
+</fmiModelDescription>

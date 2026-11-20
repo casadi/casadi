@@ -860,6 +860,19 @@ std::string FmuInternal::desc_in(FmuMemory* m, size_t id, bool more) const {
   }
 }
 
+bool FmuInternal::is_dependency(FmuMemory* m, size_t id_in) const {
+  // FMI 3.0 allows a known in a directional or adjoint derivative only if the dependencies
+  // list it, and the partial derivatives with respect to a known that is not listed are zero
+  const casadi_int* colind = jac_sp_.colind();
+  const casadi_int* row = jac_sp_.row();
+  for (casadi_int k = colind[id_in]; k < colind[id_in + 1]; ++k) {
+    if (std::binary_search(m->id_out_.begin(), m->id_out_.end(), static_cast<size_t>(row[k]))) {
+      return true;
+    }
+  }
+  return false;
+}
+
 int FmuInternal::eval_fwd(FmuMemory* m, bool independent_seeds) const {
   // Gather input and output indices
   gather_fwd(m);
@@ -888,15 +901,30 @@ int FmuInternal::eval_adj(FmuMemory* m) const {
     std::fill(m->d_in_.begin(), m->d_in_.end(), 0);
     flag = 0;
   } else {
-    // Evaluate adjoint derivatives
-    m->n_get_adjoint++;
-    auto start = std::chrono::high_resolution_clock::now();
-    flag = get_adjoint_derivative(m->instance,
-      get_ptr(m->vr_out_), m->id_out_.size(), get_ptr(m->vr_in_), m->id_in_.size(),
-      get_ptr(m->d_out_), m->id_out_.size(), get_ptr(m->d_in_), m->id_in_.size());
-    auto stop = std::chrono::high_resolution_clock::now();
-    m->t_get_adjoint += std::chrono::duration_cast<std::chrono::microseconds>(
-      stop - start).count() / 1e6;
+    // Only the knowns that an unknown depends on, the others have zero sensitivities
+    std::vector<unsigned int> vr_in;
+    std::vector<size_t> ind;
+    for (size_t k = 0; k < m->id_in_.size(); ++k) {
+      if (is_dependency(m, m->id_in_[k])) {
+        vr_in.push_back(m->vr_in_[k]);
+        ind.push_back(k);
+      }
+    }
+    std::fill(m->d_in_.begin(), m->d_in_.end(), 0);
+    flag = 0;
+    if (!vr_in.empty()) {
+      // Evaluate adjoint derivatives
+      std::vector<double> d_in(vr_in.size());
+      m->n_get_adjoint++;
+      auto start = std::chrono::high_resolution_clock::now();
+      flag = get_adjoint_derivative(m->instance,
+        get_ptr(m->vr_out_), m->id_out_.size(), get_ptr(vr_in), vr_in.size(),
+        get_ptr(m->d_out_), m->id_out_.size(), get_ptr(d_in), d_in.size());
+      auto stop = std::chrono::high_resolution_clock::now();
+      m->t_get_adjoint += std::chrono::duration_cast<std::chrono::microseconds>(
+        stop - start).count() / 1e6;
+      for (size_t k = 0; k < ind.size(); ++k) m->d_in_[ind[k]] = d_in[k];
+    }
   }
   // Collect requested variables
   if (!flag) {
@@ -925,12 +953,26 @@ int FmuInternal::eval_ad(FmuMemory* m) const {
     casadi_warning("FMU evaluation failed");
     return 1;
   }
+  // Only the knowns that an unknown depends on
+  std::vector<unsigned int> vr_in;
+  std::vector<double> d_in;
+  for (size_t k = 0; k < n_known; ++k) {
+    if (is_dependency(m, m->id_in_[k])) {
+      vr_in.push_back(m->vr_in_[k]);
+      d_in.push_back(m->d_in_[k]);
+    }
+  }
+  if (vr_in.empty()) {
+    std::fill(m->d_out_.begin(), m->d_out_.end(), 0);
+    for (size_t id : m->id_out_) m->osens_[id] = 0;
+    return 0;
+  }
   // Evaluate directional derivatives
   m->n_get_directional++;
   auto start = std::chrono::high_resolution_clock::now();
   int flag = get_directional_derivative(m->instance,
-    get_ptr(m->vr_out_), n_unknown, get_ptr(m->vr_in_), n_known,
-    get_ptr(m->d_in_), n_known, get_ptr(m->d_out_), n_unknown);
+    get_ptr(m->vr_out_), n_unknown, get_ptr(vr_in), vr_in.size(),
+    get_ptr(d_in), d_in.size(), get_ptr(m->d_out_), n_unknown);
   auto stop = std::chrono::high_resolution_clock::now();
   m->t_get_directional += std::chrono::duration_cast<std::chrono::microseconds>(
     stop - start).count() / 1e6;
