@@ -64,10 +64,10 @@ namespace casadi {
         "const proxqp options."}},
       {"warm_start_primal",
        {OT_BOOL,
-        "Use x input to warmstart [Default: true]."}},
+        "Use x0 input to warmstart [Default: true]."}},
       {"warm_start_dual",
        {OT_BOOL,
-        "Use y and z input to warmstart [Default: true]."}}
+        "Use lam_a0 and lam_x0 inputs to warmstart [Default: true]."}}
      }
   };
 
@@ -319,6 +319,30 @@ namespace casadi {
     } else {
       m->lb_vector << m->lbx_vector;
     }
+
+    // Map CasADi's initial guesses to ProxQP's primal and split dual variables.
+    Eigen::VectorXd x0, y0, z0;
+    proxsuite::optional<Eigen::Ref<const Eigen::VectorXd>> x_init, y_init, z_init;
+    if (warm_start_primal_) {
+      x0.resize(nx_);
+      casadi_copy(arg[CONIC_X0], nx_, x0.data());
+      x_init.emplace(x0);
+    }
+    if (warm_start_dual_) {
+      y0.resize(n_eq);
+      z0.resize(n_ineq);
+      for (casadi_int k=0; k<na_; ++k) {
+        double lam_a0 = arg[CONIC_LAM_A0] ? arg[CONIC_LAM_A0][k] : 0.;
+        if (lhs_equals_rhs_constraint[k]) {
+          y0[k - number_of_prev_inequality[k]] = lam_a0;
+        } else {
+          z0[k - number_of_prev_equality[k]] = lam_a0;
+        }
+      }
+      casadi_copy(arg[CONIC_LAM_X0], nx_, z0.tail(nx_).data());
+      y_init.emplace(y0);
+      z_init.emplace(z0);
+    }
     m->fstats.at("preprocessing").toc();
 
     // Solve Problem
@@ -331,7 +355,7 @@ namespace casadi {
                             C_spa, m->lb_vector, m->ub_vector);
       m->sparse_solver.settings = settings_;
 
-      m->sparse_solver.solve();
+      m->sparse_solver.solve(x_init, y_init, z_init);
 
       m->results_x = std::make_unique<Eigen::VectorXd>(m->sparse_solver.results.x);
       m->results_y = std::make_unique<Eigen::VectorXd>(m->sparse_solver.results.y);
@@ -345,7 +369,7 @@ namespace casadi {
         Eigen::MatrixXd(C_spa), m->lb_vector, m->ub_vector);
       m->dense_solver.settings = settings_;
 
-      m->dense_solver.solve();
+      m->dense_solver.solve(x_init, y_init, z_init);
 
       m->results_x = std::make_unique<Eigen::VectorXd>(m->dense_solver.results.x);
       m->results_y = std::make_unique<Eigen::VectorXd>(m->dense_solver.results.y);
