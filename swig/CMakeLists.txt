@@ -52,6 +52,9 @@ if(WITH_DEPRECATED_FEATURES)
   set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-DWITH_DEPRECATED_FEATURES")
 endif()
 
+# Per-target parts of casadi.i
+file(GLOB CASADI_SWIG_TARGET_FILES ${CMAKE_CURRENT_SOURCE_DIR}/*/casadi_*_*.i)
+
 if(WITH_PYTHON)
    add_subdirectory(python)
 endif()
@@ -73,6 +76,11 @@ if(WITH_WASM_JS)
 endif()
 
 install(FILES casadi.i DESTINATION ${INCLUDE_PREFIX}/casadi)
+foreach(f ${CASADI_SWIG_TARGET_FILES})
+  get_filename_component(d ${f} DIRECTORY)
+  get_filename_component(d ${d} NAME)
+  install(FILES ${f} DESTINATION ${INCLUDE_PREFIX}/casadi/${d})
+endforeach()
 install(FILES doc.i DESTINATION ${INCLUDE_PREFIX}/casadi)
 install(FILES doc_merged.i DESTINATION ${INCLUDE_PREFIX}/casadi)
 install(FILES python/casadi_numpy.hpp DESTINATION ${INCLUDE_PREFIX}/casadi)

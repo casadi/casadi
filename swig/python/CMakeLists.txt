@@ -212,6 +212,7 @@ else()
   # Generate SWIG wrapper
   set_source_files_properties(../casadi.i  PROPERTIES  CPLUSPLUS ON)
   swig_module_initialize(casadi python)
+  set(SWIG_MODULE_casadi_EXTRA_DEPS ${CASADI_SWIG_TARGET_FILES})
   swig_add_source_to_module(casadi FALSE PYTHON_FILE ../casadi.i)
   get_directory_property(swig_extra_clean_files ADDITIONAL_MAKE_CLEAN_FILES)
   set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${PYTHON_FILE}")

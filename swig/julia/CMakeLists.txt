@@ -43,7 +43,7 @@ if(NOT SWIG_IMPORT)
             -I${PROJECT_SOURCE_DIR}
             -I${PROJECT_SOURCE_DIR}/swig
             -o ${_swig_cpp} ${_iface}
-    DEPENDS ${_iface}
+    DEPENDS ${_iface} ${CASADI_SWIG_TARGET_FILES}
     COMMENT "swig -julia -> casadiJULIA_wrap.cxx + casadi.jl"
     VERBATIM
   )

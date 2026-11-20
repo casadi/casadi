@@ -69,7 +69,7 @@ else()
     COMMAND ${CMAKE_COMMAND} -E env sed -i -E
             "s/(load_plugin\\(name: string\\)): void;/\\1: Promise<void>;/"
             ${_swig_dts}
-    DEPENDS ${_iface} ${CMAKE_CURRENT_SOURCE_DIR}/load_plugins.js
+    DEPENDS ${_iface} ${CASADI_SWIG_TARGET_FILES} ${CMAKE_CURRENT_SOURCE_DIR}/load_plugins.js
     COMMENT "swig -wasm-js -stubs -> casadi.cpp + casadi.js + casadi.d.ts + exports"
     VERBATIM
   )
