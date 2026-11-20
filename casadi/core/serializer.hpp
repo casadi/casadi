@@ -231,6 +231,23 @@ namespace casadi {
      * \enddoctest
      * \endlang
      *
+     * \lang{java}
+     * \doctest
+     * jshell> SX x = SX.sym("x");
+     * jshell> StringSerializer s = new StringSerializer();
+     * jshell> s.pack(x)
+     * jshell> s.pack(ca.sin(x))
+     * jshell> String data = s.encode();
+     * jshell> StringDeserializer s = new StringDeserializer(data);
+     * jshell> Object a = s.unpack();
+     * jshell> Object b = s.unpack();
+     * jshell> a
+     * x
+     * jshell> b
+     * sin(x)
+     * \enddoctest
+     * \endlang
+     *
      * Note:
      *  Saving SX/MX objects individually has a substantial overhead
      *  (both time and length of encoded string).

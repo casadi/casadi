@@ -79,6 +79,10 @@ if(WITH_WASM_JS)
    add_subdirectory(wasm-js)
 endif()
 
+if(WITH_JAVA)
+   add_subdirectory(java)
+endif()
+
 install(FILES casadi.i DESTINATION ${INCLUDE_PREFIX}/casadi)
 foreach(f ${CASADI_SWIG_TARGET_FILES})
   get_filename_component(d ${f} DIRECTORY)

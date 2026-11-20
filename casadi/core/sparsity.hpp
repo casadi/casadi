@@ -188,6 +188,40 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> Sparsity sp = Sparsity.triplet(3, 4, new long[] {0, 2, 1, 0}, new long[] {0, 0, 2, 3});
+      jshell> new DM(sp, 1)
+      [[1, 00, 00, 1],
+       [00, 00, 1, 00],
+       [1, 00, 00, 00]]
+      jshell> sp
+      3x4,4nz
+      jshell> sp.size1()
+      3
+      jshell> sp.size2()
+      4
+      jshell> sp.nnz()
+      4
+      jshell> sp.numel()
+      12
+      jshell> sp.colind()
+      long[5] { 0, 2, 2, 3, 4 }
+      jshell> sp.row()
+      long[4] { 0, 2, 1, 0 }
+      jshell> sp.is_equal(Sparsity.triplet(3, 4, new long[] {0, 2, 1, 0}, new long[] {0, 0, 2, 3}))
+      true
+      jshell> SX.sym("x", sp)
+      [[x_0, 00, 00, x_3],
+       [00, 00, x_2, 00],
+       [x_1, 00, 00, 00]]
+      jshell> Sparsity.dense(0, 3)
+      0x3
+      jshell> new Sparsity().is_null()
+      true
+      \enddoctest
+      \endlang
+
    * \see Matrix
    *
    * \author Joel Andersson
@@ -244,6 +278,18 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> Sparsity sp = new Sparsity();
+        jshell> sp.is_null()
+        true
+        jshell> sp
+        NULL
+        jshell> sp.nnz()
+        |  Exception org.casadi.CasadiException: ...Assertion "!is_null()" failed...
+        \enddoctest
+        \endlang
+
         \identifier{2nj} */
     explicit Sparsity(casadi_int dummy=0);
 
@@ -294,6 +340,25 @@ namespace casadi {
         DM(
         [[00, 00],
          [00, 00]])
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> Sparsity sp = new Sparsity(2, 3);
+        jshell> sp
+        2x3,0nz
+        jshell> sp.nnz()
+        0
+        jshell> sp.is_dense()
+        false
+        jshell> new Sparsity(0, 0)
+        0x0
+        jshell> new Sparsity(0, 0).is_dense()
+        true
+        jshell> new DM(new Sparsity(2, 2), 1)
+        [[00, 00],
+         [00, 00]]
         \enddoctest
         \endlang
 
@@ -373,6 +438,22 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> Sparsity sp = new Sparsity(3, 2, new long[] {0, 2, 3}, new long[] {0, 2, 1});
+        jshell> new DM(sp, 1)
+        [[1, 00],
+         [00, 1],
+         [1, 00]]
+        jshell> new Sparsity(2, 2, new long[] {0, 2, 4}, new long[] {0, 1, 0, 1}).is_dense()
+        true
+        jshell> new Sparsity(3, 2, new long[] {0, 2, 3}, new long[] {2, 0, 1})
+        |  Exception org.casadi.CasadiException: ...not strictly monotonically increasing...
+        jshell> new Sparsity(3, 2, new long[] {0, 2, 3}, new long[] {2, 0, 1}, true).row()
+        long[3] { 0, 2, 1 }
+        \enddoctest
+        \endlang
+
         \sa compressed, triplet, get_ccs
 
         \identifier{2nk} */
@@ -447,6 +528,21 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> Sparsity.scalar()
+        1x1
+        jshell> Sparsity.scalar().nnz()
+        1
+        jshell> Sparsity.scalar(false)
+        1x1,0nz
+        jshell> Sparsity.scalar(false).nnz()
+        0
+        jshell> Sparsity.scalar().is_equal(Sparsity.dense(1, 1))
+        true
+        \enddoctest
+        \endlang
+
         \sa dense, is_scalar
 
         \identifier{bd} */
@@ -513,6 +609,30 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> Sparsity sp = Sparsity.dense(2, 3);
+        jshell> sp
+        2x3
+        jshell> sp.nnz()
+        6
+        jshell> sp.is_dense()
+        true
+        jshell> sp.colind()
+        long[4] { 0, 2, 4, 6 }
+        jshell> sp.row()
+        long[6] { 0, 1, 0, 1, 0, 1 }
+        jshell> Sparsity.dense(3)
+        3x1
+        jshell> Sparsity.dense(new long[] {2, 3})
+        2x3
+        jshell> Sparsity.dense(0, 3).nnz()
+        0
+        jshell> Sparsity.dense(0, 3).is_dense()
+        true
+        \enddoctest
+        \endlang
+
         \sa Sparsity(nrow, ncol), scalar, is_dense
 
         \identifier{be} */
@@ -553,6 +673,15 @@ namespace casadi {
         julia> ca.row(ca.Sparsity.unit(4, 1))
         1-element Vector{Int64}:
          1
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> new DM(Sparsity.unit(4, 1), 1)
+        [00, 1, 00, 00]
+        jshell> Sparsity.unit(4, 1).row()
+        long[1] { 1 }
         \enddoctest
         \endlang
 
@@ -606,6 +735,19 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> new DM(Sparsity.upper(3), 1)
+        [[1, 1, 1],
+         [00, 1, 1],
+         [00, 00, 1]]
+        jshell> Sparsity.upper(3).nnz()
+        6
+        jshell> Sparsity.upper(3).is_triu()
+        true
+        \enddoctest
+        \endlang
+
         \sa lower, triu, is_triu
 
         \identifier{bg} */
@@ -655,6 +797,18 @@ namespace casadi {
         SX(
         [[x_0, 00],
          [x_1, x_2]])
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> new DM(Sparsity.lower(3), 1)
+        [[1, 00, 00],
+         [1, 1, 00],
+         [1, 1, 1]]
+        jshell> SX.sym("x", Sparsity.lower(2))
+        [[x_0, 00],
+         [x_1, x_2]]
         \enddoctest
         \endlang
 
@@ -713,6 +867,22 @@ namespace casadi {
          [00, 1, 00, 00]])
         julia> ca.nnz(ca.Sparsity.diag(4, 2)), ca.nnz(ca.Sparsity.diag(0))
         (2, 0)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> new DM(Sparsity.diag(3), 1)
+        [[1, 00, 00],
+         [00, 1, 00],
+         [00, 00, 1]]
+        jshell> new DM(Sparsity.diag(2, 4), 1)
+        [[1, 00, 00, 00],
+         [00, 1, 00, 00]]
+        jshell> Sparsity.diag(new long[] {4, 2}).nnz()
+        2
+        jshell> Sparsity.diag(0).nnz()
+        0
         \enddoctest
         \endlang
 
@@ -791,6 +961,23 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> new DM(Sparsity.band(4, 1), 1)
+        [[00, 00, 00, 00],
+         [1, 00, 00, 00],
+         [00, 1, 00, 00],
+         [00, 00, 1, 00]]
+        jshell> new DM(Sparsity.band(4, -2), 1)
+        [[00, 00, 1, 00],
+         [00, 00, 00, 1],
+         [00, 00, 00, 00],
+         [00, 00, 00, 00]]
+        jshell> Sparsity.band(4, 0).is_equal(Sparsity.diag(4))
+        true
+        \enddoctest
+        \endlang
+
         \sa banded, diag
 
         \identifier{bj} */
@@ -843,6 +1030,20 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> new DM(Sparsity.banded(4, 1), 1)
+        [[1, 1, 00, 00],
+         [1, 1, 1, 00],
+         [00, 1, 1, 1],
+         [00, 00, 1, 1]]
+        jshell> Sparsity.banded(4, 1).bw_upper()
+        1
+        jshell> Sparsity.banded(4, 1).bw_lower()
+        1
+        \enddoctest
+        \endlang
+
         \sa band, bw_upper, bw_lower
 
         \identifier{bk} */
@@ -889,6 +1090,17 @@ namespace casadi {
          [00, 00, 00, 00],
          [00, 1, 1, 00]])
         julia> ca.nnz(ca.Sparsity.rowcol([], [1], 3, 4))
+        0
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> new DM(Sparsity.rowcol(new long[] {0, 2}, new long[] {1, 2}, 3, 4), 1)
+        [[00, 1, 1, 00],
+         [00, 00, 00, 00],
+         [00, 1, 1, 00]]
+        jshell> Sparsity.rowcol(new long[] {}, new long[] {1}, 3, 4).nnz()
         0
         \enddoctest
         \endlang
@@ -986,6 +1198,25 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> new DM(Sparsity.triplet(3, 3, new long[] {0, 2, 1}, new long[] {0, 0, 2}), 1)
+        [[1, 00, 00],
+         [00, 00, 1],
+         [1, 00, 00]]
+        jshell> Sparsity.triplet(2, 2, new long[] {0, 0, 1}, new long[] {0, 0, 1}).nnz()
+        2
+        jshell> List<Object> r = Sparsity.triplet(3, 3, new long[] {2, 0, 1}, new long[] {1, 0, 0}, false);
+        jshell> (long[]) r.get(1)
+        long[3] { 1, 2, 0 }
+        jshell> r = Sparsity.triplet(3, 3, new long[] {2, 0, 1}, new long[] {1, 0, 0}, true);
+        jshell> (long[]) r.get(1)
+        long[3] { 2, 0, 1 }
+        jshell> Sparsity.triplet(2, 2, new long[] {0, 2}, new long[] {0, 0})
+        |  Exception org.casadi.CasadiException: ...out of bounds...
+        \enddoctest
+        \endlang
+
         \sa get_triplet, rowcol, nonzeros, Sparsity(nrow, ncol, colind, row)
 
         \identifier{bm} */
@@ -1051,6 +1282,20 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> new DM(Sparsity.nonzeros(3, 2, new long[] {0, 4}), 1)
+        [[1, 00],
+         [00, 1],
+         [00, 00]]
+        jshell> Sparsity sp = Sparsity.banded(3, 1);
+        jshell> Sparsity.nonzeros(3, 3, sp.find()).is_equal(sp)
+        true
+        jshell> Sparsity.nonzeros(3, 2, new long[] {1, 5}, true).is_equal(Sparsity.nonzeros(3, 2, new long[] {0, 4}))
+        true
+        \enddoctest
+        \endlang
+
         \sa find, triplet
 
         \identifier{23g} */
@@ -1109,6 +1354,20 @@ namespace casadi {
         true
         julia> ca.Sparsity.compressed([2, 2, 0, 2, 4])
         Sparsity(2x2)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> Sparsity sp = Sparsity.compressed(new long[] {3, 2, 0, 1, 2, 0, 2});
+        jshell> new DM(sp, 1)
+        [[1, 00],
+         [00, 00],
+         [00, 1]]
+        jshell> Sparsity.compressed(sp.compress()).is_equal(sp)
+        true
+        jshell> Sparsity.compressed(new long[] {2, 2, 0, 2, 4})
+        2x2
         \enddoctest
         \endlang
 
@@ -1194,6 +1453,24 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> Sparsity P = Sparsity.permutation(new long[] {2, 0, 1});
+        jshell> new DM(P, 1)
+        [[00, 00, 1],
+         [1, 00, 00],
+         [00, 1, 00]]
+        jshell> ca.mtimes(new DM(P, 1), new DM(new double[] {10, 20, 30}))
+        [30, 10, 20]
+        jshell> ca.mtimes(new DM(Sparsity.permutation(new long[] {2, 0, 1}, true), 1), new DM(new double[] {10, 20, 30}))
+        [20, 30, 10]
+        jshell> Sparsity.permutation(new long[] {2, 0, 1}, true).is_equal(P.T())
+        true
+        jshell> Sparsity.permutation(new long[] {0, 0, 1})
+        |  Exception org.casadi.CasadiException: ...not a permutation...
+        \enddoctest
+        \endlang
+
         \sa permutation_vector, is_permutation, pmult
 
         \identifier{244} */
@@ -1247,6 +1524,17 @@ namespace casadi {
                    println("not a permutation matrix")
                end
         not a permutation matrix
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> Sparsity.permutation(new long[] {2, 0, 1}).permutation_vector()
+        long[3] { 2, 0, 1 }
+        jshell> Sparsity.permutation(new long[] {2, 0, 1}).permutation_vector(true)
+        long[3] { 1, 2, 0 }
+        jshell> Sparsity.dense(2, 2).permutation_vector()
+        |  Exception org.casadi.CasadiException: ...non-permutation matrix...
         \enddoctest
         \endlang
 
@@ -1309,6 +1597,28 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> List<Object> r = Sparsity.banded(3, 1).get_diag();
+        jshell> r.get(0)
+        3x1
+        jshell> (long[]) r.get(1)
+        long[3] { 0, 3, 6 }
+        jshell> r = Sparsity.unit(3, 1).get_diag();
+        jshell> new DM((Sparsity) r.get(0), 1)
+        [[00, 00, 00],
+         [00, 1, 00],
+         [00, 00, 00]]
+        jshell> (long[]) r.get(1)
+        long[1] { 0 }
+        jshell> r = new Sparsity(2, 3).get_diag();
+        jshell> r.get(0)
+        2x1,0nz
+        jshell> (long[]) r.get(1)
+        long[0] {  }
+        \enddoctest
+        \endlang
+
         \sa diag, nnz_diag
 
         \identifier{2nm} */
@@ -1357,6 +1667,19 @@ namespace casadi {
         [2, 2, 1]
         julia> println(ca.compress(ca.Sparsity(0, 2)))
         [0, 2, 0, 0, 0]
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> Sparsity.diag(2).compress()
+        long[7] { 2, 2, 0, 1, 2, 0, 1 }
+        jshell> Sparsity.dense(2, 2).compress()
+        long[9] { 2, 2, 0, 2, 4, 0, 1, 0, 1 }
+        jshell> Sparsity.dense(2, 2).compress(false)
+        long[3] { 2, 2, 1 }
+        jshell> new Sparsity(0, 2).compress()
+        long[5] { 0, 2, 0, 0, 0 }
         \enddoctest
         \endlang
 
@@ -1424,6 +1747,22 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> Sparsity a = Sparsity.diag(2);
+        jshell> a.is_equal(Sparsity.diag(2))
+        true
+        jshell> !a.is_equal(Sparsity.dense(2, 2))
+        true
+        jshell> a.is_equal(2, 2, new long[] {0, 1, 2}, new long[] {0, 1})
+        true
+        jshell> Sparsity.dense(2, 2).is_equal(Sparsity.dense(2, 3))
+        false
+        jshell> new Sparsity(2, 2).is_equal(Sparsity.dense(2, 2))
+        false
+        \enddoctest
+        \endlang
+
         \sa is_subset, is_transpose, is_reshape, hash
 
         \identifier{2no} */
@@ -1476,6 +1815,18 @@ namespace casadi {
         julia> ca.is_stacked(sp, ca.Sparsity.diag(2), 3), ca.is_stacked(sp, ca.Sparsity.diag(2), 2)
         (true, false)
         julia> ca.is_stacked(ca.Sparsity.dense(2, 6), ca.Sparsity.diag(2), 3)
+        false
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> Sparsity sp = ca.horzcat(Sparsity.diag(2), Sparsity.diag(2), Sparsity.diag(2));
+        jshell> sp.is_stacked(Sparsity.diag(2), 3)
+        true
+        jshell> sp.is_stacked(Sparsity.diag(2), 2)
+        false
+        jshell> Sparsity.dense(2, 6).is_stacked(Sparsity.diag(2), 3)
         false
         \enddoctest
         \endlang
@@ -1534,6 +1885,20 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> Sparsity sp = Sparsity.diag(2, 3);
+        jshell> sp.size1()
+        2
+        jshell> sp.rows()
+        2
+        jshell> sp.size2()
+        3
+        jshell> sp.columns()
+        3
+        \enddoctest
+        \endlang
+
         \sa size2, size, numel
 
         \identifier{2nq} */
@@ -1576,6 +1941,18 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> Sparsity sp = Sparsity.diag(2, 3);
+        jshell> sp.numel()
+        6
+        jshell> sp.nnz()
+        2
+        jshell> new Sparsity(0, 3).numel()
+        0
+        \enddoctest
+        \endlang
+
         \sa nnz, size
 
         \identifier{bq} */
@@ -1609,6 +1986,17 @@ namespace casadi {
         julia> ca.density(ca.Sparsity.diag(4)), ca.density(ca.Sparsity.dense(2, 2))
         (25.0, 100.0)
         julia> ca.density(ca.Sparsity(0, 3))
+        100.0
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> Sparsity.diag(4).density()
+        25.0
+        jshell> Sparsity.dense(2, 2).density()
+        100.0
+        jshell> new Sparsity(0, 3).density()
         100.0
         \enddoctest
         \endlang
@@ -1657,6 +2045,21 @@ namespace casadi {
         true
         julia> ca.is_empty(ca.Sparsity(3, 3)), ca.nnz(ca.Sparsity(3, 3))
         (false, 0)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> new Sparsity(0, 3).is_empty()
+        true
+        jshell> new Sparsity(0, 3).is_empty(true)
+        false
+        jshell> new Sparsity(0, 0).is_empty(true)
+        true
+        jshell> new Sparsity(3, 3).is_empty()
+        false
+        jshell> new Sparsity(3, 3).nnz()
+        0
         \enddoctest
         \endlang
 
@@ -1726,6 +2129,33 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> Sparsity sp = Sparsity.dense(3, 3);
+        jshell> sp.nnz_upper()
+        6
+        jshell> sp.nnz_upper(true)
+        3
+        jshell> sp.nnz_lower()
+        6
+        jshell> sp.nnz_lower(true)
+        3
+        jshell> sp.nnz_diag()
+        3
+        jshell> sp = Sparsity.dense(2, 4);
+        jshell> sp.nnz_upper()
+        7
+        jshell> sp.nnz_lower()
+        3
+        jshell> sp.nnz_diag()
+        2
+        jshell> Sparsity.lower(3).nnz_upper()
+        3
+        jshell> Sparsity.lower(3).nnz_upper(true)
+        0
+        \enddoctest
+        \endlang
+
         \sa nnz_lower, nnz_diag, get_upper, is_triu
 
         \identifier{bu} */
@@ -1784,6 +2214,23 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> Sparsity.banded(5, 2).bw_upper()
+        2
+        jshell> Sparsity.band(5, -2).bw_upper()
+        2
+        jshell> Sparsity.band(5, 2).bw_upper()
+        0
+        jshell> Sparsity.diag(3).bw_upper()
+        0
+        jshell> new Sparsity(3, 3).bw_upper()
+        0
+        jshell> Sparsity.dense(2, 5).bw_upper()
+        4
+        \enddoctest
+        \endlang
+
         \sa bw_lower, banded
 
         \identifier{bx} */
@@ -1826,6 +2273,19 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> Sparsity.banded(5, 2).bw_lower()
+        2
+        jshell> Sparsity.band(5, 2).bw_lower()
+        2
+        jshell> Sparsity.band(5, -2).bw_lower()
+        0
+        jshell> Sparsity.dense(5, 2).bw_lower()
+        4
+        \enddoctest
+        \endlang
+
         \sa bw_upper, banded
 
         \identifier{by} */
@@ -1858,6 +2318,18 @@ namespace casadi {
         julia> sp = ca.Sparsity.diag(2, 3);
         julia> ca.size(sp), ca.size(sp, 1), ca.size(sp, 2)
         ((2, 3), 2, 3)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> Sparsity sp = Sparsity.diag(2, 3);
+        jshell> sp.size()
+        long[2] { 2, 3 }
+        jshell> sp.size(1)
+        2
+        jshell> sp.size(2)
+        3
         \enddoctest
         \endlang
 
@@ -1910,6 +2382,24 @@ namespace casadi {
           "row" => [0, 1]
         julia> ca.info(ca.Sparsity())
         Dict{String, Any}()
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> Map<String, Object> info = Sparsity.diag(2, 3).info();
+        jshell> info.keySet()
+        [colind, ncol, nrow, row]
+        jshell> info.get("colind")
+        long[4] { 0, 1, 2, 2 }
+        jshell> info.get("ncol")
+        3
+        jshell> info.get("nrow")
+        2
+        jshell> info.get("row")
+        long[2] { 0, 1 }
+        jshell> new Sparsity().info()
+        {}
         \enddoctest
         \endlang
 
@@ -1992,6 +2482,27 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> import java.nio.file.*;
+        jshell> Path d = Files.createTempDirectory(null);
+        jshell> String f = d.resolve("pattern.mtx").toString();
+        jshell> Sparsity sp = Sparsity.triplet(3, 2, new long[] {0, 2, 1}, new long[] {0, 0, 1});
+        jshell> sp.to_file(f);
+        jshell> System.out.println(Files.readString(Path.of(f)))
+        %%MatrixMarket matrix coordinate pattern general
+        3 2 3
+        1 1
+        3 1
+        2 2
+        jshell> Sparsity.from_file(f).is_equal(sp)
+        true
+        jshell> Files.delete(Path.of(f)); Files.delete(d);
+        jshell> sp.to_file("pattern.txt")
+        |  Exception org.casadi.CasadiException: ...Extension 'txt' not recognised...
+        \enddoctest
+        \endlang
+
         \sa from_file, DM::to_file
 
         \identifier{2ns} */
@@ -2050,6 +2561,16 @@ namespace casadi {
         julia> typeof(s), ca.is_equal(ca.Sparsity.deserialize(s), ca.Sparsity.diag(2, 3))
         (String, true)
         julia> ca.is_null(ca.Sparsity.deserialize(ca.serialize(ca.Sparsity())))
+        true
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> String s = Sparsity.diag(2, 3).serialize();
+        jshell> Sparsity.deserialize(s).is_equal(Sparsity.diag(2, 3))
+        true
+        jshell> Sparsity.deserialize(new Sparsity().serialize()).is_null()
         true
         \enddoctest
         \endlang
@@ -2150,6 +2671,30 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> Sparsity sp = Sparsity.triplet(3, 4, new long[] {0, 2, 1, 0}, new long[] {0, 0, 2, 3});
+        jshell> new DM(sp, 1)
+        [[1, 00, 00, 1],
+         [00, 00, 1, 00],
+         [1, 00, 00, 00]]
+        jshell> sp.row()
+        long[4] { 0, 2, 1, 0 }
+        jshell> sp.colind()
+        long[5] { 0, 2, 2, 3, 4 }
+        jshell> sp.get_col()
+        long[4] { 0, 0, 2, 3 }
+        jshell> Sparsity.dense(2, 2).row()
+        long[4] { 0, 1, 0, 1 }
+        jshell> new Sparsity(2, 2).colind()
+        long[3] { 0, 0, 0 }
+        jshell> new Sparsity(0, 2).colind()
+        long[3] { 0, 0, 0 }
+        jshell> new Sparsity(2, 0).colind()
+        long[1] { 0 }
+        \enddoctest
+        \endlang
+
         \sa get_colind, get_col, get_ccs, get_triplet
 
         \identifier{c9} */
@@ -2203,6 +2748,20 @@ namespace casadi {
                    println("out of range")
                end
         out of range
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> Sparsity sp = Sparsity.triplet(3, 4, new long[] {0, 2, 1, 0}, new long[] {0, 0, 2, 3});
+        jshell> sp.row(1)
+        2
+        jshell> sp.colind(1)
+        2
+        jshell> sp.colind(4)
+        4
+        jshell> sp.row(4)
+        |  Exception org.casadi.CasadiException: ...out of range...
         \enddoctest
         \endlang
 
@@ -2283,6 +2842,20 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> Sparsity sp = Sparsity.dense(3, 3); sp.resize(2, 2); System.out.println(sp)
+        2x2
+        jshell> sp.resize(4, 4); System.out.println(new DM(sp, 1))
+        [[1, 1, 00, 00],
+         [1, 1, 00, 00],
+         [00, 00, 00, 00],
+         [00, 00, 00, 00]]
+        jshell> sp.resize(0, 2); System.out.println(sp)
+        0x2
+        \enddoctest
+        \endlang
+
         \sa enlarge, reshape
 
         \identifier{2nu} */
@@ -2345,6 +2918,26 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> Sparsity sp = new Sparsity(3, 3);
+        jshell> sp.add_nz(1, 1)
+        0
+        jshell> sp.add_nz(0, 0)
+        0
+        jshell> sp.add_nz(1, 1)
+        1
+        jshell> sp
+        3x3,2nz
+        jshell> new DM(sp, 1)
+        [[1, 00, 00],
+         [00, 1, 00],
+         [00, 00, 00]]
+        jshell> sp.add_nz(3, 0)
+        |  Exception org.casadi.CasadiException: ...out of bounds...
+        \enddoctest
+        \endlang
+
         \sa get_nz, has_nz
 
         \identifier{ce} */
@@ -2391,6 +2984,22 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> Sparsity sp = Sparsity.triplet(3, 4, new long[] {0, 2, 1, 0}, new long[] {0, 0, 2, 3});
+        jshell> sp.get_nz(0, 0)
+        0
+        jshell> sp.get_nz(2, 0)
+        1
+        jshell> sp.get_nz(1, 0)
+        -1
+        jshell> sp.get_nz(-1, 0)
+        1
+        jshell> sp.get_nz(3, 0)
+        |  Exception org.casadi.CasadiException: ...out of bounds...
+        \enddoctest
+        \endlang
+
         \sa has_nz, add_nz, find
 
         \identifier{cf} */
@@ -2421,6 +3030,16 @@ namespace casadi {
         julia> sp = ca.Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3]);
         julia> ca.has_nz(sp, 2, 0), ca.has_nz(sp, 1, 0)
         (true, false)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> Sparsity sp = Sparsity.triplet(3, 4, new long[] {0, 2, 1, 0}, new long[] {0, 0, 2, 3});
+        jshell> sp.has_nz(2, 0)
+        true
+        jshell> sp.has_nz(1, 0)
+        false
         \enddoctest
         \endlang
 
@@ -2456,6 +3075,14 @@ namespace casadi {
         julia> sp = ca.Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3]);
         julia> println(ca.get_nz(sp, [0, 2], [0, 3]))
         [0, 1, 3, -1]
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> Sparsity sp = Sparsity.triplet(3, 4, new long[] {0, 2, 1, 0}, new long[] {0, 0, 2, 3});
+        jshell> sp.get_nz(new long[] {0, 2}, new long[] {0, 3})
+        long[4] { 0, 1, 3, -1 }
         \enddoctest
         \endlang
 
@@ -2508,6 +3135,16 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> Sparsity sp = Sparsity.triplet(3, 4, new long[] {0, 2, 1, 0}, new long[] {0, 0, 2, 3});
+        jshell> sp.get_nz(new long[] {0, 2, 4, 9, 1})
+        long[5] { 0, 1, -1, 3, -1 }
+        jshell> Sparsity.dense(2, 2).get_nz(new long[] {3, 0})
+        long[2] { 3, 0 }
+        \enddoctest
+        \endlang
+
         \sa find, nonzeros
 
         \identifier{ch} */
@@ -2544,6 +3181,20 @@ namespace casadi {
         ([0, 1], [0, 2, 3])
         julia> ca.get_lower(ca.Sparsity.dense(2, 2)), ca.get_upper(ca.Sparsity.dense(2, 2))
         ([0, 1, 3], [0, 2, 3])
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> Sparsity sp = Sparsity.triplet(3, 4, new long[] {0, 2, 1, 0}, new long[] {0, 0, 2, 3});
+        jshell> sp.get_lower()
+        long[2] { 0, 1 }
+        jshell> sp.get_upper()
+        long[3] { 0, 2, 3 }
+        jshell> Sparsity.dense(2, 2).get_lower()
+        long[3] { 0, 1, 3 }
+        jshell> Sparsity.dense(2, 2).get_upper()
+        long[3] { 0, 2, 3 }
         \enddoctest
         \endlang
 
@@ -2588,6 +3239,17 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> Sparsity sp = Sparsity.triplet(3, 4, new long[] {0, 2, 1, 0}, new long[] {0, 0, 2, 3});
+        jshell> List<long[]> ccs = sp.get_ccs();
+        jshell> ccs.get(0)
+        long[5] { 0, 2, 2, 3, 4 }
+        jshell> ccs.get(1)
+        long[4] { 0, 2, 1, 0 }
+        \enddoctest
+        \endlang
+
         \sa get_crs, get_triplet, get_colind, get_row
 
         \identifier{2ny} */
@@ -2627,6 +3289,17 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> Sparsity sp = Sparsity.triplet(3, 4, new long[] {0, 2, 1, 0}, new long[] {0, 0, 2, 3});
+        jshell> List<long[]> crs = sp.get_crs();
+        jshell> crs.get(0)
+        long[4] { 0, 2, 3, 4 }
+        jshell> crs.get(1)
+        long[4] { 0, 3, 2, 0 }
+        \enddoctest
+        \endlang
+
         \sa get_ccs, T
 
         \identifier{2nz} */
@@ -2661,6 +3334,17 @@ namespace casadi {
         julia> row, col = ca.get_triplet(sp);
         julia> row, col
         ([0, 2, 1, 0], [0, 0, 2, 3])
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> Sparsity sp = Sparsity.triplet(3, 4, new long[] {0, 2, 1, 0}, new long[] {0, 0, 2, 3});
+        jshell> List<long[]> triplet = sp.get_triplet();
+        jshell> triplet.get(0)
+        long[4] { 0, 2, 1, 0 }
+        jshell> triplet.get(1)
+        long[4] { 0, 0, 2, 3 }
         \enddoctest
         \endlang
 
@@ -2739,6 +3423,30 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> Sparsity sp = Sparsity.triplet(3, 4, new long[] {0, 2, 1, 0}, new long[] {0, 0, 2, 3});
+        jshell> List<Object> r = sp.sub(new long[] {0, 2}, new long[] {0, 3});
+        jshell> new DM((Sparsity) r.get(0), 1)
+        [[1, 1],
+         [1, 00]]
+        jshell> (long[]) r.get(1)
+        long[3] { 0, 1, 3 }
+        jshell> r = sp.sub(new long[] {-1}, new long[] {0});
+        jshell> r.get(0)
+        1x1
+        jshell> (long[]) r.get(1)
+        long[1] { 1 }
+        jshell> r = sp.sub(new long[] {0, 0}, new long[] {0});
+        jshell> r.get(0)
+        2x1
+        jshell> (long[]) r.get(1)
+        long[2] { 0, 0 }
+        jshell> sp.sub(new long[] {3}, new long[] {0})
+        |  Exception org.casadi.CasadiException: ...Out of bounds...
+        \enddoctest
+        \endlang
+
         \sa get_nz, erase, pmult
 
         \identifier{ci} */
@@ -2809,6 +3517,25 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> Sparsity sp = Sparsity.triplet(3, 4, new long[] {0, 2, 1, 0}, new long[] {0, 0, 2, 3});
+        jshell> List<Object> r = sp.sub(new long[] {0, 2, 9}, Sparsity.dense(3, 1));
+        jshell> r.get(0)
+        3x1
+        jshell> (long[]) r.get(1)
+        long[3] { 0, 1, 3 }
+        jshell> r = sp.sub(new long[] {0, 1, 2, 3}, Sparsity.dense(2, 2));
+        jshell> new DM((Sparsity) r.get(0), 1)
+        [[1, 1],
+         [00, 00]]
+        jshell> (long[]) r.get(1)
+        long[2] { 0, 1 }
+        jshell> sp.sub(new long[] {0, 2}, Sparsity.dense(3, 1))
+        |  Exception org.casadi.CasadiException: ...Assertion "rr.size()==sp.nnz()" failed...
+        \enddoctest
+        \endlang
+
         \sa get_nz, find
 
         \identifier{cj} */
@@ -2869,6 +3596,25 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> Sparsity sp = Sparsity.triplet(3, 4, new long[] {0, 2, 1, 0}, new long[] {0, 0, 2, 3});
+        jshell> new DM(sp.T(), 1)
+        [[1, 00, 1],
+         [00, 00, 00],
+         [00, 1, 00],
+         [1, 00, 00]]
+        jshell> sp.T().colind()
+        long[4] { 0, 2, 3, 4 }
+        jshell> sp.T().row()
+        long[4] { 0, 3, 2, 0 }
+        jshell> Sparsity.dense(2, 3).T()
+        3x2
+        jshell> new Sparsity(0, 3).T()
+        3x0
+        \enddoctest
+        \endlang
+
         \sa transpose, is_transpose, get_crs
 
         \identifier{2o1} */
@@ -2905,6 +3651,17 @@ namespace casadi {
         julia> sp = ca.Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3]);
         julia> ca.transpose(sp, false)
         (4x3,4nz, [0, 3, 2, 1])
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> Sparsity sp = Sparsity.triplet(3, 4, new long[] {0, 2, 1, 0}, new long[] {0, 0, 2, 3});
+        jshell> List<Object> r = sp.transpose();
+        jshell> r.get(0)
+        4x3,4nz
+        jshell> (long[]) r.get(1)
+        long[4] { 0, 3, 2, 1 }
         \enddoctest
         \endlang
 
@@ -2949,6 +3706,17 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> Sparsity.band(3, 1).is_transpose(Sparsity.band(3, -1))
+        true
+        jshell> Sparsity.band(3, 1).is_transpose(Sparsity.band(3, 1))
+        false
+        jshell> Sparsity.dense(2, 3).is_transpose(Sparsity.dense(3, 2))
+        true
+        \enddoctest
+        \endlang
+
         \sa T, is_symmetric
 
         \identifier{2o2} */
@@ -2988,6 +3756,17 @@ namespace casadi {
         julia> ca.is_reshape(ca.Sparsity.diag(2), ca.Sparsity.nonzeros(4, 1, [0, 3]))
         true
         julia> ca.is_reshape(ca.Sparsity.diag(2), ca.Sparsity.nonzeros(4, 1, [0, 2]))
+        false
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> Sparsity.dense(2, 3).is_reshape(Sparsity.dense(6, 1))
+        true
+        jshell> Sparsity.diag(2).is_reshape(Sparsity.nonzeros(4, 1, new long[] {0, 3}))
+        true
+        jshell> Sparsity.diag(2).is_reshape(Sparsity.nonzeros(4, 1, new long[] {0, 2}))
         false
         \enddoctest
         \endlang
@@ -3037,6 +3816,25 @@ namespace casadi {
         (true, [0, 2], [0, 2])
         julia> ca.is_compactible(ca.Sparsity.diag(3))
         (false, [0, 1, 2], [0, 1, 2])
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> List<Object> r = Sparsity.rowcol(new long[] {0, 2}, new long[] {0, 2}, 3, 3).is_compactible();
+        jshell> r.get(0)
+        true
+        jshell> (long[]) r.get(1)
+        long[2] { 0, 2 }
+        jshell> (long[]) r.get(2)
+        long[2] { 0, 2 }
+        jshell> r = Sparsity.diag(3).is_compactible();
+        jshell> r.get(0)
+        false
+        jshell> (long[]) r.get(1)
+        long[3] { 0, 1, 2 }
+        jshell> (long[]) r.get(2)
+        long[3] { 0, 1, 2 }
         \enddoctest
         \endlang
 
@@ -3115,6 +3913,23 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> Sparsity a = Sparsity.diag(2);
+        jshell> Sparsity b = Sparsity.triplet(2, 2, new long[] {0, 1}, new long[] {1, 1});
+        jshell> a.combine(b, false, false).is_equal(a.plus(b))
+        true
+        jshell> a.combine(b, true, true).is_equal(a.times(b))
+        true
+        jshell> new DM(a.combine(b, true, false), 1)
+        [[1, 00],
+         [00, 1]]
+        jshell> new DM(a.combine(b, false, true), 1)
+        [[00, 1],
+         [00, 1]]
+        \enddoctest
+        \endlang
+
         \sa unite, intersect
 
         \identifier{cl} */
@@ -3179,6 +3994,22 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> Sparsity a = Sparsity.diag(2);
+        jshell> Sparsity b = Sparsity.triplet(2, 2, new long[] {0, 1}, new long[] {1, 1});
+        jshell> new DM(a.unite(b), 1)
+        [[1, 1],
+         [00, 1]]
+        jshell> a.plus(b).is_equal(a.unite(b))
+        true
+        jshell> a.times(b).is_equal(a.intersect(b))
+        true
+        jshell> a.plus(Sparsity.dense(3, 3))
+        |  Exception org.casadi.CasadiException: ...Dimension mismatch...
+        \enddoctest
+        \endlang
+
         \sa intersect, combine, is_subset
 
         \identifier{cm} */
@@ -3225,6 +4056,16 @@ namespace casadi {
         DM(
         [[00, 00],
          [00, 1]])
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> Sparsity a = Sparsity.diag(2);
+        jshell> Sparsity b = Sparsity.triplet(2, 2, new long[] {0, 1}, new long[] {1, 1});
+        jshell> new DM(a.intersect(b), 1)
+        [[00, 00],
+         [00, 1]]
         \enddoctest
         \endlang
 
@@ -3283,6 +4124,19 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> Sparsity.diag(3).is_subset(Sparsity.dense(3, 3))
+        true
+        jshell> Sparsity.dense(3, 3).is_subset(Sparsity.diag(3))
+        false
+        jshell> new Sparsity(3, 3).is_subset(Sparsity.diag(3))
+        true
+        jshell> Sparsity.diag(3).is_subset(Sparsity.diag(3))
+        true
+        \enddoctest
+        \endlang
+
         \sa unite, intersect, is_equal
 
         \identifier{2o4} */
@@ -3330,6 +4184,17 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> Sparsity X = Sparsity.diag(4);
+        jshell> Sparsity Y = Sparsity.dense(2, 2);
+        jshell> Sparsity x = Sparsity.nonzeros(4, 4, new long[] {0, 10, 15});
+        jshell> new DM(x.sparsity_cast_mod(X, Y), 1)
+        [[1, 1],
+         [00, 1]]
+        \enddoctest
+        \endlang
+
         \sa sparsity_cast, is_subset
 
         \identifier{246} */
@@ -3370,6 +4235,18 @@ namespace casadi {
          [1, 00]])
         julia> ca.pattern_inverse(ca.Sparsity.dense(2, 2)), ca.pattern_inverse(ca.Sparsity(2, 2))
         (2x2,0nz, 2x2)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> new DM(Sparsity.diag(2).pattern_inverse(), 1)
+        [[00, 1],
+         [1, 00]]
+        jshell> Sparsity.dense(2, 2).pattern_inverse()
+        2x2,0nz
+        jshell> new Sparsity(2, 2).pattern_inverse()
+        2x2
         \enddoctest
         \endlang
 
@@ -3532,6 +4409,20 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> Sparsity sp = Sparsity.dense(2, 2);
+        jshell> sp.enlarge(4, 3, new long[] {0, 3}, new long[] {1, 2})
+        jshell> new DM(sp, 1)
+        [[00, 1, 1],
+         [00, 00, 00],
+         [00, 00, 00],
+         [00, 1, 1]]
+        jshell> Sparsity.dense(2, 2).enlarge(4, 3, new long[] {0}, new long[] {1, 2})
+        |  Exception org.casadi.CasadiException: ...Expected 2 row indices, but got 1...
+        \enddoctest
+        \endlang
+
         \sa enlargeRows, enlargeColumns, resize, erase
 
         \identifier{cr} */
@@ -3575,6 +4466,15 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> Sparsity sp = Sparsity.dense(2, 2); sp.enlargeRows(3, new long[] {0, 2}); System.out.println(new DM(sp, 1))
+        [[1, 1],
+         [00, 00],
+         [1, 1]]
+        \enddoctest
+        \endlang
+
         \sa enlarge, enlargeColumns
 
         \identifier{cs} */
@@ -3613,6 +4513,14 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> Sparsity sp = Sparsity.dense(2, 2); sp.enlargeColumns(3, new long[] {0, 2}); System.out.println(new DM(sp, 1))
+        [[1, 00, 1],
+         [1, 00, 1]]
+        \enddoctest
+        \endlang
+
         \sa enlarge, enlargeRows
 
         \identifier{ct} */
@@ -3646,6 +4554,17 @@ namespace casadi {
         julia> sp = ca.Sparsity.triplet(3, 2, [0, 2], [0, 1]);
         julia> ca.makeDense(sp)
         (3x2, [0, 5])
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> Sparsity sp = Sparsity.triplet(3, 2, new long[] {0, 2}, new long[] {0, 1});
+        jshell> List<Object> r = sp.makeDense();
+        jshell> r.get(0)
+        3x2
+        jshell> (long[]) r.get(1)
+        long[2] { 0, 5 }
         \enddoctest
         \endlang
 
@@ -3702,6 +4621,19 @@ namespace casadi {
         [[1, 00, 1],
          [1, 1, 1],
          [1, 00, 1]])
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> Sparsity sp = Sparsity.dense(3, 3);
+        jshell> long[] mapping = sp.erase(new long[] {0, 2}, new long[] {1});
+        jshell> new DM(sp, 1)
+        [[1, 00, 1],
+         [1, 1, 1],
+         [1, 00, 1]]
+        jshell> mapping
+        long[7] { 0, 1, 2, 4, 6, 7, 8 }
         \enddoctest
         \endlang
 
@@ -3771,6 +4703,22 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> Sparsity sp = Sparsity.dense(3, 3);
+        jshell> sp.erase(new long[] {0, 4, 8})
+        long[6] { 1, 2, 3, 5, 6, 7 }
+        jshell> sp
+        3x3,6nz
+        jshell> new DM(sp, 1)
+        [[00, 1, 1],
+         [1, 00, 1],
+         [1, 1, 00]]
+        jshell> Sparsity.dense(3, 3).erase(new long[] {9})
+        |  Exception org.casadi.CasadiException: ...Out of bounds...
+        \enddoctest
+        \endlang
+
         \sa erase(rr, cc), find
 
         \identifier{cw} */
@@ -3830,6 +4778,20 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> Sparsity sp = Sparsity.dense(2, 2); sp.append(Sparsity.diag(2)); System.out.println(new DM(sp, 1))
+        [[1, 1],
+         [1, 1],
+         [1, 00],
+         [00, 1]]
+        jshell> sp = new Sparsity(0, 0); sp.append(Sparsity.diag(2)); System.out.println(sp)
+        2x2,2nz
+        jshell> Sparsity.dense(2, 2).append(Sparsity.dense(2, 3))
+        |  Exception org.casadi.CasadiException: ...The number of columns must match...
+        \enddoctest
+        \endlang
+
         \sa appendColumns, vertcat
 
         \identifier{2o6} */
@@ -3876,6 +4838,16 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> Sparsity sp = Sparsity.dense(2, 2); sp.appendColumns(Sparsity.diag(2)); System.out.println(new DM(sp, 1))
+        [[1, 1, 1, 00],
+         [1, 1, 00, 1]]
+        jshell> Sparsity.dense(2, 2).appendColumns(Sparsity.dense(3, 2))
+        |  Exception org.casadi.CasadiException: ...The number of rows must match...
+        \enddoctest
+        \endlang
+
         \sa append, horzcat
 
         \identifier{2o7} */
@@ -3910,6 +4882,19 @@ namespace casadi {
         (true, true)
         julia> ca.is_scalar(ca.Sparsity(1, 1), true), ca.is_scalar(ca.Sparsity.dense(2, 1))
         (false, false)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> Sparsity.dense(1, 1).is_scalar()
+        true
+        jshell> new Sparsity(1, 1).is_scalar()
+        true
+        jshell> new Sparsity(1, 1).is_scalar(true)
+        false
+        jshell> Sparsity.dense(2, 1).is_scalar()
+        false
         \enddoctest
         \endlang
 
@@ -3956,6 +4941,21 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> Sparsity.dense(2, 3).is_dense()
+        true
+        jshell> Sparsity.diag(3).is_dense()
+        false
+        jshell> new Sparsity(0, 3).is_dense()
+        true
+        jshell> new Sparsity(1, 1).is_dense()
+        false
+        jshell> new DM(new double[][] {{1, 0}, {0, 1}}).sparsity().is_dense()
+        true
+        \enddoctest
+        \endlang
+
         \sa dense, density, makeDense
 
         \identifier{2o9} */
@@ -3992,6 +4992,17 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> Sparsity.dense(1, 3).is_row()
+        true
+        jshell> Sparsity.dense(3, 1).is_row()
+        false
+        jshell> new Sparsity(1, 0).is_row()
+        true
+        \enddoctest
+        \endlang
+
         \sa is_column, is_vector
 
         \identifier{cx} */
@@ -4022,6 +5033,17 @@ namespace casadi {
         julia> ca.is_column(ca.Sparsity.dense(3, 1)), ca.is_column(ca.Sparsity.dense(1, 3))
         (true, false)
         julia> ca.is_column(ca.Sparsity(1, 1))
+        true
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> Sparsity.dense(3, 1).is_column()
+        true
+        jshell> Sparsity.dense(1, 3).is_column()
+        false
+        jshell> new Sparsity(1, 1).is_column()
         true
         \enddoctest
         \endlang
@@ -4064,6 +5086,21 @@ namespace casadi {
         julia> ca.is_vector(ca.Sparsity.dense(1, 1)), ca.is_vector(ca.Sparsity.dense(2, 2))
         (true, false)
         julia> ca.is_vector(ca.Sparsity(0, 3))
+        false
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> Sparsity.dense(3, 1).is_vector()
+        true
+        jshell> Sparsity.dense(1, 3).is_vector()
+        true
+        jshell> Sparsity.dense(1, 1).is_vector()
+        true
+        jshell> Sparsity.dense(2, 2).is_vector()
+        false
+        jshell> new Sparsity(0, 3).is_vector()
         false
         \enddoctest
         \endlang
@@ -4111,6 +5148,23 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> Sparsity.diag(3).is_diag()
+        true
+        jshell> Sparsity.diag(2, 3).is_diag()
+        false
+        jshell> Sparsity.dense(1, 1).is_diag()
+        true
+        jshell> new Sparsity(2, 2).is_diag()
+        false
+        jshell> new Sparsity(0, 0).is_diag()
+        true
+        jshell> Sparsity.dense(2, 2).is_diag()
+        false
+        \enddoctest
+        \endlang
+
         \sa diag, nnz_diag
 
         \identifier{247} */
@@ -4141,6 +5195,17 @@ namespace casadi {
         julia> ca.is_square(ca.Sparsity.dense(2, 2)), ca.is_square(ca.Sparsity.dense(2, 3))
         (true, false)
         julia> ca.is_square(ca.Sparsity(0, 0))
+        true
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> Sparsity.dense(2, 2).is_square()
+        true
+        jshell> Sparsity.dense(2, 3).is_square()
+        false
+        jshell> new Sparsity(0, 0).is_square()
         true
         \enddoctest
         \endlang
@@ -4177,6 +5242,19 @@ namespace casadi {
         (true, false)
         julia> ca.is_symmetric(ca.Sparsity(3, 3)), ca.is_symmetric(ca.Sparsity.dense(2, 3))
         (true, false)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> Sparsity.banded(3, 1).is_symmetric()
+        true
+        jshell> Sparsity.upper(3).is_symmetric()
+        false
+        jshell> new Sparsity(3, 3).is_symmetric()
+        true
+        jshell> Sparsity.dense(2, 3).is_symmetric()
+        false
         \enddoctest
         \endlang
 
@@ -4224,6 +5302,23 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> Sparsity.upper(3).is_triu()
+        true
+        jshell> Sparsity.upper(3).is_triu(true)
+        false
+        jshell> Sparsity.band(3, -1).is_triu(true)
+        true
+        jshell> new Sparsity(3, 3).is_triu()
+        true
+        jshell> Sparsity.dense(1, 3).is_triu()
+        true
+        jshell> Sparsity.dense(3, 1).is_triu()
+        false
+        \enddoctest
+        \endlang
+
         \sa is_tril, upper, triu, nnz_upper
 
         \identifier{24a} */
@@ -4263,6 +5358,23 @@ namespace casadi {
         (true, true)
         julia> ca.is_tril(ca.Sparsity.dense(3, 1)), ca.is_tril(ca.Sparsity.dense(1, 3))
         (true, false)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> Sparsity.lower(3).is_tril()
+        true
+        jshell> Sparsity.lower(3).is_tril(true)
+        false
+        jshell> Sparsity.band(3, 1).is_tril(true)
+        true
+        jshell> Sparsity.diag(3).is_tril()
+        true
+        jshell> Sparsity.dense(3, 1).is_tril()
+        true
+        jshell> Sparsity.dense(1, 3).is_tril()
+        false
         \enddoctest
         \endlang
 
@@ -4317,6 +5429,21 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> Sparsity.diag(3).is_singular()
+        false
+        jshell> new Sparsity(3, 3).is_singular()
+        true
+        jshell> Sparsity.nonzeros(3, 3, new long[] {0, 1, 2}).is_singular()
+        true
+        jshell> new Sparsity(0, 0).is_singular()
+        false
+        jshell> Sparsity.dense(2, 3).is_singular()
+        |  Exception org.casadi.CasadiException: ...only defined for square matrices...
+        \enddoctest
+        \endlang
+
         \sa sprank, btf
 
         \identifier{24c} */
@@ -4357,6 +5484,19 @@ namespace casadi {
         true
         julia> ca.is_permutation(ca.Sparsity.dense(2, 2)), ca.is_permutation(ca.Sparsity.diag(2, 3))
         (false, false)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> Sparsity.permutation(new long[] {1, 2, 0}).is_permutation()
+        true
+        jshell> Sparsity.diag(3).is_permutation()
+        true
+        jshell> Sparsity.dense(2, 2).is_permutation()
+        false
+        jshell> Sparsity.diag(2, 3).is_permutation()
+        false
         \enddoctest
         \endlang
 
@@ -4412,6 +5552,22 @@ namespace casadi {
         julia> ca.is_selection(ca.Sparsity.triplet(2, 3, [0], [2]), true)
         true
         julia> ca.is_selection(ca.Sparsity.diag(3, 2))
+        false
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> Sparsity S = Sparsity.triplet(2, 3, new long[] {0, 1}, new long[] {2, 0});
+        jshell> ca.mtimes(new DM(S, 1), new DM(new double[] {10, 20, 30}))
+        [30, 10]
+        jshell> S.is_selection()
+        true
+        jshell> Sparsity.triplet(2, 3, new long[] {0}, new long[] {2}).is_selection()
+        false
+        jshell> Sparsity.triplet(2, 3, new long[] {0}, new long[] {2}).is_selection(true)
+        true
+        jshell> Sparsity.diag(3, 2).is_selection()
         false
         \enddoctest
         \endlang
@@ -4475,6 +5631,23 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> Sparsity.diag(3).is_orthonormal()
+        true
+        jshell> Sparsity.triplet(3, 3, new long[] {0, 1}, new long[] {0, 1}).is_orthonormal()
+        false
+        jshell> Sparsity.triplet(3, 3, new long[] {0, 1}, new long[] {0, 1}).is_orthonormal(true)
+        true
+        jshell> Sparsity.triplet(3, 3, new long[] {0, 0}, new long[] {0, 1}).is_orthonormal(true)
+        false
+        jshell> Sparsity.diag(2, 3).is_orthonormal()
+        false
+        jshell> Sparsity.diag(2, 3).is_orthonormal(true)
+        true
+        \enddoctest
+        \endlang
+
         \sa is_orthonormal_rows, is_orthonormal_columns, is_permutation
 
         \identifier{24f} */
@@ -4515,6 +5688,20 @@ namespace casadi {
         (true, false)
         julia> ca.is_orthonormal_rows(ca.T(sp)), ca.is_orthonormal_columns(ca.T(sp))
         (false, true)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> Sparsity sp = Sparsity.diag(2, 3);
+        jshell> sp.is_orthonormal_rows()
+        true
+        jshell> sp.is_orthonormal_columns()
+        false
+        jshell> sp.T().is_orthonormal_rows()
+        false
+        jshell> sp.T().is_orthonormal_columns()
+        true
         \enddoctest
         \endlang
 
@@ -4570,6 +5757,15 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> Sparsity.banded(3, 1).rowsSequential()
+        true
+        jshell> Sparsity.dense(2, 2).rowsSequential(false)
+        true
+        \enddoctest
+        \endlang
+
         \sa removeDuplicates
 
         \identifier{d0} */
@@ -4608,6 +5804,17 @@ namespace casadi {
         julia> m = ca.removeDuplicates(sp, [0, 1, 2, 3, 4, 5, 6]);
         julia> m, sp
         ([0, 1, 2, 3, 4, 5, 6], 3x3,7nz)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> Sparsity sp = Sparsity.banded(3, 1);
+        jshell> long[] m = sp.removeDuplicates(new long[] {0, 1, 2, 3, 4, 5, 6});
+        jshell> m
+        long[7] { 0, 1, 2, 3, 4, 5, 6 }
+        jshell> sp
+        3x3,7nz
         \enddoctest
         \endlang
 
@@ -4675,6 +5882,17 @@ namespace casadi {
         ([1, 2, 3, -1], [-1, -1, -1, -1])
         julia> println(ca.etree(ca.Sparsity.dense(2, 3), true))
         [1, 2, -1]
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> Sparsity.banded(4, 1).etree()
+        long[4] { 1, 2, 3, -1 }
+        jshell> Sparsity.diag(4).etree()
+        long[4] { -1, -1, -1, -1 }
+        jshell> Sparsity.dense(2, 3).etree(true)
+        long[3] { 1, 2, -1 }
         \enddoctest
         \endlang
 
@@ -4747,6 +5965,27 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> List<Object> r = Sparsity.banded(4, 1).ldl(false);
+        jshell> new DM((Sparsity) r.get(0), 1)
+        [[00, 1, 00, 00],
+         [00, 00, 1, 00],
+         [00, 00, 00, 1],
+         [00, 00, 00, 00]]
+        jshell> (long[]) r.get(1)
+        long[4] { 0, 1, 2, 3 }
+        jshell> Sparsity A = Sparsity.nonzeros(4, 4, new long[] {0, 3, 5, 10, 12, 15});
+        jshell> r = A.ldl();
+        jshell> ((Sparsity) r.get(0)).nnz()
+        1
+        jshell> (long[]) r.get(1)
+        long[4] { 1, 2, 0, 3 }
+        jshell> Sparsity.upper(3).ldl()
+        |  Exception org.casadi.CasadiException: ...requires a symmetric matrix...
+        \enddoctest
+        \endlang
+
         The implementation is a modified version of LDL
         Copyright(c) Timothy A. Davis, 2005-2013
         Licensed as a derivative work under the GNU LGPL
@@ -4807,6 +6046,29 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> List<Object> r = Sparsity.dense(3, 2).qr_sparse();
+        jshell> r.get(0)
+        3x2,5nz
+        jshell> r.get(1)
+        3x2,3nz
+        jshell> (long[]) r.get(2)
+        long[3] { 0, 1, 2 }
+        jshell> (long[]) r.get(3)
+        long[2] { 0, 1 }
+        jshell> r = Sparsity.banded(4, 1).qr_sparse(false);
+        jshell> r.get(0)
+        4x4,7nz
+        jshell> r.get(1)
+        4x4,9nz
+        jshell> (long[]) r.get(2)
+        long[4] { 0, 1, 2, 3 }
+        jshell> (long[]) r.get(3)
+        long[4] { 0, 1, 2, 3 }
+        \enddoctest
+        \endlang
+
         The implementation is a modified version of CSparse
         Copyright(c) Timothy A. Davis, 2006-2009
         Licensed as a derivative work under the GNU LGPL
@@ -4857,6 +6119,20 @@ namespace casadi {
         \doctest
         julia> ca.dfs(ca.Sparsity.banded(3, 1), 0, 3, [0, 0, 0], [0, 0, 0], [], [false, false, false])
         (0, [0, 1, 2], [1, 4, 5], Bool[1, 1, 1])
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> List<Object> r = Sparsity.banded(3, 1).dfs(0, 3, new long[] {0, 0, 0}, new long[] {0, 0, 0}, new long[] {}, new boolean[3]);
+        jshell> r.get(0)
+        0
+        jshell> (long[]) r.get(1)
+        long[3] { 0, 1, 2 }
+        jshell> (long[]) r.get(2)
+        long[3] { 1, 4, 5 }
+        jshell> (boolean[]) r.get(3)
+        boolean[3] { true, true, true }
         \enddoctest
         \endlang
 
@@ -4957,6 +6233,52 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> Sparsity A = Sparsity.nonzeros(4, 4, new long[] {0, 2, 5, 7, 10, 13, 15});
+        jshell> new DM(A, 1)
+        [[1, 00, 00, 00],
+         [00, 1, 00, 1],
+         [1, 00, 1, 00],
+         [00, 1, 00, 1]]
+        jshell> List<Object> r = A.scc();
+        jshell> r.get(0)
+        3
+        jshell> long[] index = (long[]) r.get(1);
+        jshell> index
+        long[4] { 2, 0, 1, 3 }
+        jshell> (long[]) r.get(2)
+        long[4] { 0, 1, 2, 4 }
+        jshell> DM ind = new DM(Arrays.stream(index).asDoubleStream().toArray());
+        jshell> new DM(A, 1).get(ind, ind)
+        [[1, 1, 00, 00],
+         [00, 1, 00, 00],
+         [00, 00, 1, 1],
+         [00, 00, 1, 1]]
+        jshell> r = Sparsity.diag(3).scc();
+        jshell> r.get(0)
+        3
+        jshell> (long[]) r.get(1)
+        long[3] { 0, 1, 2 }
+        jshell> (long[]) r.get(2)
+        long[4] { 0, 1, 2, 3 }
+        jshell> r = Sparsity.dense(3, 3).scc();
+        jshell> r.get(0)
+        1
+        jshell> (long[]) r.get(1)
+        long[3] { 0, 1, 2 }
+        jshell> (long[]) r.get(2)
+        long[2] { 0, 3 }
+        jshell> r = new Sparsity(0, 0).scc();
+        jshell> r.get(0)
+        0
+        jshell> (long[]) r.get(1)
+        long[0] {  }
+        jshell> (long[]) r.get(2)
+        long[1] { 0 }
+        \enddoctest
+        \endlang
+
         \sa btf, dfs
 
         \identifier{d6} */
@@ -5053,6 +6375,41 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> Sparsity B = Sparsity.triplet(3, 3, new long[] {0, 0, 1, 2}, new long[] {0, 2, 1, 2});
+        jshell> new DM(B, 1)
+        [[1, 00, 1],
+         [00, 1, 00],
+         [00, 00, 1]]
+        jshell> List<Object> r = B.btf();
+        jshell> r.get(0)
+        3
+        jshell> long[] rowperm = (long[]) r.get(1), colperm = (long[]) r.get(2);
+        jshell> rowperm
+        long[3] { 2, 0, 1 }
+        jshell> colperm
+        long[3] { 2, 0, 1 }
+        jshell> (long[]) r.get(3)
+        long[4] { 0, 1, 2, 3 }
+        jshell> (long[]) r.get(4)
+        long[4] { 0, 1, 2, 3 }
+        jshell> (long[]) r.get(5)
+        long[5] { 0, 0, 0, 3, 3 }
+        jshell> (long[]) r.get(6)
+        long[5] { 0, 0, 3, 3, 3 }
+        jshell> new DM(B, 1).get(new DM(Arrays.stream(rowperm).asDoubleStream().toArray()),
+           ...>                  new DM(Arrays.stream(colperm).asDoubleStream().toArray()))
+        [[1, 00, 00],
+         [1, 1, 00],
+         [00, 00, 1]]
+        jshell> ca.sprank(Sparsity.nonzeros(3, 3, new long[] {0, 1, 2}))
+        1
+        jshell> ca.sprank(Sparsity.diag(3))
+        3
+        \enddoctest
+        \endlang
+
         \sa scc, sprank, is_singular
 
         \identifier{d7} */
@@ -5111,6 +6468,19 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> Sparsity.banded(4, 1).amd()
+        long[4] { 3, 2, 0, 1 }
+        jshell> Sparsity.dense(3, 3).amd()
+        long[3] { 0, 1, 2 }
+        jshell> new Sparsity(0, 0).amd()
+        long[0] {  }
+        jshell> Sparsity.upper(3).amd()
+        |  Exception org.casadi.CasadiException: ...requires a symmetric matrix...
+        \enddoctest
+        \endlang
+
         \sa ldl, qr_sparse, etree, is_symmetric
 
         \identifier{d8} */
@@ -5164,6 +6534,22 @@ namespace casadi {
         [0, 1, 2, 3]
         julia> ca.find(ca.Sparsity(2, 2)), ca.find(ca.Sparsity(0, 3))
         (Int64[], Int64[])
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> Sparsity sp = Sparsity.triplet(3, 4, new long[] {0, 2, 1, 0}, new long[] {0, 0, 2, 3});
+        jshell> sp.find()
+        long[4] { 0, 2, 7, 9 }
+        jshell> sp.find(true)
+        long[4] { 1, 3, 8, 10 }
+        jshell> Sparsity.dense(2, 2).find()
+        long[4] { 0, 1, 2, 3 }
+        jshell> new Sparsity(2, 2).find()
+        long[0] {  }
+        jshell> new Sparsity(0, 3).find()
+        long[0] {  }
         \enddoctest
         \endlang
 
@@ -5268,6 +6654,35 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> Sparsity A = Sparsity.triplet(3, 4, new long[] {0, 1, 2, 0}, new long[] {0, 1, 2, 3});
+        jshell> new DM(A, 1)
+        [[1, 00, 00, 1],
+         [00, 1, 00, 00],
+         [00, 00, 1, 00]]
+        jshell> Sparsity c = A.uni_coloring();
+        jshell> new DM(c, 1)
+        [[1, 00],
+         [1, 00],
+         [1, 00],
+         [00, 1]]
+        jshell> c.size2()
+        2
+        jshell> for (long j = 0; j < c.size2(); j++) {
+           ...>   System.out.println(Arrays.toString(Arrays.copyOfRange(c.row(), (int) c.colind(j), (int) c.colind(j + 1))));
+           ...> }
+        [0, 1, 2]
+        [3]
+        jshell> A.uni_coloring(new Sparsity(), 1).is_null()
+        true
+        jshell> Sparsity.dense(3, 3).uni_coloring()
+        3x3,3nz
+        jshell> Sparsity.diag(3).uni_coloring()
+        3x1
+        \enddoctest
+        \endlang
+
         \sa star_coloring, star_coloring_new
 
         \identifier{db} */
@@ -5354,6 +6769,34 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> Sparsity H = Sparsity.banded(4, 1);
+        jshell> List<Object> r = H.star_coloring_new();
+        jshell> new DM((Sparsity) r.get(0), 1)
+        [[00, 1, 00],
+         [1, 00, 00],
+         [00, 1, 00],
+         [00, 00, 1]]
+        jshell> long[] which_color = (long[]) r.get(1);
+        jshell> for (int k = 0; k < H.nnz(); k++) {
+           ...>   System.out.println(H.row()[k] + " " + H.get_col()[k] + " " + which_color[k]);
+           ...> }
+        0 0 1
+        1 0 -1
+        0 1 0
+        1 1 0
+        2 1 0
+        1 2 -1
+        2 2 1
+        3 2 1
+        2 3 -1
+        3 3 2
+        jshell> Sparsity.upper(3).star_coloring_new()
+        |  Exception org.casadi.CasadiException: ...Expected symmetric matrix...
+        \enddoctest
+        \endlang
+
         \sa star_coloring, star_coloring2, uni_coloring
 
         \identifier{2jz} */
@@ -5420,6 +6863,21 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> Sparsity H = Sparsity.banded(4, 1);
+        jshell> new DM(H.star_coloring(), 1)
+        [[00, 1, 00],
+         [1, 00, 00],
+         [00, 1, 00],
+         [00, 00, 1]]
+        jshell> Sparsity.diag(5).star_coloring()
+        5x1
+        jshell> Sparsity.dense(4, 4).star_coloring(1, 2).is_null()
+        true
+        \enddoctest
+        \endlang
+
         \sa star_coloring_new, star_coloring2, uni_coloring, largest_first
 
         \identifier{dc} */
@@ -5467,6 +6925,17 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> Sparsity H = Sparsity.banded(4, 1);
+        jshell> new DM(H.star_coloring2(), 1)
+        [[00, 1, 00],
+         [1, 00, 00],
+         [00, 1, 00],
+         [00, 00, 1]]
+        \enddoctest
+        \endlang
+
         \sa star_coloring, star_coloring_new
 
         \identifier{dd} */
@@ -5500,6 +6969,16 @@ namespace casadi {
         julia> sp = ca.Sparsity.triplet(3, 4, [0, 2, 1, 0], [0, 0, 2, 3]);
         julia> ca.largest_first(sp), ca.largest_first(ca.Sparsity.diag(3))
         ([0, 2, 3, 1], [0, 1, 2])
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> Sparsity sp = Sparsity.triplet(3, 4, new long[] {0, 2, 1, 0}, new long[] {0, 0, 2, 3});
+        jshell> sp.largest_first()
+        long[4] { 0, 2, 3, 1 }
+        jshell> Sparsity.diag(3).largest_first()
+        long[3] { 0, 1, 2 }
         \enddoctest
         \endlang
 
@@ -5600,6 +7079,30 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> Sparsity A = Sparsity.triplet(3, 3, new long[] {0, 1, 2, 0}, new long[] {1, 2, 0, 0});
+        jshell> new DM(A, 1)
+        [[1, 1, 00],
+         [00, 00, 1],
+         [1, 00, 00]]
+        jshell> long[] p = {2, 0, 1};
+        jshell> new DM(A.pmult(p), 1)
+        [[00, 1, 00],
+         [00, 00, 1],
+         [1, 00, 1]]
+        jshell> DM P = new DM(Sparsity.permutation(p), 1);
+        jshell> A.pmult(p).is_equal(ca.mtimes(ca.mtimes(P.T(), new DM(A, 1)), P).sparsity())
+        true
+        jshell> A.pmult(p, true, true, true).is_equal((Sparsity) A.sub(p, p).get(0))
+        true
+        jshell> new DM(A.pmult(p, true, false), 1)
+        [[00, 00, 1],
+         [1, 00, 00],
+         [1, 1, 00]]
+        \enddoctest
+        \endlang
+
         \sa permutation, sub
 
         \identifier{df} */
@@ -5649,6 +7152,22 @@ namespace casadi {
         ("2x2", "2x2,4nz")
         julia> sp
         Sparsity(2x3,2nz)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> Sparsity sp = Sparsity.diag(2, 3);
+        jshell> sp.dim()
+        "2x3"
+        jshell> sp.dim(true)
+        "2x3,2nz"
+        jshell> Sparsity.dense(2, 2).dim()
+        "2x2"
+        jshell> Sparsity.dense(2, 2).dim(true)
+        "2x2,4nz"
+        jshell> sp
+        2x3,2nz
         \enddoctest
         \endlang
 
@@ -5708,6 +7227,27 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> Sparsity.dense(1, 1).postfix_dim()
+        ""
+        jshell> new Sparsity(0, 0).postfix_dim()
+        "[]"
+        jshell> Sparsity.dense(5).postfix_dim()
+        "[5]"
+        jshell> Sparsity.dense(5, 10).postfix_dim()
+        "[5x10]"
+        jshell> Sparsity.diag(5, 10).postfix_dim()
+        "[5x10,5nz]"
+        jshell> new Sparsity(1, 1).postfix_dim()
+        "[1x1,0nz]"
+        jshell> Sparsity.dense(1, 5).postfix_dim()
+        "[1x5]"
+        jshell> new Sparsity(0, 3).postfix_dim()
+        "[0x3]"
+        \enddoctest
+        \endlang
+
         \sa dim
 
         \identifier{dg} */
@@ -5745,6 +7285,16 @@ namespace casadi {
         julia> ca.repr_el(sp, 1)
         "nonzero index 1 (row 2, col 0)"
         julia> ca.repr_el(ca.Sparsity.dense(2, 2), 3)
+        "(row 1, col 1)"
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> Sparsity sp = Sparsity.triplet(3, 4, new long[] {0, 2, 1, 0}, new long[] {0, 0, 2, 3});
+        jshell> sp.repr_el(1)
+        "nonzero index 1 (row 2, col 0)"
+        jshell> Sparsity.dense(2, 2).repr_el(3)
         "(row 1, col 1)"
         \enddoctest
         \endlang
@@ -5823,6 +7373,25 @@ namespace casadi {
         A = sparse(A_i, A_j, A_v, A_m, A_n);
         spy(A);
         julia> rm(d, recursive=true)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> import java.nio.file.*;
+        jshell> Path d = Files.createTempDirectory(null);
+        jshell> String f = d.resolve("show_pattern.m").toString();
+        jshell> Sparsity.diag(2, 3).spy_matlab(f);
+        jshell> System.out.println(Files.readString(Path.of(f)))
+        % This function was automatically generated by CasADi
+        A_m = 2;
+        A_n = 3;
+        A_j = [1, 2];
+        A_i = [1, 2];
+        A_v = ones(size(A_i));
+        A = sparse(A_i, A_j, A_v, A_m, A_n);
+        spy(A);
+        jshell> Files.delete(Path.of(f)); Files.delete(d);
         \enddoctest
         \endlang
 
@@ -5915,6 +7484,27 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> Sparsity.diag(2, 3).export_code("matlab")
+        sp_m = 2;
+        sp_n = 3;
+        sp_j = [1, 2];
+        sp_i = [1, 2];
+        sp_v = ones(size(sp_i));
+        sp = sparse(sp_i, sp_j, sp_v, sp_m, sp_n);
+        jshell> Map<String, Object> opts = Map.of("name", "A", "as_matrix", false, "nonzeros", List.of("1.5", "2"));
+        jshell> Sparsity.diag(2).export_code("matlab", opts)
+        A_m = 2;
+        A_n = 2;
+        A_j = [1, 2];
+        A_i = [1, 2];
+        A_v = [1.5, 2];
+        jshell> Sparsity.diag(2).export_code("python")
+        |  Exception org.casadi.CasadiException: ...Only matlab language supported...
+        \enddoctest
+        \endlang
+
         \sa spy_matlab, compress
 
         \identifier{dj} */
@@ -5955,6 +7545,16 @@ namespace casadi {
         (true, false)
         julia> sp == ca.Sparsity.diag(2, 3), hash(sp) == hash(ca.Sparsity.diag(2, 3))
         (true, true)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> Sparsity sp = Sparsity.diag(2, 3);
+        jshell> sp.hash() == Sparsity.diag(2, 3).hash()
+        true
+        jshell> sp.hash() == Sparsity.dense(2, 3).hash()
+        false
         \enddoctest
         \endlang
 
@@ -6029,6 +7629,21 @@ namespace casadi {
                    println("dimension mismatch")
                end
         dimension mismatch
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> new DM(Sparsity.kkt(Sparsity.diag(2), Sparsity.dense(1, 2)), 1)
+        [[1, 00, 1],
+         [00, 1, 1],
+         [1, 1, 1]]
+        jshell> new DM(Sparsity.kkt(new Sparsity(2, 2), Sparsity.dense(1, 2), false, false), 1)
+        [[00, 00, 1],
+         [00, 00, 1],
+         [1, 1, 00]]
+        jshell> Sparsity.kkt(Sparsity.diag(2), Sparsity.dense(1, 3))
+        |  Exception org.casadi.CasadiException: ...Dimension mismatch...
         \enddoctest
         \endlang
 

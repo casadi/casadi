@@ -98,6 +98,29 @@ namespace casadi {
    * \enddoctest
    * \endlang
    *
+   * \lang{java}
+   * \doctest
+   * jshell> double[] xgrid = {1, 2, 3, 4, 5, 6};
+   * jshell> double[] V = {-1, -1, -2, -3, 0, 2};
+   * jshell> import org.casadi.Function;
+   * jshell> Function LUT = ca.interpolant("LUT", "bspline", new double[][] {xgrid}, V);
+   * jshell> LUT.invoke(2.5)
+   * -1.35
+   * jshell> xgrid = new double[11]; for (int i = 0; i < 11; i++) xgrid[i] = i - 5;
+   * jshell> double[] ygrid = new double[9]; for (int j = 0; j < 9; j++) ygrid[j] = j - 4;
+   * jshell> V = new double[11 * 9];
+   * jshell> for (int j = 0; j < 9; j++) {
+   *    ...>   for (int i = 0; i < 11; i++) {
+   *    ...>     double R = Math.sqrt(5 * xgrid[i] * xgrid[i] + ygrid[j] * ygrid[j]) + 1;
+   *    ...>     V[i + 11 * j] = Math.sin(R) / R;
+   *    ...>   }
+   *    ...> }
+   * jshell> LUT = ca.interpolant("LUT", "bspline", new double[][] {xgrid, ygrid}, V);
+   * jshell> LUT.invoke(new DM(new double[] {0.5, 1}))
+   * 0.245507
+   * \enddoctest
+   * \endlang
+   *
    *  \generalsection{Interpolant}
    *  \pluginssection{Interpolant}
    * \author Joel Andersson

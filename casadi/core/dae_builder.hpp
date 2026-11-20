@@ -138,6 +138,27 @@ class DaeBuilderInternal;
     \enddoctest
     \endlang
 
+    \lang{java}
+    \doctest
+    jshell> DaeBuilder dae = new DaeBuilder("rocket");
+    jshell> MX a = dae.add("a", "parameter", "tunable");
+    jshell> MX u = dae.add("u", "input");
+    jshell> MX h = dae.add("h", Map.of("start", 0));
+    jshell> MX v = dae.add("v", Map.of("start", 0, "unit", "m/s"));
+    jshell> MX m = dae.add("m", Map.of("start", 1));
+    jshell> dae.eq(dae.der(h), v);
+    jshell> dae.eq(dae.der(v), u.minus(a.times(v.power(2))).div(m).minus(9.81));
+    jshell> dae.eq(dae.der(m), u.power(2).unaryMinus());
+    jshell> List.of(dae.x(), dae.u(), dae.p())
+    [[h, v, m], [u], [a]]
+    jshell> Function f = dae.create("f", List.of("x", "u", "p"), List.of("ode"));
+    jshell> f
+    f:(x[3],u,p)->(ode[3]) MXFunction
+    jshell> f.invoke(new double[] {0, 0, 1}, 1, 0.5)
+    [0, -8.81, -1]
+    \enddoctest
+    \endlang
+
     \date 2012-2021
     \author Joel Andersson
 
@@ -237,6 +258,18 @@ class CASADI_EXPORT DaeBuilder
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> DaeBuilder dae = new DaeBuilder("rocket");
+      jshell> List.of(dae.name(), dae.symbolic(), dae.all())
+      [rocket, true, []]
+      jshell> new DaeBuilder("m", "/nonexistent/path")
+      |  Exception org.casadi.CasadiException: ...
+      jshell> new DaeBuilder("m", "", Map.of("foo", true))
+      |  Exception org.casadi.CasadiException: ...No such option...
+      \enddoctest
+      \endlang
+
       \sa load_fmi_description, symbolic
 
       \identifier{2ko} */
@@ -272,6 +305,16 @@ class CASADI_EXPORT DaeBuilder
       "rocket"
       julia> ca.create(dae)
       Function(rocket_dae:(t[0],x[0],z[0],p[0],u[0])->(ode[0],alg[0],quad[0],zero[0]) MXFunction)
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> DaeBuilder dae = new DaeBuilder("rocket");
+      jshell> dae.name()
+      "rocket"
+      jshell> dae.create()
+      rocket_dae:(t[0],x[0],z[0],p[0],u[0])->(ode[0],alg[0],quad[0],zero[0]) MXFunction
       \enddoctest
       \endlang
 
@@ -344,6 +387,22 @@ class CASADI_EXPORT DaeBuilder
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> DaeBuilder dae = new DaeBuilder("m");
+      jshell> MX t = dae.add("t", "independent");
+      jshell> MX x = dae.add("x");
+      jshell> List.of(dae.time(), dae.has_t(), dae.t_new())
+      [t, true, [t]]
+      jshell> dae = new DaeBuilder("m");
+      jshell> x = dae.add("x");
+      jshell> List.of(dae.all(), dae.has_t(), dae.t_new())
+      [[time, x], false, []]
+      jshell> dae.time()
+      |  Exception org.casadi.CasadiException: ...No explicit time variable...
+      \enddoctest
+      \endlang
+
       \sa has_t, t_new
 
       \identifier{2by} */
@@ -403,6 +462,19 @@ class CASADI_EXPORT DaeBuilder
       julia> ca.eq(dae, ca.der(dae, x), -y)
       julia> ca.x(dae), ca.z(dae), ca.nx(dae)
       (["x"], ["y"], 1)
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> DaeBuilder dae = new DaeBuilder("m");
+      jshell> MX x = dae.add("x");
+      jshell> MX y = dae.add("y");
+      jshell> List.of(dae.x(), dae.z())
+      [[], [x, y]]
+      jshell> dae.eq(dae.der(x), y.unaryMinus());
+      jshell> List.of(dae.x(), dae.z(), dae.nx())
+      [[x], [y], 1]
       \enddoctest
       \endlang
 
@@ -480,6 +552,25 @@ class CASADI_EXPORT DaeBuilder
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> DaeBuilder dae = new DaeBuilder("m");
+      jshell> MX x = dae.add("x", "output");
+      jshell> MX y = dae.add("y", "output");
+      jshell> MX w = dae.add("w");
+      jshell> dae.eq(dae.der(x), w.unaryMinus());
+      jshell> dae.eq(w, x.power(2));
+      jshell> dae.eq(y, ca.times(2, x));
+      jshell> List.of(dae.y(), dae.x(), dae.w())
+      [[x, y], [x], [der(x), w, y]]
+      jshell> dae.outputs("y")
+      [x, y]
+      jshell> dae.set_causality("y", "local");
+      jshell> List.of(dae.y(), dae.ny())
+      [[x], 1]
+      \enddoctest
+      \endlang
+
       \sa set_causality, set_all, ny, outputs
 
       \identifier{2fu} */
@@ -549,6 +640,21 @@ class CASADI_EXPORT DaeBuilder
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> DaeBuilder dae = new DaeBuilder("m");
+      jshell> MX x = dae.add("x");
+      jshell> MX q = dae.add("q");
+      jshell> dae.eq(dae.der(x), x.unaryMinus());
+      jshell> dae.eq(dae.der(q), x.power(2));
+      jshell> List.of(dae.x(), dae.q())
+      [[x, q], []]
+      jshell> dae.set_category("q", "q");
+      jshell> List.of(dae.x(), dae.q(), dae.outputs("quad"))
+      [[x], [q], [sq(x)]]
+      \enddoctest
+      \endlang
+
       \sa set_category, x, nq
 
       \identifier{2fw} */
@@ -612,6 +718,21 @@ class CASADI_EXPORT DaeBuilder
                  println(occursin("not an input category", sprint(showerror, e)))
              end
       true
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> DaeBuilder dae = new DaeBuilder("m");
+      jshell> MX x = dae.add("x");
+      jshell> MX z = dae.add("z");
+      jshell> MX u = dae.add("u", "input");
+      jshell> dae.eq(dae.der(x), x.unaryMinus().plus(z.times(u)));
+      jshell> dae.eq(0, x.minus(ca.times(2, z)));
+      jshell> List.of(dae.inputs("x"), dae.inputs("z"), dae.inputs("u"), dae.inputs("p"))
+      [[x], [z], [u], []]
+      jshell> dae.inputs("ode")
+      |  Exception org.casadi.CasadiException: ...not an input category...
       \enddoctest
       \endlang
 
@@ -679,6 +800,21 @@ class CASADI_EXPORT DaeBuilder
                  println(occursin("No input category", sprint(showerror, e)))
              end
       true
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> DaeBuilder dae = new DaeBuilder("m");
+      jshell> MX x = dae.add("x");
+      jshell> MX z = dae.add("z");
+      jshell> MX u = dae.add("u", "input");
+      jshell> dae.eq(dae.der(x), x.unaryMinus().plus(z.times(u)));
+      jshell> dae.eq(0, x.minus(ca.times(2, z)));
+      jshell> List.of(dae.outputs("ode"), dae.outputs("alg"), dae.outputs("y"))
+      [[((z*u)-x)], [(-(x-(2.*z)))], []]
+      jshell> dae.outputs("x")
+      |  Exception org.casadi.CasadiException: ...No input category...
       \enddoctest
       \endlang
 
@@ -752,6 +888,17 @@ class CASADI_EXPORT DaeBuilder
       julia> u = ca.add(dae, "u", "input");
       julia> ca.p(dae), ca.c(dae), ca.u(dae)
       (["p"], ["c"], ["u"])
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> DaeBuilder dae = new DaeBuilder("m");
+      jshell> MX p = dae.add("p", "parameter", "tunable");
+      jshell> MX c = dae.add("c", "parameter", "fixed");
+      jshell> MX u = dae.add("u", "input");
+      jshell> List.of(dae.p(), dae.c(), dae.u())
+      [[p], [c], [u]]
       \enddoctest
       \endlang
 
@@ -857,6 +1004,20 @@ class CASADI_EXPORT DaeBuilder
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> DaeBuilder dae = new DaeBuilder("m");
+      jshell> MX x = dae.add("x");
+      jshell> MX w = dae.add("w");
+      jshell> dae.eq(w, ca.sin(x));
+      jshell> dae.eq(dae.der(x), w.unaryMinus());
+      jshell> dae.w()
+      [w, der(x)]
+      jshell> dae.wdef()
+      [sin(x), (-w)]
+      \enddoctest
+      \endlang
+
       \sa wdef, dependent_fun, eliminate, nw
 
       \identifier{5t} */
@@ -908,6 +1069,18 @@ class CASADI_EXPORT DaeBuilder
       julia> ca.set_init(dae, "x", 2*p)
       julia> ca.init_lhs(dae), ca.init_rhs(dae)
       (MX[x], MX[(2.*p)])
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> DaeBuilder dae = new DaeBuilder("m");
+      jshell> MX x = dae.add("x");
+      jshell> MX p = dae.add("p", "parameter", "tunable");
+      jshell> dae.eq(dae.der(x), x.unaryMinus());
+      jshell> dae.set_init("x", ca.times(2, p));
+      jshell> List.of(dae.init_lhs(), dae.init_rhs())
+      [[x], [(2.*p)]]
       \enddoctest
       \endlang
 
@@ -988,6 +1161,16 @@ class CASADI_EXPORT DaeBuilder
       julia> ca.eq(dae, ca.der(dae, pos), -pos)
       julia> ca.nx(dae), ca.create(dae)
       (1, m_dae:(t[0],x[3],z[0],p[0],u[0])->(ode[3],alg[0],quad[0],zero[0]) MXFunction)
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> DaeBuilder dae = new DaeBuilder("m");
+      jshell> MX pos = dae.add("pos", Map.of("dimension", new long[] {3}));
+      jshell> dae.eq(dae.der(pos), pos.unaryMinus());
+      jshell> List.of(dae.nx(), dae.create())
+      [1, m_dae:(t[0],x[3],z[0],p[0],u[0])->(ode[3],alg[0],quad[0],zero[0]) MXFunction]
       \enddoctest
       \endlang
 
@@ -1212,6 +1395,36 @@ class CASADI_EXPORT DaeBuilder
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> DaeBuilder dae = new DaeBuilder("m");
+      jshell> MX x = dae.add("x");
+      jshell> x
+      x
+      jshell> x.size()
+      long[2] { 1, 1 }
+      jshell> List.of(dae.category("x"), dae.causality("x"), dae.variability("x"))
+      [z, local, continuous]
+      jshell> MX p = dae.add("p", "parameter", "tunable");
+      jshell> List.of(dae.category("p"), dae.variability("p"))
+      [p, tunable]
+      jshell> MX b = dae.add("b", "input", Map.of("type", "Boolean", "start", false));
+      jshell> List.of(dae.category("b"), dae.variability("b"), dae.type("b"))
+      [u, discrete, Boolean]
+      jshell> MX r = dae.add("r", Map.of("dimension", new long[] {3}, "start", new double[] {1, 2, 3}, "min", 0, "unit", "m"));
+      jshell> r.size()
+      long[2] { 3, 1 }
+      jshell> dae.start("r")
+      double[3] { 1.0, 2.0, 3.0 }
+      jshell> List.of(dae.min("r"), dae.unit("r"))
+      [0.0, m]
+      jshell> dae.add("x")
+      |  Exception org.casadi.CasadiException: ...already exists...
+      jshell> dae.add("q", "parameter", "continuous")
+      |  Exception org.casadi.CasadiException: ...requires 'fixed' or 'tunable'...
+      \enddoctest
+      \endlang
+
       \sa eq, der, var, category, set_category
 
       \identifier{2kp} */
@@ -1394,6 +1607,34 @@ class CASADI_EXPORT DaeBuilder
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> DaeBuilder dae = new DaeBuilder("m");
+      jshell> MX x = dae.add("x");
+      jshell> MX y = dae.add("y");
+      jshell> MX z = dae.add("z");
+      jshell> MX w = dae.add("w");
+      jshell> List.of(dae.x(), dae.z(), dae.w())
+      [[], [x, y, z, w], []]
+      jshell> dae.eq(dae.der(x), x.unaryMinus().plus(z));
+      jshell> List.of(dae.x(), dae.z(), dae.w())
+      [[x], [y, z, w], [der(x)]]
+      jshell> dae.eq(0, x.minus(ca.times(2, z)));
+      jshell> List.of(dae.z(), dae.outputs("alg"))
+      [[y, z, w], [(-(x-(2.*z)))]]
+      jshell> dae.eq(w, x.times(z));
+      jshell> List.of(dae.w(), dae.wdef())
+      [[der(x), w], [(z-x), (x*z)]]
+      jshell> dae.eq(ca.vertcat(dae.der(y), w), ca.vertcat(w, new MX(1)));
+      jshell> List.of(dae.x(), dae.outputs("ode"), dae.outputs("alg"))
+      [[x, y], [(z-x), w], [(-(x-(2.*z))), (-(w-1))]]
+      jshell> dae.eq(x, 1);
+      |  Exception org.casadi.CasadiException: ...Cannot handle left-hand-side...
+      jshell> dae.eq(ca.vertcat(dae.der(x), dae.der(y)), ca.vertcat(new MX(1), new MX(2), new MX(3)));
+      |  Exception org.casadi.CasadiException: ...Mismatched dimensions...
+      \enddoctest
+      \endlang
+
       \sa der, when, set_init, add
 
       \identifier{2kt} */
@@ -1474,6 +1715,26 @@ class CASADI_EXPORT DaeBuilder
                  println(occursin("Only strict inequality", sprint(showerror, e)))
              end
       true
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> DaeBuilder dae = new DaeBuilder("ball");
+      jshell> MX h = dae.add("h", Map.of("start", 5));
+      jshell> MX v = dae.add("v", Map.of("start", 0));
+      jshell> dae.eq(dae.der(h), v);
+      jshell> dae.eq(dae.der(v), -9.81);
+      jshell> dae.when(ca.lt(h, 0), List.of(dae.reinit("v", ca.times(-0.8, v))));
+      jshell> List.of(dae.nzero(), dae.outputs("zero"))
+      [1, [h]]
+      jshell> Function T = dae.transition();
+      jshell> T
+      ball_transition:(index[],t[0],x[2],z[0],p[0],u[0])->(post_x[2],post_z[0]) MXFunction
+      jshell> T.invoke(0, 0, new double[] {-0.1, -3}, new double[] {}, new double[] {}, new double[] {})
+      [[-0.1, 2.4], 0x1]
+      jshell> dae.when(ca.le(h, 0), List.of());
+      |  Exception org.casadi.CasadiException: ...Only strict inequality...
       \enddoctest
       \endlang
 
@@ -1567,6 +1828,31 @@ class CASADI_EXPORT DaeBuilder
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> DaeBuilder dae = new DaeBuilder("m");
+      jshell> MX x = dae.add("x", Map.of("start", 0));
+      jshell> MX b = dae.add("b", Map.of("type", "Boolean", "start", false));
+      jshell> dae.eq(dae.der(x), 1);
+      jshell> dae.assign("b", 1)
+      "__assign__b__"
+      jshell> dae.when(ca.gt(x, 1), List.of(dae.assign("b", 1)));
+      jshell> dae.disp(true);
+      nt = 0, nx = 2, nz = 0, nq = 0, ny = 0, np = 0, nc = 0, nd = 0, nw = 1, nu = 0
+      Model variables:
+        x = [x, b]
+        w = [der(x)]
+      List of dependent variables (w):
+        der(x) := 1
+      Time derivatives of differential states (x):
+        x: der(x)
+        b: 0
+      When equations:
+        when (1-x) < 0 :
+          b := 1
+      \enddoctest
+      \endlang
+
       \sa when, reinit
 
       \identifier{2kv} */
@@ -1623,6 +1909,22 @@ class CASADI_EXPORT DaeBuilder
       ("__reinit__v__0", "calculated")
       julia> ca.when(dae, h < 0, [r])
       julia> ca.nzero(dae)
+      1
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> DaeBuilder dae = new DaeBuilder("ball");
+      jshell> MX h = dae.add("h", Map.of("start", 5));
+      jshell> MX v = dae.add("v", Map.of("start", 0));
+      jshell> dae.eq(dae.der(h), v);
+      jshell> dae.eq(dae.der(v), -9.81);
+      jshell> String r = dae.reinit("v", ca.times(-0.8, v));
+      jshell> List.of(r, dae.category(r))
+      [__reinit__v__0, calculated]
+      jshell> dae.when(ca.lt(h, 0), List.of(r));
+      jshell> dae.nzero()
       1
       \enddoctest
       \endlang
@@ -1691,6 +1993,23 @@ class CASADI_EXPORT DaeBuilder
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> DaeBuilder dae = new DaeBuilder("m");
+      jshell> MX x = dae.add("x");
+      jshell> MX p = dae.add("p", "parameter", "tunable");
+      jshell> dae.eq(dae.der(x), x.unaryMinus());
+      jshell> List.of(dae.init_lhs(), dae.init_rhs())
+      [[], []]
+      jshell> dae.set_init("x", ca.times(2, p));
+      jshell> List.of(dae.init_lhs(), dae.init_rhs())
+      [[x], [(2.*p)]]
+      jshell> dae.set_init("x", new MX());
+      jshell> List.of(dae.init_lhs(), dae.init_rhs())
+      [[], []]
+      \enddoctest
+      \endlang
+
       \sa init_lhs, init_rhs
 
       \identifier{2kx} */
@@ -1719,6 +2038,13 @@ class CASADI_EXPORT DaeBuilder
       \doctest
       julia> dae = ca.DaeBuilder("m");
       julia> ca.sanity_check(dae)
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> DaeBuilder dae = new DaeBuilder("m");
+      jshell> dae.sanity_check();
       \enddoctest
       \endlang
 
@@ -1794,6 +2120,23 @@ class CASADI_EXPORT DaeBuilder
                  println(occursin("1 elements provided for 2 components", sprint(showerror, e)))
              end
       true
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> DaeBuilder dae = new DaeBuilder("m");
+      jshell> MX x = dae.add("x");
+      jshell> MX y = dae.add("y");
+      jshell> dae.eq(dae.der(x), y.unaryMinus());
+      jshell> dae.eq(dae.der(y), x);
+      jshell> List.of(dae.x(), dae.outputs("ode"))
+      [[x, y], [(-y), x]]
+      jshell> dae.reorder("x", List.of("y", "x"));
+      jshell> List.of(dae.x(), dae.outputs("ode"))
+      [[y, x], [x, (-y)]]
+      jshell> dae.reorder("x", List.of("y"));
+      |  Exception org.casadi.CasadiException: ...1 elements provided for 2 components...
       \enddoctest
       \endlang
 
@@ -1893,6 +2236,27 @@ class CASADI_EXPORT DaeBuilder
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> DaeBuilder dae = new DaeBuilder("m");
+      jshell> MX x = dae.add("x");
+      jshell> MX u1 = dae.add("u1", "input");
+      jshell> MX p1 = dae.add("p1", "parameter", "tunable");
+      jshell> dae.eq(dae.der(x), x.unaryMinus().plus(u1.times(p1)));
+      jshell> dae.set_all("u", List.of("p1", "u1"));
+      jshell> List.of(dae.u(), dae.p(), dae.c())
+      [[p1, u1], [], []]
+      jshell> dae.set_all("p", List.of("u1"));
+      jshell> List.of(dae.u(), dae.p(), dae.c())
+      [[p1], [u1], []]
+      jshell> dae.set_all("y", List.of("x"));
+      jshell> List.of(dae.y(), dae.causality("x"))
+      [[x], output]
+      jshell> dae.set_all("x", List.of("x", "x"));
+      |  Exception org.casadi.CasadiException: ...Duplicate names...
+      \enddoctest
+      \endlang
+
       \sa reorder, set_category, set_causality
 
       \identifier{2l0} */
@@ -1969,6 +2333,23 @@ class CASADI_EXPORT DaeBuilder
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> DaeBuilder dae = new DaeBuilder("m");
+      jshell> MX x = dae.add("x");
+      jshell> MX w1 = dae.add("w1");
+      jshell> MX w2 = dae.add("w2");
+      jshell> dae.eq(w2, w1.power(2));
+      jshell> dae.eq(w1, ca.times(2, x));
+      jshell> dae.eq(dae.der(x), w2.unaryMinus());
+      jshell> dae.eliminate("w");
+      jshell> List.of(dae.w(), dae.outputs("ode"), dae.category("w1"))
+      [[], [(-sq((2.*x)))], calculated]
+      jshell> dae.eliminate("x");
+      |  Exception org.casadi.CasadiException: ...Elimination not supported...
+      \enddoctest
+      \endlang
+
       \sa sort, dependent_fun, lift
 
       \identifier{2l1} */
@@ -2036,6 +2417,23 @@ class CASADI_EXPORT DaeBuilder
       julia> ca.sort(dae, "w")
       julia> ca.w(dae), ca.wdef(dae)
       (["w1", "w2", "der(x)"], MX[(2.*x), sq(w1), (-w2)])
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> DaeBuilder dae = new DaeBuilder("m");
+      jshell> MX x = dae.add("x");
+      jshell> MX w1 = dae.add("w1");
+      jshell> MX w2 = dae.add("w2");
+      jshell> dae.eq(w2, w1.power(2));
+      jshell> dae.eq(w1, ca.times(2, x));
+      jshell> dae.eq(dae.der(x), w2.unaryMinus());
+      jshell> List.of(dae.w(), dae.wdef())
+      [[w2, w1, der(x)], [sq(w1), (2.*x), (-w2)]]
+      jshell> dae.sort("w");
+      jshell> List.of(dae.w(), dae.wdef())
+      [[w1, w2, der(x)], [(2.*x), sq(w1), (-w2)]]
       \enddoctest
       \endlang
 
@@ -2134,6 +2532,27 @@ class CASADI_EXPORT DaeBuilder
        MX((-((w_1-sq(w_3))-w_4)))
       julia> ca.create(dae, "f", ["z", "w"], ["alg", "wdef"])
       Function(f:(z[2],w[5])->(alg[2],wdef[5]) MXFunction)
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> MX a = MX.sym("a");
+      jshell> Function F = new Function("F", List.of(a), List.of(ca.sin(a).plus(a.power(2))));
+      jshell> DaeBuilder dae = new DaeBuilder("m");
+      jshell> MX x = dae.add("x");
+      jshell> MX y = dae.add("y");
+      jshell> dae.eq(0, x.minus((MX) F.invoke(y)));
+      jshell> dae.eq(0, y.minus(((MX) F.invoke(x)).power(2)).minus((MX) F.invoke(y)));
+      jshell> dae.lift();
+      jshell> dae.w()
+      [w_0, w_1, w_2, w_3, w_4]
+      jshell> dae.wdef()
+      [x, y, F(w_1){0}, F(w_0){0}, F(w_1){0}]
+      jshell> dae.outputs("alg")
+      [(-(w_0-w_2)), (-((w_1-sq(w_3))-w_4))]
+      jshell> dae.create("f", List.of("z", "w"), List.of("alg", "wdef"))
+      f:(z[2],w[5])->(alg[2],wdef[5]) MXFunction
       \enddoctest
       \endlang
 
@@ -2240,6 +2659,23 @@ class CASADI_EXPORT DaeBuilder
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> DaeBuilder dae = new DaeBuilder("m");
+      jshell> MX x = dae.add("x");
+      jshell> MX w = dae.add("w");
+      jshell> dae.eq(w, ca.sin(x));
+      jshell> dae.eq(dae.der(x), w.unaryMinus());
+      jshell> Function f = dae.add_fun("wfun", List.of("x"), List.of("w"));
+      jshell> f
+      wfun:(x)->(w) MXFunction
+      jshell> List.of(dae.has_fun("wfun"), dae.has_fun("nope"))
+      [true, false]
+      jshell> dae.add_fun("bad", List.of("x"), List.of("x"))
+      |  Exception org.casadi.CasadiException: ...Cannot find dependent...
+      \enddoctest
+      \endlang
+
       \sa fun, has_fun, gather_fun
 
       \identifier{2l6} */
@@ -2284,6 +2720,18 @@ class CASADI_EXPORT DaeBuilder
       julia> [ca.name(g) for g in ca.fun(dae)]
       1-element Vector{String}:
        "F"
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> MX a = MX.sym("a");
+      jshell> Function F = new Function("F", List.of(a), List.of(a.power(2)));
+      jshell> DaeBuilder dae = new DaeBuilder("m");
+      jshell> dae.add_fun(F)
+      F:(i0)->(o0) MXFunction
+      jshell> dae.fun().stream().map(g -> g.name()).toList()
+      [F]
       \enddoctest
       \endlang
 
@@ -2354,6 +2802,18 @@ class CASADI_EXPORT DaeBuilder
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> MX a = MX.sym("a");
+      jshell> DaeBuilder dae = new DaeBuilder("m");
+      jshell> Function f = dae.add_fun(new Function("F", List.of(a), List.of(a.power(2))));
+      jshell> dae.fun("F")
+      F:(i0)->(o0) MXFunction
+      jshell> dae.fun("nope")
+      |  Exception org.casadi.CasadiException: ...No such function...
+      \enddoctest
+      \endlang
+
       \sa has_fun, add_fun
 
       \identifier{2la} */
@@ -2411,6 +2871,21 @@ class CASADI_EXPORT DaeBuilder
       julia> [ca.name(g) for g in ca.fun(dae)]
       1-element Vector{String}:
        "F"
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> MX a = MX.sym("a");
+      jshell> Function F = new Function("F", List.of(a), List.of(a.power(2)));
+      jshell> DaeBuilder dae = new DaeBuilder("m");
+      jshell> MX x = dae.add("x");
+      jshell> dae.eq(dae.der(x), (MX) F.invoke(x));
+      jshell> dae.fun().stream().map(g -> g.name()).toList()
+      []
+      jshell> dae.gather_fun();
+      jshell> dae.fun().stream().map(g -> g.name()).toList()
+      [F]
       \enddoctest
       \endlang
 
@@ -2565,6 +3040,23 @@ class CASADI_EXPORT DaeBuilder
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> DaeBuilder dae = new DaeBuilder("m");
+      jshell> MX x = dae.add("x");
+      jshell> MX z = dae.add("z");
+      jshell> dae.eq(dae.der(x), x.unaryMinus().times(z));
+      jshell> dae.eq(0, z.minus(x.power(2)));
+      jshell> dae.add_lc("gamma", List.of("ode", "alg"));
+      jshell> Function H = dae.create("H", List.of("x", "z", "lam_ode", "lam_alg"),
+         ...>                            List.of("hess_gamma_x_x", "hess_gamma_x_z"));
+      jshell> H
+      H:(x,z,lam_ode,lam_alg)->(hess_gamma_x_x,hess_gamma_x_z) MXFunction
+      jshell> H.invoke(1, 2, 1, 1)
+      [2, -1]
+      \enddoctest
+      \endlang
+
       \sa create
 
       \identifier{2lf} */
@@ -2711,6 +3203,39 @@ class CASADI_EXPORT DaeBuilder
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> DaeBuilder dae = new DaeBuilder("m");
+      jshell> MX x = dae.add("x");
+      jshell> MX z = dae.add("z");
+      jshell> MX u = dae.add("u", "input");
+      jshell> MX p = dae.add("p", "parameter", "tunable");
+      jshell> MX c = dae.add("c", "parameter", "fixed", Map.of("start", 3));
+      jshell> MX w = dae.add("w");
+      jshell> MX y = dae.add("y", "output");
+      jshell> dae.eq(dae.der(x), c.unaryMinus().times(x).plus(z.times(u)));
+      jshell> dae.eq(0, x.minus(p.times(z.power(2))));
+      jshell> dae.eq(w, x.plus(z));
+      jshell> dae.eq(y, w.power(2));
+      jshell> Function f = dae.create("f", List.of("x", "z", "u", "p"), List.of("ode", "alg", "y"));
+      jshell> f
+      f:(x,z,u,p)->(ode,alg,y) MXFunction
+      jshell> f.invoke(1, 2, 3, 4)
+      [3, 15, 9]
+      jshell> Function J = dae.create("J", List.of("x", "z", "u", "p"), List.of("jac_ode_x", "jac_alg_z"));
+      jshell> J.invoke(1, 2, 3, 4)
+      [-3, 16]
+      jshell> dae.create("g", List.of("x", "z", "w"), List.of("ode", "wdef"))
+      g:(x,z,w[3])->(ode,wdef[3]) MXFunction
+      jshell> dae.create("s", List.of("x", "z", "u", "p"), List.of("ode"), true)
+      s:(x,z,u,p)->(ode) SXFunction
+      jshell> dae.create("f", List.of("x", "z", "c"), List.of("ode"))
+      |  Exception org.casadi.CasadiException: ...Cannot process "c" as input...
+      jshell> dae.create("f", List.of("x", "z"), List.of("w"))
+      |  Exception org.casadi.CasadiException: ...Cannot process "w" as output...
+      \enddoctest
+      \endlang
+
       \sa oracle, add_lc, dependent_fun, transition
 
       \identifier{6e} */
@@ -2771,6 +3296,20 @@ class CASADI_EXPORT DaeBuilder
       (2, 0x1, 0x1, 0x1)
       julia> f(t=0, x=1, u=3)["ode"]
       DM(2)
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> DaeBuilder dae = new DaeBuilder("m");
+      jshell> MX x = dae.add("x");
+      jshell> MX u = dae.add("u", "input");
+      jshell> dae.eq(dae.der(x), x.unaryMinus().plus(u));
+      jshell> Function f = dae.create("mydae");
+      jshell> f
+      mydae:(t[0],x,z[0],p[0],u)->(ode,alg[0],quad[0],zero[0]) MXFunction
+      jshell> f.invoke(0, 1, new double[] {}, new double[] {}, 3)
+      [2, 0x1, 0x1, 0x1]
       \enddoctest
       \endlang
 
@@ -2859,6 +3398,26 @@ class CASADI_EXPORT DaeBuilder
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> DaeBuilder dae = new DaeBuilder("m");
+      jshell> MX x = dae.add("x");
+      jshell> MX w1 = dae.add("w1");
+      jshell> MX w2 = dae.add("w2");
+      jshell> MX p = dae.add("p", "parameter", "tunable");
+      jshell> dae.eq(w1, ca.times(2, x));
+      jshell> dae.eq(w2, w1.power(2).plus(p));
+      jshell> dae.eq(dae.der(x), w2.unaryMinus());
+      jshell> Function f = dae.dependent_fun("f", List.of("x", "p"), List.of("w"));
+      jshell> f
+      f:(x,p)->(w[3]) MXFunction
+      jshell> f.invoke(1, 3)
+      [2, 7, -7]
+      jshell> dae.dependent_fun("f", List.of("x", "w"), List.of("w"))
+      |  Exception org.casadi.CasadiException: ...cannot be both input and output...
+      \enddoctest
+      \endlang
+
       \sa w, d, create, eliminate
 
       \identifier{2lh} */
@@ -2934,6 +3493,24 @@ class CASADI_EXPORT DaeBuilder
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> DaeBuilder dae = new DaeBuilder("ball");
+      jshell> MX h = dae.add("h", Map.of("start", 5));
+      jshell> MX v = dae.add("v", Map.of("start", 0));
+      jshell> dae.eq(dae.der(h), v);
+      jshell> dae.eq(dae.der(v), -9.81);
+      jshell> dae.when(ca.lt(h, 0), List.of(dae.reinit("v", ca.times(-0.8, v))));
+      jshell> Function T = dae.transition("tr", 0);
+      jshell> T
+      tr:(t[0],x[2],z[0],p[0],u[0])->(post_x[2],post_z[0]) MXFunction
+      jshell> T.invoke(0, new double[] {-0.1, -3}, new double[] {}, new double[] {}, new double[] {})
+      [[-0.1, 2.4], 0x1]
+      jshell> dae.transition("tr", 1)
+      |  Exception org.casadi.CasadiException: ...Illegal event index...
+      \enddoctest
+      \endlang
+
       \sa when, create
 
       \identifier{2li} */
@@ -2986,6 +3563,21 @@ class CASADI_EXPORT DaeBuilder
       julia> ca.when(dae, h < 0, [ca.reinit(dae, "v", -0.8*v)])
       julia> ca.transition(dae, "tr")
       Function(tr:(index[],t[0],x[2],z[0],p[0],u[0])->(post_x[2],post_z[0]) MXFunction)
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> DaeBuilder dae = new DaeBuilder("ball");
+      jshell> MX h = dae.add("h", Map.of("start", 5));
+      jshell> MX v = dae.add("v", Map.of("start", 0));
+      jshell> dae.eq(dae.der(h), v);
+      jshell> dae.eq(dae.der(v), -9.81);
+      jshell> dae.transition().is_null()
+      true
+      jshell> dae.when(ca.lt(h, 0), List.of(dae.reinit("v", ca.times(-0.8, v))));
+      jshell> dae.transition("tr")
+      tr:(index[],t[0],x[2],z[0],p[0],u[0])->(post_x[2],post_z[0]) MXFunction
       \enddoctest
       \endlang
 
@@ -3055,6 +3647,21 @@ class CASADI_EXPORT DaeBuilder
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> DaeBuilder dae = new DaeBuilder("m");
+      jshell> MX x = dae.add("x", Map.of("dimension", new long[] {2}));
+      jshell> dae.var("x")
+      x
+      jshell> dae.var("x").size()
+      long[2] { 2, 1 }
+      jshell> List.of(dae.has("x"), dae.has("y"))
+      [true, false]
+      jshell> dae.var("y")
+      |  Exception org.casadi.CasadiException: ...No such variable...
+      \enddoctest
+      \endlang
+
       \sa has, all, inputs
 
       \identifier{2ll} */
@@ -3107,6 +3714,20 @@ class CASADI_EXPORT DaeBuilder
       2-element Vector{String}:
        "der(x)"
        "der(y)"
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> DaeBuilder dae = new DaeBuilder("m");
+      jshell> MX x = dae.add("x");
+      jshell> MX y = dae.add("y");
+      jshell> dae.der()
+      []
+      jshell> dae.eq(dae.der(x), y.unaryMinus());
+      jshell> dae.eq(dae.der(y), x);
+      jshell> dae.der()
+      [der(x), der(y)]
       \enddoctest
       \endlang
 
@@ -3166,6 +3787,21 @@ class CASADI_EXPORT DaeBuilder
                  println(occursin("No derivative expression", sprint(showerror, e)))
              end
       true
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> DaeBuilder dae = new DaeBuilder("m");
+      jshell> MX x = dae.add("x");
+      jshell> MX y = dae.add("y");
+      jshell> MX p = dae.add("p", "parameter", "tunable");
+      jshell> dae.eq(dae.der(x), y.unaryMinus());
+      jshell> dae.eq(dae.der(y), x);
+      jshell> List.of(dae.der("x"), dae.der(List.of("x", "y")))
+      [der(x), [der(x), der(y)]]
+      jshell> dae.der("p")
+      |  Exception org.casadi.CasadiException: ...No derivative expression...
       \enddoctest
       \endlang
 
@@ -3271,6 +3907,29 @@ class CASADI_EXPORT DaeBuilder
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> DaeBuilder dae = new DaeBuilder("m");
+      jshell> MX x = dae.add("x");
+      jshell> MX y = dae.add("y");
+      jshell> MX p = dae.add("p", "parameter", "tunable");
+      jshell> dae.der(x)
+      der(x)
+      jshell> dae.der(ca.vertcat(x, y))
+      vertcat(der(x), der(y))
+      jshell> dae.der(x.times(y).plus(p))
+      ((y*der(x))+(x*der(y)))
+      jshell> dae.der(p)
+      0
+      jshell> dae.z()
+      [x, y, der(x), der(y)]
+      jshell> dae.der(ca.vertcat(x, y).T())
+      |  Exception org.casadi.CasadiException: ...must be a vector...
+      jshell> dae.der(MX.sym("foo"))
+      |  Exception org.casadi.CasadiException: ...No such variable...
+      \enddoctest
+      \endlang
+
       \sa eq, der, var
 
       \identifier{2ln} */
@@ -3347,6 +4006,18 @@ class CASADI_EXPORT DaeBuilder
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> DaeBuilder dae = new DaeBuilder("m");
+      jshell> MX x = dae.add("x");
+      jshell> MX w = dae.add("w");
+      jshell> dae.eq(w, ca.sin(x));
+      jshell> dae.eq(dae.der(x), w.unaryMinus());
+      jshell> List.of(dae.beq("w"), dae.beq("der(x)"))
+      [sin(x), (-w)]
+      \enddoctest
+      \endlang
+
       \sa has_beq, wdef
 
       \identifier{2lr} */
@@ -3396,6 +4067,19 @@ class CASADI_EXPORT DaeBuilder
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> DaeBuilder dae = new DaeBuilder("m");
+      jshell> MX x = dae.add("x");
+      jshell> MX y = dae.add("y");
+      jshell> List.of(dae.value_reference("x"), dae.value_reference("y"))
+      [1, 2]
+      jshell> dae.set_value_reference("x", 100);
+      jshell> dae.value_reference("x")
+      100
+      \enddoctest
+      \endlang
+
       \identifier{2ls} */
   casadi_int value_reference(const std::string& name) const;
   void set_value_reference(const std::string& name, casadi_int val);
@@ -3438,6 +4122,18 @@ class CASADI_EXPORT DaeBuilder
       "position"
       julia> ca.set_description(dae, "x", "height")
       julia> ca.description(dae, "x")
+      "height"
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> DaeBuilder dae = new DaeBuilder("m");
+      jshell> MX x = dae.add("x", Map.of("description", "position"));
+      jshell> dae.description("x")
+      "position"
+      jshell> dae.set_description("x", "height");
+      jshell> dae.description("x")
       "height"
       \enddoctest
       \endlang
@@ -3508,6 +4204,21 @@ class CASADI_EXPORT DaeBuilder
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> DaeBuilder dae = new DaeBuilder("m");
+      jshell> MX x = dae.add("x");
+      jshell> MX n = dae.add("n", Map.of("type", "Int32"));
+      jshell> List.of(dae.type("x"), dae.type("x", 2), dae.type("n"), dae.type("n", 2))
+      [Float64, real, Int32, integer]
+      jshell> dae.set_type("x", "Float32");
+      jshell> dae.type("x")
+      "Float32"
+      jshell> dae.set_type("x", "bogus");
+      |  Exception org.casadi.CasadiException: ...No such enum...
+      \enddoctest
+      \endlang
+
       \identifier{2lu} */
   std::string type(const std::string& name, casadi_int fmi_version = 3) const;
   void set_type(const std::string& name, const std::string& val);
@@ -3548,6 +4259,17 @@ class CASADI_EXPORT DaeBuilder
       julia> x = ca.add(dae, "x");
       julia> ca.causality(dae, "t"), ca.causality(dae, "u"), ca.causality(dae, "x")
       ("independent", "input", "local")
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> DaeBuilder dae = new DaeBuilder("m");
+      jshell> MX t = dae.add("t", "independent");
+      jshell> MX u = dae.add("u", "input");
+      jshell> MX x = dae.add("x");
+      jshell> List.of(dae.causality("t"), dae.causality("u"), dae.causality("x"))
+      [independent, input, local]
       \enddoctest
       \endlang
 
@@ -3600,6 +4322,19 @@ class CASADI_EXPORT DaeBuilder
       julia> ca.eq(dae, ca.der(dae, q), x^2)
       julia> ca.categories(dae, "u"), ca.categories(dae, "x"), ca.categories(dae, "q")
       (["p", "u", "c"], ["x"], ["x", "q", ""])
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> DaeBuilder dae = new DaeBuilder("m");
+      jshell> MX u = dae.add("u", "input");
+      jshell> MX x = dae.add("x");
+      jshell> MX q = dae.add("q");
+      jshell> dae.eq(dae.der(x), x.unaryMinus());
+      jshell> dae.eq(dae.der(q), x.power(2));
+      jshell> List.of(dae.categories("u"), dae.categories("x"), dae.categories("q"))
+      [[p, u, c], [x], [x, q, ]]
       \enddoctest
       \endlang
 
@@ -3670,6 +4405,22 @@ class CASADI_EXPORT DaeBuilder
                  println(occursin("Cannot change causality", sprint(showerror, e)))
              end
       true
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> DaeBuilder dae = new DaeBuilder("m");
+      jshell> MX x = dae.add("x");
+      jshell> MX y = dae.add("y", "output");
+      jshell> dae.eq(dae.der(x), x.unaryMinus());
+      jshell> dae.eq(y, ca.times(2, x));
+      jshell> dae.set_causality("y", "local");
+      jshell> dae.set_causality("x", "output");
+      jshell> List.of(dae.y(), dae.causality("y"))
+      [[x], local]
+      jshell> dae.set_causality("x", "input");
+      |  Exception org.casadi.CasadiException: ...Cannot change causality...
       \enddoctest
       \endlang
 
@@ -3762,6 +4513,26 @@ class CASADI_EXPORT DaeBuilder
                  println(occursin("Cannot change variability", sprint(showerror, e)))
              end
       true
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> DaeBuilder dae = new DaeBuilder("m");
+      jshell> MX u = dae.add("u", "input");
+      jshell> MX x = dae.add("x");
+      jshell> dae.eq(dae.der(x), u.unaryMinus().times(x));
+      jshell> dae.set_variability("u", "fixed");
+      jshell> List.of(dae.u(), dae.c(), dae.causality("u"))
+      [[], [u], parameter]
+      jshell> dae.set_variability("u", "tunable");
+      jshell> List.of(dae.p(), dae.causality("u"))
+      [[u], parameter]
+      jshell> dae.set_variability("u", "continuous");
+      jshell> List.of(dae.u(), dae.causality("u"))
+      [[u], input]
+      jshell> dae.set_variability("x", "discrete");
+      |  Exception org.casadi.CasadiException: ...Cannot change variability...
       \enddoctest
       \endlang
 
@@ -3868,6 +4639,28 @@ class CASADI_EXPORT DaeBuilder
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> DaeBuilder dae = new DaeBuilder("m");
+      jshell> MX u = dae.add("u", "input");
+      jshell> MX x = dae.add("x");
+      jshell> MX q = dae.add("q");
+      jshell> dae.eq(dae.der(x), x.unaryMinus());
+      jshell> dae.eq(dae.der(q), x.power(2));
+      jshell> dae.set_category("q", "q");
+      jshell> List.of(dae.x(), dae.q())
+      [[x], [q]]
+      jshell> dae.set_category("q", "");
+      jshell> List.of(dae.x(), dae.q(), dae.category("q"))
+      [[x], [], ]
+      jshell> dae.set_category("u", "p");
+      jshell> List.of(dae.u(), dae.p(), dae.causality("u"), dae.variability("u"))
+      [[], [u], parameter, tunable]
+      jshell> dae.set_category("x", "q");
+      |  Exception org.casadi.CasadiException: ...Cannot change category of x from 'x' to 'q'...
+      \enddoctest
+      \endlang
+
       \sa category, categories, set_all
 
       \identifier{2c4} */
@@ -3922,6 +4715,20 @@ class CASADI_EXPORT DaeBuilder
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> DaeBuilder dae = new DaeBuilder("m");
+      jshell> MX x = dae.add("x", Map.of("initial", "approx"));
+      jshell> MX p = dae.add("p", "parameter", "tunable");
+      jshell> MX u = dae.add("u", "input");
+      jshell> List.of(dae.initial("x"), dae.initial("p"), dae.initial("u"))
+      [approx, exact, na]
+      jshell> dae.set_initial("x", "exact");
+      jshell> dae.initial("x")
+      "exact"
+      \enddoctest
+      \endlang
+
       \identifier{2lz} */
   std::string initial(const std::string& name) const;
   void set_initial(const std::string& name, const std::string& val);
@@ -3964,6 +4771,18 @@ class CASADI_EXPORT DaeBuilder
       "m/s"
       julia> ca.set_unit(dae, "v", "km/h")
       julia> ca.unit(dae, "v")
+      "km/h"
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> DaeBuilder dae = new DaeBuilder("m");
+      jshell> MX v = dae.add("v", Map.of("unit", "m/s"));
+      jshell> dae.unit("v")
+      "m/s"
+      jshell> dae.set_unit("v", "km/h");
+      jshell> dae.unit("v")
       "km/h"
       \enddoctest
       \endlang
@@ -4018,6 +4837,20 @@ class CASADI_EXPORT DaeBuilder
       julia> m = ca.add(dae, "m", Dict("dimension" => [2, 3]));
       julia> ca.numel(dae, "x"), ca.numel(dae, "m"), ca.dimension(dae, "m"), size(ca.var(dae, "m"))
       (1, 6, [2, 3], (6, 1))
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> DaeBuilder dae = new DaeBuilder("m");
+      jshell> MX x = dae.add("x");
+      jshell> MX m = dae.add("m", Map.of("dimension", new long[] {2, 3}));
+      jshell> List.of(dae.numel("x"), dae.numel("m"))
+      [1, 6]
+      jshell> dae.dimension("m")
+      long[2] { 2, 3 }
+      jshell> dae.var("m").size()
+      long[2] { 6, 1 }
       \enddoctest
       \endlang
 
@@ -4078,6 +4911,20 @@ class CASADI_EXPORT DaeBuilder
       julia> ca.set_step_size(dae, 0.01)
       julia> ca.start_time(dae), ca.stop_time(dae), ca.tolerance(dae), ca.step_size(dae)
       (0.0, 10.0, 1.0e-6, 0.01)
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> DaeBuilder dae = new DaeBuilder("m");
+      jshell> List.of(dae.start_time(), dae.stop_time(), dae.tolerance(), dae.step_size())
+      [NaN, NaN, NaN, NaN]
+      jshell> dae.set_start_time(0);
+      jshell> dae.set_stop_time(10);
+      jshell> dae.set_tolerance(1e-6);
+      jshell> dae.set_step_size(0.01);
+      jshell> List.of(dae.start_time(), dae.stop_time(), dae.tolerance(), dae.step_size())
+      [0.0, 10.0, 1.0E-6, 0.01]
       \enddoctest
       \endlang
 
@@ -4188,6 +5035,28 @@ class CASADI_EXPORT DaeBuilder
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> DaeBuilder dae = new DaeBuilder("m");
+      jshell> MX x = dae.add("x", Map.of("start", 1, "min", -2, "nominal", 10));
+      jshell> MX v = dae.add("v", Map.of("dimension", new long[] {2}, "start", new double[] {1, 2}));
+      jshell> List.of(dae.attribute("start", "x"), dae.attribute("min", "x"))
+      [1.0, -2.0]
+      jshell> dae.attribute("start", List.of("x", "v"))
+      double[3] { 1.0, 1.0, 2.0 }
+      jshell> dae.attribute("nominal", List.of("x"))
+      double[1] { 10.0 }
+      jshell> dae.set_attribute("min", "x", -1);
+      jshell> dae.set_attribute("start", List.of("x", "v"), new double[] {9, 8, 7});
+      jshell> dae.min("x")
+      -1.0
+      jshell> dae.start("v")
+      double[2] { 8.0, 7.0 }
+      jshell> dae.attribute("unit", "x")
+      |  Exception org.casadi.CasadiException: ...No such enum...
+      \enddoctest
+      \endlang
+
       \sa min, max, nominal, start, get
 
       \identifier{2m6} */
@@ -4240,6 +5109,24 @@ class CASADI_EXPORT DaeBuilder
       julia> ca.set_nominal(dae, "x", 2)
       julia> dae.min(["x"]), dae.max("x"), ca.nominal(dae, ["x"])
       ([0.0], 5.0, [2.0])
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> DaeBuilder dae = new DaeBuilder("m");
+      jshell> MX x = dae.add("x", Map.of("min", -2, "max", 2, "nominal", 10));
+      jshell> List.of(dae.min("x"), dae.max("x"), dae.nominal("x"))
+      [-2.0, 2.0, 10.0]
+      jshell> dae.set_min("x", 0);
+      jshell> dae.set_max(List.of("x"), new double[] {5});
+      jshell> dae.set_nominal("x", 2);
+      jshell> dae.min(List.of("x"))
+      double[1] { 0.0 }
+      jshell> dae.max("x")
+      5.0
+      jshell> dae.nominal(List.of("x"))
+      double[1] { 2.0 }
       \enddoctest
       \endlang
 
@@ -4336,6 +5223,29 @@ class CASADI_EXPORT DaeBuilder
                  println(occursin(msg, sprint(showerror, e)))
              end
       true
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> DaeBuilder dae = new DaeBuilder("m");
+      jshell> MX x = dae.add("x", Map.of("start", 1));
+      jshell> MX v = dae.add("v", Map.of("dimension", new long[] {2}));
+      jshell> dae.start("x")
+      double[1] { 1.0 }
+      jshell> dae.start("v")
+      double[2] { 0.0, 0.0 }
+      jshell> dae.start(List.of("x", "v"))
+      double[3] { 1.0, 0.0, 0.0 }
+      jshell> dae.set_start("v", new double[] {3, 4});
+      jshell> dae.set_start(List.of("x", "v"), new double[] {0, 1});
+      jshell> dae.start(List.of("x", "v"))
+      double[3] { 0.0, 1.0, 1.0 }
+      jshell> dae.set_start(List.of("x", "v"), new double[] {1, 2, 3});
+      jshell> dae.start(List.of("x", "v"))
+      double[3] { 1.0, 2.0, 3.0 }
+      jshell> dae.set_start("v", new double[] {1, 2, 3});
+      |  Exception org.casadi.CasadiException: ...expected number of elements (2) or number of variables (1)...
       \enddoctest
       \endlang
 
@@ -4447,6 +5357,36 @@ class CASADI_EXPORT DaeBuilder
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> DaeBuilder dae = new DaeBuilder("m");
+      jshell> MX c = dae.add("c", "parameter", "fixed");
+      jshell> MX x = dae.add("x", Map.of("start", 1));
+      jshell> MX v = dae.add("v", Map.of("dimension", new long[] {2}));
+      jshell> MX s = dae.add("s", Map.of("type", "String"));
+      jshell> dae.get("c")
+      NaN
+      jshell> dae.get("x")
+      1.0
+      jshell> dae.get("v")
+      double[2] { NaN, NaN }
+      jshell> dae.get("s")
+      ""
+      jshell> dae.set("c", 2.5);
+      jshell> dae.set("v", 1);
+      jshell> dae.set("s", "hello");
+      jshell> Arrays.deepToString(dae.get(List.of("c", "v", "s")).toArray())
+      "[2.5, [1.0, 1.0], hello]"
+      jshell> dae.set(List.of("c", "x"), new double[] {3, 4});
+      jshell> dae.set(List.of("v"), new double[] {5, 6});
+      jshell> Arrays.deepToString(dae.get(List.of("c", "x", "v")).toArray())
+      "[3.0, 4.0, [5.0, 6.0]]"
+      jshell> dae.reset();
+      jshell> dae.get(List.of("c", "x"))
+      [NaN, NaN]
+      \enddoctest
+      \endlang
+
       The value of a constant is baked into the functions created afterwards:
 
       \lang{python}
@@ -4480,6 +5420,18 @@ class CASADI_EXPORT DaeBuilder
       julia> ca.set(dae, "c", 3)
       julia> ca.create(dae, "f", ["x"], ["ode"])(2)
       DM(-6)
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> DaeBuilder dae = new DaeBuilder("m");
+      jshell> MX c = dae.add("c", "parameter", "fixed");
+      jshell> MX x = dae.add("x");
+      jshell> dae.eq(dae.der(x), c.unaryMinus().times(x));
+      jshell> dae.set("c", 3);
+      jshell> dae.create("f", List.of("x"), List.of("ode")).invoke(2)
+      -6
       \enddoctest
       \endlang
 
@@ -4517,6 +5469,13 @@ class CASADI_EXPORT DaeBuilder
       \lang{julia}
       \doctest
       julia> ca.symbolic(ca.DaeBuilder("m"))
+      true
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> new DaeBuilder("m").symbolic()
       true
       \enddoctest
       \endlang
@@ -4610,6 +5569,17 @@ class CASADI_EXPORT DaeBuilder
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> DaeBuilder dae = new DaeBuilder("m");
+      jshell> MX x = dae.add("x");
+      jshell> List.of(dae.has("x"), dae.has("der(x)"), dae.has("time"))
+      [true, false, true]
+      jshell> List.of(dae.der(x), dae.has("der(x)"))
+      [der(x), true]
+      \enddoctest
+      \endlang
+
       \sa all, var
 
       \identifier{2me} */
@@ -4660,6 +5630,18 @@ class CASADI_EXPORT DaeBuilder
        "__assign__der(x)__"
       julia> ca.all(dae, "x"), ca.all(dae, "w"), ca.all(dae, "calculated")
       (["x"], ["der(x)"], ["__assign__der(x)__"])
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> DaeBuilder dae = new DaeBuilder("m");
+      jshell> MX x = dae.add("x");
+      jshell> dae.eq(dae.der(x), x.unaryMinus());
+      jshell> dae.all()
+      [time, x, der(x), __assign__der(x)__]
+      jshell> List.of(dae.all("x"), dae.all("w"), dae.all("calculated"))
+      [[x], [der(x)], [__assign__der(x)__]]
       \enddoctest
       \endlang
 
@@ -4754,6 +5736,25 @@ class CASADI_EXPORT DaeBuilder
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> DaeBuilder dae = new DaeBuilder("m");
+      jshell> MX x = dae.add("x");
+      jshell> MX w = dae.add("w");
+      jshell> dae.eq(w, ca.sin(x));
+      jshell> dae.eq(dae.der(x), w.unaryMinus());
+      jshell> Function f = dae.oracle();
+      jshell> List.of(f.name(), f.name_in())
+      [mx_oracle, [t, p, d, w, u, x, z, q]]
+      jshell> f.name_out()
+      [ode, alg, quad, zero, ddef, wdef, y]
+      jshell> List.of(f.size1_in("w"), f.size1_in("p"))
+      [2, 0]
+      jshell> List.of(dae.oracle(true).class_name(), dae.oracle(false, true).name_in())
+      [SXFunction, [t, p, d, u, x, z, q]]
+      \enddoctest
+      \endlang
+
       \sa create, symbolic
 
       \identifier{2mh} */
@@ -4799,6 +5800,17 @@ class CASADI_EXPORT DaeBuilder
       julia> ca.eq(dae, ca.der(dae, x), -x*u)
       julia> ca.jac_sparsity(dae, ["der(x)"], ["x", "u"])
       Sparsity(1x2,0nz)
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> DaeBuilder dae = new DaeBuilder("m");
+      jshell> MX x = dae.add("x");
+      jshell> MX u = dae.add("u", "input");
+      jshell> dae.eq(dae.der(x), x.unaryMinus().times(u));
+      jshell> dae.jac_sparsity(List.of("der(x)"), List.of("x", "u"))
+      1x2,0nz
       \enddoctest
       \endlang
 

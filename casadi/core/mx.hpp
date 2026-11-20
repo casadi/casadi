@@ -132,6 +132,23 @@ namespace casadi {
       \enddoctest
       \endlang
 
+      \lang{java}
+      \doctest
+      jshell> MX x = MX.sym("x", 2);
+      jshell> MX A = MX.sym("A", 2, 2);
+      jshell> MX e = ca.mtimes(A, x).plus(1);
+      jshell> e
+      (ones(2x1)+mac(A,x,zeros(2x1)))
+      jshell> e.size()
+      long[2] { 2, 1 }
+      jshell> List.of(e.n_dep(), e.is_symbolic())
+      [2, false]
+      jshell> Function f = new Function("f", List.of(A, x), List.of(e));
+      jshell> f.invoke(new DM(new double[][] {{1, 2}, {3, 4}}), new DM(new double[] {1, 1}))
+      [4, 8]
+      \enddoctest
+      \endlang
+
       \sa SX, DM, Function
 
       \author Joel Andersson
@@ -176,6 +193,17 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> new MX()
+        0x0
+        jshell> new MX().size()
+        long[2] { 0, 0 }
+        jshell> new MX().is_constant()
+        true
+        \enddoctest
+        \endlang
+
         \identifier{q0} */
     MX();
 
@@ -217,6 +245,17 @@ namespace casadi {
         julia> Z[2, 3] = ca.MX.sym("x");
         julia> ca.sparsity(Z)
         Sparsity(2x3,1nz)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> MX Z = new MX(2, 3);
+        jshell> List.of(Z, Z.nnz(), Z.is_zero())
+        [zeros(2x3,0nz), 0, true]
+        jshell> Z.set(1, 2, MX.sym("x"));
+        jshell> Z.sparsity()
+        2x3,1nz
         \enddoctest
         \endlang
 
@@ -265,6 +304,16 @@ namespace casadi {
         DM(
         [[1, 00],
          [1, 1]])
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> new MX(Sparsity.lower(2))
+        ones(2x2,3nz)
+        jshell> ca.evalf(new MX(Sparsity.lower(2)))
+        [[1, 00],
+         [1, 1]]
         \enddoctest
         \endlang
 
@@ -334,6 +383,21 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> MX v = MX.sym("v", 3);
+        jshell> MX L = new MX(Sparsity.lower(2), v);
+        jshell> List.of(L.sparsity(), L.is_constant())
+        [2x2,3nz, false]
+        jshell> new Function("f", List.of(v), List.of(L)).invoke(new DM(new double[] {1, 2, 3}))
+        [[1, 00],
+         [2, 3]]
+        jshell> ca.evalf(new MX(Sparsity.lower(2), new MX(7)))
+        [[7, 00],
+         [7, 7]]
+        \enddoctest
+        \endlang
+
         \sa MX.sym, sparsity_cast
 
         \identifier{q4} */
@@ -372,6 +436,17 @@ namespace casadi {
                catch e
                    println(occursin("Cannot open file", sprint(showerror, e)))
                end
+        true
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> try {
+           ...>   new MX(Sparsity.lower(2), "no_such_file.txt");
+           ...> } catch (CasadiException e) {
+           ...>   System.out.println(e.getMessage().contains("Cannot open file"));
+           ...> }
         true
         \enddoctest
         \endlang
@@ -417,6 +492,16 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> MX p = new MX(new DM(new double[] {1, 2}), "p");
+        jshell> List.of(p, p.is_constant())
+        [constant_pool('p'): [1, 2], true]
+        jshell> ca.evalf(ca.times(2, p))
+        [2, 4]
+        \enddoctest
+        \endlang
+
         \sa CodeGenerator
 
         \identifier{2aa} */
@@ -448,6 +533,18 @@ namespace casadi {
         julia> c = ca.MX(3.5);
         julia> c, ca.is_constant(c), size(c), Float64(c)
         (3.5, true, (1, 1), 3.5)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> MX c = new MX(3.5);
+        jshell> List.of(c, c.is_constant())
+        [3.5, true]
+        jshell> c.size()
+        long[2] { 1, 1 }
+        jshell> c.to_double()
+        3.5
         \enddoctest
         \endlang
 
@@ -508,6 +605,19 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> MX c = new MX(new DM(Sparsity.diag(2), new DM(new double[] {1, 2})));
+        jshell> List.of(c.sparsity(), c.is_constant())
+        [2x2,2nz, true]
+        jshell> new MX(new double[] {1, 2, 3}).size()
+        long[2] { 3, 1 }
+        jshell> new MX(new double[][] {{1, 2}, {3, 4}})
+        [[1, 2],
+         [3, 4]]
+        \enddoctest
+        \endlang
+
         \sa to_DM, evalf
 
         \identifier{q8} */
@@ -565,6 +675,15 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> MX.sym("S", Sparsity.lower(2)).sparsity()
+        2x2,3nz
+        jshell> MX.sym("S", Sparsity.lower(2)).plus(1).sparsity()
+        2x2
+        \enddoctest
+        \endlang
+
         \identifier{qc} */
     const Sparsity& sparsity() const;
 
@@ -610,6 +729,19 @@ namespace casadi {
                catch e
                    println(occursin("constant scalar", sprint(showerror, e)))
                end
+        true
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> List.of(new MX(2).nonzero(), new MX(0).nonzero())
+        [true, false]
+        jshell> try {
+           ...>   MX.sym("x").nonzero();
+           ...> } catch (CasadiException e) {
+           ...>   System.out.println(e.getMessage().contains("Can only determine truth value of a numeric MX"));
+           ...> }
         true
         \enddoctest
         \endlang
@@ -672,6 +804,17 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> MX B = MX.sym("B", 3, 3);
+        jshell> B.erase(new long[] {0}, new long[] {1});
+        jshell> B.sparsity()
+        3x3,8nz
+        jshell> B.size()
+        long[2] { 3, 3 }
+        \enddoctest
+        \endlang
+
         \sa enlarge, Sparsity.erase
 
         \identifier{qe} */
@@ -707,6 +850,15 @@ namespace casadi {
         julia> ca.erase(B, [0, 4]);
         julia> ca.sparsity(B)
         Sparsity(3x3,7nz)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> MX B = MX.sym("B", 3, 3);
+        jshell> B.erase(new long[] {0, 4});
+        jshell> B.sparsity()
+        3x3,7nz
         \enddoctest
         \endlang
 
@@ -755,6 +907,19 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> MX B = MX.sym("B", 2, 2);
+        jshell> B.enlarge(3, 3, new long[] {0, 2}, new long[] {0, 2});
+        jshell> B.size()
+        long[2] { 3, 3 }
+        jshell> B.nnz()
+        4
+        jshell> B.sparsity().row()
+        long[4] { 0, 2, 0, 2 }
+        \enddoctest
+        \endlang
+
         \sa erase, Sparsity.enlarge
 
         \identifier{qg} */
@@ -791,6 +956,14 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> MX x = MX.sym("x");
+        jshell> List.of(x.unaryMinus(), x.unaryMinus().unaryMinus())
+        [(-x), x]
+        \enddoctest
+        \endlang
+
         \identifier{2pq} */
     MX operator-() const;
 
@@ -810,6 +983,16 @@ namespace casadi {
         (MX((1./A)), MX(A))
         >>> evalf(MX(4).inv())
         DM(0.25)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> MX A = MX.sym("A", 2, 2);
+        jshell> List.of(A.inv(), A.inv().inv())
+        [(1./A), A]
+        jshell> ca.evalf(new MX(4).inv())
+        0.25
         \enddoctest
         \endlang
 
@@ -878,6 +1061,18 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> MX x = MX.sym("x");
+        jshell> MX y = MX.sym("y");
+        jshell> MX e = x.times(y).plus(1);
+        jshell> List.of(e.n_dep(), e.dep(0), e.dep(1))
+        [2, 1, (x*y)]
+        jshell> List.of(e.dep(1).dep(0), x.n_dep())
+        [x, 0]
+        \enddoctest
+        \endlang
+
         \sa n_dep, op, is_op
 
         \identifier{qj} */
@@ -924,6 +1119,19 @@ namespace casadi {
         julia> call = ca.dep(r0, 0);
         julia> call, ca.n_out(call), ca.n_out(r0)
         (f(x), 2, 1)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> SX a = SX.sym("a");
+        jshell> Function f = new Function("f", List.of(a), List.of(a.plus(1), ca.times(2, a)));
+        jshell> MX x = MX.sym("x");
+        jshell> List<MX> r = f.call(List.of(x));
+        jshell> MX r0 = r.get(0), r1 = r.get(1);
+        jshell> MX call = r0.dep(0);
+        jshell> List.of(call, call.n_out(), r0.n_out())
+        [f(x), 2, 1]
         \enddoctest
         \endlang
 
@@ -981,6 +1189,21 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> SX a = SX.sym("a");
+        jshell> Function f = new Function("f", List.of(a), List.of(a.plus(1), ca.times(2, a)));
+        jshell> MX x = MX.sym("x");
+        jshell> List<MX> r = f.call(List.of(x));
+        jshell> MX r0 = r.get(0), r1 = r.get(1);
+        jshell> MX call = r0.dep(0);
+        jshell> List.of(call.get_output(1), ca.is_equal(call.get_output(0), r0))
+        [f(x){1}, true]
+        jshell> x.get_output(0)
+        x
+        \enddoctest
+        \endlang
+
         \sa n_out, which_output
 
         \identifier{ql} */
@@ -1027,6 +1250,17 @@ namespace casadi {
         (0, 1, 2, 3)
         julia> ca.n_dep(A * A), ca.n_dep(A[1, 1]), ca.n_dep(ca.MX(1))
         (3, 1, 0)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> MX x = MX.sym("x");
+        jshell> MX A = MX.sym("A", 2, 2);
+        jshell> List.of(x.n_dep(), ca.sin(x).n_dep(), x.plus(1).n_dep(), ca.vertcat(List.of(x, x, x)).n_dep())
+        [0, 1, 2, 3]
+        jshell> List.of(ca.mtimes(A, A).n_dep(), A.get(0, 0).n_dep(), new MX(1).n_dep())
+        [3, 1, 0]
         \enddoctest
         \endlang
 
@@ -1078,6 +1312,20 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> MX x = MX.sym("x", 2);
+        jshell> x.name()
+        "x"
+        jshell> try {
+           ...>   x.plus(1).name();
+           ...> } catch (CasadiException e) {
+           ...>   System.out.println(e.getMessage().contains("'name' not defined"));
+           ...> }
+        true
+        \enddoctest
+        \endlang
+
         \sa is_symbolic, symvar
 
         \identifier{2pr} */
@@ -1117,6 +1365,19 @@ namespace casadi {
                catch e
                    println(occursin("requires a constant scalar", sprint(showerror, e)))
                end
+        true
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> new MX(2).to_double()
+        2.0
+        jshell> try {
+           ...>   MX.sym("x").to_double();
+           ...> } catch (CasadiException e) {
+           ...>   System.out.println(e.getMessage().contains("'to_double' not defined"));
+           ...> }
         true
         \enddoctest
         \endlang
@@ -1172,6 +1433,20 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> new MX(new DM(new double[][] {{1, 2}, {3, 4}})).to_DM()
+        [[1, 2],
+         [3, 4]]
+        jshell> try {
+           ...>   MX.sym("x").plus(1).to_DM();
+           ...> } catch (CasadiException e) {
+           ...>   System.out.println(e.getMessage().contains("'get_DM' not defined"));
+           ...> }
+        true
+        \enddoctest
+        \endlang
+
         \sa evalf, is_constant
 
         \identifier{2pt} */
@@ -1211,6 +1486,16 @@ namespace casadi {
         julia> ca.is_symbolic(x), ca.is_symbolic(x + 1), ca.is_symbolic([x; x])
         (true, false, false)
         julia> ca.is_symbolic(ca.MX.sym("e", 2, 0))
+        false
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> MX x = MX.sym("x");
+        jshell> List.of(x.is_symbolic(), x.plus(1).is_symbolic(), ca.vertcat(List.of(x, x)).is_symbolic())
+        [true, false, false]
+        jshell> MX.sym("e", 2, 0).is_symbolic()
         false
         \enddoctest
         \endlang
@@ -1256,6 +1541,15 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> List.of(new MX(1).is_constant(), new MX(2, 2).is_constant(), MX.sym("x").is_constant())
+        [true, true, false]
+        jshell> new MX(1).plus(new MX(2)).is_constant()
+        true
+        \enddoctest
+        \endlang
+
         \sa is_symbolic, to_DM, evalf
 
         \identifier{2pv} */
@@ -1285,6 +1579,13 @@ namespace casadi {
         \doctest
         julia> ca.is_integer(ca.MX(3)), ca.is_integer(ca.MX(3.5)), ca.is_integer(ca.MX.sym("x"))
         (true, false, false)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> List.of(new MX(3).is_integer(), new MX(3.5).is_integer(), MX.sym("x").is_integer())
+        [true, false, false]
         \enddoctest
         \endlang
 
@@ -1321,6 +1622,15 @@ namespace casadi {
         julia> x = ca.MX.sym("x"); y = ca.MX.sym("y");
         julia> ca.is_doubled(x + x), ca.is_doubled(2 * x), ca.is_doubled(x + y)
         (true, true, false)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> MX x = MX.sym("x");
+        jshell> MX y = MX.sym("y");
+        jshell> List.of(x.plus(x).is_doubled(), ca.times(2, x).is_doubled(), x.plus(y).is_doubled())
+        [true, true, false]
         \enddoctest
         \endlang
 
@@ -1372,6 +1682,20 @@ namespace casadi {
         julia> ca.is_call(r0), ca.is_output(r0), ca.is_call(ca.dep(r0, 0))
         (false, true, true)
         julia> ca.name(ca.which_function(ca.dep(r0, 0)))
+        "f"
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> SX a = SX.sym("a");
+        jshell> Function f = new Function("f", List.of(a), List.of(a.plus(1), ca.times(2, a)));
+        jshell> MX x = MX.sym("x");
+        jshell> List<MX> r = f.call(List.of(x));
+        jshell> MX r0 = r.get(0), r1 = r.get(1);
+        jshell> List.of(r0.is_call(), r0.is_output(), r0.dep(0).is_call())
+        [false, true, true]
+        jshell> r0.dep(0).which_function().name()
         "f"
         \enddoctest
         \endlang
@@ -1433,6 +1757,23 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> SX a = SX.sym("a");
+        jshell> Function f = new Function("f", List.of(a), List.of(ca.times(2, a)));
+        jshell> MX x = MX.sym("x");
+        jshell> MX r = (MX) f.invoke(x);
+        jshell> r.dep(0).which_function().name()
+        "f"
+        jshell> try {
+           ...>   r.which_function();
+           ...> } catch (CasadiException e) {
+           ...>   System.out.println(e.getMessage().contains("'which_function' not defined"));
+           ...> }
+        true
+        \enddoctest
+        \endlang
+
         \sa is_call
 
         \identifier{2py} */
@@ -1487,6 +1828,20 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> SX a = SX.sym("a");
+        jshell> Function f = new Function("f", List.of(a), List.of(a.plus(1), ca.times(2, a)));
+        jshell> MX x = MX.sym("x");
+        jshell> List<MX> r = f.call(List.of(x));
+        jshell> MX r0 = r.get(0), r1 = r.get(1);
+        jshell> List.of(r1, r1.is_output(), r1.which_output(), r1.dep(0))
+        [f(x){1}, true, 1, f(x)]
+        jshell> List.of(x.is_output(), x.plus(1).is_output())
+        [false, false]
+        \enddoctest
+        \endlang
+
         \sa which_output, is_call, has_output
 
         \identifier{2pz} */
@@ -1533,6 +1888,18 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> SX a = SX.sym("a");
+        jshell> Function f = new Function("f", List.of(a), List.of(a.plus(1), ca.times(2, a)));
+        jshell> MX x = MX.sym("x");
+        jshell> List<MX> r = f.call(List.of(x));
+        jshell> MX r0 = r.get(0), r1 = r.get(1);
+        jshell> List.of(r0.dep(0).has_output(), r0.has_output(), x.has_output())
+        [true, false, false]
+        \enddoctest
+        \endlang
+
         \sa n_out, get_output, is_output
 
         \identifier{284} */
@@ -1573,6 +1940,18 @@ namespace casadi {
         julia> r0, r1 = f(x);
         julia> ca.which_output(r0), ca.which_output(r1)
         (0, 1)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> SX a = SX.sym("a");
+        jshell> Function f = new Function("f", List.of(a), List.of(a.plus(1), ca.times(2, a)));
+        jshell> MX x = MX.sym("x");
+        jshell> List<MX> r = f.call(List.of(x));
+        jshell> MX r0 = r.get(0), r1 = r.get(1);
+        jshell> List.of(r0.which_output(), r1.which_output())
+        [0, 1]
         \enddoctest
         \endlang
 
@@ -1621,6 +2000,16 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> MX x = MX.sym("x", 2);
+        jshell> List.of(x.plus(1).is_op(Operation.OP_ADD.swigValue()), ca.sin(x).is_op(Operation.OP_SIN.swigValue()), x.is_op(Operation.OP_PARAMETER.swigValue()))
+        [true, true, true]
+        jshell> List.of(x.get(0).is_op(Operation.OP_GETNONZEROS.swigValue()), new MX(1).is_op(Operation.OP_CONST.swigValue()))
+        [true, true]
+        \enddoctest
+        \endlang
+
         \sa op
 
         \identifier{2q1} */
@@ -1653,6 +2042,14 @@ namespace casadi {
         julia> A = ca.MX.sym("A", 2, 2);
         julia> ca.is_multiplication(A * A), ca.is_multiplication(A .* A)
         (true, false)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> MX A = MX.sym("A", 2, 2);
+        jshell> List.of(ca.mtimes(A, A).is_multiplication(), A.times(A).is_multiplication())
+        [true, false]
         \enddoctest
         \endlang
 
@@ -1690,6 +2087,15 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> MX x = MX.sym("x");
+        jshell> MX y = MX.sym("y");
+        jshell> List.of(x.plus(y).is_commutative(), x.minus(y).is_commutative())
+        [true, false]
+        \enddoctest
+        \endlang
+
         \sa is_binary, is_unary
 
         \identifier{2q3} */
@@ -1721,6 +2127,14 @@ namespace casadi {
         julia> A = ca.MX.sym("A", 2, 2);
         julia> ca.is_norm(ca.norm_2(A)), ca.is_norm(ca.norm_fro(A)), ca.is_norm(sqrt(ca.dot(A, A)))
         (true, true, false)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> MX A = MX.sym("A", 2, 2);
+        jshell> List.of(ca.norm_2(A).is_norm(), ca.norm_fro(A).is_norm(), ca.sqrt(ca.dot(A, A)).is_norm())
+        [true, true, false]
         \enddoctest
         \endlang
 
@@ -1770,6 +2184,17 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> MX x = MX.sym("x", 2);
+        jshell> MX y = MX.sym("y", 3);
+        jshell> List.of(ca.vertcat(List.of(x, y)).is_valid_input(), ca.vertcat(List.of(x, y)).T().is_valid_input())
+        [true, true]
+        jshell> List.of(x.plus(1).is_valid_input(), new MX(1).is_valid_input(), new MX(2, 2).is_valid_input())
+        [false, false, true]
+        \enddoctest
+        \endlang
+
         \sa primitives, n_primitives, is_symbolic
 
         \identifier{qn} */
@@ -1804,6 +2229,15 @@ namespace casadi {
         julia> x = ca.MX.sym("x", 2); y = ca.MX.sym("y", 3);
         julia> ca.n_primitives([x; y]), ca.n_primitives(x)
         (2, 1)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> MX x = MX.sym("x", 2);
+        jshell> MX y = MX.sym("y", 3);
+        jshell> List.of(ca.vertcat(List.of(x, y)).n_primitives(), x.n_primitives())
+        [2, 1]
         \enddoctest
         \endlang
 
@@ -1855,6 +2289,17 @@ namespace casadi {
         julia> ca.primitives(reshape(x, 1, 2))
         1-element Vector{MX}:
          MX(x)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> MX x = MX.sym("x", 2);
+        jshell> MX y = MX.sym("y", 3);
+        jshell> ca.vertcat(List.of(x, y)).primitives()
+        [x, y]
+        jshell> ca.reshape(x, 1, 2).primitives()
+        [x]
         \enddoctest
         \endlang
 
@@ -1914,6 +2359,18 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> MX x = MX.sym("x", 2);
+        jshell> MX y = MX.sym("y", 3);
+        jshell> MX X = ca.vertcat(List.of(x, y));
+        jshell> X.split_primitives(new DM(new double[] {1, 2, 3, 4, 5}))
+        [[1, 2], [3, 4, 5]]
+        jshell> X.split_primitives(SX.sym("z", 5))
+        [[z_0, z_1], [z_2, z_3, z_4]]
+        \enddoctest
+        \endlang
+
         \sa join_primitives, primitives
 
         \identifier{qq} */
@@ -1970,6 +2427,22 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> MX x = MX.sym("x", 2);
+        jshell> MX y = MX.sym("y", 3);
+        jshell> MX X = ca.vertcat(List.of(x, y));
+        jshell> X.join_primitives(List.of(new DM(new double[] {1, 2}), new DM(new double[] {3, 4, 5})))
+        [1, 2, 3, 4, 5]
+        jshell> try {
+           ...>   X.join_primitives(List.of(new DM(new double[] {1, 2})));
+           ...> } catch (CasadiException e) {
+           ...>   System.out.println(e.getMessage().contains("Wrong number of primitives"));
+           ...> }
+        true
+        \enddoctest
+        \endlang
+
         \sa split_primitives, primitives
 
         \identifier{qr} */
@@ -2021,6 +2494,17 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> MX x = MX.sym("x", 2);
+        jshell> ca.vertcat(List.of(x, x)).has_duplicates()
+        true
+        jshell> ca.vertcat(List.of(x, x)).reset_input();
+        jshell> ca.vertcat(List.of(x, MX.sym("y"))).has_duplicates()
+        false
+        \enddoctest
+        \endlang
+
         \sa reset_input, is_valid_input
 
         \identifier{qs} */
@@ -2058,6 +2542,13 @@ namespace casadi {
         \doctest
         julia> ca.is_eye(ca.MX.eye(2)), ca.is_eye(ca.MX([1 0; 0 1])), ca.is_eye(ca.MX(1))
         (true, false, true)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> List.of(MX.eye(2).is_eye(), new MX(new DM(new double[][] {{1, 0}, {0, 1}})).is_eye(), new MX(1).is_eye())
+        [true, false, true]
         \enddoctest
         \endlang
 
@@ -2103,6 +2594,16 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> MX x = MX.sym("x");
+        jshell> List.of(new MX(0).is_zero(), new MX(2, 2).is_zero(), x.minus(x).is_zero(), x.is_zero())
+        [true, true, true, false]
+        jshell> MX.sym("e", 2, 0).is_zero()
+        true
+        \enddoctest
+        \endlang
+
         \identifier{qv} */
     bool is_zero() const;
 
@@ -2135,6 +2636,13 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> List.of(new MX(1).is_one(), MX.ones(2, 2).is_one(), new MX(Sparsity.lower(2)).is_one())
+        [true, true, false]
+        \enddoctest
+        \endlang
+
         \identifier{qw} */
     bool is_one() const;
 
@@ -2161,6 +2669,13 @@ namespace casadi {
         \doctest
         julia> ca.is_minus_one(ca.MX(-1)), ca.is_minus_one(-ca.MX(1)), ca.is_minus_one(ca.MX(1))
         (true, true, false)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> List.of(new MX(-1).is_minus_one(), new MX(1).unaryMinus().is_minus_one(), new MX(1).is_minus_one())
+        [true, true, false]
         \enddoctest
         \endlang
 
@@ -2208,6 +2723,15 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> List.of(new MX(3).is_value(3), new MX(new DM(new double[] {3, 3})).is_value(3), new MX(new DM(new double[] {3, 4})).is_value(3))
+        [true, true, false]
+        jshell> MX.sym("x").is_value(3)
+        false
+        \enddoctest
+        \endlang
+
         \identifier{2eq} */
     bool is_value(double val) const;
 
@@ -2233,6 +2757,13 @@ namespace casadi {
         \doctest
         julia> ca.is_inf(ca.MX.inf()), ca.is_inf(ca.MX.inf(2, 2)), ca.is_inf(ca.MX(1))
         (true, true, false)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> List.of(MX.inf().is_inf(), MX.inf(2, 2).is_inf(), new MX(1).is_inf())
+        [true, true, false]
         \enddoctest
         \endlang
 
@@ -2263,6 +2794,13 @@ namespace casadi {
         \doctest
         julia> ca.is_minus_inf(-ca.MX.inf()), ca.is_minus_inf(ca.MX.inf())
         (true, false)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> List.of(MX.inf().unaryMinus().is_minus_inf(), MX.inf().is_minus_inf())
+        [true, false]
         \enddoctest
         \endlang
 
@@ -2297,6 +2835,14 @@ namespace casadi {
         julia> A = ca.MX.sym("A", 2, 2);
         julia> ca.is_transpose(A'), ca.is_transpose(A), ca.is_transpose(ca.MX.sym("v", 2)')
         (true, false, false)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> MX A = MX.sym("A", 2, 2);
+        jshell> List.of(A.T().is_transpose(), A.is_transpose(), MX.sym("v", 2).T().is_transpose())
+        [true, false, false]
         \enddoctest
         \endlang
 
@@ -2346,6 +2892,19 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> List.of(new MX(1).is_regular(), MX.inf().is_regular(), new MX(new DM(new double[] {1, Double.NaN})).is_regular())
+        [true, false, false]
+        jshell> try {
+           ...>   MX.sym("x").is_regular();
+           ...> } catch (CasadiException e) {
+           ...>   System.out.println(e.getMessage().contains("Cannot check regularity for symbolic MX"));
+           ...> }
+        true
+        \enddoctest
+        \endlang
+
         \identifier{2q5} */
     bool is_regular() const;
 
@@ -2382,6 +2941,16 @@ namespace casadi {
         julia> x = ca.MX.sym("x"); y = ca.MX.sym("y"); A = ca.MX.sym("A", 2, 2);
         julia> ca.is_binary(x + y), ca.is_binary(x^y), ca.is_binary(A * A), ca.is_binary(x + x)
         (true, true, false, false)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> MX x = MX.sym("x");
+        jshell> MX y = MX.sym("y");
+        jshell> MX A = MX.sym("A", 2, 2);
+        jshell> List.of(x.plus(y).is_binary(), ca.power(x, y).is_binary(), ca.mtimes(A, A).is_binary(), x.plus(x).is_binary())
+        [true, true, false, false]
         \enddoctest
         \endlang
 
@@ -2430,6 +2999,16 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> MX x = MX.sym("x");
+        jshell> List.of(ca.power(x, 2).is_nonnegative(), ca.abs(x).is_nonnegative(), ca.exp(x).is_nonnegative())
+        [true, true, true]
+        jshell> List.of(x.is_nonnegative(), new MX(-3).is_nonnegative(), new MX(0).is_nonnegative())
+        [false, false, true]
+        \enddoctest
+        \endlang
+
         \identifier{2e3} */
     bool is_nonnegative() const;
 
@@ -2464,6 +3043,15 @@ namespace casadi {
         julia> x = ca.MX.sym("x"); A = ca.MX.sym("A", 2, 2);
         julia> ca.is_unary(sin(x)), ca.is_unary(-x), ca.is_unary(x), ca.is_unary(A')
         (true, true, false, false)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> MX x = MX.sym("x");
+        jshell> MX A = MX.sym("A", 2, 2);
+        jshell> List.of(ca.sin(x).is_unary(), x.unaryMinus().is_unary(), x.is_unary(), A.T().is_unary())
+        [true, true, false, false]
         \enddoctest
         \endlang
 
@@ -2507,6 +3095,16 @@ namespace casadi {
                ca.op(ca.MX(1)) == ca.OP_CONST
         (true, true, true)
         julia> ca.print_operator(x + 1, ["a", "b"])
+        "(a+b)"
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> MX x = MX.sym("x");
+        jshell> List.of(x.op() == Operation.OP_PARAMETER.swigValue(), x.plus(1).op() == Operation.OP_ADD.swigValue(), new MX(1).op() == Operation.OP_CONST.swigValue())
+        [true, true, true]
+        jshell> ca.print_operator(x.plus(1), List.of("a", "b"))
         "(a+b)"
         \enddoctest
         \endlang
@@ -2555,6 +3153,16 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> MX X = MX.sym("X", 2, 2);
+        jshell> X.get(0, 1).info()
+        {slice={start=2, step=1, stop=3}}
+        jshell> X.info()
+        {}
+        \enddoctest
+        \endlang
+
         \identifier{2q9} */
     Dict info() const;
 
@@ -2593,6 +3201,17 @@ namespace casadi {
         julia> d = ca.StringDeserializer(ca.encode(s));
         julia> ca.unpack(d)
         MX((1+x))
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> MX x = MX.sym("x");
+        jshell> StringSerializer s = new StringSerializer();
+        jshell> s.pack(x.plus(1));
+        jshell> StringDeserializer d = new StringDeserializer(s.encode());
+        jshell> d.unpack()
+        (1+x)
         \enddoctest
         \endlang
 
@@ -2673,6 +3292,23 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> MX x = MX.sym("x");
+        jshell> MX y = MX.sym("y");
+        jshell> List.of(MX.binary(Operation.OP_ADD.swigValue(), x, y), MX.unary(Operation.OP_SIN.swigValue(), x))
+        [(x+y), sin(x)]
+        jshell> MX.binary(Operation.OP_ADD.swigValue(), MX.sym("V", 2, 4), MX.sym("W", 2, 2))
+        (V+repmat(W, 2))
+        jshell> try {
+           ...>   MX.binary(Operation.OP_ADD.swigValue(), MX.sym("v", 2), MX.sym("w", 3));
+           ...> } catch (CasadiException e) {
+           ...>   System.out.println(e.getMessage().contains("Dimension mismatch"));
+           ...> }
+        true
+        \enddoctest
+        \endlang
+
         \sa op
 
         \identifier{r1} */
@@ -2706,6 +3342,13 @@ namespace casadi {
         \doctest
         julia> ca.MX.inf(), ca.MX.inf(2, 1), ca.MX.inf(ca.Sparsity.lower(2))
         (inf, inf(2x1), inf(2x2,3nz))
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> List.of(MX.inf(), MX.inf(2, 1), MX.inf(Sparsity.lower(2)))
+        [inf, inf(2x1), inf(2x2,3nz)]
         \enddoctest
         \endlang
 
@@ -2744,6 +3387,13 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> List.of(MX.nan(), MX.nan(Sparsity.lower(2)))
+        [nan, nan(2x2,3nz)]
+        \enddoctest
+        \endlang
+
         \sa inf
 
         \identifier{r3} */
@@ -2773,6 +3423,13 @@ namespace casadi {
         \doctest
         julia> ca.MX.eye(2), ca.is_eye(ca.MX.eye(2))
         (ones(2x2,2nz), true)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> List.of(MX.eye(2), MX.eye(2).is_eye())
+        [ones(2x2,2nz), true]
         \enddoctest
         \endlang
 
@@ -2881,6 +3538,31 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> MX X = MX.sym("X", 3, 3);
+        jshell> List.of(X.get(4), X.get(-1), X.get(new DM(new double[] {0, 4})))
+        [X[4], X[8], X[:8:4]]
+        jshell> X.get(new Slice(1, 3)).size()
+        long[2] { 2, 1 }
+        jshell> try {
+           ...>   X.get(9);
+           ...> } catch (CasadiException e) {
+           ...>   System.out.println(e.getMessage().contains("Out of bounds"));
+           ...> }
+        true
+        jshell> MX S = MX.sym("S", Sparsity.lower(2));
+        jshell> List.of(S.get(2), S.get(2).nnz())
+        [00, 0]
+        jshell> X.get(Sparsity.lower(3))
+        project(X)
+        jshell> MX k = MX.sym("k");
+        jshell> MX v = MX.sym("v", 4);
+        jshell> List.of(v.get(k), new Function("f", List.of(v, k), List.of(v.get(k))).invoke(new DM(new double[] {10, 20, 30, 40}), 1.7))
+        [v[k], 20]
+        \enddoctest
+        \endlang
+
         \sa set, get_nz, nz
 
         \identifier{2qa} */
@@ -2942,6 +3624,24 @@ namespace casadi {
         julia> S = ca.MX.sym("S", ca.Sparsity.lower(3));
         julia> ca.sparsity(S[:, 1]), ca.nnz(S[1, 3])
         (3x1, 0)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> MX X = MX.sym("X", 3, 3);
+        jshell> X.get(0, 1)
+        X[3]
+        jshell> X.get(1, new Slice()).size()
+        long[2] { 1, 3 }
+        jshell> X.get(new DM(new double[] {0, 2}), new DM(new double[] {0, 2})).size()
+        long[2] { 2, 2 }
+        jshell> MX S = MX.sym("S", Sparsity.lower(3));
+        jshell> List.of(S.get(new Slice(), 0).sparsity(), S.get(0, 2).nnz())
+        [3x1, 0]
+        jshell> MX k = MX.sym("k");
+        jshell> X.get(k, 1)
+        X[(k;3:6:3)]
         \enddoctest
         \endlang
 
@@ -3043,6 +3743,26 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> MX Y = MX.sym("Y", 3, 3);
+        jshell> MX alias = Y, copy = new MX(Y), twice = ca.times(2, Y);
+        jshell> Y.set(new DM(new double[] {4}), 5);
+        jshell> List.of(Y, Y.n_dep(), Y.dep(0), Y.dep(1))
+        [(Y[4] = 5), 2, Y, 5]
+        jshell> List.of(alias, copy, twice)
+        [(Y[4] = 5), Y, (2.*Y)]
+        jshell> MX Z = new MX(3, 3);
+        jshell> Z.set(new DM(new double[] {0, 8}), MX.sym("a", 2));
+        jshell> Z.sparsity()
+        3x3,2nz
+        jshell> Y = MX.sym("Y", 3, 3);
+        jshell> Y.set(Sparsity.lower(3), 1);
+        jshell> Y
+        (Y[0, 1, 2, 4, 5, 8] = ones(6x1))
+        \enddoctest
+        \endlang
+
         \sa get, set_nz
 
         \identifier{2qc} */
@@ -3102,6 +3822,24 @@ namespace casadi {
                catch e
                    println(occursin("Dimension mismatch", sprint(showerror, e)))
                end
+        true
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> MX Y = MX.sym("Y", 3, 3);
+        jshell> Y.set(new Slice(), 0, MX.sym("c", 1, 3));
+        jshell> Y
+        (Y[:3] = c')
+        jshell> Y.set(new Slice(0, 2), new Slice(0, 2), 0);
+        jshell> Y.sparsity()
+        3x3
+        jshell> try {
+           ...>   Y.set(new Slice(), 0, MX.sym("d", 2));
+           ...> } catch (CasadiException e) {
+           ...>   System.out.println(e.getMessage().contains("Dimension mismatch"));
+           ...> }
         true
         \enddoctest
         \endlang
@@ -3166,6 +3904,23 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> MX S = MX.sym("S", Sparsity.lower(3));
+        jshell> S.get_nz(false, 1)
+        S[1]
+        jshell> S.get_nz(false, new Slice()).size()
+        long[2] { 6, 1 }
+        jshell> S.nnz()
+        6
+        jshell> MX k = MX.sym("k");
+        jshell> S.get_nz(false, k)
+        S[k]
+        jshell> MX.sym("x", 2, 2).get_nz(false, new DM(new double[] {})).size()
+        long[2] { 0, 1 }
+        \enddoctest
+        \endlang
+
         \sa set_nz, get
 
         \identifier{2qe} */
@@ -3226,6 +3981,19 @@ namespace casadi {
         MX(((Y[0] = 7)[(k-1)] = 8))
         julia> ca.is_op(Y, ca.OP_SETNONZEROS_PARAM)
         true
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> MX Y = MX.sym("Y", 3, 3);
+        jshell> Y.set_nz(7, false, 0);
+        jshell> Y
+        (Y[0] = 7)
+        jshell> MX k = MX.sym("k");
+        jshell> Y.set_nz(8, false, k);
+        jshell> List.of(Y, Y.is_op(Operation.OP_SETNONZEROS_PARAM.swigValue()))
+        [((Y[0] = 7)[k] = 8), true]
         \enddoctest
         \endlang
 
@@ -3303,6 +4071,23 @@ namespace casadi {
         DM(
         [[22, 49],
          [28, 64]])
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> MX A = MX.sym("A", 6);
+        jshell> MX B = MX.sym("B", 6);
+        jshell> MX C = ca.einstein(A, B, new long[] {2, 3}, new long[] {3, 2}, new long[] {2, 2}, new long[] {-1, -3}, new long[] {-3, -2}, new long[] {-1, -2});
+        jshell> C.size()
+        long[2] { 4, 1 }
+        jshell> Function f = new Function("f", List.of(A, B), List.of(C));
+        jshell> DM r = new DM(new double[] {1, 2, 3, 4, 5, 6});
+        jshell> f.invoke(r, r)
+        [22, 28, 49, 64]
+        jshell> ca.mtimes(ca.reshape(r, 2, 3), ca.reshape(r, 3, 2))
+        [[22, 49],
+         [28, 64]]
         \enddoctest
         \endlang
 
@@ -3548,6 +4333,19 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> double[][] knots = {{0, 0, 0, 0, 1, 2, 3, 3, 3, 3}};
+        jshell> DM B = MX.bspline_dual(new double[] {0.5, 1.5}, knots, new long[] {3});
+        jshell> B.size()
+        long[2] { 2, 6 }
+        jshell> ca.sum2(B)
+        [1, 1]
+        jshell> ca.mtimes(B, new DM(new double[] {0, 1, 2, 3, 4, 5}))
+        [1.17708, 2.5]
+        \enddoctest
+        \endlang
+
         \sa bspline
 
         \identifier{2qg} */
@@ -3618,6 +4416,24 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> MX g = MX.sym("g", 3);
+        jshell> MX v = MX.sym("v", 3);
+        jshell> MX xq = MX.sym("xq", 2);
+        jshell> MX e = MX.interpn_linear(List.of(g), v, List.of(xq));
+        jshell> Function f = new Function("f", List.of(g, v, xq), List.of(e));
+        jshell> f.invoke(new DM(new double[] {0, 1, 2}), new DM(new double[] {0, 10, 40}), new DM(new double[] {0.5, 3}))
+        [5, 70]
+        jshell> try {
+           ...>   MX.interpn_linear(List.of(g), MX.sym("w", 4), List.of(xq));
+           ...> } catch (CasadiException e) {
+           ...>   System.out.println(e.getMessage().contains("Dimension mismatch"));
+           ...> }
+        true
+        \enddoctest
+        \endlang
+
         \sa interpolant, low
 
         \identifier{r6} */
@@ -3658,6 +4474,16 @@ namespace casadi {
         julia> e = ca.printme(x, y);
         julia> e, ca.is_op(e, ca.OP_PRINTME)
         (printme(x,y), true)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> MX x = MX.sym("x");
+        jshell> MX y = MX.sym("y");
+        jshell> MX e = x.printme(y);
+        jshell> List.of(e, e.is_op(Operation.OP_PRINTME.swigValue()))
+        [printme(x,y), true]
         \enddoctest
         \endlang
 
@@ -3722,6 +4548,25 @@ namespace casadi {
                catch e
                    println(occursin("Argument must be vector", sprint(showerror, e)))
                end
+        true
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> MX v = MX.sym("v", 3);
+        jshell> Function f = new Function("f", List.of(v), List.of(ca.find(v)));
+        jshell> ca.find(v).size()
+        long[2] { 1, 1 }
+        jshell> List.of(f.invoke(new DM(new double[] {0, 3, 1})), f.invoke(new DM(new double[] {0, 0, 0})))
+        [1, 3]
+        jshell> ca.evalf(ca.find(new MX(new DM(Sparsity.unit(3, 2), new DM(new double[] {1})))))
+        2
+        jshell> try {
+           ...>   ca.find(MX.sym("A", 2, 2));
+           ...> } catch (CasadiException e) {
+           ...>   System.out.println(e.getMessage().contains("Argument must be vector"));
+           ...> }
         true
         \enddoctest
         \endlang
@@ -3792,6 +4637,24 @@ namespace casadi {
                catch e
                    println(occursin("Invalid lookup mode", sprint(showerror, e)))
                end
+        true
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> MX g = MX.sym("g", 4);
+        jshell> MX p = MX.sym("p", 5);
+        jshell> Function f = new Function("f", List.of(g, p), List.of(ca.low(g, p)));
+        jshell> f.invoke(new DM(new double[] {0, 1, 2, 3}), new DM(new double[] {-1, 0, 1.5, 3, 4}))
+        [0, 0, 1, 2, 2]
+        jshell> ca.jacobian(ca.low(g, p), p).nnz()
+        0
+        jshell> try {
+           ...>   ca.low(g, p, Map.of("lookup_mode", "foo"));
+           ...> } catch (CasadiException e) {
+           ...>   System.out.println(e.getMessage().contains("Invalid lookup mode"));
+           ...> }
         true
         \enddoctest
         \endlang
@@ -3881,6 +4744,31 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> MX x = MX.sym("x");
+        jshell> MX y = MX.sym("y");
+        jshell> MX s = x.plus(y);
+        jshell> MX e = ca.sin(s).plus(s);
+        jshell> ca.graph_substitute(e, List.of(s), List.of(new MX(3)))
+        3.14112
+        jshell> ca.graph_substitute(e, List.of(x.plus(y)), List.of(new MX(3)))
+        @1=(x+y), (sin(@1)+@1)
+        jshell> try {
+           ...>   ca.substitute(e, s, new MX(3));
+           ...> } catch (CasadiException err) {
+           ...>   System.out.println(err.getMessage().contains("not symbolic"));
+           ...> }
+        true
+        jshell> try {
+           ...>   ca.graph_substitute(e, List.of(s), List.of(MX.sym("z", 2)));
+           ...> } catch (CasadiException err) {
+           ...>   System.out.println(err.getMessage().contains("Inconsistent shapes"));
+           ...> }
+        true
+        \enddoctest
+        \endlang
+
         \sa substitute
 
         \identifier{r9} */
@@ -3927,6 +4815,15 @@ namespace casadi {
         2-element Vector{MX}:
          MX(0.14112)
          MX(6)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> MX x = MX.sym("x");
+        jshell> MX s = x.plus(1);
+        jshell> ca.graph_substitute(List.of(ca.sin(s), ca.times(2, s)), List.of(s), List.of(new MX(3)))
+        [0.14112, 6]
         \enddoctest
         \endlang
 
@@ -4010,6 +4907,22 @@ namespace casadi {
         DM(5.9093)
         julia> ca.which_function(ca.dep(ca.matrix_expand(e, [sx]), 0))
         Function(expand_tmp_matrix_expand:(i0,i1)->(o0) SXFunction)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> MX x = MX.sym("x");
+        jshell> Function g = new Function("g", List.of(x), List.of(ca.power(x, 2).plus(1)));
+        jshell> MX sx = ca.sin(x);
+        jshell> MX e = ((MX) g.invoke(x)).plus(sx);
+        jshell> MX r = ca.matrix_expand(e);
+        jshell> List.of(r, r.is_output(), r.dep(0).which_function())
+        [expand_tmp_matrix_expand(x){0}, true, expand_tmp_matrix_expand:(i0)->(o0) SXFunction]
+        jshell> new Function("f", List.of(x), List.of(r)).invoke(2.0)
+        5.9093
+        jshell> ca.matrix_expand(e, List.of(sx)).dep(0).which_function()
+        expand_tmp_matrix_expand:(i0,i1)->(o0) SXFunction
         \enddoctest
         \endlang
 
@@ -4109,6 +5022,26 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> MX x = MX.sym("x");
+        jshell> double[][] knots = {{0, 0, 0, 0, 1, 2, 3, 3, 3, 3}};
+        jshell> DM c = new DM(new double[] {0, 1, 2, 3, 4, 5});
+        jshell> MX y = ca.bspline(x, c, knots, new long[] {3}, 1);
+        jshell> Function f = new Function("f", List.of(x), List.of(y));
+        jshell> List.of(y, f.invoke(1.5), f.invoke(4.0))
+        [BSpline(x), 2.5, 0]
+        jshell> new Function("df", List.of(x), List.of(ca.jacobian(y, x))).invoke(1.5)
+        1.125
+        jshell> try {
+           ...>   ca.bspline(MX.sym("v", 2), c, knots, new long[] {3}, 1);
+           ...> } catch (CasadiException e) {
+           ...>   System.out.println(e.getMessage().contains("must match"));
+           ...> }
+        true
+        \enddoctest
+        \endlang
+
         \sa bspline_dual, interpolant
 
         \identifier{2qi} */
@@ -4165,6 +5098,19 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> MX x = MX.sym("x");
+        jshell> MX C = MX.sym("C", 6);
+        jshell> double[][] knots = {{0, 0, 0, 0, 1, 2, 3, 3, 3, 3}};
+        jshell> MX y = ca.bspline(x, C, knots, new long[] {3}, 1);
+        jshell> y
+        BSplineParametric(x, C)
+        jshell> new Function("f", List.of(x, C), List.of(y)).invoke(1.5, new DM(new double[] {0, 1, 2, 3, 4, 5}))
+        2.5
+        \enddoctest
+        \endlang
+
         \identifier{2qj} */
     inline friend MX bspline(const MX& x, const MX& coeffs,
             const std::vector< std::vector<double> >& knots,
@@ -4209,6 +5155,18 @@ namespace casadi {
         julia> f = ca.Function("f", [x, C, K], [y]);
         julia> f(1.5, 0:5, [0, 0, 0, 0, 1, 2, 3, 3, 3, 3])
         DM(2.5)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> MX x = MX.sym("x");
+        jshell> MX C = MX.sym("C", 6);
+        jshell> MX K = MX.sym("K", 10);
+        jshell> MX y = ca.bspline(x, C, List.of(K), new long[] {3}, 1);
+        jshell> Function f = new Function("f", List.of(x, C, K), List.of(y));
+        jshell> f.invoke(1.5, new DM(new double[] {0, 1, 2, 3, 4, 5}), new DM(new double[] {0, 0, 0, 0, 1, 2, 3, 3, 3, 3}))
+        2.5
         \enddoctest
         \endlang
 
@@ -4320,6 +5278,30 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> MX H = MX.sym("H", 2, 2);
+        jshell> Function f = new Function("f", List.of(H), List.of(ca.convexify(H)));
+        jshell> f.invoke(new DM(new double[][] {{1, 0}, {0, -2}}))
+        [[1, 0],
+         [0, 1e-07]]
+        jshell> f = new Function("f", List.of(H), List.of(ca.convexify(H, Map.of("strategy", "eigen-reflect"))));
+        jshell> f.invoke(new DM(new double[][] {{1, 0}, {0, -2}}))
+        [[1, 0],
+         [0, 2]]
+        jshell> f = new Function("f", List.of(H), List.of(ca.convexify(H, Map.of("strategy", "regularize", "margin", 0.5))));
+        jshell> f.invoke(new DM(new double[][] {{1, 0}, {0, -2}}))
+        [[3.5, 0],
+         [0, 0.5]]
+        jshell> try {
+           ...>   ca.convexify(H, Map.of("strategy", "foo"));
+           ...> } catch (CasadiException e) {
+           ...>   System.out.println(e.getMessage().contains("Invalid convexify strategy"));
+           ...> }
+        true
+        \enddoctest
+        \endlang
+
         \sa nlpsol
 
         \identifier{2ql} */
@@ -4387,6 +5369,22 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> MX A = MX.sym("A", 2, 2);
+        jshell> List.of(ca.inv_node(A), ca.inv_node(A).is_op(Operation.OP_INVERSE.swigValue()))
+        [inv(A), true]
+        jshell> ca.jacobian(ca.inv_node(A), A).size()
+        long[2] { 4, 4 }
+        jshell> try {
+           ...>   ca.inv_node(MX.sym("B", 2, 3));
+           ...> } catch (CasadiException e) {
+           ...>   System.out.println(e.getMessage().contains("must be square"));
+           ...> }
+        true
+        \enddoctest
+        \endlang
+
         \sa inv, solve
 
         \identifier{re} */
@@ -4445,6 +5443,22 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> ca.evalf(ca.mtimes(new MX(new DM(new double[][] {{1, 2}, {3, 4}})), new MX(new double[] {1, 1})))
+        [3, 7]
+        jshell> ca.evalf(new MX(Sparsity.lower(2)).times(2))
+        [[2, 00],
+         [2, 2]]
+        jshell> try {
+           ...>   ca.evalf(MX.sym("x").plus(1));
+           ...> } catch (CasadiException e) {
+           ...>   System.out.println(e.getMessage().contains("are free"));
+           ...> }
+        true
+        \enddoctest
+        \endlang
+
         \sa to_DM, Function
 
         \identifier{rf} */
@@ -4487,6 +5501,15 @@ namespace casadi {
         julia> e = x * ca.stop_diff(x^2, 1);
         julia> ca.Function("f", [x], [e, ca.jacobian(e, x)])(3)
         (27, 9)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> MX x = MX.sym("x");
+        jshell> MX e = x.times(ca.stop_diff(ca.power(x, 2), 1));
+        jshell> new Function("f", List.of(x), List.of(e, ca.jacobian(e, x))).invoke(3.0)
+        [27, 9]
         \enddoctest
         \endlang
 
@@ -4538,6 +5561,17 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> MX x = MX.sym("x");
+        jshell> MX y = ca.no_grad(ca.power(x, 2));
+        jshell> List.of(new Function("f", List.of(x), List.of(y)).invoke(3.0), ca.jacobian(y, x).nnz())
+        [9, 0]
+        jshell> new Function("f", List.of(x), List.of(ca.jacobian(x.times(y), x))).invoke(3.0)
+        9
+        \enddoctest
+        \endlang
+
         \sa stop_diff, no_hess
 
         \identifier{25m} */
@@ -4577,6 +5611,15 @@ namespace casadi {
         julia> y = ca.no_hess(x^3);
         julia> ca.Function("f", [x], [ca.jacobian(y, x)])(2), ca.nnz(first(ca.hessian(y, x)))
         (12, 0)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> MX x = MX.sym("x");
+        jshell> MX y = ca.no_hess(ca.power(x, 3));
+        jshell> List.of(new Function("f", List.of(x), List.of(ca.jacobian(y, x))).invoke(2.0), ((MX) ca.hessian(y, x).get(0)).nnz())
+        [12, 0]
         \enddoctest
         \endlang
 
@@ -4626,6 +5669,17 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> MX x = MX.sym("x");
+        jshell> MX y = MX.sym("y");
+        jshell> MX e = ca.stop_diff(x.times(y), x, 1);
+        ...
+        jshell> List.of(ca.jacobian(e, x).nnz(), new Function("f", List.of(x, y), List.of(ca.jacobian(e, y))).invoke(2.0, 3.0))
+        [0, 2]
+        \enddoctest
+        \endlang
+
         \identifier{25o} */
     inline friend MX stop_diff(const MX& expr, const MX& var, casadi_int order) {
       return MX::stop_diff(expr, var, order);
@@ -4665,6 +5719,15 @@ namespace casadi {
         julia> x = ca.MX.sym("x"); y = ca.MX.sym("y");
         julia> ca.difference([x, y, x], [y]), ca.difference([x + 1], [x + 1])
         (MX[x, x], MX[(1+x)])
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> MX x = MX.sym("x");
+        jshell> MX y = MX.sym("y");
+        jshell> List.of(ca.difference(List.of(x, y, x), List.of(y)), ca.difference(List.of(x.plus(1)), List.of(x.plus(1))))
+        [[x, x], [(1+x)]]
         \enddoctest
         \endlang
 
@@ -4734,6 +5797,24 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> MX x = MX.sym("x");
+        jshell> MX e = x.attachAssert(ca.gt(x, 0), "x must be positive");
+        jshell> e
+        assertion(x, (0<x))
+        jshell> Function f = new Function("f", List.of(x), List.of(e));
+        jshell> f.invoke(1.0)
+        1
+        jshell> try {
+           ...>   f.invoke(-1.0);
+           ...> } catch (CasadiException err) {
+           ...>   System.out.println(err.getMessage().contains("Assertion error: x must be positive"));
+           ...> }
+        true
+        \enddoctest
+        \endlang
+
         \sa monitor, printme
 
         \identifier{rg} */
@@ -4770,6 +5851,15 @@ namespace casadi {
         julia> e = ca.monitor(x, "value of x");
         julia> e, ca.is_op(e, ca.OP_MONITOR)
         (monitor(x, value of x), true)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> MX x = MX.sym("x");
+        jshell> MX e = x.monitor("value of x");
+        jshell> List.of(e, e.is_op(Operation.OP_MONITOR.swigValue()))
+        [monitor(x, value of x), true]
         \enddoctest
         \endlang
 
@@ -4830,6 +5920,18 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> MX A = MX.sym("A", 2, 3);
+        jshell> A.T()
+        A'
+        jshell> A.T().size()
+        long[2] { 3, 2 }
+        jshell> A.T().T()
+        A
+        \enddoctest
+        \endlang
+
         \sa is_transpose, transpose
 
         \identifier{2qn} */
@@ -4876,6 +5978,20 @@ namespace casadi {
                catch e
                    println(occursin("'mapping' not defined", sprint(showerror, e)))
                end
+        true
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> MX X = MX.sym("X", 3, 3);
+        jshell> List.of(X.get(0, 1).mapping(), X.get(new Slice(), 1).mapping())
+        [3, [3, 4, 5]]
+        jshell> try {
+           ...>   X.mapping();
+           ...> } catch (CasadiException e) {
+           ...>   System.out.println(e.getMessage().contains("'mapping' not defined"));
+           ...> }
         true
         \enddoctest
         \endlang
@@ -4938,6 +6054,21 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> MX x = MX.sym("x");
+        jshell> MX y = MX.sym("y");
+        jshell> List.of(MX.get_max_depth(), x.plus(y).minus(x.plus(y)))
+        [1, 0]
+        jshell> MX.set_max_depth(0);
+        jshell> x.plus(y).minus(x.plus(y))
+        ((x+y)-(x+y))
+        jshell> MX.set_max_depth();
+        jshell> MX.get_max_depth()
+        1
+        \enddoctest
+        \endlang
+
         \sa get_max_depth, is_equal
 
         \identifier{rj} */
@@ -4985,6 +6116,15 @@ namespace casadi {
         julia> f = ca.Function("f", [x], [2 * x]);
         julia> ca.MX.get_input(f), ca.is_equal(ca.MX.get_input(f)[1], x)
         (MX[x], true)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> MX x = MX.sym("x");
+        jshell> Function f = new Function("f", List.of(x), List.of(ca.times(2, x)));
+        jshell> List.of(MX.get_input(f), ca.is_equal(MX.get_input(f).get(0), x))
+        [[x], true]
         \enddoctest
         \endlang
 
@@ -5040,6 +6180,22 @@ namespace casadi {
                catch e
                    println(occursin("variables [y] are free", sprint(showerror, e)))
                end
+        true
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> MX x = MX.sym("x");
+        jshell> MX y = MX.sym("y");
+        jshell> Function f = new Function("f", List.of(x), List.of(x.plus(y)), Map.of("allow_free", true));
+        jshell> List.of(MX.get_free(f), MX.get_free(new Function("g", List.of(x), List.of(x))))
+        [[y], []]
+        jshell> try {
+           ...>   new Function("f", List.of(x), List.of(x.plus(y)));
+           ...> } catch (CasadiException e) {
+           ...>   System.out.println(e.getMessage().contains("variables [y] are free"));
+           ...> }
         true
         \enddoctest
         \endlang
@@ -5101,6 +6257,17 @@ namespace casadi {
         julia> ca.eval_mx(ca.MX.sym("v", 3)[2], [ca.MX([4, 5, 6])])
         1-element Vector{MX}:
          MX([4, 5, 6][1])
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> MX x = MX.sym("x");
+        jshell> MX y = MX.sym("y");
+        jshell> List.of(x.times(y).eval_mx(List.of(new MX(2), new MX(3))), x.plus(y).eval_mx(List.of(y, x)))
+        [[6], [(y+x)]]
+        jshell> MX.sym("v", 3).get(1).eval_mx(List.of(new MX(new double[] {4, 5, 6})))
+        [[4, 5, 6][1]]
         \enddoctest
         \endlang
 
@@ -5204,6 +6371,20 @@ namespace casadi {
       DM(
       [[10, 12],
        [18, 20]])
+      \enddoctest
+      \endlang
+
+      \lang{java}
+      \doctest
+      jshell> MX M = MX.sym("M", 4, 4);
+      jshell> MX X = MX.sym("X", 2, 2);
+      jshell> Function f = new Function("f", List.of(M, X), List.of(ca.kron_contract(M, X, true), ca.kron_contract(M, X, false)));
+      jshell> f.invoke(new DM(new double[][] {{0, 1, 2, 3}, {4, 5, 6, 7}, {8, 9, 10, 11}, {12, 13, 14, 15}}), DM.eye(2))
+      [
+      [[5, 9],
+       [21, 25]],
+      [[10, 12],
+       [18, 20]]]
       \enddoctest
       \endlang
 

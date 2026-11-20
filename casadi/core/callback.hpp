@@ -144,6 +144,42 @@ namespace casadi {
    \enddoctest
    \endlang
 
+   \lang{java}
+   \doctest
+   jshell> class MyCallback extends Callback {
+      ...>   double d;
+      ...>   MyCallback(String name, double d, Map<String, ?> opts) {
+      ...>     this.d = d;
+      ...>     construct(name, opts);
+      ...>   }
+      ...>   MyCallback(String name, double d) { this(name, d, Map.of()); }
+      ...>   public long get_n_in() { return 1; }
+      ...>   public long get_n_out() { return 1; }
+      ...>   public List<DM> eval(List<DM> arg) {
+      ...>     return List.of(ca.sin(arg.get(0).times(d)));
+      ...>   }
+      ...> }
+   jshell> MyCallback f = new MyCallback("f", 0.5);
+   jshell> f
+   f:(i0)->(o0) CallbackInternal
+   jshell> f.invoke(2.0)
+   0.841471
+   jshell> MX x = MX.sym("x");
+   jshell> f.invoke(x)
+   f(x){0}
+   jshell> try {
+      ...>   ca.jacobian((MX) f.invoke(x), x);
+      ...> } catch (CasadiException e) {
+      ...>   System.out.println(e.getMessage().contains("Derivatives cannot be calculated for f"));
+      ...> }
+   true
+   jshell> f = new MyCallback("f", 0.5, Map.of("enable_fd", true));
+   jshell> Function J = new Function("J", List.of(x), List.of(ca.jacobian((MX) f.invoke(x), x)));
+   jshell> J.invoke(2.0)
+   0.270151
+   \enddoctest
+   \endlang
+
    The callback object must outlive every use of the Function:
 
    \lang{python}
@@ -205,6 +241,31 @@ namespace casadi {
    \enddoctest
    \endlang
 
+   \lang{java}
+   \doctest
+   jshell> class Sq extends Callback {
+      ...>   Sq(String name, Map<String, ?> opts) { construct(name, opts); }
+      ...>   Sq(String name) { this(name, Map.of()); }
+      ...>   public List<DM> eval(List<DM> arg) {
+      ...>     return List.of(ca.power(arg.get(0), 2));
+      ...>   }
+      ...> }
+   jshell> MX x = MX.sym("x");
+   jshell> Sq f = new Sq("f");
+   jshell> Function F = new Function("F", List.of(x), List.of((MX) f.invoke(x)));
+   jshell> F.invoke(3.0)
+   9
+   jshell> f.delete();
+   jshell> try {
+      ...>   F.invoke(3.0);
+      ...> } catch (CasadiException e) {
+      ...>   String[] lines = e.getMessage().split("\n");
+      ...>   System.out.println(lines[lines.length - 1]);
+      ...> }
+   Callback object has been deleted
+   \enddoctest
+   \endlang
+
    Use in an NLP with finite differences:
 
    \lang{python}
@@ -254,6 +315,25 @@ namespace casadi {
                      Dict("print_level" => 0, "sb" => "yes"))
    julia> ca.value(ca.solve(opti), v)
    1.0
+   \enddoctest
+   \endlang
+
+   \lang{java}
+   \doctest
+   jshell> class Sq extends Callback {
+      ...>   Sq(String name, Map<String, ?> opts) { construct(name, opts); }
+      ...>   Sq(String name) { this(name, Map.of()); }
+      ...>   public List<DM> eval(List<DM> arg) {
+      ...>     return List.of(ca.power(arg.get(0), 2));
+      ...>   }
+      ...> }
+   jshell> Sq f = new Sq("f", Map.of("enable_fd", true));
+   jshell> Opti opti = new Opti();
+   jshell> MX v = opti.variable();
+   jshell> opti.minimize((MX) f.invoke(v.minus(1)));
+   jshell> opti.solver("ipopt", Map.of("print_time", false), Map.of("print_level", 0, "sb", "yes"));
+   jshell> opti.solve().value(v)
+   1
    \enddoctest
    \endlang
 
@@ -323,6 +403,25 @@ namespace casadi {
                catch e
                    println(e isa MethodError)
                end
+        true
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> class Sq extends Callback {
+           ...>   Sq(String name, Map<String, ?> opts) { construct(name, opts); }
+           ...>   Sq(String name) { this(name, Map.of()); }
+           ...>   public List<DM> eval(List<DM> arg) {
+           ...>     return List.of(ca.power(arg.get(0), 2));
+           ...>   }
+           ...> }
+        jshell> Sq f = new Sq("f");
+        jshell> try {
+           ...>   new Callback(f);
+           ...> } catch (CasadiException e) {
+           ...>   System.out.println(e.getMessage().contains("Callback objects cannot be copied"));
+           ...> }
         true
         \enddoctest
         \endlang
@@ -401,6 +500,27 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> class Sq extends Callback {
+           ...>   Sq(String name, Map<String, ?> opts) { construct(name, opts); }
+           ...>   Sq(String name) { this(name, Map.of()); }
+           ...>   public List<DM> eval(List<DM> arg) {
+           ...>     return List.of(ca.power(arg.get(0), 2));
+           ...>   }
+           ...> }
+        jshell> Sq f = new Sq("f", Map.of("enable_fd", true, "fd_method", "forward"));
+        jshell> List.of(f.name(), f.n_in(), f.n_out())
+        [f, 1, 1]
+        jshell> try {
+           ...>   f.construct("g");
+           ...> } catch (CasadiException e) {
+           ...>   System.out.println(e.getMessage().contains("Internal class already created"));
+           ...> }
+        true
+        \enddoctest
+        \endlang
+
         \identifier{o5} */
     void construct(const std::string& name, const Dict& opts=Dict());
 
@@ -462,6 +582,29 @@ namespace casadi {
                end
         before construct
         init
+        finalize
+        after construct
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> class Sq extends Callback {
+           ...>   Sq(String name, Map<String, ?> opts) {
+           ...>     System.out.println("before construct");
+           ...>     construct(name, opts);
+           ...>     System.out.println("after construct");
+           ...>   }
+           ...>   Sq(String name) { this(name, Map.of()); }
+           ...>   public void init() { System.out.println("init " + n_in()); }
+           ...>   public void finalize_() { System.out.println("finalize"); }
+           ...>   public List<DM> eval(List<DM> arg) {
+           ...>     return List.of(ca.power(arg.get(0), 2));
+           ...>   }
+           ...> }
+        jshell> Sq f = new Sq("f");
+        before construct
+        init 1
         finalize
         after construct
         \enddoctest
@@ -566,6 +709,38 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> class Scale extends Callback {
+           ...>   Scale(String name, Map<String, ?> opts) { construct(name, opts); }
+           ...>   Scale(String name) { this(name, Map.of()); }
+           ...>   public long get_n_in() { return 2; }
+           ...>   public Sparsity get_sparsity_in(long i) {
+           ...>     return i == 0 ? Sparsity.dense(2, 1) : Sparsity.dense(1, 1);
+           ...>   }
+           ...>   public Sparsity get_sparsity_out(long i) { return Sparsity.dense(2, 1); }
+           ...>   public List<DM> eval(List<DM> arg) {
+           ...>     return List.of(arg.get(0).times(arg.get(1)));
+           ...>   }
+           ...> }
+        jshell> Scale f = new Scale("f");
+        jshell> f.invoke(new DM(new double[] {1, 2}), 3.0)
+        [3, 6]
+        jshell> class Bad extends Scale {
+           ...>   Bad(String name) { super(name); }
+           ...>   public List<DM> eval(List<DM> arg) {
+           ...>     return List.of(arg.get(1));
+           ...>   }
+           ...> }
+        jshell> try {
+           ...>   new Bad("b").invoke(new DM(new double[] {1, 2}), 3.0);
+           ...> } catch (CasadiException e) {
+           ...>   System.out.println(e.getMessage().contains("Shape mismatch"));
+           ...> }
+        true
+        \enddoctest
+        \endlang
+
         \identifier{o8} */
     virtual std::vector<DM> eval(const std::vector<DM>& arg) const;
 
@@ -607,6 +782,26 @@ namespace casadi {
         julia> f = ca.callback(Sq(), "f");
         julia> f([1, 2, 3])
         DM([1, 4, 9])
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> class Sq extends Callback {
+           ...>   Sq(String name, Map<String, ?> opts) { construct(name, opts); }
+           ...>   Sq(String name) { this(name, Map.of()); }
+           ...>   public Sparsity get_sparsity_in(long i) { return Sparsity.dense(3, 1); }
+           ...>   public Sparsity get_sparsity_out(long i) { return Sparsity.dense(3, 1); }
+           ...>   public boolean has_eval_buffer() { return true; }
+           ...>   public int eval_buffer(List<java.nio.DoubleBuffer> arg, List<java.nio.DoubleBuffer> res) {
+           ...>     java.nio.DoubleBuffer a = arg.get(0), r = res.get(0);
+           ...>     for (int i = 0; i < a.capacity(); i++) r.put(i, a.get(i) * a.get(i));
+           ...>     return 0;
+           ...>   }
+           ...> }
+        jshell> Sq f = new Sq("f");
+        jshell> f.invoke(new DM(new double[] {1, 2, 3}))
+        [1, 4, 9]
         \enddoctest
         \endlang
 
@@ -676,6 +871,23 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> class Split extends Callback {
+           ...>   Split(String name, Map<String, ?> opts) { construct(name, opts); }
+           ...>   Split(String name) { this(name, Map.of()); }
+           ...>   public long get_n_in() { return 1; }
+           ...>   public long get_n_out() { return 2; }
+           ...>   public List<DM> eval(List<DM> arg) {
+           ...>     return List.of(ca.power(arg.get(0), 2), arg.get(0).unaryMinus());
+           ...>   }
+           ...> }
+        jshell> Split f = new Split("f");
+        jshell> f.invoke(3.0)
+        [9, -3]
+        \enddoctest
+        \endlang
+
         \identifier{ob} */
     virtual casadi_int get_n_out();
 
@@ -728,6 +940,26 @@ namespace casadi {
         julia> f = ca.callback(Trace(3), "f");
         julia> ca.sparsity_in(f, 0), f(ca.DM.ones(3, 3))
         (3x3,3nz, 3)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> class Trace extends Callback {
+           ...>   long n;
+           ...>   Trace(String name, long n, Map<String, ?> opts) {
+           ...>     this.n = n;
+           ...>     construct(name, opts);
+           ...>   }
+           ...>   Trace(String name, long n) { this(name, n, Map.of()); }
+           ...>   public Sparsity get_sparsity_in(long i) { return Sparsity.diag(n); }
+           ...>   public List<DM> eval(List<DM> arg) {
+           ...>     return List.of(ca.sum1(ca.diag(arg.get(0))));
+           ...>   }
+           ...> }
+        jshell> Trace f = new Trace("f", 3);
+        jshell> List.of(f.sparsity_in(0), f.invoke(DM.ones(3, 3)))
+        [3x3,3nz, 3]
         \enddoctest
         \endlang
 
@@ -800,6 +1032,26 @@ namespace casadi {
         julia> f(x=2, a=3)
         Dict{String, DM} with 1 entry:
           "y" => 6
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> class Lin extends Callback {
+           ...>   Lin(String name, Map<String, ?> opts) { construct(name, opts); }
+           ...>   Lin(String name) { this(name, Map.of()); }
+           ...>   public long get_n_in() { return 2; }
+           ...>   public String get_name_in(long i) { return List.of("x", "a").get((int) i); }
+           ...>   public String get_name_out(long i) { return "y"; }
+           ...>   public List<DM> eval(List<DM> arg) {
+           ...>     return List.of(arg.get(1).times(arg.get(0)));
+           ...>   }
+           ...> }
+        jshell> Lin f = new Lin("f");
+        jshell> f
+        f:(x,a)->(y) CallbackInternal
+        jshell> f.invoke(Map.of("x", 2.0, "a", 3.0))
+        {y=6}
         \enddoctest
         \endlang
 
@@ -877,6 +1129,30 @@ namespace casadi {
                end
         julia> ca.sparsity_in(ca.jacobian(ca.callback(Sq(), "f")), 1)
         Sparsity(1x1,0nz)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> class Sq extends Callback {
+           ...>   Sq(String name, Map<String, ?> opts) { construct(name, opts); }
+           ...>   Sq(String name) { this(name, Map.of()); }
+           ...>   public List<DM> eval(List<DM> arg) {
+           ...>     return List.of(ca.power(arg.get(0), 2));
+           ...>   }
+           ...>   public boolean has_jacobian() { return true; }
+           ...>   public Function get_jacobian(String name, List<String> inames, List<String> onames, Map<String, ?> opts) {
+           ...>     SX x = SX.sym("x");
+           ...>     SX y = SX.sym("y", uses_output() ? sparsity_out(0) : new Sparsity(1, 1));
+           ...>     return new Function(name, List.of(x, y), List.of(ca.times(2, x)), inames, onames, opts);
+           ...>   }
+           ...> }
+        jshell> class SqU extends Sq {
+           ...>   SqU(String name) { super(name); }
+           ...>   public boolean uses_output() { return true; }
+           ...> }
+        jshell> List.of(new Sq("f").jacobian().sparsity_in(1), new SqU("f").jacobian().sparsity_in(1))
+        [1x1,0nz, 1x1]
         \enddoctest
         \endlang
 
@@ -1001,6 +1277,42 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> class F43 extends Callback {
+           ...>   F43(String name, Map<String, ?> opts) { construct(name, opts); }
+           ...>   F43(String name) { this(name, Map.of()); }
+           ...>   public Sparsity get_sparsity_in(long i) { return Sparsity.dense(4, 1); }
+           ...>   public Sparsity get_sparsity_out(long i) { return Sparsity.dense(3, 1); }
+           ...>   public List<DM> eval(List<DM> arg) {
+           ...>     List<DM> v = ca.vertsplit(arg.get(0));
+           ...>     DM a = v.get(0), b = v.get(1), c = v.get(2), d = v.get(3);
+           ...>     return List.of(ca.vertcat(List.of(ca.sin(c).times(d).plus(ca.power(d, 2)), ca.times(2, a).plus(c), ca.power(b, 2).plus(ca.times(5, c)))));
+           ...>   }
+           ...>   public boolean has_jacobian() { return true; }
+           ...>   public Function get_jacobian(String name, List<String> inames, List<String> onames, Map<String, ?> opts) {
+           ...>     System.out.println(name + " " + inames + " " + onames);
+           ...>     SX x = SX.sym("x", 4);
+           ...>     SX y = SX.sym("y", new Sparsity(3, 1));
+           ...>     List<SX> v = ca.vertsplit(x);
+           ...>     SX a = v.get(0), b = v.get(1), c = v.get(2), d = v.get(3);
+           ...>     SX J = ca.blockcat(List.of(List.of(new SX(0), new SX(0), d.times(ca.cos(c)), ca.sin(c).plus(ca.times(2, d))),
+           ...>                                List.of(new SX(2), new SX(0), new SX(1), new SX(0)),
+           ...>                                List.of(new SX(0), ca.times(2, b), new SX(5), new SX(0))));
+           ...>     return new Function(name, List.of(x, y), List.of(J), inames, onames, opts);
+           ...>   }
+           ...> }
+        jshell> F43 f = new F43("f");
+        jshell> MX x = MX.sym("x", 4);
+        jshell> Function J = new Function("J", List.of(x), List.of(ca.jacobian((MX) f.invoke(x), x)));
+        jac_f [i0, out_o0] [jac_o0_i0]
+        jshell> J.invoke(new DM(new double[] {1, 2, 0, 3}))
+        [[0, 0, 3, 6],
+         [2, 0, 1, 0],
+         [0, 4, 5, 0]]
+        \enddoctest
+        \endlang
+
         \identifier{oh} */
     virtual bool has_jacobian() const;
     virtual Function get_jacobian(const std::string& name,
@@ -1084,6 +1396,30 @@ namespace casadi {
         1 fwd1_f ["i0", "out_o0", "fwd_i0"] ["fwd_o0"]
         julia> J(3)
         DM(6)
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> class Sq extends Callback {
+           ...>   Sq(String name, Map<String, ?> opts) { construct(name, opts); }
+           ...>   Sq(String name) { this(name, Map.of()); }
+           ...>   public List<DM> eval(List<DM> arg) {
+           ...>     return List.of(ca.power(arg.get(0), 2));
+           ...>   }
+           ...>   public boolean has_forward(long nfwd) { return nfwd == 1; }
+           ...>   public Function get_forward(long nfwd, String name, List<String> inames, List<String> onames, Map<String, ?> opts) {
+           ...>     System.out.println(nfwd + " " + name + " " + inames + " " + onames);
+           ...>     SX x = SX.sym("x"), y = SX.sym("y", new Sparsity(1, 1)), xd = SX.sym("xd");
+           ...>     return new Function(name, List.of(x, y, xd), List.of(ca.times(2, x).times(xd)), inames, onames, opts);
+           ...>   }
+           ...> }
+        jshell> Sq f = new Sq("f");
+        jshell> MX x = MX.sym("x");
+        jshell> Function J = new Function("J", List.of(x), List.of(ca.jacobian((MX) f.invoke(x), x)));
+        1 fwd1_f [i0, out_o0, fwd_i0] [fwd_o0]
+        jshell> J.invoke(3.0)
+        6
         \enddoctest
         \endlang
 
@@ -1173,6 +1509,30 @@ namespace casadi {
         \enddoctest
         \endlang
 
+        \lang{java}
+        \doctest
+        jshell> class Sq extends Callback {
+           ...>   Sq(String name, Map<String, ?> opts) { construct(name, opts); }
+           ...>   Sq(String name) { this(name, Map.of()); }
+           ...>   public List<DM> eval(List<DM> arg) {
+           ...>     return List.of(ca.power(arg.get(0), 2));
+           ...>   }
+           ...>   public boolean has_reverse(long nadj) { return nadj == 1; }
+           ...>   public Function get_reverse(long nadj, String name, List<String> inames, List<String> onames, Map<String, ?> opts) {
+           ...>     System.out.println(nadj + " " + name + " " + inames + " " + onames);
+           ...>     SX x = SX.sym("x"), y = SX.sym("y", new Sparsity(1, 1)), yb = SX.sym("yb");
+           ...>     return new Function(name, List.of(x, y, yb), List.of(ca.times(2, x).times(yb)), inames, onames, opts);
+           ...>   }
+           ...> }
+        jshell> Sq f = new Sq("f");
+        jshell> MX x = MX.sym("x");
+        jshell> Function G = new Function("G", List.of(x), List.of(ca.gradient((MX) f.invoke(x), x)));
+        1 adj1_f [i0, out_o0, adj_o0] [adj_i0]
+        jshell> G.invoke(3.0)
+        6
+        \enddoctest
+        \endlang
+
         \identifier{oj} */
     virtual bool has_reverse(casadi_int nadj) const;
     virtual Function get_reverse(casadi_int nadj, const std::string& name,
@@ -1259,6 +1619,31 @@ namespace casadi {
         [[2, 00, 00],
          [00, 4, 00],
          [00, 00, 6]])
+        \enddoctest
+        \endlang
+
+        \lang{java}
+        \doctest
+        jshell> class Diag extends Callback {
+           ...>   Diag(String name, Map<String, ?> opts) { construct(name, opts); }
+           ...>   Diag(String name) { this(name, Map.of()); }
+           ...>   public Sparsity get_sparsity_in(long i) { return Sparsity.dense(3, 1); }
+           ...>   public Sparsity get_sparsity_out(long i) { return Sparsity.dense(3, 1); }
+           ...>   public List<DM> eval(List<DM> arg) {
+           ...>     return List.of(ca.power(arg.get(0), 2));
+           ...>   }
+           ...>   public boolean has_jac_sparsity(long oind, long iind) { return true; }
+           ...>   public Sparsity get_jac_sparsity(long oind, long iind, boolean symmetric) { return Sparsity.diag(3); }
+           ...> }
+        jshell> Diag f = new Diag("f", Map.of("enable_fd", true));
+        jshell> MX x = MX.sym("x", 3);
+        jshell> MX J = ca.jacobian((MX) f.invoke(x), x);
+        jshell> J.sparsity()
+        3x3,3nz
+        jshell> new Function("J", List.of(x), List.of(J)).invoke(new DM(new double[] {1, 2, 3}))
+        [[2, 00, 00],
+         [00, 4, 00],
+         [00, 00, 6]]
         \enddoctest
         \endlang
 

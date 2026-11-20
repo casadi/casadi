@@ -34,6 +34,8 @@
 %include "julia/casadi_julia_head.i"
 #elif defined(SWIGWASMJS)
 %include "wasm-js/casadi_wasmjs_head.i"
+#elif defined(SWIGJAVA)
+%include "java/casadi_java_head.i"
 #elif defined(SWIGRUST)
 %include "rust/casadi_rust_head.i"
 #endif
@@ -188,6 +190,8 @@ namespace std {
 %include "julia/casadi_julia_pre.i"
 #elif defined(SWIGWASMJS)
 %include "wasm-js/casadi_wasmjs_pre.i"
+#elif defined(SWIGJAVA)
+%include "java/casadi_java_pre.i"
 #elif defined(SWIGRUST)
 %include "rust/casadi_rust_pre.i"
 #endif
@@ -1127,6 +1131,8 @@ class _SupportsMX(Protocol):
 %include "julia/casadi_julia_decl.i"
 #elif defined(SWIGWASMJS)
 %include "wasm-js/casadi_wasmjs_decl.i"
+#elif defined(SWIGJAVA)
+%include "java/casadi_java_decl.i"
 #elif defined(SWIGRUST)
 %include "rust/casadi_rust_decl.i"
 #endif
@@ -2062,7 +2068,7 @@ namespace casadi{
 
 
 // Extend DM with SWIG unique features
-#ifndef SWIGWASMJS
+#if !defined(SWIGWASMJS) && !defined(SWIGJAVA)
 namespace casadi{
   %extend Matrix<double> {
     // Convert to a dense matrix
@@ -2105,7 +2111,7 @@ namespace casadi {
 };
 
 
-#ifndef SWIGPYTHON
+#if !defined(SWIGPYTHON) && !defined(SWIGJAVA)
 %ignore FunctionBuffer;
 %ignore _function_buffer_eval;
 #endif
@@ -2248,6 +2254,8 @@ make_property_opti(f_linear_scale, float)
 %include "matlab/casadi_matlab_post.i"
 #elif defined(SWIGWASMJS)
 %include "wasm-js/casadi_wasmjs_post.i"
+#elif defined(SWIGJAVA)
+%include "java/casadi_java_post.i"
 #endif
 // Cleanup for dependent modules
 %exception {
