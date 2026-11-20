@@ -252,7 +252,7 @@ jobs:
           cp casadi-wasm/casadi.js casadi-wasm/casadi.d.ts \
              casadi-wasm/casadi_wasm.js casadi-wasm/casadi_wasm.wasm \
              casadi-wasm/libcasadi_*.so casadi-wasm/plugins.json build-wasm/swig/wasm-js/
-      - uses: actions/setup-node@v4.4.0
+      - uses: actions/setup-node@v7.1.0
         with:
           node-version: '22'
       - run: npm install -g typescript@5  # TS6 errors on tsconfig's deprecated moduleResolution:node
@@ -284,7 +284,7 @@ jobs:
         run: unzip -q casadi_source.zip
       - name: Install Fortran toolchain (from-source solver builds)
         run: sudo apt-get update && sudo apt-get install -y gfortran
-      - uses: julia-actions/setup-julia@v2
+      - uses: julia-actions/setup-julia@v3.0.3
         with:
           version: '1'
       - name: Build core + julia wrapper (SWIG_IMPORT) with full solver set
@@ -334,7 +334,7 @@ jobs:
         with:
           name: casadi-wasm     # same-run artifact (no run-id) -> the bytes we built here
       - run: unzip -q casadi-wasm-v${{ needs.version.outputs.casadi }}.zip
-      - uses: actions/setup-node@v4.4.0
+      - uses: actions/setup-node@v7.1.0
         with:
           node-version: '22'
           registry-url: 'https://registry.npmjs.org'
