@@ -27,9 +27,7 @@
 %module(package="casadi",directors=1) casadi
 
 #ifdef SWIGPYTHON
-// SWIG 4 removed -outputtuple, and its list-based collection of multiple
-// return values swallows any output that is itself a list (swig/swig#1933).
-// Collect in a tuple instead; works with vanilla SWIG, no patched Lib needed.
+// Collect multiple outputs in a tuple (swig/swig#1933)
 #undef SWIG_AppendOutput
 #if SWIG_VERSION >= 0x040300
 #define SWIG_AppendOutput(result, obj)  SWIG_Python_AppendOutput_Tuple(result, obj, $isvoid)
@@ -83,13 +81,7 @@ SWIG_Python_AppendOutput_Tuple(PyObject* result, PyObject* obj, int is_void) {
 // casadi_int type
 %include <casadi/core/casadi_types.hpp>
 
-/* Compat shim for SWIG without the -stubs patch.  The patched fork
- * defines %stub_* primitives (see Lib/python/pyuserdir.swg) and sets
- * SWIG_STUBS_ENABLED when -stubs is passed.  Vanilla SWIG has neither
- * the real macros nor the noop branch, so we declare everything
- * empty here.  Direct `%stubcode %{...%}` use sites must be guarded
- * with `#ifdef SWIG_STUBS_ENABLED` separately -- `%insert("stubs")`
- * isn't a known target in vanilla SWIG. */
+// No-op %stub_* macros without -stubs
 #ifndef SWIG_STUBS_ENABLED
 %define %stub_method(NAME, RET, ARGS...) %enddef
 %define %stub_method0(NAME, RET) %enddef
@@ -304,8 +296,7 @@ SWIG_Python_AppendOutput_Tuple(PyObject* result, PyObject* obj, int is_void) {
   // Truncate at separator
   path = path.substr(0, path.rfind(sep));
 
-  // Octave-on-Windows seems to pick up superfluous +casadi
-  // Make sure we exclude it
+  // Strip a superfluous +casadi (Octave on Windows)
   if (path.rfind(sep)!=std::string::npos && path.substr(path.rfind(sep)+1)=="+casadi")
     path = path.substr(0, path.rfind(sep));
 
@@ -341,7 +332,7 @@ SWIG_Python_AppendOutput_Tuple(PyObject* result, PyObject* obj, int is_void) {
 #ifdef SWIGJULIA
 %{
   namespace casadi {
-    // Redirect printout to Julia's stdout/stderr
+    // Printout goes to Julia's stdout/stderr
     static jl_value_t* julia_write = 0;
     static jl_value_t* julia_flush = 0;
     static void julialogger(const char* s, std::streamsize num, bool error) {
@@ -371,8 +362,7 @@ extern "C" SWIGEXPORT void casadi_julia_logger(jl_value_t* write, jl_value_t* fl
 %}
 #endif // SWIGJULIA
 
-// Turn off the warnings that certain methods are effectively ignored, this seams to be a false warning,
-// for example vertcat(SXVector), vertcat(DMVector) and vertcat(MXVector) appears to work fine
+// Spurious warnings, e.g. for vertcat(SXVector)
 #pragma SWIG nowarn=509,303,302
 
 #define CASADI_EXPORT
@@ -466,10 +456,7 @@ def DM_from_csc(m, check_only=True):
 #endif // WITH_SWIGPYTHON
 
 
-//  These are the following styles
-// error
-// overview
-// group
+// Doc styles: error, overview, group
 
 %feature("autodoc", "1");
 
@@ -565,8 +552,6 @@ namespace std {
 %include "doc.i"
 
 
-// casadi requires SWIG >= 3.0 (Swig::DirectorException inherits from
-// std::exception there, so the std::exception catch already covers it).
 // Exceptions handling
 %include "exception.i"
 #ifdef SWIGJULIA
@@ -589,8 +574,7 @@ namespace std {
 }
 #endif
 
-// Python sometimes takes an approach to not check, but just try.
-// It expects a python error to be thrown.
+// Python expects __int__ to raise on failure
 %exception __int__ {
   try {
     $action
@@ -599,8 +583,7 @@ namespace std {
   }
 }
 
-// See https://github.com/casadi/casadi/issues/701
-// Recent numpys will only catch TypeError or ValueError in printing logic
+// numpy printing only catches TypeError/ValueError (#701)
 %exception __bool__ {
  try {
     $action
@@ -846,8 +829,7 @@ namespace std {
       PyObject *cr = PyObject_CallFunctionObjArgs(dm, p, check_only, NULL);
       if (!cr) return false;
       bool ret;
-      // None signals "not handled by this helper" (issue #4216):
-      // without this check, conv() would dereference None and segfault.
+      // None means not handled (#4216)
       if (cr == Py_None) {
         ret = false;
       } else if (PyBool_Check(cr)) {
@@ -2878,10 +2860,7 @@ namespace std {
 
 %define %casadi_input_typemaps(xName, xStubIn, xTsStub, xPrec, xType...)
 #ifdef SWIGWASMJS
- // wasm_js: all wrapped types cross the wasm boundary as EM_VAL -- an
- // i32 handle into Embind's value table, the wasm-js analog of mxArray*
- // and PyObject*.  to_ptr / SWIG_ConvertPtr unwrap the JS-side carrier
- // (a `{_ptr: <int>}` proxy) via emscripten::val on the wasm side.
+ // Wrapped types cross the wasm boundary as EM_VAL
 %typemap(ctype) xType, const xType&, xType& "EM_VAL"
 #endif
 #ifdef SWIGJULIA
@@ -2905,9 +2884,7 @@ namespace std {
   $1 = casadi::to_ptr($input, static_cast< xType **>(0));
  }
 
- // Directorout typemap; as input by value.  All targets (to_val/to_ptr
- // branch per target); richer per-target bodies override via
- // last-registered-wins (%casadi_director_class).
+ // Directorout typemap; as input by value
 %typemap(directorout, noblock=1, fragment="casadi_all") xType {
     if (!casadi::to_val($input, &$result)) {
       %dirout_fail(SWIG_TypeError,"$type");
@@ -2937,10 +2914,7 @@ namespace std {
 %typemap(freearg, noblock=1) const xType & {}
 
 #ifdef SWIGWASMJS
- // Non-const reference: use the standard SWIG convention.  SWIG_ConvertPtr
- // (Lib/wasm_js/wasm_jsrun.swg) wraps the EM_VAL via emscripten::val,
- // reads the `_ptr` property and writes the C++ pointer through &$1.
- // Mirrors MATLAB's default SWIGTYPE & typemap.
+ // Non-const reference: standard SWIG convention
 %typemap(in, doc=xName, pystub_in=xStubIn, tsstub_in=xTsStub, noblock=1) xType & {
   if (!SWIG_IsOK(SWIG_ConvertPtr($input, (void**)&$1, $1_descriptor, 0))) {
     SWIG_exception_fail(SWIG_TypeError, "Failed to convert input $argnum to type '" xName "'.");
@@ -2951,11 +2925,7 @@ namespace std {
 
 %enddef
 
- // Output typemaps.
- //   xStubOut becomes pystub_out= on return typemaps and &OUTPUT/&INOUT.
- //   xTsStub  becomes tsstub_out= -- single arg used for both input
- //           (e.g. INOUT pass-through) and output positions.  wasm_js
- //           reads tsstub_out for return types directly.
+ // Output typemaps; xStubOut/xTsStub are the .pyi/.d.ts annotations
 %define %casadi_output_typemaps(xName, xStubIn, xStubOut, xTsStub, xType...)
 
 #ifdef SWIGWASMJS
@@ -2997,9 +2967,7 @@ namespace std {
  $1 = &m;
 }
 
- // Directorin typemap; as output.  All targets (from_ref/from_ptr branch
- // per target); wasm-js overrides class types via %casadi_director_class /
- // %casadi_director_vec (last-registered-wins).
+ // Directorin typemap; as output
 %typemap(directorin, noblock=1, fragment="casadi_all") xType, const xType {
     if(!($input = casadi::from_ref($1))) %dirout_fail(SWIG_TypeError,"For director inputs, failed to convert input to " xName ".");
  }
@@ -3051,18 +3019,14 @@ namespace std {
 %julia_convention_repair()
 %enddef
 
- // All-in-one template instantiation + typemaps.
- // xTsStub is a TypeScript type literal pasted verbatim into the .d.ts;
- // single arg used for both input and output positions.
+ // All-in-one template instantiation + typemaps
 %define %casadi_template(xName, xStubIn, xStubOut, xTsStub, xPrec, xType...)
 %template() xType;
 %casadi_input_typemaps(xName, xStubIn, xTsStub, xPrec, xType)
 %casadi_output_typemaps(xName, xStubIn, xStubOut, xTsStub, %arg(xType))
 %enddef
 
-// std::vector<E> variant: under SWIGWASMJS additionally emits the NAMED
-// %template class (the array-marshaling typemaps reference it by name)
-// plus %wasm_vec autoconversion.
+// std::vector<E> variant; wasm-js also gets a named %template and %wasm_vec
 %define %casadi_template_vec(xName, xStubIn, xStubOut, xTsStub, xPrec, xJSName, xElemType...)
 %casadi_template(xName, xStubIn, xStubOut, xTsStub, xPrec, std::vector< xElemType >)
 #ifdef SWIGWASMJS
@@ -3107,9 +3071,7 @@ namespace std {
 %typemap(directorin, noblock=1) std::vector< xElemType >,
                                  const std::vector< xElemType >&,
                                        std::vector< xElemType >& {
-  // SWIG_NewPointerObj routes through clientdata to the JS wrap
-  // automatically (see %casadi_director_class above).  xElemJsName
-  // is unused here, kept for callsite-arity compatibility.
+  // SWIG_NewPointerObj wraps via clientdata
   {
     emscripten::val __a = emscripten::val::array();
     for (size_t __i = 0; __i < $1.size(); ++__i) {
@@ -3137,8 +3099,7 @@ namespace std {
 }
 %enddef
 
-// std::vector<std::string>: each element is a JS primitive string, not
-// a proxy class -- so no __wrap_ helper, plain val::as<std::string>().
+// std::vector<std::string>: elements are plain JS strings
 %define %casadi_director_vec_str
 %typemap(directorin, noblock=1) std::vector< std::string >,
                                  const std::vector< std::string >&,
@@ -3164,10 +3125,7 @@ namespace std {
 }
 %enddef
 
-// ----------------------------------------------------------------------------
-// jsout for std::map<std::string, X>: unbox the EM_VAL into a native JS
-// object (else Function.stats() etc. leak the raw i32 handle).  Values of
-// casadi class type arrive as {_ptr} carriers, same trade-off as vectors.
+// jsout for std::map<std::string, X>: unbox into a native JS object
 %define %casadi_dict_jsout(xValueType...)
 %typemap(jsout) std::map< std::string, xValueType >,
                  const std::map< std::string, xValueType >&,
@@ -3303,24 +3261,13 @@ namespace std {
 #endif
 
 #ifndef SWIGWASMJS
-// wasm_js has direct ctype/in/out typemaps for std::string in
-// Lib/wasm_js/wasm_js.swg (const char* across the wasm boundary,
-// malloc+memcpy for the return path).  The casadi_typemaps version
-// would route through casadi::from_ref(string) returning GUESTOBJECT*,
-// which doesn't match our typed ABI.
+// wasm-js has its own std::string typemaps
 %casadi_typemaps(L_STR, "builtins.str", "builtins.str", "string", PREC_STRING, std::string)
 #endif
 %casadi_template_vec(LL L_STR LR, "Sequence[builtins.str]", "list[builtins.str]", "string[]", PREC_VECTOR, StringVector, std::string)
 %casadi_template(LL LL L_STR LR LR, "Sequence[Sequence[builtins.str]]", "list[list[builtins.str]]", "string[][]", PREC_VECTOR, std::vector<std::vector<std::string> >)
 
-/* -------- PEP-484 stub aliases and preamble.  Active with -stubs. --
- * Each %stub_alias_in(NAME, TYPES) emits `_NAME = TYPES` into the
- * preamble and registers NAME -> _NAME for pystub token substitution.
- * Input aliases widen (to_ptr<T> accepts more than the C++ signature);
- * output aliases stay narrow unless the wrapper unwraps at from_ptr.
- * Do not cross-chain matrix aliases -- narrowest-first overloads want
- * DM subset-of SX and DM subset-of MX but SX and MX must stay independent.
- * ----------------------------------------------------------------- */
+// PEP-484 stub aliases and preamble (-stubs)
 
 #ifdef SWIG_STUBS_ENABLED
 
@@ -3363,14 +3310,7 @@ class _SupportsMX(Protocol):
 
 %}
 
-/* issue #2959: casadi.ArrayInterface (a %pythoncode class, invisible to
- * SWIG's -stubs).  Hand-written here via %stubcode (= %insert("stubs")),
- * the body section SWIG also scans into __all__ -- unlike stubs_preamble,
- * so `from casadi import *` re-exports it.  The three backing-typed
- * subclasses each carry exactly one conversion hook, so an SX-backed array
- * satisfies _SupportsSX only (accepted where _SX is) while a numeric
- * DM-backed array satisfies _SupportsDM (hence _DM, and via the unions _SX
- * and _MX too) -- matching casadi's runtime to_ptr rules. */
+// issue #2959: stub for casadi.ArrayInterface (a %pythoncode class)
 #if defined(SWIG_STUBS_ENABLED) && defined(SWIGPYTHON)
 %stubcode %{class ArrayInterface(Generic[_T]):
     """numpy-semantics array view over a casadi DM/SX/MX.  Constructing one
@@ -3465,23 +3405,11 @@ class ArrayInterfaceMX(ArrayInterface[MX]):
 %}
 #endif
 
-/* Matrix input aliases.  SX/MX both extend DM; they don't extend each
- * other -- to_ptr<SX>(MX) and to_ptr<MX>(SX) fail at runtime.
- *
- * NDArray dtype is intentionally `Any`: numpy stubs evolve rapidly
- * (dtype changes between 1.x / 2.x / 2.3+ using `_AnyShape` vs
- * `tuple[int,...]`; literals like `np.linspace(...)` resolve to
- * different concrete dtypes across versions).  Since casadi's C++
- * runtime accepts any numeric ndarray, false-precision dtype narrowing
- * just caused overload-resolution failures that differed between
- * Python/numpy-version combinations.  `NDArray[Any]` is
- * version-agnostic. */
+// Matrix input aliases; SX and MX do not accept each other
 %stub_alias_in(DM, bool | int | float | DM | Sparsity | _SupportsDM | _SupportsTocsc | Sequence[bool | int | float] | Sequence[Sequence[bool | int | float]] | NDArray[Any] | %arg(np.floating[Any]) | %arg(np.integer[Any]) | np.bool_)
 %stub_alias_in(SX, SX | _SupportsSX | _DM)
 %stub_alias_in(MX, MX | _SupportsMX | _DM)
-/* IM is casadi::Matrix<casadi_int>: typemaps only, no Python class is
- * generated -- so an `IM` term here can never match.  List what
- * to_ptr<IM>() really takes, mirroring _MIndex. */
+// IM has no Python class: list what to_ptr<IM>() accepts
 %stub_alias_in(IM, int | Sequence[int] | Sequence[Sequence[int]] | NDArray[Any] | Sparsity | DM)
 /* Out: from_ptr(const IM*) hands back a DM (e.g. MX::mapping()). */
 %stub_alias_out_key(IM, DM)
@@ -3494,40 +3422,15 @@ class ArrayInterfaceMX(ArrayInterface[MX]):
 
 %stub_alias_in(Slice, Slice | int | slice)
 
-/* Input: precise recursive union -- matches what to_ptr<GenericType>()
- * accepts, guides users constructing options dicts like
- * `{"ipopt": {"tol": 1e-6, ...}, "print_time": True}`.
- *
- * Output: `Any`, deliberately.  Reasons:
- * (1) On return paths (`stats()`, `info()`, etc.) users compare against
- *     plain scalars (`stats["nsteps"] < 2500`).  A recursive union
- *     would disallow operators because not all members support them.
- * (2) pyright's cross-module resolution of our recursive alias is
- *     typeshed/target-dependent: on Py3.11 it silently falls back to
- *     `Unknown` (hiding the real errors), on Py3.8 it resolves and
- *     flags them.  `Any` is stable across all targets.
- * (3) Users inspect stats output freely; precise typing buys nothing. */
-/* Forward references stay unquoted: pyright cannot evaluate a string
- * annotation inside a `|` union and silently degrades the whole alias
- * to Unknown, which disables every check that uses it. */
+// GenericType: precise input union, Any output
+// Forward references stay unquoted inside | unions
 %stub_alias_in(GenericType, bool | int | float | str | Function | Sequence[_GenericType] | %arg(Mapping[str, _GenericType]) | None)
 %stub_alias_out_key(GenericType, Any)
 
-/* __getitem__/__setitem__ axis index.  MX additionally accepts MX
- * indices, added via a narrower %extend overload on MX itself. */
+// Matrix index; MX adds MX indices in its own %extend
 %stub_alias_in(MIndex, int | slice | Slice | Sequence[bool | int] | NDArray[Any] | Sparsity | DM)
 
-/* CasadiMatrix operator overloads.  Emitted on GenericExpressionCommon,
- * which DM/SX/MX all inherit -- per-class overloads narrow the `other`
- * argument to what each class actually accepts at runtime.
- *
- *   DM.__add__(other: _DM) -> DM
- *   SX.__add__(other: _SX) -> SX        (_SX = SX | _SupportsSX | _DM)
- *   MX.__add__(other: _MX) -> MX        (_MX = MX | _SupportsMX | _DM)
- *
- * Crucially, MX + SX is NOT allowed: SX isn't in _MX, and MX isn't in
- * _SX.  Both `__add__` on MX and `__radd__` on SX fail to match,
- * mirroring the runtime behaviour. */
+// CasadiMatrix operator overloads, narrowed per class (no MX + SX)
 %define %stub_CasadiMatrix_binop(NAME)
 %stub_overload_method_selftyped(NAME, DM, DM, other: _DM)
 %stub_overload_method_selftyped(NAME, SX, SX, other: _SX)
@@ -3559,9 +3462,7 @@ class ArrayInterfaceMX(ArrayInterface[MX]):
 %casadi_template(LDICT(LL "Sparsity" LR), "Mapping[builtins.str, Sequence[Sparsity]]", "dict[builtins.str, list[Sparsity]]", "Record<string, Sparsity[]>", PREC_SPARSITY, std::map<std::string, std::vector<casadi::Sparsity > >)
 %casadi_template(LPAIR(LDICT("Sparsity"),"[" L_STR "]"), "tuple[Mapping[builtins.str, Sparsity], Sequence[builtins.str]]", "tuple[dict[builtins.str, Sparsity], list[builtins.str]]", "[Record<string, Sparsity>, string[]]", PREC_SPARSITY, std::pair<std::map<std::string, casadi::Sparsity >, std::vector<std::string> >)
 #ifndef SWIGWASMJS
-// wasm_js: bool / casadi_int handled by direct ctype/in/out typemaps
-// in Lib/wasm_js/wasm_js.swg; vector instantiations go through
-// %template(...) + %wasm_vec(...) for JS-side Array marshaling.
+// wasm-js has its own bool/casadi_int typemaps
 %casadi_typemaps(L_BOOL, "bool", "bool", "boolean", SWIG_TYPECHECK_BOOL, bool)
 %casadi_template("[" L_BOOL "]", "Sequence[bool | int] | NDArray[Any]", "list[bool]", "boolean[]", SWIG_TYPECHECK_BOOL, std::vector<bool>)
 %casadi_template("[[" L_BOOL "]]", "Sequence[Sequence[bool | int]] | Sequence[NDArray[Any]]", "list[list[bool]]", "boolean[][]", SWIG_TYPECHECK_BOOL, std::vector<std::vector<bool> >)
@@ -3585,9 +3486,7 @@ class ArrayInterfaceMX(ArrayInterface[MX]):
 #endif
 %casadi_template_vec("[" L_DOUBLE "]", "Sequence[bool | int | float] | NDArray[Any]", "list[float]", "number[]", SWIG_TYPECHECK_DOUBLE, DoubleVector, double)
 %casadi_template(LL "[" L_DOUBLE "]" LR, "Sequence[Sequence[bool | int | float] | NDArray[Any]]", "list[list[float]]", "number[][]", SWIG_TYPECHECK_DOUBLE, std::vector<std::vector<double> >)
-// ORDER CONSTRAINT (d.ts): TS picks the first matching overload and the
-// _DM/_SX/_MX coercion unions overlap, so instantiate most-specific-first
-// (DM, then SX, then MX) -- wasm-js emits stubs in declaration order.
+// Most specific first: DM, SX, MX (d.ts overload order)
 %casadi_typemaps("DM", "DM", "DM", "DM", PREC_DM, casadi::Matrix<double>)
 %casadi_template_vec(LL "DM" LR, "Sequence[DM]", "list[DM]", "DM[]", PREC_DMVector, DMVector, casadi::Matrix<double>)
 %casadi_template(LL LL "DM" LR LR, "Sequence[Sequence[DM]]", "list[list[DM]]", "DM[][]", PREC_DMVectorVector, std::vector<std::vector< casadi::Matrix<double> > >)
@@ -3604,8 +3503,6 @@ class ArrayInterfaceMX(ArrayInterface[MX]):
 %casadi_template(LDICT("MX"), "Mapping[builtins.str, MX]", "dict[builtins.str, MX]", "Record<string, MX>", PREC_MX, std::map<std::string, casadi::MX>)
 %casadi_template(LPAIR("MX","MX"), "tuple[MX, MX]", "tuple[MX, MX]", "[MX, MX]", PREC_MXVector, std::pair<casadi::MX, casadi::MX>)
 %casadi_typemaps("IM", "IM", "IM", "IM", PREC_IM, casadi::Matrix<casadi_int>)
-// Without CASADI_INT_TYPE, you get SwigValueWrapper
-// With it, docstrings are screwed
 %casadi_typemaps("GenericType", "GenericType", "GenericType", "GenericType", PREC_GENERICTYPE, casadi::GenericType)
 %casadi_template(LL "GenericType" LR, "Sequence[GenericType]", "list[GenericType]", "GenericType[]", PREC_GENERICTYPE, std::vector<casadi::GenericType>)
 %casadi_template(LL LL "GenericType" LR LR, "Sequence[Sequence[GenericType]]", "list[list[GenericType]]", "GenericType[][]", PREC_GENERICTYPE, std::vector<std::vector<casadi::GenericType> >)
@@ -3678,10 +3575,7 @@ class ArrayInterfaceMX(ArrayInterface[MX]):
 
 %casadi_director_vec_str
 
-// jsout for every dict-shaped return type the casadi API surfaces.
-// Drains the wasm-returned EM_VAL handle into a native JS object.
-// Affects Function.stats() (returns Dict), all opts:Dict accessors,
-// the result.x_dict etc. fields of solver returns, and so on.
+// jsout for every dict-shaped return type
 %casadi_dict_jsout(casadi::GenericType)
 %casadi_dict_jsout(casadi::Sparsity)
 %casadi_dict_jsout(casadi::Matrix<double>)
@@ -3693,10 +3587,6 @@ class ArrayInterfaceMX(ArrayInterface[MX]):
 %casadi_dict_jsout(std::vector< casadi::MX >)
 %casadi_dict_jsout(std::vector< casadi::Matrix<casadi::SXElem> >)
 #endif // SWIGWASMJS
-
-// Named std::vector instantiations + array<->vector autoconversion
-// typemaps are now folded into the relevant %casadi_template_vec
-// calls above (one site per type instead of two parallel blocks).
 
 #undef L_INT
 #undef L_BOOL
@@ -3845,12 +3735,7 @@ export default createcasadi;
 
 %ts_alias_out(GenericType)
 
-// ---------------------------------------------------------------------------
-// JS-side ergonomics: post-class-definition overrides.  The "js" slot is
-// emitted by wasm_js.cxx after all class definitions and before the module
-// `return { ... }`, so the proxy classes (DM, DMVector, Function, ...) are
-// in lexical scope here.
-// ---------------------------------------------------------------------------
+// JS-side ergonomics, emitted after the class definitions
 %insert("js") %{
   /* Coerce bare numbers/arrays into matrix proxies (jsarg typemaps),
      so `plus(x, 2)` works. */
@@ -4051,16 +3936,9 @@ PyOS_setsig(SIGINT, SigIntHandler);
 
 %pythoncode "casadi_nparray.py"
 
-/* `inf` and `pi` exist at runtime (casadi/core const doubles) but are
- * deliberately NOT declared in the stub.  numpy declares both as
- * `Final[float]`; a parallel casadi declaration triggers "declared as
- * Final and cannot be reassigned" on any user file that does both
- * `from casadi import *` and `from numpy import *`.  Users who need
- * these names in a typed context should import them from numpy. */
+// No inf/pi stubs: they would clash with numpy's Final declarations
 
-/* Stubs for the numpy-flavoured aliases above.  Each dispatches to
- * the corresponding casadi.<atan/asin/...> overload; overloads mirror
- * the underlying auto-generated ones so the return type narrows. */
+// Stubs for the numpy-flavoured aliases above
 %define %stub_unary_math(NAME)
 %stub_overload_func(NAME, DM, x: _DM)
 %stub_overload_func(NAME, SX, x: _SX)
@@ -4084,16 +3962,10 @@ inf: float
 #endif // SWIGPYTHON
 
 #ifdef SWIGWASMJS
-// Emit enum values as 64-bit ints so they round-trip to JS as bigint,
-// matching casadi_int-returning methods (else `id === OP_ADD` fails:
-// one side number, the other bigint).  The width lives here (not in the
-// wasm-js backend) because casadi_int's representation is project-specific.
+// Enum values as 64-bit ints (bigint in JS, like casadi_int)
 %feature("wasmjs:enum_int_type","long long");
 
-// Accept a bare JS number / array where SX/MX/DM is expected, coercing
-// via the constructor (so `M.plus(x, 2)` works like Python).  jstypecheck
-// lets such an arg select the overload; jsarg performs the coercion.
-// __coerce is defined in the %insert("js") block above.
+// Accept a bare JS number/array where SX/MX/DM is expected
 %typemap(jstypecheck) casadi::Matrix<casadi::SXElem>, const casadi::Matrix<casadi::SXElem>&, casadi::Matrix<casadi::SXElem>&
   "(M._swig_can_SX(__unwrap($input)) || typeof $input === 'number' || typeof $input === 'bigint' || Array.isArray($input))";
 %typemap(jsarg) casadi::Matrix<casadi::SXElem>, const casadi::Matrix<casadi::SXElem>&, casadi::Matrix<casadi::SXElem>&
@@ -4107,8 +3979,7 @@ inf: float
 %typemap(jsarg) casadi::Matrix<double>, const casadi::Matrix<double>&, casadi::Matrix<double>&
   "__unwrap(__coerce($input, DM))";
 
-// Element indexing: wrap SX/MX/DM instances in the __mkIndex Proxy so
-// x[k] / x[k]=v / x[[i,j]] / x["a:b"] / x.nz[k] work (see %insert("js")).
+// Element indexing via the __mkIndex Proxy
 %feature("wasmjs:index") casadi::Matrix<casadi::SXElem>;
 %feature("wasmjs:index") casadi::MX;
 %feature("wasmjs:index") casadi::Matrix<double>;
@@ -4135,8 +4006,7 @@ inf: float
 %rename(to_DM) operator Matrix<double>;
 
 #ifdef SWIGJULIA
-// Julia spells concatenation [a b] / [a; b] (Base.hcat/vcat, extended by the
-// ergonomics layer); the builders stay reachable for it as _horzcat/_vertcat.
+// Julia concatenates with [a b] / [a; b]; builders stay as _horzcat/_vertcat
 %rename(_vertcat) casadi_vertcat;
 %rename(_horzcat) casadi_horzcat;
 // Python's names; Julia's own spelling is & | ! (and .& .| .!)
@@ -4221,12 +4091,7 @@ def dcat(args):
     return _diagcat(args)
 %}
 
-/* Stubs for the %pythoncode *cat wrappers above.  Overloads narrow
- * the return to the dominant input type.  Order matters: pyright
- * picks the first matching overload, so narrowest (Sparsity) first,
- * then DM, then SX, then MX -- otherwise `vertcat(1, 1)` (all inputs
- * in _DM) resolves to the MX overload because _MX is a superset
- * of _DM. */
+// Stubs for the *cat wrappers above, narrowest first
 %stub_overload_func(veccat,  Sparsity, *args: Sparsity)
 %stub_overload_func(veccat,  DM,       *args: _DM)
 %stub_overload_func(veccat,  SX,       *args: _SX)
@@ -4339,11 +4204,7 @@ class NZproxy:
 
 %}
 
-/* NZproxy has no C++ counterpart; it's defined via %pythoncode.
- * Parameterised on the owning matrix type so `x.nz[i]` narrows to
- * the same matrix type as `x`.  MX.nz additionally accepts MX-typed
- * masks -- the _selftyped overload matches only when _T=MX, keeping
- * DM.nz / SX.nz narrow. */
+// NZproxy (%pythoncode), generic in the owning matrix type
 #ifdef SWIG_STUBS_ENABLED
 %stubcode %{class NZproxy(Generic[_TNZ]):
 %}
@@ -4436,10 +4297,7 @@ class NZproxy:
       return arr
 
 %}
-/* __array__ makes DM / SX / MX acceptable where numpy / scipy expect
- * an ArrayLike.  Runtime path: `.full()` for DM (dense numeric),
- * scalar-object boxing for symbolic.  Keeps scipy.linalg.solve(A,b)
- * etc. typing without forcing users to wrap calls in np.array().  */
+// __array__ makes DM/SX/MX numpy ArrayLike
 %stub_method(__array__, %arg(NDArray[arraydtype]), *args: Any, **kwargs: Any)
 #ifdef SWIG_STUBS_ENABLED
 %stubcode %{    __array_priority__: float
@@ -4558,23 +4416,13 @@ class NZproxy:
 #endif
 
 #if defined(SWIGMATLAB) || defined(SWIGOCTAVE)
-// Mark the empty-struct mixin bases as abstract for the MATLAB/Octave
-// generator. Effect: they inherit from handle instead of SwigRef, emit no
-// delete or swig_this, and the concrete leaf appends "& SwigRef" so the
-// diamond collapses to a single SwigRef path. Breaks the diamond that
-// trips Octave 10+ (Savannah bug #50011 / #66930); no effect on MATLAB
-// correctness but removes the fragile per-class delete chain.
-// NOTE: these %feature directives must appear before the corresponding
-// %include that brings each class into the SWIG parse.
+// Abstract mixins avoid the Octave 10+ SwigRef diamond; before their %include
 %feature("abstract") casadi::PrintableCommon;
 %feature("abstract") casadi::GenericExpressionCommon;
 %feature("abstract") casadi::GenericMatrixCommon;
 %feature("abstract") casadi::SparsityInterfaceCommon;
 %feature("abstract") casadi::MatrixCommon;
-// GenSharedObject is a %template(GenSharedObject) instantiation of
-// GenericShared<...> (see the %template directive further down). The
-// feature has to be applied to the template base class, not the
-// instantiated short name, so it takes effect when the template expands.
+// Applied to the template, not to GenSharedObject
 %feature("abstract") casadi::GenericShared<casadi::SharedObject, casadi::SharedObjectInternal>;
 %feature("abstract") casadi::SharedObject;
 %feature("abstract") casadi::IndexAbstraction;
@@ -4636,8 +4484,7 @@ namespace casadi{
   %stub_method0(__getstate__, %arg(dict[builtins.str, Any]))
   %stub_method(__setstate__, None, state: Mapping[builtins.str, Any])
   %stub_method(__array__, %arg(NDArray[Any]), *args: Any, **kwargs: Any)
-  /* Runtime-accessible attributes exposed via C++ getters but
-   * without an explicit typemap doc= annotation.  */
+  // Getter-backed attributes without a typemap doc
   %stub_attr(T, Sparsity)
   %stub_attr(shape, tuple[int, int]) // TYPE is variadic; inner comma is fine here
 }
@@ -4699,7 +4546,6 @@ namespace casadi{
    lacks a slice type, the type should be exposed here */
 // #if !(defined(SWIGPYTHON) || defined(SWIGMATLAB))
 %include <casadi/core/slice.hpp>
- //#endif
 
 
 %include <casadi/core/generic_matrix.hpp>
@@ -4710,8 +4556,7 @@ namespace casadi{
 
 %include <casadi/core/generic_expression.hpp>
 
-// Flags to allow differentiating the wrapping by type.  SWIG wraps every
-// literal #define as a module constant; these are interface-internal.
+// Interface-internal flags, not module constants
 %ignore IS_GLOBAL; %ignore IS_MEMBER; %ignore IS_SPARSITY; %ignore IS_DMATRIX;
 %ignore IS_IMATRIX; %ignore IS_SX; %ignore IS_MX; %ignore IS_DOUBLE; %ignore FLAG;
 #define IS_GLOBAL   0x1
@@ -5720,9 +5565,7 @@ namespace casadi{
     # forcing densification through NEP-18 shape ops like np.atleast_1d.
     return self.full()
 %}
-/* `tocsc` returns a scipy.sparse.csc_matrix; not type-importing scipy.sparse
- * here keeps the stub independent of an optional dependency.  `Any` is the
- * least-bad option until we also bridge scipy.sparse types. */
+// scipy.sparse result, left untyped
 %stub_method0(tocsc,    Any)
 %stub_method0(tocsc_array, Any)
 %stub_method(toarray,   %arg(NDArray[np.float64] | float), simplify: bool = ...)
@@ -5935,9 +5778,6 @@ namespace casadi {
   %matrix_helpers(casadi::MX, %arg(_MIndex | MX))
   #ifdef SWIGPYTHON
   %python_array_wrappers(1002.0, Any)
-  /* MX is unique among CasadiMatrix types in accepting MX-valued
-   * indices (runtime: MX_get / MX_set).  Additional overloads on top
-   * of the DM-compatible ones from %matrix_helpers. */
   #endif //SWIGPYTHON
 };
 
@@ -6031,20 +5871,9 @@ namespace casadi{
       caller = functools.partial(_casadi._function_buffer_eval, fb._self())
       return (fb, caller)
   %}
-  /* buffer() returns (FunctionBuffer, callable) -- the callable is a
-   * functools.partial around the raw eval function, typed loosely. */
+  // buffer() returns (FunctionBuffer, callable)
   %stub_method0(buffer, %arg(tuple[FunctionBuffer, Any]))
-  /* Function.__call__ -- narrowing overloads per homogeneous input
-   * matrix type so pyright resolves f(mx) -> MX.  Runtime semantics
-   * (see the %pythoncode above):
-   *   f(pos_args)   -> single matrix if 1 output,  tuple[matrix,...] if >1
-   *   f(**kwargs)   -> dict[str, matrix]
-   *   f()           -> dict (no-arg path routes to `self.call({})`)
-   * Output arity is not statically known.  Returning the single-matrix
-   * case covers the common pattern (one-output Function); multi-output
-   * sites use `f.call([...])` which returns the tuple explicitly.
-   * The positional overloads require at least one positional arg
-   * (arg0 pos-only) so f() / f(**kw) routes to the dict overloads. */
+  // __call__ narrows per homogeneous input type; f() and f(**kw) give dicts
   %stub_overload_method(__call__, DM, __arg0: _DM, *args: _DM)
   %stub_overload_method(__call__, SX, __arg0: _SX, *args: _SX)
   %stub_overload_method(__call__, MX, __arg0: _MX, *args: _MX)
@@ -6660,11 +6489,7 @@ namespace casadi {
 
 %feature("director") casadi::Callback;
 
-/* The Python-visible Callback interface differs from the C++ signatures
- * because SWIG's director magic reshapes eval_buffer into a 2-tuple
- * form and hands the user-defined eval() a list of DM.  Suppress the
- * auto-generated .pyi entries for these methods and emit hand-crafted
- * ones below so pyright guides users toward correct overrides. */
+// Callback: hand-written stubs for the director-reshaped methods
 #ifdef SWIGPYTHON
 %feature("python:stub_skip") casadi::Callback::eval;
 %feature("python:stub_skip") casadi::Callback::eval_buffer;
@@ -6706,16 +6531,9 @@ namespace casadi {
 
 #ifdef SWIGPYTHON
 %extend casadi::Callback {
-  /* eval: Python-visible signature is `eval(self, arg, /)` where arg
-   * is an iterable of DM.  Positional-only (arg0 can have any name
-   * in subclasses).  Return type Sequence[_DM] so subclasses may
-   * return anything that to_ptr<DM> promotes -- int / float / DM /
-   * ndarray / nested sequences -- each gets converted at the C++
-   * boundary. */
+  // eval(arg, /): arg is a sequence of DM
   %stub_method(eval, %arg(Sequence[_DM]), %arg(__arg: Sequence[DM]))
-  /* eval_buffer: director reshapes the 4-arg C++ interface (arg,
-   * sizes_arg, res, sizes_res) into a 2-tuple Python interface: two
-   * tuples of memoryview objects exposing the structural nonzeros. */
+  // eval_buffer(arg, res): tuples of memoryviews
   %stub_method(eval_buffer, int, %arg(__arg: tuple[memoryview, ...], res: tuple[memoryview, ...]))
   %stub_method(get_sparsity_in,  Sparsity, i: int)
   %stub_method(get_sparsity_out, Sparsity, i: int)
@@ -6809,9 +6627,7 @@ class global_unpickle_context:
         _thread_local.casadi_unpickle_ctx = None
 %}
 
-/* Pure-pythoncode classes -- SWIG doesn't see them, so the .pyi has to
- * be hand-rolled.  Both are referenced from error messages
- * (`Use ca.global_pickle_context(): ...`) and from test/python/serialize.py. */
+// Stubs for pure-pythoncode classes
 %stub_class_begin(global_pickle_context)
 %stub_method0(__enter__, StringSerializer)
 %stub_method(__exit__, None, *args: object)
@@ -6934,6 +6750,7 @@ make_property(casadi::OptiAdvanced, casadi_solver, Function);
 #endif
 #endif // SWIGPYTHON || SWIGJULIA
 
+// Record the caller's stack trace in the user dict of new variables, parameters and constraints
 #ifdef SWIGPYTHON
 %define opti_metadata_modifiers(class)
   %rename(_variable) class ## :: variable;
@@ -7002,9 +6819,7 @@ make_property(casadi::OptiAdvanced, casadi_solver, Function);
     %stub_overload_method(parameter, MX, n: int = ..., m: int = ..., attribute: builtins.str = ...)
     %stub_overload_method(parameter, MX, sp: Sparsity | DM, attribute: builtins.str = ...)
     %stub_overload_method(parameter, MX, symbol: MX | SX | DM, attribute: builtins.str = ...)
-    /* subject_to(g[, linear_scale][, options]) -- the %pythoncode
-     * above inspects args[1] to decide whether it's an options dict
-     * or a linear_scale; the 3-arg form always has options last. */
+    // subject_to(g[, linear_scale][, options])
     %stub_overload_method0(subject_to, None)
     %stub_overload_method(subject_to, None, g: MX | SX | DM | float)
     %stub_overload_method(subject_to, None, g: Sequence[MX | SX | DM | float])
@@ -7129,9 +6944,7 @@ opti_metadata_modifiers(casadi::Opti)
 
 
   %}
-  /* Opti.callback registers a per-iteration Python callable; the %pythoncode
-   * above defines it, so the SWIG C++ parser never sees it and pyright loses
-   * visibility.  `fh` is invoked with the iteration index (int). */
+  // Opti.callback (%pythoncode); fh gets the iteration index
   %stub_method(callback, None, %arg(fh: Callable[[int], Any] | None = ...))
 
 }
@@ -7151,7 +6964,6 @@ opti_metadata_modifiers(casadi::Opti)
 %{
 #ifdef HAVE_OCTAVE
   // Mandatory as of Octave 10
-  // Null effect for prior versions
   extern "C" const int __octave_mex_soversion__ = 1;
 #endif
 %}
