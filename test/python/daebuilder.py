@@ -912,6 +912,94 @@ class Daebuildertests(casadiTestCase):
     )
     print(dae.export_fmu())
 
+  def test_w_equation_order(self):
+    # Issue #4096: M_x is defined before the thrust it depends on.
+    for sort_w in [False, True]:
+      dae = ca.DaeBuilder('quad')
+      dae.add('time', 'independent')
+      omega = dae.add('m_1_omega', dict(start=0.0))
+      moment = dae.add('m_1_moment', 'output', dict(start=0.0))
+      M_x = dae.add('M_x', 'output', dict(start=0.0))
+      thrust = dae.add('m_1_thrust', dict(start=0.0))
+      dae.eq(dae.der(omega), 10 * (32 - omega))
+      dae.eq(M_x, -thrust)
+      dae.eq(thrust, 1)
+      dae.eq(moment, 0.01 * thrust)
+      if sort_w:
+        dae.sort('w')
+      w_order = dae.w()
+      expected = {'der(m_1_omega)': 320, 'M_x': -1,
+                  'm_1_thrust': 1, 'm_1_moment': 0.01}
+      for sx in [False, True]:
+        with self.subTest(sort_w=sort_w, sx=sx):
+          f = dae.create('f', ['x'], ['ode', 'y', 'wdef'], sx, False)
+          ode, y, wdef = f(0)
+          self.checkarray(ode, 320)
+          self.checkarray(y, ca.DM([0.01, -1]))
+          self.checkarray(wdef, ca.DM([expected[name] for name in w_order]))
+          self.assertEqual(dae.w(), w_order)
+
+  def test_w_reverse_dependencies(self):
+    dae = ca.DaeBuilder('chain')
+    x = dae.add('x')
+    a = dae.add('a', 'output')
+    b = dae.add('b', 'output')
+    c = dae.add('c', 'output')
+    dae.eq(a, 2 * b)
+    dae.eq(b, 3 * c)
+    dae.eq(c, x**2)
+    dae.eq(dae.der(x), -a)
+    dae.when(x < 0, [dae.reinit('x', a)])
+    w_order = dae.w()
+    expected = {'a': 6 * x**2, 'b': 3 * x**2,
+                'c': x**2, 'der(x)': -6 * x**2}
+    wdef = ca.vertcat(*[expected[name] for name in w_order])
+    f_ref = ca.Function('f_ref', [x], [-6 * x**2, ca.vertcat(6*x**2, 3*x**2, x**2), wdef])
+    for sx in [False, True]:
+      with self.subTest(sx=sx):
+        f = dae.create('f', ['x'], ['ode', 'y', 'wdef'], sx, False)
+        self.checkfunction(f, f_ref, inputs=[2], verbose=False)
+    with self.subTest(entry_point='dependent_fun'):
+      f = dae.dependent_fun('dep', ['x'], ['w'])
+      self.checkfunction(f, ca.Function('dep_ref', [x], [wdef]), inputs=[2], verbose=False)
+    with self.subTest(entry_point='transition'):
+      f = dae.transition('tr', 0)
+      self.checkarray(f(0, 2, [], [], [])[0], 24)
+    self.assertEqual(dae.w(), w_order)
+
+  def test_w_upper_triangular_dependencies(self):
+    # Independent dynamics leave the reverse chain entirely above the diagonal.
+    for sort_w in [False, True]:
+      dae = ca.DaeBuilder('chain')
+      x = dae.add('x')
+      a = dae.add('a', 'output')
+      b = dae.add('b', 'output')
+      dae.eq(dae.der(x), -x)
+      dae.eq(a, 2 * b)
+      dae.eq(b, x**2)
+      dae.when(x < 0, [dae.reinit('x', a)])
+      if sort_w:
+        dae.sort('w')
+        self.assertLess(dae.w().index('b'), dae.w().index('a'))
+      w_order = dae.w()
+      expected = {'der(x)': -x, 'a': 2 * x**2, 'b': x**2}
+      wdef = ca.vertcat(*[expected[name] for name in w_order])
+      f_ref = ca.Function('f_ref', [x], [-x, ca.vertcat(2*x**2, x**2), wdef])
+      for sx in [False, True]:
+        with self.subTest(sort_w=sort_w, sx=sx):
+          f = dae.create('f', ['x'], ['ode', 'y', 'wdef'], sx, False)
+          self.checkfunction(f, f_ref, inputs=[2], verbose=False)
+      with self.subTest(sort_w=sort_w, entry_point='dependent_fun'):
+        f = dae.dependent_fun('dep', ['x'], ['w'])
+        self.checkfunction(f, ca.Function('dep_ref', [x], [wdef]), inputs=[2], verbose=False)
+      with self.subTest(sort_w=sort_w, entry_point='transition'):
+        f = dae.transition('tr', 0)
+        self.checkarray(f(0, 2, [], [], [])[0], 8)
+      self.assertEqual(dae.w(), w_order)
+      if sort_w:
+        dae.sort('w')
+        self.assertEqual(dae.w(), w_order)
+
   @requires_modelicaparser('lacemodelica')
   def test_basemodelica(self):
     """Test loading .bmo files via the LaceModelica plugin."""
