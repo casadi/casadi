@@ -34,6 +34,8 @@
 %include "julia/casadi_julia_head.i"
 #elif defined(SWIGWASMJS)
 %include "wasm-js/casadi_wasmjs_head.i"
+#elif defined(SWIGRUST)
+%include "rust/casadi_rust_head.i"
 #endif
 
 
@@ -186,6 +188,8 @@ namespace std {
 %include "julia/casadi_julia_pre.i"
 #elif defined(SWIGWASMJS)
 %include "wasm-js/casadi_wasmjs_pre.i"
+#elif defined(SWIGRUST)
+%include "rust/casadi_rust_pre.i"
 #endif
 %include "stl.i"
 #endif // SWIGXML
@@ -1123,6 +1127,8 @@ class _SupportsMX(Protocol):
 %include "julia/casadi_julia_decl.i"
 #elif defined(SWIGWASMJS)
 %include "wasm-js/casadi_wasmjs_decl.i"
+#elif defined(SWIGRUST)
+%include "rust/casadi_rust_decl.i"
 #endif
 %include <casadi/core/printable.hpp>
 
@@ -2230,8 +2236,6 @@ make_property_opti(x_linear_scale_offset, DM)
 make_property_opti(g_linear_scale, DM)
 make_property_opti(f_linear_scale, float)
 #endif
-
-// Record the caller's stack trace in the user dict of new variables, parameters and constraints
 
 %include <casadi/core/optistack.hpp>
 
