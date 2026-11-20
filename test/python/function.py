@@ -2531,7 +2531,6 @@ class Functiontests(casadiTestCase):
   @requiresPlugin(ca.Importer,"shell")
   def test_jit_directory_spaces(self):
     if not args.run_slow: return
-    if os.name!='nt': return
     # Working directories with spaces and punctuation
     x = ca.MX.sym("x")
     null = "nul" if os.name=='nt' else "/dev/null"

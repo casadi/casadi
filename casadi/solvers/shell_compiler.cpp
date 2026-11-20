@@ -44,6 +44,8 @@
 #ifdef CASADI_WITH_THREAD
 #include <mutex>
 #endif // CASADI_WITH_THREAD
+#else // _WIN32
+#include <unistd.h>
 #endif // _WIN32
 
 namespace casadi {
@@ -225,8 +227,18 @@ namespace {
       size_t n_backslash = s.size() - (s.find_last_not_of('\\')+1);
       return "\"" + s + std::string(n_backslash, '\\') + "\"";
 #else // _WIN32
-      // Still interpreted by the shell
-      return s;
+      // POSIX shell
+      if (!s.empty() && s.find_first_not_of("abcdefghijklmnopqrstuvwxyz"
+          "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-+=/.,:@%")==std::string::npos) return s;
+      std::string r = "'";
+      for (char c : s) {
+        if (c=='\'') {
+          r += "'\\''";
+        } else {
+          r += c;
+        }
+      }
+      return r + "'";
 #endif // _WIN32
     }
 
@@ -242,8 +254,30 @@ namespace {
       if (e.size()>=2 && e.front()=='"' && e.back()=='"') return e.substr(1, e.size()-2);
       return e;
 #else // _WIN32
-      // Still interpreted by the shell
-      return s;
+      if (s.size()>=2 && s.front()=='\'' && s.back()=='\'') return s.substr(1, s.size()-2);
+      std::string e = s;
+      if (e.size()>=2 && e.front()=='"' && e.back()=='"') e = e.substr(1, e.size()-2);
+      // $VAR and ${VAR}
+      std::string r;
+      for (size_t i=0; i<e.size(); ++i) {
+        if (e[i]=='$') {
+          bool brace = i+1<e.size() && e[i+1]=='{';
+          size_t j = brace ? i+2 : i+1, k = j;
+          while (k<e.size() && (e[k]=='_' || (e[k]>='0' && e[k]<='9')
+              || (e[k]>='A' && e[k]<='Z') || (e[k]>='a' && e[k]<='z'))) k++;
+          if (k>j && (!brace || (k<e.size() && e[k]=='}'))) {
+            std::string name = e.substr(j, k-j);
+            char buf[4096];
+            const char* v = name=="PWD" ? getcwd(buf, sizeof(buf)) : nullptr;
+            if (!v) v = getenv(name.c_str());
+            if (v) r += v;
+            i = brace ? k : k-1;
+            continue;
+          }
+        }
+        r += e[i];
+      }
+      return r;
 #endif // _WIN32
     }
 
