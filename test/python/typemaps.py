@@ -219,6 +219,14 @@ class typemaptests(casadiTestCase):
 
     #print DM(np.array([1,2,3,6]),2,2).full()
 
+  def test_array_layouts(self):
+    self.message("numpy arrays convert whatever their memory layout")
+    M = np.arange(12.0).reshape(3, 4)
+    self.checkarray(ca.DM(M.T), M.T, "DM(F-ordered ndarray)")
+    x = ca.MX.sym("x", 10)
+    i = np.arange(6)[::-2]
+    self.assertEqual(str(x[i]), str(x[i.tolist()]))
+
   def test_autoconversion(self):
     self.message("Auto conversion DM")
     x=np.array([2.3])

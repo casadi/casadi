@@ -422,7 +422,7 @@ def DM_from_array(m, check_only=True):
     else:
       shape = m.shape + (1, 1)
       nrow, ncol = shape[0], shape[1]
-      return (nrow,ncol,m.flat)
+      return (nrow,ncol,m.tobytes())
   return False
 
 def IM_from_array(m, check_only=True):
@@ -439,7 +439,7 @@ def IM_from_array(m, check_only=True):
     else:
       shape = m.shape + (1, 1)
       nrow, ncol = shape[0], shape[1]
-      return (nrow,ncol,m.flat)
+      return (nrow,ncol,m.flat,m.tobytes())
   return False
 
 def SX_from_array(m, check_only=True):
@@ -859,6 +859,23 @@ namespace std {
       return ret;
     }
 
+    // False unless bytes holds exactly n values of type T
+    template<typename T>
+    bool from_bytes(PyObject* bytes, casadi_int n, std::vector<T>* data) {
+      if (PyBytes_Size(bytes) != n * static_cast<casadi_int>(sizeof(T))) return false;
+      data->resize(n);
+      if (n) std::memcpy(data->data(), PyBytes_AsString(bytes), n * sizeof(T));
+      return true;
+    }
+
+    // Copy a row-major nrow-by-ncol array into a dense column-major one
+    template<typename T>
+    void copy_row_major(const std::vector<T>& data, casadi_int nrow, casadi_int ncol, T* d) {
+      for (casadi_int i = 0; i < nrow; ++i) {
+        for (casadi_int j = 0; j < ncol; ++j) d[i + j * nrow] = data[j + i * ncol];
+      }
+    }
+
     bool SX_from_array_conv(GUESTOBJECT *p, casadi::SX** m) {
       std::vector<SXElem> data;
       if (!to_val(PyTuple_GetItem(p, 2), &data)) return false;
@@ -866,30 +883,31 @@ namespace std {
       casadi_int ncol; to_val(PyTuple_GetItem(p, 1), &ncol);
       if (m) {
         **m = casadi::SX::zeros(nrow, ncol);
-        casadi_densify(get_ptr(data), (**m).sparsity().T(), (**m).ptr(), true);
+        copy_row_major(data, nrow, ncol, (**m).ptr());
       }
       return true;
     }
 
     bool IM_from_array_conv(GUESTOBJECT *p, casadi::IM** m) {
       if (!m) return true;
-      std::vector<casadi_int> data;
-      if (!to_val(PyTuple_GetItem(p, 2), &data)) return false;
       casadi_int nrow; to_val(PyTuple_GetItem(p, 0), &nrow);
       casadi_int ncol; to_val(PyTuple_GetItem(p, 1), &ncol);
+      std::vector<casadi_int> data;
+      if (!from_bytes(PyTuple_GetItem(p, 3), nrow * ncol, &data)
+          && !to_val(PyTuple_GetItem(p, 2), &data)) return false;
       **m = IM::zeros(nrow, ncol);
-      casadi_densify(get_ptr(data), (**m).sparsity().T(), (**m).ptr(), true);
+      copy_row_major(data, nrow, ncol, (**m).ptr());
       return true;
     }
 
     bool DM_from_array_conv(GUESTOBJECT *p, casadi::DM** m) {
       if (!m) return true;
-      std::vector<double> data;
-      if (!to_val(PyTuple_GetItem(p, 2), &data)) return false;
       casadi_int nrow; to_val(PyTuple_GetItem(p, 0), &nrow);
       casadi_int ncol; to_val(PyTuple_GetItem(p, 1), &ncol);
+      std::vector<double> data;
+      if (!from_bytes(PyTuple_GetItem(p, 2), nrow * ncol, &data)) return false;
       **m = DM::zeros(nrow, ncol);
-      casadi_densify(get_ptr(data), (**m).sparsity().T(), (**m).ptr(), true);
+      copy_row_major(data, nrow, ncol, (**m).ptr());
       return true;
     }
 
