@@ -2352,6 +2352,215 @@ class Integrationtests(casadiTestCase):
         if features["codegen"]: self.check_codegen(G, inputs=[v0], digits=9)
 
   @memory_heavy()
+  def test_adjoint_piecewise_controls(self):
+    self.message("issue #3227: adjoint sensitivities with piecewise constant controls")
+    x = ca.SX.sym("x")
+    p = ca.SX.sym("p")
+    u = ca.SX.sym("u")
+    dae = {"x": x, "p": p, "u": u, "ode": u - p*x*(1 + x), "quad": x**2}
+    grid = list(numpy.linspace(0.25, 4, 16))
+    for plugin in ["cvodes", "idas"]:
+      F = ca.integrator("F", plugin, dae, 0, grid,
+        {"abstol": 1e-10, "reltol": 1e-10, "quad_err_con": True})
+      v = ca.MX.sym("v", 18)
+      r = F(x0=v[0], p=v[1], u=v[2:].T)
+      obj = ca.sumsqr(r["xf"]) + ca.sum2(r["qf"])
+      G = ca.Function("G", [v], [ca.jtimes(obj, v, ca.MX.ones(1, 1), True),
+        ca.jtimes(obj, v, ca.MX.eye(18)).T])
+      grad_adj, grad_fwd = G(ca.vertcat(0.3, 0.5, numpy.sin(numpy.arange(16)) + 1.5))
+      self.checkarray(grad_fwd, grad_adj, plugin, digits=5)
+
+  @memory_heavy()
+  def test_events_sundials_rewind(self):
+    self.message("zero-crossing events: cvodes/idas event iterations beyond the last step")
+    g = 9.81
+    x = ca.SX.sym("x", 3)
+    z = ca.SX.sym("z")
+    p = ca.SX.sym("p")
+    index = ca.SX.sym("index")
+    t = ca.SX.sym("t")
+    # Bouncing ball with a decaying third state, large steps between the outputs
+    ode = {"x": x, "p": p, "ode": ca.vertcat(x[1], -g, -x[2]), "zero": x[0]}
+    dae = {"x": x, "z": z, "p": p, "ode": ca.vertcat(z, -g, -x[2]), "alg": z - x[1],
+           "zero": x[0]}
+    tr = ca.Function("transition", [index, t, x, z, p, ca.SX(0, 1)],
+      [ca.vertcat(x[0], -p*x[1], x[2]), z], ["index", "t", "x", "z", "p", "u"],
+      ["post_x", "post_z"])
+    opts = {"transition": tr, "event_tol": 1e-12, "max_event_iter": 20}
+    for grid in [[1.0], list(numpy.linspace(0.1, 4, 40))]:
+      F = ca.integrator("F", "erk", ode, 0, grid,
+        dict(opts, method="rk45", abstol=1e-12, reltol=1e-12))
+      ref = F(x0=[2, 0.3, 1], p=0.8)["xf"]
+      for plugin, problem in [("cvodes", ode), ("idas", ode), ("idas", dae)]:
+        F = ca.integrator("F", plugin, problem, 0, grid,
+          dict(opts, abstol=1e-12, reltol=1e-12))
+        self.checkarray(F(x0=[2, 0.3, 1], z0=0.3, p=0.8)["xf"], ref, plugin, digits=7)
+
+  @memory_heavy()
+  def test_events_quadrature_sensitivities(self):
+    self.message("zero-crossing events: forward sensitivities of quadratures")
+    g = 9.81
+    x = ca.SX.sym("x", 2)
+    p = ca.SX.sym("p")
+    index = ca.SX.sym("index")
+    t = ca.SX.sym("t")
+    # Bouncing ball, quadrature with a right-hand side that jumps at the event
+    dae = {"x": x, "p": p, "ode": ca.vertcat(x[1], -g), "quad": ca.vertcat(x[1], x[0]),
+           "zero": x[0]}
+    tr = ca.Function("transition", [index, t, x, ca.SX(0, 1), p, ca.SX(0, 1)],
+      [ca.vertcat(x[0], -p*x[1]), ca.SX(0, 1)], ["index", "t", "x", "z", "p", "u"],
+      ["post_x", "post_z"])
+    for plugin, opts in [("rk", {"number_of_finite_elements": 100}),
+                         ("collocation", {"number_of_finite_elements": 100}),
+                         ("cvodes", {"abstol": 1e-12, "reltol": 1e-12,
+                                     "quad_err_con": True})]:
+      F = ca.integrator("F", plugin, dae, 0, 1, dict(opts, transition=tr, event_tol=1e-12,
+        max_event_iter=20))
+      v = ca.MX.sym("v", 3)
+      r = F(x0=v[:2], p=v[2])
+      G = ca.Function("G", [v], [ca.jacobian(r["qf"], v), ca.jacobian(r["xf"], v)])
+      J_q, J_x = G(ca.vertcat(2, 0.3, 0.8))
+      # Velocity integrates to the height, which is continuous
+      self.checkarray(J_q[0, :], J_x[0, :] - ca.DM([[1, 0, 0]]), plugin, digits=7)
+      # Reference: central differences
+      fd = ca.horzcat(*[(F(x0=[2, 0.3] + h*e[:2], p=0.8 + h*e[2])["qf"]
+        - F(x0=[2, 0.3] - h*e[:2], p=0.8 - h*e[2])["qf"])/(2*h)
+        for h in [1e-6] for e in [ca.DM.eye(3)[:, i] for i in range(3)]])
+      self.checkarray(J_q, fd, plugin, digits=5)
+
+  @memory_heavy()
+  def test_events_empty_post_z(self):
+    self.message("zero-crossing events: transition without post_z")
+    g = 9.81
+    x = ca.SX.sym("x", 2)
+    z = ca.SX.sym("z")
+    p = ca.SX.sym("p")
+    index = ca.SX.sym("index")
+    t = ca.SX.sym("t")
+    dae = {"x": x, "z": z, "p": p, "ode": ca.vertcat(z, -g), "alg": z - x[1], "zero": x[0]}
+    for plugin, opts in [("collocation", {"number_of_finite_elements": 100}),
+                         ("idas", {"abstol": 1e-12, "reltol": 1e-12})]:
+      res = []
+      for post_z in [z, ca.SX(0, 1)]:
+        tr = ca.Function("transition", [index, t, x, z, p, ca.SX(0, 1)],
+          [ca.vertcat(x[0], -p*x[1]), post_z], ["index", "t", "x", "z", "p", "u"],
+          ["post_x", "post_z"])
+        F = ca.integrator("F", plugin, dae, 0, 1, dict(opts, transition=tr, event_tol=1e-12,
+          max_event_iter=20))
+        v = ca.MX.sym("v", 3)
+        r = F(x0=v[:2], z0=v[1], p=v[2])
+        res.append(ca.Function("G", [v], [r["xf"], ca.jacobian(r["xf"], v)])([2, 0.3, 0.8]))
+      for i in range(2): self.checkarray(res[0][i], res[1][i], plugin, digits=8)
+
+  @memory_heavy()
+  def test_idas_adjoint_output_times(self):
+    self.message("idas: adjoint seeds of a DAE at intermediate output times")
+    x = ca.SX.sym("x")
+    z = ca.SX.sym("z")
+    p = ca.SX.sym("p")
+    dae = {"x": x, "z": z, "p": p, "ode": z + p, "alg": z*ca.cos(z) - x}
+    F = ca.integrator("F", "idas", dae, 0, [0.1, 0.2, 0.3], {"abstol": 1e-10, "reltol": 1e-10})
+    v = ca.MX.sym("v", 2)
+    r = F(x0=v[0], p=v[1])
+    # Seeds at the last output time, at all output times, and before the last one only
+    for w_x, w_z in [([0, 0, 1], [0, 0, 0]), ([1, 2, 1], [0, 0, 0]), ([1, 0, 0], [0, 0, 0])]:
+      obj = ca.mtimes(r["xf"], ca.DM(w_x)) + ca.mtimes(r["zf"], ca.DM(w_z))
+      G = ca.Function("G", [v], [ca.jtimes(obj, v, ca.MX.ones(1, 1), True),
+        ca.jtimes(obj, v, ca.MX.eye(2)).T])
+      grad_adj, grad_fwd = G([0.1, 0.15])
+      self.checkarray(grad_fwd, grad_adj, str(w_x + w_z), digits=7)
+
+  @memory_heavy()
+  def test_idas_adjoint_z_seeds(self):
+    self.message("idas: adjoint seeds in the algebraic states")
+    x = ca.SX.sym("x")
+    z = ca.SX.sym("z")
+    p = ca.SX.sym("p")
+    dae = {"x": x, "z": z, "p": p, "ode": z + p, "alg": z*ca.cos(z) - x, "quad": z**2}
+    F = ca.integrator("F", "idas", dae, 0, [0.1, 0.2, 0.3], {"abstol": 1e-10, "reltol": 1e-10})
+    v = ca.MX.sym("v", 2)
+    r = F(x0=v[0], p=v[1])
+    for w_x, w_z in [([0, 0, 0], [0, 0, 1]), ([0, 0, 0], [0, 1, 0]), ([1, 0, 2], [3, 1, 0])]:
+      obj = ca.mtimes(r["xf"], ca.DM(w_x)) + ca.mtimes(r["zf"], ca.DM(w_z)) + r["qf"][-1]
+      G = ca.Function("G", [v], [ca.jtimes(obj, v, ca.MX.ones(1, 1), True),
+        ca.jtimes(obj, v, ca.MX.eye(2)).T])
+      grad_adj, grad_fwd = G([0.1, 0.15])
+      self.checkarray(grad_fwd, grad_adj, str(w_x + w_z), digits=7)
+
+  @memory_heavy()
+  def test_zero_horizon(self):
+    self.message("issue #1810: integration horizon of length zero")
+    x = ca.SX.sym("x", 2)
+    dae = {"x": x, "ode": x}
+    for plugin in ["rk", "collocation", "cvodes", "erk", "rosenbrock"]:
+      F = ca.integrator("F", plugin, dae, 0, 0)
+      self.checkarray(F(x0=[1, 2])["xf"], ca.DM([1, 2]), plugin)
+    # The initial condition calculation needs a nonzero horizon
+    F = ca.integrator("F", "idas", dae, 0, 0)
+    with self.assertInException("IDACalcIC"):
+      F(x0=[1, 2])
+    F = ca.integrator("F", "idas", dae, 0, 0, {"calc_ic": False})
+    self.checkarray(F(x0=[1, 2])["xf"], ca.DM([1, 2]), "idas")
+
+  @memory_heavy()
+  def test_adjoint_quadrature_error_control(self):
+    self.message("issue #4383: adjoint sensitivities are part of the error test")
+    t = ca.SX.sym("t")
+    x = ca.SX.sym("x")
+    p = ca.SX.sym("p", 3)
+    # The adjoint state is constant: only the quadratures for adj_p limit the step size
+    dae = {"t": t, "x": x, "p": p, "ode": p[0]*(1 - t) + (p[1] + p[2])*t}
+    for plugin, tol, digits in [("cvodes", 1e-12, 9), ("idas", 1e-8, 4)]:
+      F = ca.integrator("F", plugin, dae, 0, 1, {"abstol": tol, "reltol": tol})
+      v = ca.MX.sym("v", 3)
+      G = ca.Function("G", [v], [ca.jtimes(F(x0=0, p=v)["xf"], v, ca.MX.ones(1, 1), True)])
+      self.checkarray(G([1, 1, 1]), ca.DM([0.5, 0.5, 0.5]), plugin, digits=digits)
+
+  @memory_heavy()
+  def test_adjoint_checkpoint_stop_time(self):
+    self.message("issue #3227: recomputation from a check point ending at a stop time")
+    x = ca.SX.sym("x")
+    p = ca.SX.sym("p")
+    u = ca.SX.sym("u")
+    dae = {"x": x, "p": p, "u": u, "ode": u*(p - x) + 1}
+    grid = list(numpy.linspace(0.25, 4, 16))
+    for plugin in ["cvodes", "idas"]:
+      F = ca.integrator("F", plugin, dae, 0, grid,
+        {"abstol": 1e-6, "reltol": 1e-6, "steps_per_checkpoint": 1})
+      v = ca.MX.sym("v", 18)
+      obj = ca.sumsqr(F(x0=v[0], p=v[1], u=v[2:].T)["xf"])
+      G = ca.Function("G", [v], [ca.jtimes(obj, v, ca.MX.ones(1, 1), True),
+        ca.jtimes(obj, v, ca.MX.eye(18)).T])
+      grad_adj, grad_fwd = G(ca.vertcat(0.3, 0.5, numpy.sin(numpy.arange(16)) + 1.5))
+      self.checkarray(grad_fwd, grad_adj, plugin, digits=3)
+
+  @memory_heavy()
+  def test_multipoint_controls(self):
+    self.message("issue #3189: output times with changing controls, as chained integrators")
+    x = ca.MX.sym("x")
+    z = ca.MX.sym("z")
+    p = ca.MX.sym("p")
+    u = ca.MX.sym("u")
+    ode = {"x": x, "p": p, "u": u, "ode": ca.cos(x + p*u), "quad": x**2}
+    dae = {"x": x, "z": z, "p": p, "u": u, "ode": z + p*u, "alg": z*ca.cos(z) - x, "quad": x**2}
+    opts = {"abstol": 1e-14, "reltol": 1e-14}
+    for plugin, problem in [("cvodes", ode), ("idas", ode), ("idas", dae)]:
+      F = ca.integrator("F", plugin, problem, 0, [0.1, 0.2], opts)
+      F1 = ca.integrator("F1", plugin, problem, 0, 0.1, opts)
+      F2 = ca.integrator("F2", plugin, problem, 0.1, 0.2, opts)
+      v = ca.MX.sym("v", 4)
+      r = F(x0=v[0], p=v[1], u=v[2:].T)
+      r1 = F1(x0=v[0], p=v[1], u=v[2])
+      r2 = F2(x0=r1["xf"], p=v[1], u=v[3])
+      ref = ca.vertcat(r1["xf"], r2["xf"], r1["qf"], r1["qf"] + r2["qf"])
+      out = ca.vertcat(r["xf"].T, r["qf"].T)
+      outputs = [ref, out, ca.jacobian(ref, v), ca.jacobian(out, v)]
+      outputs += [ca.jtimes(ca.sum1(e), v, ca.MX.ones(1, 1), True) for e in (ref, out)]
+      res = ca.Function("G", [v], outputs)(ca.vertcat(0, 0.15, 1, 1.1))
+      for i in range(0, len(res), 2):
+        self.checkarray(res[i], res[i + 1], plugin, digits=9)
+
+  @memory_heavy()
   def test_erk_tape(self):
     self.message("erk: adaptive steps and adjoints, bounded tape")
     x = ca.SX.sym("x", 2)

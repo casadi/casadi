@@ -234,7 +234,7 @@ int IDACalcIC(void *ida_mem, int icopt, realtype tout1)
 
   tdist = SUNRabs(tout1 - tn);
   troundoff = TWO*uround*(SUNRabs(tn) + SUNRabs(tout1));
-  if(tdist < troundoff) {
+  if(tdist == ZERO || tdist < troundoff) {
     IDAProcessError(IDA_mem, IDA_ILL_INPUT, "IDAS", "IDACalcIC", MSG_IC_TOO_CLOSE);
     return(IDA_ILL_INPUT);
   }
