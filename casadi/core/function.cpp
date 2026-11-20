@@ -658,6 +658,26 @@ namespace casadi {
     return rev(get_ptr(arg), get_ptr(res), get_ptr(iw), get_ptr(w), 0);
   }
 
+  int Function::jump_fwd(std::vector<const bvec_t*> arg, std::vector<bvec_t*> res) const {
+    casadi_assert_dev(arg.size()>=n_in());
+    arg.resize(sz_arg());
+    casadi_assert_dev(res.size()>=n_out());
+    res.resize(sz_res());
+    std::vector<casadi_int> iw(sz_iw());
+    std::vector<bvec_t> w(sz_w());
+    return jump_fwd(get_ptr(arg), get_ptr(res), get_ptr(iw), get_ptr(w), 0);
+  }
+
+  int Function::jump_rev(std::vector<bvec_t*> arg, std::vector<bvec_t*> res) const {
+    casadi_assert_dev(arg.size()>=n_in());
+    arg.resize(sz_arg());
+    casadi_assert_dev(res.size()>=n_out());
+    res.resize(sz_res());
+    std::vector<casadi_int> iw(sz_iw());
+    std::vector<bvec_t> w(sz_w());
+    return jump_rev(get_ptr(arg), get_ptr(res), get_ptr(iw), get_ptr(w), 0);
+  }
+
   Function Function::fold(casadi_int N, const Dict& opts) const {
     Function base = mapaccum(N, opts);
     std::vector<MX> base_in = base.mx_in();
@@ -1110,6 +1130,36 @@ namespace casadi {
     }
   }
 
+  Sparsity Function::jump_sparsity(casadi_int oind, casadi_int iind, bool compact) const {
+    try {
+      Sparsity sp = (*this)->jump_sparsity(oind, iind);
+      return compact ? sp : (*this)->from_compact(oind, iind, sp);
+    } catch(std::exception& e) {
+      THROW_ERROR("jump_sparsity", e.what());
+    }
+  }
+
+  std::vector<bool> Function::
+  which_jump(const std::string& s_in, const std::vector<std::string>& s_out, bool tr) const {
+    try {
+      casadi_int iind = index_in(s_in);
+      std::vector<bool> ret(tr ? 0 : nnz_in(iind), false);
+      for (auto&& s : s_out) {
+        Sparsity sp = jump_sparsity(index_out(s), iind, true);
+        if (tr) {
+          std::vector<bool> r(sp.size1(), false);
+          for (casadi_int k = 0; k < sp.nnz(); ++k) r[sp.row(k)] = true;
+          ret.insert(ret.end(), r.begin(), r.end());
+        } else {
+          for (casadi_int c : sp.get_col()) ret[c] = true;
+        }
+      }
+      return ret;
+    } catch(std::exception& e) {
+      THROW_ERROR("which_jump", e.what());
+    }
+  }
+
   const std::vector<std::string>& Function::name_in() const {
     return (*this)->name_in_;
   }
@@ -1254,6 +1304,23 @@ namespace casadi {
       return (*this)->sp_reverse(arg, res, iw, w, memory(mem));
     } catch(std::exception& e) {
       THROW_ERROR("rev", e.what());
+    }
+  }
+
+  int Function::jump_fwd(const bvec_t** arg, bvec_t** res,
+                         casadi_int* iw, bvec_t* w, int mem) const {
+    try {
+      return (*this)->sp_forward_jump(arg, res, iw, w, memory(mem));
+    } catch(std::exception& e) {
+      THROW_ERROR("jump_fwd", e.what());
+    }
+  }
+
+  int Function::jump_rev(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, int mem) const {
+    try {
+      return (*this)->sp_reverse_jump(arg, res, iw, w, memory(mem));
+    } catch(std::exception& e) {
+      THROW_ERROR("jump_rev", e.what());
     }
   }
 

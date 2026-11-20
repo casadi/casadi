@@ -234,6 +234,72 @@ namespace casadi {
     return 0;
   }
 
+  int MapSum::sp_forward_jump(const bvec_t** arg, bvec_t** res,
+      casadi_int* iw, bvec_t* w, void* mem) const {
+    const bvec_t** arg1 = arg+n_in_;
+    std::copy_n(arg, n_in_, arg1);
+    bvec_t** res1 = res+n_out_;
+    bvec_t* w_scratch = w + f_.sz_w();
+    for (casadi_int j=0;j<n_out_;++j) {
+      if (res[j] && reduce_out_[j]) {
+        casadi_clear(res[j], f_.nnz_out(j));
+        res1[j] = w_scratch;
+        w_scratch += f_.nnz_out(j);
+      } else {
+        res1[j] = res[j];
+      }
+    }
+    for (casadi_int i=0; i<n_; ++i) {
+      if (f_.jump_fwd(arg1, res1, iw, w)) return 1;
+      for (casadi_int j=0; j<n_in_; ++j) {
+        if (arg1[j] && !reduce_in_[j]) arg1[j] += f_.nnz_in(j);
+      }
+      for (casadi_int j=0; j<n_out_; ++j) {
+        if (res1[j]) {
+          if (reduce_out_[j]) {
+            for (casadi_int k=0; k<f_.nnz_out(j); ++k) res[j][k] |= res1[j][k];
+          } else {
+            res1[j] += f_.nnz_out(j);
+          }
+        }
+      }
+    }
+    return 0;
+  }
+
+  int MapSum::sp_reverse_jump(bvec_t** arg, bvec_t** res,
+      casadi_int* iw, bvec_t* w, void* mem) const {
+    // Reduced output seeds must reach every iteration, but f_.jump_rev clears them
+    bvec_t* w_scratch = w + f_.sz_w();
+    for (casadi_int j=0;j<n_out_;++j) {
+      if (res[j] && reduce_out_[j]) {
+        casadi_copy(res[j], f_.nnz_out(j), w_scratch);
+        w_scratch += f_.nnz_out(j);
+      }
+    }
+    bvec_t** arg1 = arg+n_in_;
+    std::copy_n(arg, n_in_, arg1);
+    bvec_t** res1 = res+n_out_;
+    std::copy_n(res, n_out_, res1);
+    for (casadi_int i=0; i<n_; ++i) {
+      w_scratch = w + f_.sz_w();
+      for (casadi_int j=0;j<n_out_;++j) {
+        if (res[j] && reduce_out_[j]) {
+          casadi_copy(w_scratch, f_.nnz_out(j), res1[j]);
+          w_scratch += f_.nnz_out(j);
+        }
+      }
+      if (f_.jump_rev(arg1, res1, iw, w)) return 1;
+      for (casadi_int j=0; j<n_in_; ++j) {
+        if (arg1[j] && !reduce_in_[j]) arg1[j] += f_.nnz_in(j);
+      }
+      for (casadi_int j=0; j<n_out_; ++j) {
+        if (res1[j] && !reduce_out_[j]) res1[j] += f_.nnz_out(j);
+      }
+    }
+    return 0;
+  }
+
   void MapSum::codegen_declarations(CodeGenerator& g) const {
     g.add_dependency(f_);
   }

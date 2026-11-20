@@ -72,6 +72,10 @@ namespace casadi {
         \identifier{7y} */
     casadi_int op() const override { return OP_GETNONZEROS_PARAM;}
 
+    /** \brief Jumps in the indices, which sp_forward drops */
+    bool has_jump(casadi_int i) const override { return i>=1;}
+    bool has_dense_jump() const override { return true;}
+
     /** \brief Deserialize without type information
 
         \identifier{7z} */

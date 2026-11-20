@@ -1238,6 +1238,11 @@ namespace casadi {
   }
 
   template<>
+  std::vector<bool> CASADI_EXPORT SX::which_jump(const SX &expr, const SX &var, bool tr) {
+    return _which_jump(expr, var, tr);
+  }
+
+  template<>
   Sparsity CASADI_EXPORT SX::jacobian_sparsity(const SX &f, const SX &x) {
     return _jacobian_sparsity(f, x);
   }

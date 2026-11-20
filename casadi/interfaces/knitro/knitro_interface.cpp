@@ -113,8 +113,9 @@ namespace casadi {
       contype_.resize(ng_, KN_CONTYPE_GENERAL);
       if (detect_linear_constraints) {
         std::vector<bool> nl_g = oracle_.which_depends("x", {"g"}, 2, true);
+        std::vector<bool> jump_g = oracle_.which_jump("x", {"g"}, true);
         for (casadi_int i=0;i<ng_;++i)
-          contype_[i] = nl_g[i] ? KN_CONTYPE_GENERAL : KN_CONTYPE_LINEAR;
+          contype_[i] = nl_g[i] || jump_g[i] ? KN_CONTYPE_GENERAL : KN_CONTYPE_LINEAR;
       }
     }
 

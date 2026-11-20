@@ -325,6 +325,8 @@ class OptiStacktests(inherit_from):  # pyright: ignore[reportGeneralTypeIssues]
       self.checkarray(opti.debug.value(p),ca.vertcat(1,0,0))
       with self.assertInException("cannot set initial/value of an arbitrary expression"):
         opti.set_value(p[0]+p[1], 3)
+      with self.assertInException("cannot set initial/value of an arbitrary expression"):
+        opti.set_value(ca.floor(p[0]), 3)
 
       opti.set_value(ca.veccat(v,3), [1,2,3])
       opti.set_value(ca.veccat(2,v,5,p), [2,3,4,5,6,7,8])
