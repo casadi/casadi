@@ -1003,6 +1003,29 @@ namespace std {
       return false;
     }
 
+#ifdef SWIGPYTHON
+    // Type of p if p is a DM, SX or MX, but not a subclass, else 0.
+    // These classes define no conversion hooks, so their type alone decides
+    // which conversions can succeed.
+    swig_type_info* exact_matrix_type(GUESTOBJECT *p) {
+      static swig_type_info* const types[] = {$descriptor(casadi::Matrix<double>*),
+        $descriptor(casadi::Matrix<casadi::SXElem>*), $descriptor(casadi::MX*)};
+      for (swig_type_info* t : types) {
+        SwigPyClientData* cd = static_cast<SwigPyClientData*>(t->clientdata);
+        if (cd && reinterpret_cast<PyObject*>(Py_TYPE(p)) == cd->klass) return t;
+      }
+      return 0;
+    }
+
+    // A float or int, but not a subclass, that fits in a double: the full
+    // DM/SX/MX conversion of such an object yields the same scalar.
+    bool python_scalar(GUESTOBJECT *p, double* m) {
+      if (!(PyFloat_CheckExact(p) || PyLong_CheckExact(p)) || !to_val(p, m)) return false;
+      if (PyErr_Occurred()) PyErr_Clear();
+      return true;
+    }
+#endif // SWIGPYTHON
+
 #ifdef SWIGMATLAB
     Sparsity get_sparsity(const mxArray* p) {
       // Get sparsity pattern
@@ -1095,6 +1118,13 @@ namespace std {
       // Treat Null
       if (is_null(p)) return false;
 
+#ifdef SWIGPYTHON
+      if (exact_matrix_type(p)) {
+        if (PyErr_Occurred()) PyErr_Clear();
+        return false;
+      }
+#endif // SWIGPYTHON
+
       // long long
       {
         long long tmp;
@@ -1157,6 +1187,13 @@ namespace std {
     bool to_ptr(GUESTOBJECT *p, double** m) {
       // Treat Null
       if (is_null(p)) return false;
+
+#ifdef SWIGPYTHON
+      if (exact_matrix_type(p)) {
+        if (PyErr_Occurred()) PyErr_Clear();
+        return false;
+      }
+#endif // SWIGPYTHON
 
       // Standard typemaps
       if (SWIG_IsOK(SWIG_AsVal(double)(p, m ? *m : 0))) return true;
@@ -1526,22 +1563,30 @@ namespace std {
 #endif
 #ifdef SWIGPYTHON
 
+      if (exact_matrix_type(p)) {
+        if (PyErr_Occurred()) PyErr_Clear();
+        return false;
+      }
+
       // Some built-in types are iterable
       // bytes is iterable but yields ints; walking it as a vector of numbers
       // would silently turn b"ab" into [97, 98] instead of raising.
       if (PyDict_Check(p) || PyBytes_Check(p) || PySet_Check(p) || PyUnicode_Check(p)) return false;
+
+      // Plain lists and tuples have neither conversion hooks nor a shape
+      bool plain = PyList_CheckExact(p) || PyTuple_CheckExact(p);
 
       // An object exposing a casadi conversion hook is a SINGLE matrix, not
       // a sequence of them -- don't iterate it as a vector.  (A 1-D numeric-
       // like iterable such as the experimental NumpyArray would otherwise be
       // walked element-by-element with float()/int(), which throws on a
       // symbolic element and can crash the interpreter mid-iteration.)
-      if (PyObject_HasAttrString(p, "__MX__") || PyObject_HasAttrString(p, "__SX__")
-          || PyObject_HasAttrString(p, "__DM__")) return false;
+      if (!plain && (PyObject_HasAttrString(p, "__MX__") || PyObject_HasAttrString(p, "__SX__")
+          || PyObject_HasAttrString(p, "__DM__"))) return false;
 
       // Make sure shape is 1D, if defined.
       if (PyErr_Occurred()) PyErr_Clear(); // Clear pending exception before type check
-      if (PyObject_HasAttrString(p, "shape")) {
+      if (!plain && PyObject_HasAttrString(p, "shape")) {
         PyObject * shape = PyObject_GetAttrString(p, "shape");
         if (!shape) { PyErr_Clear(); return false; }
         bool is_1d = PyTuple_Check(shape) && PyTuple_Size(shape)==1;
@@ -2322,6 +2367,21 @@ namespace std {
       // Treat Null
       if (is_null(p)) return false;
 
+#ifdef SWIGPYTHON
+      {
+        double tmp;
+        if (python_scalar(p, m ? &tmp : 0)) {
+          if (m) **m = DM(tmp);
+          return true;
+        }
+      }
+
+      if (exact_matrix_type(p) == $descriptor(casadi::MX*)) {
+        if (PyErr_Occurred()) PyErr_Clear();
+        return false;
+      }
+#endif // SWIGPYTHON
+
       // SX already?
       if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(m),
                                     $descriptor(casadi::Matrix<casadi::SXElem>*), 0))) {
@@ -2407,6 +2467,21 @@ namespace std {
     bool to_ptr(GUESTOBJECT *p, MX** m) {
       // Treat Null
       if (is_null(p)) return false;
+
+#ifdef SWIGPYTHON
+      {
+        double tmp;
+        if (python_scalar(p, m ? &tmp : 0)) {
+          if (m) **m = DM(tmp);
+          return true;
+        }
+      }
+
+      if (exact_matrix_type(p) == $descriptor(casadi::Matrix<casadi::SXElem>*)) {
+        if (PyErr_Occurred()) PyErr_Clear();
+        return false;
+      }
+#endif // SWIGPYTHON
 
       // MX already?
       if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(m),
@@ -2500,6 +2575,24 @@ namespace std {
     bool to_ptr(GUESTOBJECT *p, DM** m) {
       // Treat Null
       if (is_null(p)) return false;
+
+#ifdef SWIGPYTHON
+      {
+        double tmp;
+        if (python_scalar(p, m ? &tmp : 0)) {
+          if (m) **m = tmp;
+          return true;
+        }
+      }
+
+      {
+        swig_type_info* t = exact_matrix_type(p);
+        if (t && t != $descriptor(casadi::Matrix<double>*)) {
+          if (PyErr_Occurred()) PyErr_Clear();
+          return false;
+        }
+      }
+#endif // SWIGPYTHON
 
       // DM already?
       if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(m),
@@ -2659,6 +2752,10 @@ namespace std {
     bool to_ptr(GUESTOBJECT *p, Sparsity** m) {
       // Treat Null
       if (is_null(p)) return false;
+
+#ifdef SWIGPYTHON
+      if (exact_matrix_type(p)) return false;
+#endif // SWIGPYTHON
 
       // Sparsity already?
       if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(m),
