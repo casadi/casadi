@@ -36,7 +36,55 @@
 
 #include <cstdlib>
 
+#ifdef _WIN32
+#include <windows.h>
+#endif // _WIN32
+
 namespace casadi {
+
+namespace {
+#ifdef _WIN32
+    // Run a command line; -1 if it could not be started
+    int win_run(const std::string& app, const std::string& cmd) {
+      STARTUPINFOA si;
+      ZeroMemory(&si, sizeof(si));
+      si.cb = sizeof(si);
+      // No console window when the parent has none
+      DWORD flags = GetConsoleCP() ? 0 : CREATE_NO_WINDOW;
+      std::vector<char> buf(cmd.begin(), cmd.end());
+      buf.push_back('\0');
+      PROCESS_INFORMATION pi;
+      if (!CreateProcessA(app.c_str(), buf.data(), nullptr, nullptr, TRUE, flags,
+          nullptr, nullptr, &si, &pi)) return -1;
+      WaitForSingleObject(pi.hProcess, INFINITE);
+      DWORD ret = 1;
+      GetExitCodeProcess(pi.hProcess, &ret);
+      CloseHandle(pi.hProcess);
+      CloseHandle(pi.hThread);
+      return static_cast<int>(ret);
+    }
+
+    // Command interpreter of system()
+    std::string win_shell() {
+      const char* comspec = getenv("ComSpec");
+      if (comspec && *comspec) return comspec;
+      char dir[MAX_PATH];
+      UINT n = GetSystemDirectoryA(dir, MAX_PATH);
+      return std::string(dir, n<MAX_PATH ? n : 0) + "\\cmd.exe";
+    }
+#endif // _WIN32
+
+    // Run a command through the shell
+    int run(const std::string& cmd) {
+#ifdef _WIN32
+      // As system(), without a console window
+      std::string shell = win_shell();
+      return win_run(shell, "\"" + shell + "\" /s /c \"" + cmd + "\"");
+#else // _WIN32
+      return system(cmd.c_str());
+#endif // _WIN32
+    }
+}  // namespace
 
   extern "C"
   int CASADI_IMPORTER_SHELL_EXPORT
@@ -241,7 +289,7 @@ namespace casadi {
 
     // Compile into an object
     if (verbose_) casadi_message("calling \"" + cccmd.str() + "\"");
-    if (system(cccmd.str().c_str())) {
+    if (run(cccmd.str())) {
       casadi_error("Compilation failed. Tried \"" + cccmd.str() + "\"");
     }
 
@@ -260,7 +308,7 @@ namespace casadi {
 
     // Compile into a shared library
     if (verbose_) casadi_message("calling \"" + ldcmd.str() + "\"");
-    if (system(ldcmd.str().c_str())) {
+    if (run(ldcmd.str())) {
       casadi_error("Linking failed. Tried \"" + ldcmd.str() + "\"");
     }
 

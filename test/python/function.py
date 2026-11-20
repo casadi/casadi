@@ -2507,6 +2507,26 @@ class Functiontests(casadiTestCase):
       with open(os.path.join(d,"jit_codegen_options.c")) as src:
         self.assertTrue("cgopt_" in src.read())
 
+  @requiresPlugin(ca.Importer,"shell")
+  def test_jit_shell_variables(self):
+    if not args.run_slow: return
+    # Variables and quotes in options are interpreted as by the shell
+    x = ca.MX.sym("x")
+    if os.name=='nt':
+      cc, ld, var = "cl.exe", "link.exe", "%CASADI_TEST_{}%"
+    else:
+      cc = ld = "clang" if sys.platform=="darwin" else "gcc"
+      var = "$CASADI_TEST_{}"
+    os.environ["CASADI_TEST_CC"] = cc
+    os.environ["CASADI_TEST_LD"] = ld
+    opts = {"compiler": var.format("CC"), "linker": var.format("LD"), "flags": ['-DTAG="a b"']}
+    try:
+      f = ca.Function('f',[x],[x**2],{"jit":True,"compiler":"shell","jit_options":opts})
+      self.checkarray(f(3),9)
+    finally:
+      del os.environ["CASADI_TEST_CC"]
+      del os.environ["CASADI_TEST_LD"]
+
   @requires_nlpsol("ipopt")
   @requiresPlugin(ca.Importer,"shell")
   def test_inherit_jit_options(self):
