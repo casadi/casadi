@@ -117,6 +117,7 @@ namespace swig {
   mxDestroyArray(warning_rhs[0]);
   mxDestroyArray(warning_rhs[1]);
 
+
   // Set logger functions
   casadi::Logger::writeFun = casadi::mexlogger;
   casadi::Logger::flush = casadi::mexflush;
@@ -271,6 +272,126 @@ namespace swig {
   } // namespace swig
 }
 
+// Host conversions: is_null, full/sparse, casadi_host_conv overloads
+%fragment("casadi_host", "header", fragment="casadi_decl") {
+  namespace casadi {
+    bool is_null(GUESTOBJECT *p) {
+      if (p == 0) return true;
+      return false;
+    }
+
+    GUESTOBJECT* full(const DM& m, bool simplify) {
+      mxArray *p  = mxCreateDoubleMatrix(m.size1(), m.size2(), mxREAL);
+      double* d = static_cast<double*>(mxGetData(p));
+      casadi_densify(m.ptr(), m.sparsity(), d, false); // Column-major
+      return p;
+    }
+
+    // Convert to a sparse matrix
+    GUESTOBJECT* sparse(const DM& m) {
+      mxArray *p  = mxCreateSparse(m.size1(), m.size2(), m.nnz(), mxREAL);
+      casadi::casadi_copy(m.ptr(), m.nnz(), static_cast<double*>(mxGetData(p)));
+      std::copy(m.colind(), m.colind()+m.size2()+1, mxGetJc(p));
+      std::copy(m.row(), m.row()+m.nnz(), mxGetIr(p));
+      return p;
+    }
+
+    Sparsity get_sparsity(const mxArray* p) {
+      // Get sparsity pattern
+      size_t nrow = mxGetM(p);
+      size_t ncol = mxGetN(p);
+
+      if (mxIsSparse(p)) {
+        // Sparse storage in MATLAB
+        mwIndex *Jc = mxGetJc(p);
+        mwIndex *Ir = mxGetIr(p);
+
+        // Store in vectors
+        std::vector<casadi_int> colind(ncol+1);
+        std::copy(Jc, Jc+colind.size(), colind.begin());
+        std::vector<casadi_int> row(colind.back());
+        std::copy(Ir, Ir+row.size(), row.begin());
+
+        // Create pattern and return
+        return Sparsity(nrow, ncol, colind, row);
+      } else {
+        return Sparsity::dense(nrow, ncol);
+      }
+    }
+
+    size_t getNNZ(const mxArray* p) {
+      // Dimensions
+      size_t nrow = mxGetM(p);
+      size_t ncol = mxGetN(p);
+      if (mxIsSparse(p)) {
+        // Sparse storage in MATLAB
+        mwIndex *Jc = mxGetJc(p);
+        return Jc[ncol];
+      } else {
+        return nrow*ncol;
+      }
+    }
+  } // namespace casadi
+
+  namespace swig {
+    inline int casadi_host_conv(GUESTOBJECT* p, casadi::DM* m) {
+      using namespace casadi;
+      // MATLAB double matrix (sparse or dense)
+      if (mxIsDouble(p) && mxGetNumberOfDimensions(p)==2) {
+        if (m) {
+          *m = casadi::DM(get_sparsity(p));
+          double* data = static_cast<double*>(mxGetData(p));
+          casadi_copy(data, m->nnz(), m->ptr());
+        }
+        return true;
+      }
+
+      // No match
+      return false;
+    }
+
+    inline int casadi_host_conv(GUESTOBJECT* p, casadi::IM* m) {
+      using namespace casadi;
+      // In MATLAB, it is common to use floating point values to represent integers
+      if (mxIsDouble(p) && mxGetNumberOfDimensions(p)==2) {
+        double* data = static_cast<double*>(mxGetData(p));
+
+        // Check if all integers
+        bool all_integers=true;
+        size_t sz = getNNZ(p);
+        for (size_t i=0; i<sz; ++i) {
+          if (data[i] != casadi_int(data[i])) {
+            all_integers = false;
+            break;
+          }
+        }
+
+        // If successful
+        if (all_integers) {
+          if (m) {
+            *m = casadi::IM(get_sparsity(p));
+            for (size_t i=0; i<sz; ++i) {
+              (*m)->at(i) = casadi_int(data[i]);
+            }
+          }
+          return true;
+        }
+      }
+
+      return -1;
+    }
+
+    inline GUESTOBJECT* casadi_host_from(const casadi::GenericType& a) {
+      using namespace casadi;
+      switch (a.getType()) {
+      case OT_VOIDPTR:
+        return mxCreateDoubleScalar(0);
+      default: return 0;
+      }
+    }
+  } // namespace swig
+}
+
 // Type names in error messages and docs
   #define L_INT "int"
   #define L_BOOL "bool"
@@ -339,6 +460,7 @@ namespace swig {
       return n==1 ? $self->numel() : i==1 ? $self->size1() : $self->size2();
     }
 
+
     // Needed for brace syntax to access nonzeros
     casadi_int numel(casadi_int k) const {
       return 1;
@@ -359,6 +481,7 @@ namespace swig {
     casadi_int numel() const {
       return $self->numel();
     }
+
 
     // Transpose using the A' syntax in addition to A.'
     Type ctranspose() const { return $self->T();}

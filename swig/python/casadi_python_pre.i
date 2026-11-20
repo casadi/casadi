@@ -106,6 +106,7 @@ namespace swig {
 }
 }
 
+
 #ifdef CASADI_WITH_PYTHON_GIL_RELEASE
 %{
   // This .cxx was swig-compiled with WITH_PYTHON_GIL_RELEASE option
@@ -410,6 +411,304 @@ SWIG_Python_AppendOutput_Tuple(PyObject* result, PyObject* obj, int is_void) {
         return p;
       }
     };
+  } // namespace swig
+}
+
+// Host conversions: is_null, full/sparse, casadi_host_conv overloads
+%fragment("casadi_map_traits", "header") {} // Python converts std::map in casadi_containers
+
+%fragment("casadi_host", "header", fragment="casadi_decl") {
+  namespace casadi {
+    bool is_null(GUESTOBJECT *p) {
+      return p == Py_None;
+    }
+
+    GUESTOBJECT* full(const DM& m, bool simplify) {
+      PyObject *p = swig::from(m);
+      PyObject *method_name = PyUnicode_FromString("toarray");
+      PyObject *cr = PyObject_CallMethodObjArgs(p, method_name, (simplify? Py_True: Py_False), 0);
+      Py_DECREF(method_name);
+      Py_DECREF(p);
+      if (cr) return cr;
+      return Py_None;
+    }
+
+    // Convert to a sparse matrix
+    GUESTOBJECT* sparse(const DM& m) {
+      PyObject *p = swig::from(m);
+      PyObject *cr = PyObject_CallMethod(p, (char*) "tocsc", 0);
+      Py_DECREF(p);
+      if (cr) return cr;
+      return Py_None;
+    }
+
+    PyObject* get_Python_helper(const std::string& name) {
+%#if PY_VERSION_HEX < 0x03070000
+      PyObject* module = PyImport_AddModule("casadi");
+%#else
+      PyObject* c_name = PyUnicode_FromString("casadi");
+      PyObject* module = PyImport_GetModule(c_name);
+      Py_DECREF(c_name);
+%#endif
+      if (!module) {
+        if (PyErr_Occurred()) {
+          PyErr_Clear();
+        }
+      }
+      PyObject* dict = PyModule_GetDict(module);
+      return PyDict_GetItemString(dict, (char*) name.c_str());
+    }
+
+    template<class T>
+    bool casadi_object_from_fun(GUESTOBJECT *p, T** m, const std::string& fun, const std::function<bool(PyObject*, T**)> & conv) {
+      PyObject* dm = get_Python_helper(fun);
+      if (!dm) return false;
+      PyObject *check_only = m? Py_False : Py_True;
+      PyObject *cr = PyObject_CallFunctionObjArgs(dm, p, check_only, NULL);
+      if (!cr) return false;
+      bool ret;
+      // None means not handled (#4216)
+      if (cr == Py_None) {
+        ret = false;
+      } else if (PyBool_Check(cr)) {
+        ret = PyObject_IsTrue(cr);
+      } else {
+        ret = conv(cr, m);
+      }
+      Py_DECREF(cr);
+      return ret;
+    }
+
+    bool SX_from_array_conv(GUESTOBJECT *p, casadi::SX** m) {
+      std::vector<SXElem> data;
+      if (!swig::assign(PyTuple_GetItem(p, 2), &data)) return false;
+      casadi_int nrow; swig::assign(PyTuple_GetItem(p, 0), &nrow);
+      casadi_int ncol; swig::assign(PyTuple_GetItem(p, 1), &ncol);
+      if (m) {
+        **m = casadi::SX::zeros(nrow, ncol);
+        casadi_densify(get_ptr(data), (**m).sparsity().T(), (**m).ptr(), true);
+      }
+      return true;
+    }
+
+    bool IM_from_array_conv(GUESTOBJECT *p, casadi::IM** m) {
+      if (!m) return true;
+      std::vector<casadi_int> data;
+      if (!swig::assign(PyTuple_GetItem(p, 2), &data)) return false;
+      casadi_int nrow; swig::assign(PyTuple_GetItem(p, 0), &nrow);
+      casadi_int ncol; swig::assign(PyTuple_GetItem(p, 1), &ncol);
+      **m = IM::zeros(nrow, ncol);
+      casadi_densify(get_ptr(data), (**m).sparsity().T(), (**m).ptr(), true);
+      return true;
+    }
+
+    bool DM_from_array_conv(GUESTOBJECT *p, casadi::DM** m) {
+      if (!m) return true;
+      std::vector<double> data;
+      if (!swig::assign(PyTuple_GetItem(p, 2), &data)) return false;
+      casadi_int nrow; swig::assign(PyTuple_GetItem(p, 0), &nrow);
+      casadi_int ncol; swig::assign(PyTuple_GetItem(p, 1), &ncol);
+      **m = DM::zeros(nrow, ncol);
+      casadi_densify(get_ptr(data), (**m).sparsity().T(), (**m).ptr(), true);
+      return true;
+    }
+
+    bool DM_from_csc_conv(GUESTOBJECT *p, casadi::DM** m) {
+      std::vector<double> data;
+      std::vector<casadi_int> colind, row;
+      if (!swig::assign(PyTuple_GetItem(p, 4), &data)) return false;
+      if (!swig::assign(PyTuple_GetItem(p, 3), &row)) return false;
+      if (!swig::assign(PyTuple_GetItem(p, 2), &colind)) return false;
+      casadi_int nrow; swig::assign(PyTuple_GetItem(p, 0), &nrow);
+      casadi_int ncol; swig::assign(PyTuple_GetItem(p, 1), &ncol);
+      **m = casadi::Matrix<double>(casadi::Sparsity(nrow,ncol,colind,row), data, false);
+      return true;
+    }
+
+    bool SX_from_array(GUESTOBJECT *p, casadi::SX** m) {
+      return casadi_object_from_fun<casadi::SX>(p, m, "SX_from_array", SX_from_array_conv);
+    }
+
+    bool IM_from_array(GUESTOBJECT *p, casadi::IM** m) {
+      return casadi_object_from_fun<casadi::IM>(p, m, "IM_from_array", IM_from_array_conv);
+    }
+
+    bool DM_from_array(GUESTOBJECT *p, casadi::DM** m) {
+      return casadi_object_from_fun<casadi::DM>(p, m, "DM_from_array", DM_from_array_conv);
+    }
+
+    bool DM_from_csc(GUESTOBJECT *p, casadi::DM** m) {
+      return casadi_object_from_fun<casadi::DM>(p, m, "DM_from_csc", DM_from_csc_conv);
+    }
+  } // namespace casadi
+
+  namespace swig {
+    // A failed conversion leaves no Python error set
+    inline bool casadi_ok(bool ok) {
+      if (!ok && PyErr_Occurred()) PyErr_Clear();
+      return ok;
+    }
+
+    inline int casadi_host_conv(GUESTOBJECT* p, casadi::Slice* m) {
+      // Python casadi_int
+      if (PyLong_Check(p)) {
+        if (m) {
+          m->start = PyLong_AsLong(p);
+          m->stop = m->start+1;
+          if (m->stop==0) m->stop = std::numeric_limits<casadi_int>::max();
+        }
+        return true;
+      }
+      // Python slice - use Limited API compatible approach
+      if (PySlice_Check(p)) {
+        Py_ssize_t start, stop, step;
+%#if PY_VERSION_HEX >= 0x03060100
+        int res = PySlice_Unpack(p, &start, &stop, &step);
+%#else
+        // Python 2.7 and early Python 3.x use _PySlice_Unpack (private API)
+        int res = _PySlice_Unpack(p, &start, &stop, &step);
+%#endif
+        if (res < 0) {
+          return false;  // TypeError already set by PySlice_Unpack
+        }
+
+        if (m) {
+          // Map PySlice_Unpack sentinels (either extreme) to CasADi's limits
+          m->start = (start == PY_SSIZE_T_MIN || start == PY_SSIZE_T_MAX)
+              ? std::numeric_limits<casadi_int>::min()
+              : static_cast<casadi_int>(start);
+          m->stop = (stop == PY_SSIZE_T_MAX || stop == PY_SSIZE_T_MIN)
+              ? std::numeric_limits<casadi_int>::max()
+              : static_cast<casadi_int>(stop);
+          if (step != 1) {
+            m->step = static_cast<casadi_int>(step);
+          }
+        }
+        return true;
+      }
+      return false;
+    }
+
+    inline int casadi_host_conv(GUESTOBJECT* p, casadi::DM* m) {
+      using namespace casadi;
+      // Object has __DM__ method; None means not a DM
+      if (PyErr_Occurred()) PyErr_Clear(); // Clear pending exception before type check
+      if (PyObject_HasAttrString(p,"__DM__")) {
+        char name[] = "__DM__";
+        PyObject *cr = PyObject_CallMethod(p, name, 0);
+        if (!cr) return false;
+        if (cr == Py_None) { Py_DECREF(cr); return false; }
+        bool result = swig::assign(cr, m);
+        Py_DECREF(cr);
+        return result;
+      }
+
+      DM* mp = m;
+      if (DM_from_array(p, m ? &mp : 0)) return true;
+
+      if (DM_from_csc(p, m ? &mp : 0)) return true;
+
+      {
+        std::vector<double> t;
+        bool res = swig::assign(p, m ? &t : 0);
+        if (m) *m = t.empty() ? casadi::Matrix<double>(0,0) : casadi::Matrix<double>(t);
+        return res;
+      }
+    }
+
+    inline int casadi_host_conv(GUESTOBJECT* p, casadi::IM* m) {
+      using namespace casadi;
+      // Numpy arrays will be cast to dense Matrix<casadi_int>
+      IM* mp = m;
+      if (IM_from_array(p, m ? &mp : 0)) return true;
+
+      if (PyErr_Occurred()) PyErr_Clear(); // Clear pending exception before type check
+      if (PyObject_HasAttrString(p,"__IM__")) {
+        PyObject *cr = PyObject_CallMethod(p, (char*) "__IM__", 0);
+        if (!cr) return false;
+        bool result = swig::assign(cr, m);
+        Py_DECREF(cr);
+        return result;
+      }
+
+      {
+        std::vector <casadi_int> t;
+        if (swig::assign(p, m ? &t : 0)) {
+          if (m) *m = casadi::Matrix<casadi_int>(t);
+          return true;
+        }
+      }
+
+      return -1;
+    }
+
+    inline int casadi_host_conv(GUESTOBJECT* p, casadi::SX* m) {
+      using namespace casadi;
+      // Object has __SX__ method; checked before the numeric heuristics
+      if (PyErr_Occurred()) PyErr_Clear(); // Clear pending exception before type check
+      if (PyObject_HasAttrString(p,"__SX__")) {
+        PyObject *cr = PyObject_CallMethod(p, (char*) "__SX__", 0);
+        if (!cr) return false;
+        if (cr == Py_None) { Py_DECREF(cr); }
+        else {
+          // swig::assign COPIES into *m; the hook result dies with cr
+          bool flag = swig::assign(cr, m);
+          Py_DECREF(cr);
+          if (flag) return true;
+        }
+      }
+
+      return -1;
+    }
+
+    inline int casadi_host_conv_late(GUESTOBJECT* p, casadi::SX* m) {
+      using namespace casadi;
+      // Clear any error from a failed DM conversion
+      if (PyErr_Occurred()) PyErr_Clear();
+      // Numpy arrays will be cast to dense SX
+      SX* mp = m;
+      if (SX_from_array(p, m ? &mp : 0)) return true;
+
+      return -1;
+    }
+
+    inline int casadi_host_conv(GUESTOBJECT* p, casadi::MX* m) {
+      using namespace casadi;
+      // Object has __MX__ method; checked before the numeric heuristics
+      if (PyErr_Occurred()) PyErr_Clear(); // Clear pending exception before type check
+      if (PyObject_HasAttrString(p,"__MX__")) {
+        PyObject *cr = PyObject_CallMethod(p, (char*) "__MX__", 0);
+        if (!cr) return false;
+        if (cr == Py_None) { Py_DECREF(cr); }
+        else {
+          // swig::assign copies into *m
+          bool flag = swig::assign(cr, m);
+          Py_DECREF(cr);
+          if (flag) return true;
+        }
+      }
+
+      return -1;
+    }
+
+    inline int casadi_host_conv_late(GUESTOBJECT* p, casadi::MX* m) {
+      // Clear any error from a failed DM conversion
+      if (PyErr_Occurred()) PyErr_Clear();
+
+      return -1;
+    }
+
+    inline GUESTOBJECT* casadi_host_from(const casadi::GenericType& a) {
+      using namespace casadi;
+      switch (a.getType()) {
+      case OT_NULL:
+      case OT_VOIDPTR:
+        // A new reference, like every other branch
+        Py_INCREF(Py_None);
+        return Py_None;
+      default: return 0;
+      }
+    }
   } // namespace swig
 }
 

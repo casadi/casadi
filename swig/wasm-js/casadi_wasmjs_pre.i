@@ -175,6 +175,77 @@
   } // namespace swig
 }
 
+// Host conversions: is_null, full/sparse, casadi_host_conv overloads
+%fragment("casadi_host", "header", fragment="casadi_decl") {
+  namespace casadi {
+    bool is_null(GUESTOBJECT *p) {
+      if (!p) return true;
+      emscripten::val v = SWIG_WASMJS_Borrow(p);
+      return v.isNull() || v.isUndefined();
+    }
+
+    GUESTOBJECT* full(const DM& m, bool simplify) {
+      return 0;
+    }
+
+    // Convert to a sparse matrix
+    GUESTOBJECT* sparse(const DM& m) {
+      return 0;
+    }
+  } // namespace casadi
+
+  namespace swig {
+      // A JS number or BigInt as a double
+    inline bool js_number(const emscripten::val& el, double* d) {
+        std::string ty = el.typeOf().as<std::string>();
+        if (ty == "number") *d = el.as<double>();
+        else if (ty == "bigint") *d = emscripten::val::global("Number")(el).as<double>();
+        else return false;
+        return true;
+      }
+
+    inline int casadi_host_conv(GUESTOBJECT* p, casadi::DM* m) {
+      // JS Array of numbers -> column vector; nested [[a,b],[c,d]] -> dense matrix, row-major in JS
+      emscripten::val v = SWIG_WASMJS_Borrow(p);
+      if (!v.isArray()) return false;
+      unsigned n = v["length"].as<unsigned>();
+      bool nested = false;
+      if (n > 0) {
+        emscripten::val first = v[0];
+        nested = first.isArray();
+      }
+      if (nested) {
+        unsigned ncols = 0;
+        for (unsigned i = 0; i < n; ++i) {
+          emscripten::val row = v[i];
+          if (!row.isArray()) return false;
+          unsigned w = row["length"].as<unsigned>();
+          if (i == 0) ncols = w;
+          else if (w != ncols) return false;
+        }
+        std::vector<double> data((size_t)n * (size_t)ncols);
+        for (unsigned i = 0; i < n; ++i) {
+          emscripten::val row = v[i];
+          for (unsigned j = 0; j < ncols; ++j) {
+            emscripten::val el = row[j];
+            // Column-major: data[j*n + i]
+            if (!js_number(el, &data[(size_t)j * (size_t)n + (size_t)i])) return false;
+          }
+        }
+        if (m) *m = casadi::Matrix<double>::reshape(casadi::Matrix<double>(data), n, ncols);
+        return true;
+      }
+      std::vector<double> data(n);
+      for (unsigned i = 0; i < n; ++i) {
+        emscripten::val el = v[i];
+        if (!js_number(el, &data[i])) return false;
+      }
+      if (m) *m = casadi::Matrix<double>(data);
+      return true;
+    }
+  } // namespace swig
+}
+
 // Target typemaps of each casadi-typemapped type
 %define CASADI_TARGET_INPUT_TYPEMAPS(xName, xStubIn, xTsStub, xType...)
  // Wrapped types cross the wasm boundary as EM_VAL
