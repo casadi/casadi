@@ -82828,7 +82828,7 @@ Functions called by friend functions defined for GenericMatrix
 Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L4214
 Implementation:
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L3203-L3205 ";
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L3200-L3202 ";
 
 %feature("docstring") casadi::MX::_rank1 "
 
@@ -82837,7 +82837,7 @@ Functions called by friend functions defined for GenericMatrix
 Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L4215
 Implementation:
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L3207-L3209 ";
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L3204-L3206 ";
 
 %feature("docstring") casadi::MX::project "
 
@@ -82864,7 +82864,7 @@ Functions called by friend functions defined for GenericMatrix
 Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L4218
 Implementation:
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L3211-L3213 ";
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L3208-L3210 ";
 
 %feature("docstring") casadi::MX::cse "
 
@@ -82873,7 +82873,7 @@ Functions called by friend functions defined for GenericMatrix
 Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L4219
 Implementation:
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L2635-L2771 ";
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L2635-L2770 ";
 
 %feature("docstring") casadi::MX::extract_parametric "
 
@@ -82882,7 +82882,7 @@ Functions called by friend functions defined for GenericMatrix
 Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L4220
 Implementation:
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L2803-L2927 ";
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L2802-L2925 ";
 
 %feature("docstring") casadi::MX::separate_linear "
 
@@ -82891,7 +82891,7 @@ Functions called by friend functions defined for GenericMatrix
 Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L4222
 Implementation:
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L2929-L3018 ";
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L2927-L3015 ";
 
 %feature("docstring") casadi::MX::find "
 
@@ -85865,7 +85865,7 @@ Extra doc: https://github.com/casadi/casadi/wiki/L_ro
 Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L6285
 Implementation:
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L3228-L3235 ";
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L3225-L3232 ";
 
 %feature("docstring") casadi::MX::ad_reverse "
 
@@ -85876,7 +85876,7 @@ Extra doc: https://github.com/casadi/casadi/wiki/L_ro
 Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L6287
 Implementation:
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L3237-L3244 ";
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L3234-L3241 ";
 
 %feature("docstring") casadi::MX::get_row "
 
@@ -86592,7 +86592,7 @@ Extra doc: https://github.com/casadi/casadi/wiki/L_r6
 Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L4440
 Implementation:
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L3138-L3193 ";
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L3135-L3190 ";
 
 %feature("docstring") casadi::MX::set_max_depth "
 
@@ -86759,7 +86759,7 @@ Extra doc: https://github.com/casadi/casadi/wiki/L_rl
 Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L6134
 Implementation:
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L3195-L3197 ";
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L3192-L3194 ";
 
 %feature("docstring") casadi::MX::get_free "
 
@@ -86842,7 +86842,7 @@ Extra doc: https://github.com/casadi/casadi/wiki/L_rm
 Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L6206
 Implementation:
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L3199-L3201 ";
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L3196-L3198 ";
 
 %feature("docstring") casadi::MX::MX "
 
@@ -89843,7 +89843,7 @@ Extra doc: https://github.com/casadi/casadi/wiki/L_rn
 Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L6277
 Implementation:
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L3216-L3226 ";
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L3213-L3223 ";
 
 %feature("docstring") casadi::MX::nnz "
 
