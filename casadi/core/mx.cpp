@@ -2670,8 +2670,7 @@ namespace casadi {
       }
 
       // Loop over computational nodes in forward order
-      casadi_int alg_counter = 0;
-      for (auto it=ff->algorithm_.begin(); it!=ff->algorithm_.end(); ++it, ++alg_counter) {
+      for (auto it=ff->algorithm_.begin(); it!=ff->algorithm_.end(); ++it) {
         if (it->op == OP_INPUT) {
           // pass
         } else if (it->op==OP_OUTPUT) {
@@ -2850,8 +2849,7 @@ namespace casadi {
     std::vector<MX> symbol_v, parametric_v;
 
     // Loop over computational nodes in forward order
-    casadi_int alg_counter = 0;
-    for (auto it=ff->algorithm_.begin(); it!=ff->algorithm_.end(); ++it, ++alg_counter) {
+    for (auto it=ff->algorithm_.begin(); it!=ff->algorithm_.end(); ++it) {
       if (it->op == OP_INPUT) {
         w[it->res.front()] = arg_split.at(it->data->segment());
         expr_status[it->res.front()] = 1;
@@ -2955,8 +2953,7 @@ namespace casadi {
     std::array<MX, 3> res;
 
     // Loop over computational nodes in forward order
-    casadi_int alg_counter = 0;
-    for (auto it=ff->algorithm_.begin(); it!=ff->algorithm_.end(); ++it, ++alg_counter) {
+    for (auto it=ff->algorithm_.begin(); it!=ff->algorithm_.end(); ++it) {
       if (it->op == OP_INPUT) {
         MX null = MX::zeros(arg_split.at(it->data->ind()).at(it->data->segment()).sparsity());
         w[it->res.front()][0] = null;

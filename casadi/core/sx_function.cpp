@@ -568,10 +568,8 @@ namespace casadi {
     std::vector<SXNode*> nodes;
 
     // Add the list of nodes
-    casadi_int ind=0;
-    for (auto it = out_.begin(); it != out_.end(); ++it, ++ind) {
-      casadi_int nz=0;
-      for (auto itc = (*it)->begin(); itc != (*it)->end(); ++itc, ++nz) {
+    for (auto it = out_.begin(); it != out_.end(); ++it) {
+      for (auto itc = (*it)->begin(); itc != (*it)->end(); ++itc) {
         // Add outputs to the list
         s.push(itc->get());
         sort_depth_first(s, nodes);
@@ -2134,10 +2132,8 @@ namespace casadi {
     std::vector<SXNode*> nodes;
 
     // Add the list of nodes
-    casadi_int ind=0;
-    for (auto it = expr.begin(); it != expr.end(); ++it, ++ind) {
-      casadi_int nz=0;
-      for (auto itc = (*it)->begin(); itc != (*it)->end(); ++itc, ++nz) {
+    for (auto it = expr.begin(); it != expr.end(); ++it) {
+      for (auto itc = (*it)->begin(); itc != (*it)->end(); ++itc) {
         // Add outputs to the list
         s.push(itc->get());
         XFunction<SXFunction, SX, SXNode>::sort_depth_first(s, nodes);
