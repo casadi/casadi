@@ -41,6 +41,9 @@
 #include <windows.h>
 #include <algorithm>
 #include <sstream>
+#ifdef CASADI_WITH_THREAD
+#include <mutex>
+#endif // CASADI_WITH_THREAD
 #else // _WIN32
 #include <cerrno>
 #include <spawn.h>
@@ -56,18 +59,54 @@ namespace casadi {
 
 namespace {
 #ifdef _WIN32
-    // Run a command line; -1 if it could not be started
-    int win_run(const std::string& app, const std::string& cmd) {
+    // Variables set up for the compiler and linker
+    struct WinEnv {
+      std::wstring block;
+      std::wstring path;
+    };
+
+    // Run a command line, optionally capturing stdout; -1 if it could not be started
+    int win_run(const std::string& app, const std::string& cmd, const WinEnv* env,
+        std::string* out=nullptr, const char* dir=nullptr) {
+      HANDLE rd = nullptr, wr = nullptr;
       STARTUPINFOA si;
       ZeroMemory(&si, sizeof(si));
       si.cb = sizeof(si);
+      if (out) {
+        if (!CreatePipe(&rd, &wr, nullptr, 0)) return -1;
+        si.dwFlags = STARTF_USESTDHANDLES;
+        si.hStdInput = GetStdHandle(STD_INPUT_HANDLE);
+        si.hStdOutput = wr;
+        si.hStdError = GetStdHandle(STD_ERROR_HANDLE);
+      }
       // No console window when the parent has none
       DWORD flags = GetConsoleCP() ? 0 : CREATE_NO_WINDOW;
+      if (env) flags |= CREATE_UNICODE_ENVIRONMENT;
       std::vector<char> buf(cmd.begin(), cmd.end());
       buf.push_back('\0');
       PROCESS_INFORMATION pi;
-      if (!CreateProcessA(app.c_str(), buf.data(), nullptr, nullptr, TRUE, flags,
-          nullptr, nullptr, &si, &pi)) return -1;
+      BOOL ok;
+      {
+#ifdef CASADI_WITH_THREAD
+        // Only this child inherits the pipe
+        static std::mutex mtx;
+        std::lock_guard<std::mutex> lock(mtx);
+#endif // CASADI_WITH_THREAD
+        if (wr) SetHandleInformation(wr, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT);
+        ok = CreateProcessA(app.c_str(), buf.data(), nullptr, nullptr, TRUE, flags,
+          env ? const_cast<wchar_t*>(env->block.data()) : nullptr, dir, &si, &pi);
+        if (wr) CloseHandle(wr);
+      }
+      if (!ok) {
+        if (rd) CloseHandle(rd);
+        return -1;
+      }
+      if (out) {
+        char chunk[4096];
+        DWORD n;
+        while (ReadFile(rd, chunk, sizeof(chunk), &n, nullptr) && n>0) out->append(chunk, n);
+        CloseHandle(rd);
+      }
       WaitForSingleObject(pi.hProcess, INFINITE);
       DWORD ret = 1;
       GetExitCodeProcess(pi.hProcess, &ret);
@@ -169,11 +208,16 @@ namespace {
       return r;
     }
 
-    // Full path of a program, found as by cmd.exe on the PATH; empty if none
-    std::string win_find(const std::string& prog) {
-      std::vector<wchar_t> buf(32768);
-      DWORD n = GetEnvironmentVariableW(L"PATH", buf.data(), static_cast<DWORD>(buf.size()));
-      std::wstring path(buf.data(), n<buf.size() ? n : 0);
+    // Full path of a program, found as by cmd.exe on the PATH of an environment; empty if none
+    std::string win_find(const std::string& prog, const WinEnv* env) {
+      std::wstring path;
+      if (env) {
+        path = env->path;
+      } else {
+        std::vector<wchar_t> buf(32768);
+        DWORD n = GetEnvironmentVariableW(L"PATH", buf.data(), static_cast<DWORD>(buf.size()));
+        path.assign(buf.data(), n<buf.size() ? n : 0);
+      }
       std::vector<std::string> names;
       for (const std::string& e : win_pathext()) {
         if (prog.size()>e.size() && _stricmp(prog.c_str()+prog.size()-e.size(), e.c_str())==0) {
@@ -195,14 +239,65 @@ namespace {
       return "";
     }
 
+    // Environment after running a batch file; empty on failure
+    WinEnv win_env(const std::string& bat, const std::string& args) {
+      WinEnv env;
+      // Not interpreted by cmd.exe
+      if (bat.empty() || bat.find_first_of("%!^\"")!=std::string::npos) return env;
+      std::string shell = win_cmd();
+      std::string cmd = "\"" + shell
+        + "\" /u /d /s /c \"set VSCMD_SKIP_SENDTELEMETRY=1&& \"" + bat + "\" " + args
+        + " >nul && set\"";
+      std::string dir = bat.substr(0, bat.find_last_of('\\')), out;
+      if (win_run(shell, cmd, nullptr, &out, dir.c_str())) out.clear();
+      // Output is UTF-16, one NAME=value per line
+      std::wstring wout(reinterpret_cast<const wchar_t*>(out.data()),
+        out.size()/sizeof(wchar_t));
+      size_t pos = 0;
+      while (pos<wout.size()) {
+        size_t end = wout.find(L'\n', pos);
+        if (end==std::wstring::npos) end = wout.size();
+        std::wstring line = wout.substr(pos, end-pos);
+        pos = end+1;
+        if (!line.empty() && line.back()==L'\r') line.pop_back();
+        size_t eq = line.find(L'=');
+        if (eq==std::wstring::npos || eq==0) continue;
+        if (_wcsicmp(line.substr(0, eq).c_str(), L"PATH")==0) env.path = line.substr(eq+1);
+        env.block += line;
+        env.block += L'\0';
+      }
+      if (!env.block.empty()) env.block += L'\0';
+      return env;
+    }
+
+    // Locate vcvarsall.bat of the latest Visual Studio with a C++ toolset
+    std::string win_vcvarsall() {
+      const char* pf = getenv("ProgramFiles(x86)");
+      if (!pf) pf = getenv("ProgramFiles");
+      if (!pf) return "";
+      std::string dir = std::string(pf) + "\\Microsoft Visual Studio\\Installer";
+#if defined(_M_ARM64) || defined(__aarch64__)
+      std::string component = "Microsoft.VisualStudio.Component.VC.Tools.ARM64";
+#else
+      std::string component = "Microsoft.VisualStudio.Component.VC.Tools.x86.x64";
+#endif
+      std::string out, vswhere = dir + "\\vswhere.exe";
+      if (win_run(vswhere, "\"" + vswhere + "\" -latest -products * -requires " + component
+          + " -property installationPath", nullptr, &out, dir.c_str())) return "";
+      size_t end = out.find_first_of("\r\n");
+      if (end!=std::string::npos) out.resize(end);
+      if (out.empty()) return "";
+      return out + "\\VC\\Auxiliary\\Build\\vcvarsall.bat";
+    }
+
     // Run a program
-    int run(const std::vector<std::string>& args) {
+    int run(const std::vector<std::string>& args, const WinEnv* env) {
       std::vector<std::string> a = args;
-      if (a.empty() || (a[0] = win_find(a[0])).empty()) return -1;
+      if (a.empty() || (a[0] = win_find(a[0], env)).empty()) return -1;
       // A batch file is run by cmd.exe, which must find the arguments within quotes
       std::string ext = a[0].substr(a[0].size()-4);
       if (_stricmp(ext.c_str(), ".bat") && _stricmp(ext.c_str(), ".cmd")) {
-        return win_run(a[0], cmdline(a));
+        return win_run(a[0], cmdline(a), env);
       }
       for (const std::string& s : a) {
         bool quote = s.find('"')!=std::string::npos;
@@ -212,7 +307,7 @@ namespace {
         casadi_assert(ok, "Unsupported argument '" + s + "' for a batch file");
       }
       std::string shell = win_cmd();
-      return win_run(shell, "\"" + shell + "\" /d /s /c \"" + cmdline(a) + "\"");
+      return win_run(shell, "\"" + shell + "\" /d /s /c \"" + cmdline(a) + "\"", env);
     }
 #else // _WIN32
     // Run a program
@@ -418,6 +513,26 @@ namespace {
     base_name_ = std::string(obj_name_.begin(), obj_name_.begin()+obj_name_.size()-suffix.size());
     bin_name_ = base_name_+SHARED_LIBRARY_SUFFIX;
 
+#ifdef _WIN32
+    // Set up Visual Studio if cl.exe is not on the PATH
+    const WinEnv* env = nullptr;
+    std::vector<std::string> cc;
+    add_args(cc, compiler);
+    std::string prog = cc.empty() ? "" : cc[0];
+    if ((_stricmp(prog.c_str(), "cl")==0 || _stricmp(prog.c_str(), "cl.exe")==0)
+        && win_find(prog, nullptr).empty()) {
+      // Set up once per process
+#if defined(_M_ARM64) || defined(__aarch64__)
+      static const WinEnv vs = win_env(win_vcvarsall(), "arm64");
+#elif defined(_WIN64)
+      static const WinEnv vs = win_env(win_vcvarsall(), "x64");
+#else
+      static const WinEnv vs = win_env(win_vcvarsall(), "x86");
+#endif
+      if (!vs.block.empty()) env = &vs;
+    }
+#endif // _WIN32
+
     // Construct the compiler command
     std::vector<std::string> cccmd;
     add_args(cccmd, compiler);
@@ -434,7 +549,11 @@ namespace {
 
     // Compile into an object
     if (verbose_) casadi_message("calling \"" + cmdline(cccmd) + "\"");
+#ifdef _WIN32
+    int ret = run(cccmd, env);
+#else // _WIN32
     int ret = run(cccmd);
+#endif // _WIN32
     if (ret) {
       casadi_error("Compilation failed. Tried \"" + cmdline(cccmd) + "\"");
     }
@@ -453,7 +572,11 @@ namespace {
 
     // Compile into a shared library
     if (verbose_) casadi_message("calling \"" + cmdline(ldcmd) + "\"");
+#ifdef _WIN32
+    ret = run(ldcmd, env);
+#else // _WIN32
     ret = run(ldcmd);
+#endif // _WIN32
     if (ret) {
       casadi_error("Linking failed. Tried \"" + cmdline(ldcmd) + "\"");
     }
