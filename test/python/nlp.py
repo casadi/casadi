@@ -2854,6 +2854,7 @@ class NLPtests(casadiTestCase):
     solver = ca.nlpsol("solver", "sqpmethod", nlp, opts)
     with self.assertInException("p must be nonnegative"):
       solver(p=-1, ubg=0)
+    if not args.run_slow: return
     cg = ca.CodeGenerator("detect_bounds_fail")
     cg.add(solver)
     F = ca.external("solver", ca.Importer(cg.generate(), "shell"))
