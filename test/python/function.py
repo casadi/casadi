@@ -32,6 +32,7 @@ from numpy import random
 from helpers import args, casadiTestCase, hessian_old, jacobian_old, memory_heavy, requiresPlugin, requires_conic, requires_expm, requires_nlpsol, skip, toSX_fun
 import pickle
 import os
+import shutil
 import re
 import sys
 from casadi.tools import capture_stdout
@@ -2506,6 +2507,67 @@ class Functiontests(casadiTestCase):
       self.checkarray(g(3),9)
       with open(os.path.join(d,"jit_codegen_options.c")) as src:
         self.assertTrue("cgopt_" in src.read())
+
+  @requiresPlugin(ca.Importer,"shell")
+  def test_jit_shell_arguments(self):
+    if not args.run_slow: return
+    # Quotes in options group arguments, \" is a quote
+    d = tempfile.mkdtemp()
+    try:
+      src = os.path.join(d, "shell_arguments.c")
+      with open(src, "w") as f:
+        f.write('static const char tag[] = TAG;\n'
+                'int check_tag[sizeof(tag)==4 ? 1 : -1];\n'
+                'int check_pair[PAIR==3 ? 1 : -1];\n'
+                'int shell_arguments(void) { return 0; }\n')
+      opts = {"flags": ['"-DTAG=\\"a b\\"" "-DPAIR=1 + 2"'], "directory": d + os.sep}
+      ca.Importer(src, "shell", opts)
+    finally:
+      shutil.rmtree(d, ignore_errors=True)
+
+  @requiresPlugin(ca.Importer,"shell")
+  def test_jit_shell_batch(self):
+    if not args.run_slow or os.name!='nt': return
+    # A batch file as compiler gets its arguments through cmd.exe
+    x = ca.MX.sym("x")
+    d = tempfile.mkdtemp()
+    try:
+      bat = os.path.join(d, "R&D (x86) cc.bat")
+      out = os.path.join(d, "args.txt")
+      with open(bat, "w") as f:
+        f.write('@echo %* > "' + out + '"\n@exit /b 1\n')
+      opts = {"compiler": '"' + bat + '"', "flags": ['"-DTAG=\\"a b\\""']}
+      with self.assertRaises(Exception):
+        ca.Function('f',[x],[x**2],{"jit":True,"compiler":"shell","jit_options":opts})
+      with open(out) as f:
+        self.assertTrue('"-DTAG=\\"a b\\""' in f.read())
+      opts["flags"] = ["-DTAG=%PATH%"]
+      with self.assertRaises(Exception) as e:
+        ca.Function('f',[x],[x**2],{"jit":True,"compiler":"shell","jit_options":opts})
+      self.assertTrue("Unsupported argument" in str(e.exception))
+    finally:
+      shutil.rmtree(d, ignore_errors=True)
+
+  @requiresPlugin(ca.Importer,"shell")
+  def test_jit_directory_spaces(self):
+    if not args.run_slow: return
+    # Working directories with spaces and punctuation
+    x = ca.MX.sym("x")
+    base = tempfile.mkdtemp()
+    cwd = os.getcwd()
+    try:
+      for name in ["with space", "O'Brien", "R&D", "R&D (x86)", "50%", "a!b^c"]:
+        d = os.path.join(base, name)
+        os.mkdir(d)
+        os.chdir(d)
+        f = ca.Function('f',[x],[x**2],{"jit":True,"compiler":"shell",
+                                         "jit_options":{"include_dirs": [d]}})
+        self.checkarray(f(3),9)
+        f = None
+        os.chdir(cwd)
+    finally:
+      os.chdir(cwd)
+      shutil.rmtree(base, ignore_errors=True)
 
   @requires_nlpsol("ipopt")
   @requiresPlugin(ca.Importer,"shell")
