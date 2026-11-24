@@ -1398,11 +1398,13 @@ namespace casadi {
           it2++;
           break;
         CASADI_MATH_BINARY_BUILTIN // Binary operation
-          w[a.i0] = it2->d[0] * w[a.i1] + it2->d[1] * w[a.i2];
+          if (w[a.i1].is_zero() && w[a.i2].is_zero()) w[a.i0] = 0;
+          else w[a.i0] = it2->d[0] * w[a.i1] + it2->d[1] * w[a.i2];
           it2++;
           break;
         default: // Unary operation
-          w[a.i0] = it2->d[0] * w[a.i1];
+          if (w[a.i1].is_zero()) w[a.i0] = 0;
+          else w[a.i0] = it2->d[0] * w[a.i1];
           it2++;
         }
       }
@@ -1596,13 +1598,17 @@ namespace casadi {
         CASADI_MATH_BINARY_BUILTIN // Binary operation
           seed = w[it->i0];
           w[it->i0] = 0;
-          w[it->i1] += it2->d[0] * seed;
-          w[it->i2] += it2++->d[1] * seed;
+          if (!seed.is_zero()) {
+            w[it->i1] += it2->d[0] * seed;
+            w[it->i2] += it2->d[1] * seed;
+          }
+          it2++;
           break;
         default: // Unary operation
           seed = w[it->i0];
           w[it->i0] = 0;
-          w[it->i1] += it2++->d[0] * seed;
+          if (!seed.is_zero()) w[it->i1] += it2->d[0] * seed;
+          it2++;
         }
       }
     }
