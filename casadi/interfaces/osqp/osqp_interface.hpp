@@ -139,6 +139,9 @@ namespace casadi {
 
     bool warm_start_primal_, warm_start_dual_;
 
+    // Reset rho to rho_initial_ before every solve
+    bool reset_rho_;
+
     /** \brief Generate code for the function body */
     void codegen_body(CodeGenerator& g) const override;
 
