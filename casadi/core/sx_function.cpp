@@ -1410,7 +1410,7 @@ namespace casadi {
   }
 
   void SXFunction::ad_reverse(const std::vector<std::vector<SX> >& aseed,
-                                std::vector<std::vector<SX> >& asens) const {
+                                std::vector<std::vector<SX> >& asens, bool hessian_only) const {
     if (verbose_) casadi_message(name_ + "::ad_reverse");
 
     // number of adjoint seeds
@@ -1425,7 +1425,7 @@ namespace casadi {
     for (auto&& r : aseed) {
       if (!matching_res(r, npar)) {
         casadi_assert_dev(npar==1);
-        ad_reverse(replace_aseed(aseed, npar), asens);
+        ad_reverse(replace_aseed(aseed, npar), asens, hessian_only);
         return;
       }
     }
@@ -1445,7 +1445,7 @@ namespace casadi {
         for (casadi_int i=0; i<n_out_; ++i)
           if (aseed2[d][i].sparsity()!=sparsity_out_[i])
             aseed2[d][i] = project(aseed2[d][i], sparsity_out_[i]);
-      ad_reverse(aseed2, asens);
+      ad_reverse(aseed2, asens, hessian_only);
       return;
     }
 
@@ -1489,20 +1489,78 @@ namespace casadi {
       }
     }
 
+    // Per operand: depends on the inputs (D), so does its partial (P), its contribution is kept
+    // even for an input-independent adjoint (K)
+    enum : unsigned char {D1 = 1, D2 = 2, P1 = 4, P2 = 8, K1 = 16, K2 = 32};
+    std::vector<unsigned char> opflags(hessian_only ? algorithm_.size() : 0);
+    if (hessian_only) {
+      std::vector<bool> dep(worksize_, false), aff(worksize_, true);
+      for (casadi_int k=0; k<algorithm_.size(); ++k) {
+        const AlgEl& a = algorithm_[k];
+        switch (a.op) {
+        case OP_INPUT:
+        case OP_CONST:
+        case OP_PARAMETER:
+          dep[a.i0] = a.op==OP_INPUT;
+          aff[a.i0] = true;
+          break;
+        case OP_OUTPUT:
+          break;
+        case OP_CALL:
+          for (int r : call_.el.at(a.i1).res) {
+            if (r>=0) {
+              dep[r] = true;
+              aff[r] = false;
+            }
+          }
+          break;
+        CASADI_MATH_BINARY_BUILTIN
+        case OP_IF_ELSE_ZERO:
+          {
+            bool d1 = dep[a.i1], d2 = dep[a.i2], p1, p2;
+            switch (a.op) {
+              case OP_ADD: case OP_SUB: p1 = p2 = false; break;
+              case OP_MUL: p1 = p2 = d1 && d2; break;
+              case OP_DIV: p1 = d1 && d2; p2 = d2; break;
+              default: p1 = d1; p2 = d2;
+            }
+            bool k1 = d1 && (p1 || !aff[a.i1]), k2 = d2 && (p2 || !aff[a.i2]);
+            opflags[k] = d1*D1 | d2*D2 | p1*P1 | p2*P2 | k1*K1 | k2*K2;
+            dep[a.i0] = d1 || d2;
+            aff[a.i0] = !(k1 || k2);
+          }
+          break;
+        default:  // Unary operation
+          {
+            bool d1 = dep[a.i1];
+            bool p1 = d1 && a.op!=OP_NEG && a.op!=OP_ASSIGN && a.op!=OP_TWICE;
+            bool k1 = d1 && (p1 || !aff[a.i1]);
+            opflags[k] = d1*D1 | p1*P1 | k1*K1;
+            dep[a.i0] = d1;
+            aff[a.i0] = !k1;
+          }
+        }
+      }
+    }
+
     // Calculate adjoint sensitivities
     if (verbose_) casadi_message("Calculating adjoint derivatives");
 
     // Work vector
     std::vector<SXElem> w(worksize_, 0);
+    // Whether the adjoint in w depends on the inputs
+    std::vector<bool> adep(worksize_, false);
 
     for (casadi_int dir=0; dir<nadj; ++dir) {
       auto it2 = s_pdwork.rbegin();
       for (auto it = algorithm_.rbegin(); it!=algorithm_.rend(); ++it) {
         SXElem seed;
+        bool keep1 = true, keep2 = true;
         switch (it->op) {
         case OP_INPUT:
           asens[dir][it->i1].nonzeros()[it->i2] = w[it->i0];
           w[it->i0] = 0;
+          adep[it->i0] = false;
           break;
         case OP_OUTPUT:
           w[it->i1] += aseed[dir][it->i0].nonzeros()[it->i2];
@@ -1510,10 +1568,13 @@ namespace casadi {
         case OP_CONST:
         case OP_PARAMETER:
           w[it->i0] = 0;
+          adep[it->i0] = false;
           break;
         case OP_IF_ELSE_ZERO:
           seed = w[it->i0];
           w[it->i0] = 0;
+          adep[it->i0] = false;
+          adep[it->i2] = true;
           w[it->i2] += if_else_zero(it2++->d[1], seed);
           break;
         case OP_CALL:
@@ -1573,7 +1634,10 @@ namespace casadi {
 
             // Clear out reverse seeds
             for (casadi_int i=0;i<m.n_res;++i) {
-              if (m.res[i]>=0) w[m.res[i]] = 0;
+              if (m.res[i]>=0) {
+                w[m.res[i]] = 0;
+                adep[m.res[i]] = false;
+              }
             }
 
             // Store reverse sensitivities into work vector
@@ -1586,6 +1650,7 @@ namespace casadi {
               if (nnz) {
                 for (casadi_int j=0;j<nnz;++j) {
                   w[m.dep[offset+j]] += ret[k++];
+                  adep[m.dep[offset+j]] = true;
                 }
               }
               offset += m.f_nnz_in[i];
@@ -1596,13 +1661,31 @@ namespace casadi {
         CASADI_MATH_BINARY_BUILTIN // Binary operation
           seed = w[it->i0];
           w[it->i0] = 0;
-          w[it->i1] += it2->d[0] * seed;
-          w[it->i2] += it2++->d[1] * seed;
+          if (hessian_only) {
+            bool sd = adep[it->i0];
+            adep[it->i0] = false;
+            unsigned char f = opflags[algorithm_.rend() - it - 1];
+            keep1 = (f & K1) || (sd && (f & D1));
+            keep2 = (f & K2) || (sd && (f & D2));
+            adep[it->i1] = adep[it->i1] || (f & P1) || (sd && (f & D1));
+            adep[it->i2] = adep[it->i2] || (f & P2) || (sd && (f & D2));
+          }
+          if (keep1) w[it->i1] += it2->d[0] * seed;
+          if (keep2) w[it->i2] += it2->d[1] * seed;
+          it2++;
           break;
         default: // Unary operation
           seed = w[it->i0];
           w[it->i0] = 0;
-          w[it->i1] += it2++->d[0] * seed;
+          if (hessian_only) {
+            bool sd = adep[it->i0];
+            adep[it->i0] = false;
+            unsigned char f = opflags[algorithm_.rend() - it - 1];
+            keep1 = (f & K1) || (sd && (f & D1));
+            adep[it->i1] = adep[it->i1] || (f & P1) || (sd && (f & D1));
+          }
+          if (keep1) w[it->i1] += it2->d[0] * seed;
+          it2++;
         }
       }
     }
