@@ -390,6 +390,26 @@ jobs:
           test -f install/casadi/casadi.jar
           cmake -DDIR=install/casadi -DPLATFORM=${{ matrix.platform }} -DOUT=casadi-natives-${{ matrix.platform }}.jar -P swig/java/natives.cmake
           cd install/casadi && zip -rq ../../casadi-${{ matrix.os }}64-java.zip .
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v4.4.1
+      - run: cp casadi-${{ matrix.os }}64-java.zip casadi-${{ needs.version.outputs.casadi }}-${{ matrix.os }}64-java.zip
+      - name: Delete old release assets
+        uses: jgillis/delete-release-assets@codex/bump-runtime-node24
+        with:
+          token: ${{ github.token }}
+          tag: nightly-${{ env.GITHUB_REF_SLUG }}
+          assets: casadi-*-${{ matrix.os }}64-java.zip
+          fail-if-no-release: false
+          fail-if-no-assets: false
+        if: github.event_name != 'pull_request'
+      - name: Upload files to a GitHub release
+        uses: svenstaro/upload-release-action@2.11.5
+        with:
+          overwrite: true
+          tag: nightly-${{ env.GITHUB_REF_SLUG }}
+          file: casadi-${{ needs.version.outputs.casadi }}-${{ matrix.os }}64-java.zip
+          prerelease: true
+        if: github.event_name != 'pull_request'
       - uses: actions/upload-artifact@v7.0.1
         with:
           name: casadi-${{ matrix.os }}64-java
@@ -457,6 +477,26 @@ jobs:
           test -f install/casadi/casadi.jar
           cmake -DDIR=install/casadi -DPLATFORM=macos-arm64 -DOUT=casadi-natives-macos-arm64.jar -P swig/java/natives.cmake
           cd install/casadi && zip -rq ../../casadi-osx-arm64-java.zip .
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v4.4.1
+      - run: cp casadi-osx-arm64-java.zip casadi-${{ needs.version.outputs.casadi }}-osx-arm64-java.zip
+      - name: Delete old release assets
+        uses: jgillis/delete-release-assets@codex/bump-runtime-node24
+        with:
+          token: ${{ github.token }}
+          tag: nightly-${{ env.GITHUB_REF_SLUG }}
+          assets: casadi-*-osx-arm64-java.zip
+          fail-if-no-release: false
+          fail-if-no-assets: false
+        if: github.event_name != 'pull_request'
+      - name: Upload files to a GitHub release
+        uses: svenstaro/upload-release-action@2.11.5
+        with:
+          overwrite: true
+          tag: nightly-${{ env.GITHUB_REF_SLUG }}
+          file: casadi-${{ needs.version.outputs.casadi }}-osx-arm64-java.zip
+          prerelease: true
+        if: github.event_name != 'pull_request'
       - uses: actions/upload-artifact@v7.0.1
         with:
           name: casadi-osx-arm64-java
