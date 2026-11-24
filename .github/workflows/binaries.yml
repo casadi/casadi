@@ -334,6 +334,10 @@ jobs:
   java-dockcross:
     needs: [core-dockcross,swig,version]
     runs-on: ubuntu-24.04
+    environment: ${{ needs.version.outputs.sign_windows == 'true' && matrix.os == 'windows' && 'windows-signing' || '' }}
+    permissions:
+      contents: write
+      id-token: write          # OIDC token, required for Azure Artifact Signing
     strategy:
       fail-fast: false
       matrix:
@@ -385,6 +389,16 @@ jobs:
           bitness: 64
       - run: ./dockcross bash -c 'cp `rustc --target=$CARGO_BUILD_TARGET --print target-libdir`/*.dll /work/install/casadi'
         if: matrix.os == 'windows'
+      # The source archive does not carry .github
+      - uses: actions/checkout@v6.0.2
+        with:
+          sparse-checkout: .github/actions
+          path: ci
+        if: needs.version.outputs.sign_windows == 'true' && matrix.os == 'windows'
+      - uses: ./ci/.github/actions/sign-windows
+        with:
+          dir: install
+        if: needs.version.outputs.sign_windows == 'true' && matrix.os == 'windows'
       - name: Archives (install tree, natives jar)
         run: |
           test -f install/casadi/casadi.jar
@@ -442,6 +456,8 @@ jobs:
   java-osx:
     needs: [core-osx,swig,version]
     runs-on: macos-15
+    env:
+      DEVELOPMENT_CERTIFICATE_DATA_AVAILABLE: ${{ secrets.DEVELOPMENT_CERTIFICATE_DATA != '' }}
     steps:
       - uses: casadi/action-setup-compiler@master
         with:
@@ -472,11 +488,20 @@ jobs:
           source_path: install/casadi
           destination_path: install/casadi
           search_paths: "${{env.COMPILER_LIB_SEARCH_PATH}}"
+      - uses: jgillis/import-codesign-certs@master
+        with: 
+          p12-file-base64: ${{ secrets.DEVELOPMENT_CERTIFICATE_DATA }}
+          p12-password: ${{ secrets.P12_PASSWORD }}
+          keychain-password: ${{ secrets.KEYCHAIN_PASSWORD }}
+        if: ${{ env.DEVELOPMENT_CERTIFICATE_DATA_AVAILABLE == 'true' }}
       - name: Archives (install tree, natives jar)
         run: |
           test -f install/casadi/casadi.jar
           cmake -DDIR=install/casadi -DPLATFORM=macos-arm64 -DOUT=casadi-natives-macos-arm64.jar -P swig/java/natives.cmake
           cd install/casadi && zip -rq ../../casadi-osx-arm64-java.zip .
+      - run: python misc/certify.py "${{ secrets.CODESIGN_IDENTITY }}" casadi-osx-arm64-java.zip "${{ secrets.APPLE_ID }}" "${{ secrets.APPLE_TEAM_ID }}" "${{ secrets.NOTARIZE_PASSWORD }}"
+        shell: bash -el {0}
+        if: ${{ env.DEVELOPMENT_CERTIFICATE_DATA_AVAILABLE == 'true' && contains(github.event.head_commit.message, '[ci:run_slow]') }}
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.4.1
       - run: cp casadi-osx-arm64-java.zip casadi-${{ needs.version.outputs.casadi }}-osx-arm64-java.zip
@@ -640,6 +665,8 @@ jobs:
   rust-osx:
     needs: [core-osx,swig,version]
     runs-on: macos-15
+    env:
+      DEVELOPMENT_CERTIFICATE_DATA_AVAILABLE: ${{ secrets.DEVELOPMENT_CERTIFICATE_DATA != '' }}
     steps:
       - uses: casadi/action-setup-compiler@master
         with:
@@ -666,7 +693,16 @@ jobs:
           source_path: install/casadi
           destination_path: install/casadi
           search_paths: "${{env.COMPILER_LIB_SEARCH_PATH}}"
+      - uses: jgillis/import-codesign-certs@master
+        with: 
+          p12-file-base64: ${{ secrets.DEVELOPMENT_CERTIFICATE_DATA }}
+          p12-password: ${{ secrets.P12_PASSWORD }}
+          keychain-password: ${{ secrets.KEYCHAIN_PASSWORD }}
+        if: ${{ env.DEVELOPMENT_CERTIFICATE_DATA_AVAILABLE == 'true' }}
       - run: cd install/casadi && zip -rq ../../casadi-osx-arm64-rust.zip .
+      - run: python misc/certify.py "${{ secrets.CODESIGN_IDENTITY }}" casadi-osx-arm64-rust.zip "${{ secrets.APPLE_ID }}" "${{ secrets.APPLE_TEAM_ID }}" "${{ secrets.NOTARIZE_PASSWORD }}"
+        shell: bash -el {0}
+        if: ${{ env.DEVELOPMENT_CERTIFICATE_DATA_AVAILABLE == 'true' && contains(github.event.head_commit.message, '[ci:run_slow]') }}
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.4.1
       - run: cp casadi-osx-arm64-rust.zip casadi-${{ needs.version.outputs.casadi }}-osx-arm64-rust.zip
