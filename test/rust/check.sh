@@ -26,13 +26,15 @@ cargo build --examples
 run=$(mktemp -d)
 cp "$root/docs/examples/python/rocket.mo" "$run/"
 fail=0
+# macOS has no timeout(1)
+to=$(command -v timeout || command -v gtimeout || true)
 for f in "$root"/docs/examples/rust/*.rs; do
   n=$(basename "$f" .rs)
   if [ "$n" = modelica_fmu_import ] && ! command -v omc > /dev/null; then
     echo "skip $n (no omc)"
     continue
   fi
-  if (cd "$run" && timeout 1200 "$CARGO_TARGET_DIR/debug/examples/$n" > "$n.log" 2>&1); then
+  if (cd "$run" && ${to:+$to 1200} "$CARGO_TARGET_DIR/debug/examples/$n" > "$n.log" 2>&1); then
     echo "ok   $n"
   else
     echo "FAIL $n"
