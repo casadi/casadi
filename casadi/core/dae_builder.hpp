@@ -4171,6 +4171,26 @@ class CASADI_EXPORT DaeBuilder
   bool has_attribute(const std::string& a, const std::string& name) const;
 
   ///@{
+  /** \brief Get/set the annotations of a variable
+
+      The vendor annotations of a variable, which carry information that has no FMI attribute,
+      from the `Annotations` element of the variable in an FMI 3.0 model description: one
+      entry per `Annotation` element, keyed by its `type` attribute. Its value is a Dict with
+      an entry per child element of the `Annotation`, keyed by the element name; that entry is
+      a Dict of the XML attributes of the element (strings) and, the same way, of its own child
+      elements (Dicts). Text inside the elements is not kept, and of child elements with the
+      same name, the last one. Empty without annotations.
+
+      lacemodelica writes the Modelica attribute `fixed` of a `.bmo` model this way, which
+      gives `{"org.lacemodelica.modelica": {"Attributes": {"fixed": "true"}}}` for
+      `Real u(fixed = true)`.
+
+      \sa initial */
+  Dict annotations(const std::string& name) const;
+  void set_annotations(const std::string& name, const Dict& val);
+  ///@}
+
+  ///@{
   /** \brief Get/set the type
 
       The variable type in FMI 3 naming (`"Float64"`, `"Float32"`, `"Int32"`, `"Boolean"`,

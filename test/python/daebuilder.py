@@ -1070,6 +1070,23 @@ class Daebuildertests(casadiTestCase):
     with self.assertRaisesRegex(RuntimeError, 'No expression for attribute value'):
       dae.set_attribute_expr('value', 'x', p)
 
+  def test_annotations(self):
+    dae = ca.DaeBuilder('m')
+    dae.add('x')
+    self.assertEqual(dae.annotations('x'), {})
+    a = {'org.example': {'Attributes': {'flag': 'true'}, 'Nested': {'Inner': {'v': '1'}}}}
+    dae.set_annotations('x', a)
+    self.assertEqual(dae.annotations('x'), a)
+
+  @requires_modelicaparser('lacemodelica')
+  def test_basemodelica_fixed(self):
+    # lacemodelica gives fixed as the FMI initial attribute, for an input as an annotation
+    dae = ca.DaeBuilder('m', '../data/Fixed.bmo')
+    self.assertEqual([dae.initial(n) for n in ['x', 'y', 'z']], ['exact', 'approx', 'calculated'])
+    self.assertEqual(dae.annotations('u'),
+                     {'org.lacemodelica.modelica': {'Attributes': {'fixed': 'true'}}})
+    self.assertEqual(dae.annotations('z'), {})
+
   @requires_modelicaparser('lacemodelica')
   def test_basemodelica(self):
     """Test loading .bmo files via the LaceModelica plugin."""

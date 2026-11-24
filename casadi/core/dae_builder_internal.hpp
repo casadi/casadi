@@ -139,6 +139,9 @@ struct CASADI_EXPORT Variable {
   // Does it appear in any right-hand-side?
   bool in_rhs;
 
+  /// Vendor annotations, by annotation type, cf. DaeBuilder::annotations
+  Dict annotations;
+
   /// Numerical value (also for booleans, integers, enums)
   std::vector<double> value;
 

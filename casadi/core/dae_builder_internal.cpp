@@ -3891,6 +3891,15 @@ void DaeBuilderInternal::import_model_exchange(const XmlNode& n) {
   }
 }
 
+// The content of an XML element as in DaeBuilder::annotations: its attributes (strings) and,
+// recursively, its child elements (Dicts), by name
+static Dict annotation_content(const XmlNode& n) {
+  Dict r;
+  for (auto& a : n.attributes) r[a.first] = a.second;
+  for (const XmlNode& c : n.children) r[c.name] = annotation_content(c);
+  return r;
+}
+
 // Start value(s) of a Boolean, integer or enumeration variable, as doubles: whitespace separated
 // numbers, or 'true' and 'false'. Empty if the node has no start attribute.
 static std::vector<double> read_discrete_start(const XmlNode& n) {
@@ -3954,6 +3963,9 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
     // Dimension of the variable
     std::vector<casadi_int> dimension;
 
+    // Vendor annotations
+    Dict annotations;
+
     // Type specific properties
     Dict opts;
     Type type = Type::NUMEL;
@@ -3974,7 +3986,12 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
         } else if (c.name == "Alias") {
           // Aliases currently ignored
         } else if (c.name == "Annotations") {
-          // Annotations currently ignored
+          // By type, the child elements of each annotation
+          for (const XmlNode& an : c.children) {
+            Dict content;
+            for (const XmlNode& e : an.children) content[e.name] = annotation_content(e);
+            annotations[an.attribute<std::string>("type")] = content;
+          }
         } else if (c.name == "Start") {
           // Start currently ignored
         } else {
@@ -4106,6 +4123,9 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
     if (variability == Variability::DISCRETE) {
       categorize(var.index, Category::NUMEL);
     }
+
+    // Vendor annotations
+    var.annotations = annotations;
 
     // Derivative attribute
     var.der_of = derivative;

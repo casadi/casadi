@@ -587,6 +587,23 @@ bool DaeBuilder::has_attribute(const std::string& a, const std::string& name) co
   }
 }
 
+Dict DaeBuilder::annotations(const std::string& name) const {
+  try {
+    return (*this)->variable(name).annotations;
+  } catch (std::exception& e) {
+    THROW_ERROR("annotations", e.what());
+    return Dict();  // never reached
+  }
+}
+
+void DaeBuilder::set_annotations(const std::string& name, const Dict& val) {
+  try {
+    (*this)->variable(name).annotations = val;
+  } catch (std::exception& e) {
+    THROW_ERROR("set_annotations", e.what());
+  }
+}
+
 std::string DaeBuilder::description(const std::string& name) const {
   return (*this)->variable(name).description;
 }
