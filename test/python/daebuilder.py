@@ -109,6 +109,49 @@ class Daebuildertests(casadiTestCase):
     if os.path.exists(fmu_file):
         os.remove(fmu_file)
 
+  def test_fmi_discrete_start(self):
+    # Start values of Boolean, integer and enumeration variables, without an FMU binary
+    import tempfile
+    md3 = """<?xml version="1.0" encoding="UTF-8"?>
+<fmiModelDescription fmiVersion="3.0" modelName="starts" instantiationToken="{0}">
+  <ModelExchange modelIdentifier="starts"/>
+  <ModelVariables>
+    <Boolean name="b" valueReference="1" causality="parameter" variability="fixed" start="true"/>
+    <Boolean name="c" valueReference="2" causality="parameter" variability="fixed" start="false"/>
+    <Int32 name="n" valueReference="3" causality="parameter" variability="fixed" start="-3"/>
+    <Int32 name="m" valueReference="4" causality="parameter" variability="fixed" start="1 2">
+      <Dimension start="2"/>
+    </Int32>
+    <Enumeration name="e" valueReference="5" declaredType="E" causality="parameter" variability="fixed" start="2"/>
+    <Float64 name="p" valueReference="6" causality="parameter" variability="fixed" start="1.5"/>
+  </ModelVariables>
+  <ModelStructure/>
+</fmiModelDescription>
+"""
+    md2 = """<?xml version="1.0" encoding="UTF-8"?>
+<fmiModelDescription fmiVersion="2.0" modelName="starts" guid="{0}" numberOfEventIndicators="0">
+  <ModelExchange modelIdentifier="starts"/>
+  <ModelVariables>
+    <ScalarVariable name="b" valueReference="1" causality="parameter" variability="fixed"><Boolean start="true"/></ScalarVariable>
+    <ScalarVariable name="c" valueReference="2" causality="parameter" variability="fixed"><Boolean start="false"/></ScalarVariable>
+    <ScalarVariable name="n" valueReference="3" causality="parameter" variability="fixed"><Integer start="-3"/></ScalarVariable>
+    <ScalarVariable name="e" valueReference="5" causality="parameter" variability="fixed"><Enumeration declaredType="E" start="2"/></ScalarVariable>
+    <ScalarVariable name="p" valueReference="6" causality="parameter" variability="fixed"><Real start="1.5"/></ScalarVariable>
+  </ModelVariables>
+  <ModelStructure/>
+</fmiModelDescription>
+"""
+    for md in [md3, md2]:
+      with tempfile.TemporaryDirectory() as folder:
+        with open(os.path.join(folder, "modelDescription.xml"), "w") as f: f.write(md)
+        dae = ca.DaeBuilder("starts", folder)
+        self.assertEqual(dae.start("b"), [1])
+        self.assertEqual(dae.start("c"), [0])
+        self.assertEqual(dae.start("n"), [-3])
+        self.assertEqual(dae.start("e"), [2])
+        self.assertEqual(dae.start("p"), [1.5])
+        if dae.has("m"): self.assertEqual(dae.start("m"), [1, 2])
+
   @memory_heavy() # FMU has a memleak
   def test_cstr(self):
     fmu_file = "../data/cstr.fmu"

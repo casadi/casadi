@@ -3871,6 +3871,27 @@ void DaeBuilderInternal::import_model_exchange(const XmlNode& n) {
   }
 }
 
+// Start value(s) of a Boolean, integer or enumeration variable, as doubles: whitespace separated
+// numbers, or 'true' and 'false'. Empty if the node has no start attribute.
+static std::vector<double> read_discrete_start(const XmlNode& n) {
+  std::vector<double> r;
+  if (!n.has_attribute("start")) return r;
+  std::istringstream ss(n.attribute<std::string>("start"));
+  std::string s;
+  while (ss >> s) {
+    if (s == "true") {
+      r.push_back(1);
+    } else if (s == "false") {
+      r.push_back(0);
+    } else {
+      double v;
+      XmlNode::read(s, &v);
+      r.push_back(v);
+    }
+  }
+  return r;
+}
+
 void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
   // Mapping from derivative variables to corresponding state variables, FMUX only
   std::vector<std::pair<std::string, std::string>> fmi1_der;
@@ -3968,6 +3989,12 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
       default:
         break;
       }
+      // Start values of Boolean, integer and enumeration variables
+      if (type != Type::FLOAT32 && type != Type::FLOAT64 && type != Type::STRING
+          && type != Type::BINARY && type != Type::CLOCK) {
+        std::vector<double> start = read_discrete_start(vnode);
+        if (!start.empty()) opts["start"] = start;
+      }
     } else {
       // FMI 1.0 / 2.0: Type information in a separate node
       if (vnode.has_child("Real")) {
@@ -3985,12 +4012,18 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
         const XmlNode& props = vnode["Integer"];
         opts["min"] = props.attribute<double>("min", -inf);
         opts["max"] = props.attribute<double>("max", inf);
+        std::vector<double> start = read_discrete_start(props);
+        if (!start.empty()) opts["start"] = start;
       } else if (vnode.has_child("Boolean")) {
         type = Type::BOOLEAN;
+        std::vector<double> start = read_discrete_start(vnode["Boolean"]);
+        if (!start.empty()) opts["start"] = start;
       } else if (vnode.has_child("String")) {
         type = Type::STRING;
       } else if (vnode.has_child("Enumeration")) {
         type = Type::ENUMERATION;
+        std::vector<double> start = read_discrete_start(vnode["Enumeration"]);
+        if (!start.empty()) opts["start"] = start;
       } else {
         casadi_warning("Unknown type for " + name);
       }
