@@ -65,4 +65,6 @@ add_custom_command(TARGET casadi_rust POST_BUILD
   COMMENT "casadi.rs -> ${CMAKE_CURRENT_BINARY_DIR}")
 
 install(TARGETS casadi_rust DESTINATION ${LIB_PREFIX})
-install(FILES ${_swig_rs} DESTINATION ${LIB_PREFIX}/rust)
+install(FILES ${_swig_rs} Cargo.toml build.rs DESTINATION ${LIB_PREFIX}/rust)
+install(DIRECTORY src DESTINATION ${LIB_PREFIX}/rust)
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/docs/examples/rust/ DESTINATION ${LIB_PREFIX}/rust/examples FILES_MATCHING PATTERN "*.rs")
