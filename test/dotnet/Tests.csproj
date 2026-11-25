@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- C# tests of the casadi .NET front-end; no NuGet packages (a small runner in Runner.cs).
+       test/dotnet/run.sh <build>/swig/dotnet builds against CasADi.dll there and runs them. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <RootNamespace>CasADi.Tests</RootNamespace>
+    <CasadiAssembly Condition="'$(CasadiAssembly)' == ''">../../build/swig/dotnet/assembly/CasADi.dll</CasadiAssembly>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="CasADi">
+      <HintPath>$(CasadiAssembly)</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>

@@ -374,6 +374,7 @@ option(WITH_WASM_JS "Compile the WebAssembly+JavaScript front-end (Emscripten on
 option(WITH_JULIA "Compile the Julia front-end (needs the casadi-patched SWIG, or SWIG_IMPORT)" OFF)
 option(WITH_JAVA "Compile the Java front-end (needs the casadi-patched SWIG, or SWIG_IMPORT)" OFF)
 option(WITH_RUST "Compile the Rust front-end (needs the casadi-patched SWIG, or SWIG_IMPORT)" OFF)
+option(WITH_DOTNET "Compile the .NET (C#) front-end (needs the casadi-patched SWIG, or SWIG_IMPORT)" OFF)
 option(WITH_OCTAVE_IMPORT "[DEPRECATED] Copy import.m file to install directory" OFF)
 option(WITH_PYTHON_GIL_RELEASE "Create Python bindings that release the GIL" OFF)
 
@@ -3117,7 +3118,7 @@ endif()
 ###################### swig #########################
 #####################################################
 option(WITH_EXTENDING_CASADI "Compile a demonstration that shows how a project that depends on CasADi can be implemented." OFF)
-if(WITH_PYTHON OR WITH_MATLAB OR WITH_OCTAVE OR WITH_JSON OR WITH_WASM_JS OR WITH_JULIA OR WITH_JAVA OR WITH_RUST)
+if(WITH_PYTHON OR WITH_MATLAB OR WITH_OCTAVE OR WITH_JSON OR WITH_WASM_JS OR WITH_JULIA OR WITH_JAVA OR WITH_RUST OR WITH_DOTNET)
   add_subdirectory(swig)
 endif()
 

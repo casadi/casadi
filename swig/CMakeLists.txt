@@ -79,6 +79,10 @@ if(WITH_WASM_JS)
    add_subdirectory(wasm-js)
 endif()
 
+if(WITH_DOTNET)
+   add_subdirectory(dotnet)
+endif()
+
 if(WITH_JAVA)
    add_subdirectory(java)
 endif()

@@ -38,6 +38,8 @@
 %include "java/casadi_java_head.i"
 #elif defined(SWIGRUST)
 %include "rust/casadi_rust_head.i"
+#elif defined(SWIGDOTNET)
+%include "dotnet/casadi_dotnet_head.i"
 #endif
 
 
@@ -194,6 +196,8 @@ namespace std {
 %include "java/casadi_java_pre.i"
 #elif defined(SWIGRUST)
 %include "rust/casadi_rust_pre.i"
+#elif defined(SWIGDOTNET)
+%include "dotnet/casadi_dotnet_pre.i"
 #endif
 %include "stl.i"
 #endif // SWIGXML
@@ -1135,6 +1139,8 @@ class _SupportsMX(Protocol):
 %include "java/casadi_java_decl.i"
 #elif defined(SWIGRUST)
 %include "rust/casadi_rust_decl.i"
+#elif defined(SWIGDOTNET)
+%include "dotnet/casadi_dotnet_decl.i"
 #endif
 %include <casadi/core/printable.hpp>
 
@@ -2068,7 +2074,7 @@ namespace casadi{
 
 
 // Extend DM with SWIG unique features
-#if !defined(SWIGWASMJS) && !defined(SWIGJAVA) && !defined(SWIGRUST)
+#if !defined(SWIGWASMJS) && !defined(SWIGJAVA) && !defined(SWIGRUST) && !defined(SWIGDOTNET)
 namespace casadi{
   %extend Matrix<double> {
     // Convert to a dense matrix

@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- The C# examples, one class with a Main per file.
+       Run one:  dotnet run -p:StartupObject=rosenbrock -p:CasadiAssembly=<build>/swig/dotnet/assembly/CasADi.dll
+       Run all:  ./run_all.sh <build>/swig/dotnet   (builds once, ExampleRunner picks the example by name)
+       The native libraries casadi_dotnet and casadi must be found at run time (LD_LIBRARY_PATH / PATH). -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <StartupObject Condition="'$(StartupObject)' == ''">ExampleRunner</StartupObject>
+    <CasadiAssembly Condition="'$(CasadiAssembly)' == ''">../../../build/swig/dotnet/assembly/CasADi.dll</CasadiAssembly>
+    <NoWarn>$(NoWarn);CS8981</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="CasADi">
+      <HintPath>$(CasadiAssembly)</HintPath>
+    </Reference>
+    <Compile Remove="plugins/**" Condition="'$(WithPluginExamples)' != 'true'" />
+  </ItemGroup>
+</Project>

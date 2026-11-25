@@ -73,38 +73,43 @@ jobs:
           
     - name: generate Python 3
       run: >
-        docker run --rm -v`pwd`:/local ghcr.io/casadi/ci-swig:v13 /bin/bash -c
+        docker run --rm -v`pwd`:/local ghcr.io/casadi/ci-swig:v14 /bin/bash -c
         "mkdir build && cd build && cmake -DWITH_SELFCONTAINED=ON -DWITH_PYTHON=ON -DSWIG_EXPORT=ON -DWITH_COMMON=OFF -DWITH_PYTHON_GIL_RELEASE=OFF .. && make python_source && cd .. && rm -rf build"
 
     - name: generate Python 3
       run: >
-        docker run --rm -v`pwd`:/local ghcr.io/casadi/ci-swig:v13 /bin/bash -c
+        docker run --rm -v`pwd`:/local ghcr.io/casadi/ci-swig:v14 /bin/bash -c
         "mkdir build && cd build && cmake -DWITH_SELFCONTAINED=ON -DWITH_PYTHON=ON -DSWIG_EXPORT=ON -DWITH_COMMON=OFF -DWITH_PYTHON_GIL_RELEASE=ON .. && make python_source && cd .. && rm -rf build"
   
     - name: generate Matlab
       run: >
-        docker run --rm -v`pwd`:/local ghcr.io/casadi/ci-swig:v13 /bin/bash -c
+        docker run --rm -v`pwd`:/local ghcr.io/casadi/ci-swig:v14 /bin/bash -c
         "mkdir build && cd build && cmake -DWITH_SELFCONTAINED=ON -DWITH_MATLAB=ON -DSWIG_EXPORT=ON -DWITH_COMMON=OFF .. && make matlab_source && cd .. && rm -rf build"
     
     - name: generate wasm-js
       run: >
-        docker run --rm -v`pwd`:/local ghcr.io/casadi/ci-swig:v13 /bin/bash -c
+        docker run --rm -v`pwd`:/local ghcr.io/casadi/ci-swig:v14 /bin/bash -c
         "mkdir build && cd build && cmake -DWITH_WASM_JS=ON -DSWIG_EXPORT=ON -DWITH_COMMON=OFF .. && make wasm_source && cd .. && rm -rf build"
 
     - name: generate julia
       run: >
-        docker run --rm -v`pwd`:/local ghcr.io/casadi/ci-swig:v13 /bin/bash -c
+        docker run --rm -v`pwd`:/local ghcr.io/casadi/ci-swig:v14 /bin/bash -c
         "mkdir build && cd build && cmake -DWITH_JULIA=ON -DSWIG_EXPORT=ON -DWITH_COMMON=OFF .. && make julia_source && cd .. && rm -rf build"
 
     - name: generate java
       run: >
-        docker run --rm -v`pwd`:/local ghcr.io/casadi/ci-swig:v13 /bin/bash -c
+        docker run --rm -v`pwd`:/local ghcr.io/casadi/ci-swig:v14 /bin/bash -c
         "mkdir build && cd build && cmake -DWITH_JAVA=ON -DSWIG_EXPORT=ON -DWITH_COMMON=OFF .. && make java_source && cd .. && rm -rf build"
 
     - name: generate rust
       run: >
-        docker run --rm -v`pwd`:/local ghcr.io/casadi/ci-swig:v13 /bin/bash -c
+        docker run --rm -v`pwd`:/local ghcr.io/casadi/ci-swig:v14 /bin/bash -c
         "mkdir build && cd build && cmake -DWITH_RUST=ON -DSWIG_EXPORT=ON -DWITH_COMMON=OFF .. && make rust_source && cd .. && rm -rf build"
+
+    - name: generate dotnet
+      run: >
+        docker run --rm -v`pwd`:/local ghcr.io/casadi/ci-swig:v14 /bin/bash -c
+        "mkdir build && cd build && cmake -DWITH_DOTNET=ON -DSWIG_EXPORT=ON -DWITH_COMMON=OFF .. && make dotnet_source && cd .. && rm -rf build"
 
     - name: set CMAKE default options
       run: |
@@ -431,6 +436,223 @@ jobs:
             casadi-${{ matrix.os }}64-java.zip
             casadi-natives-${{ matrix.platform }}.jar
           retention-days: 5
+
+  # Distributable .NET archives (as matlab-dockcross/java-dockcross): the native casadi_dotnet
+  # is built on the shared dockcross cores, CasADi.dll (platform independent) by the dotnet CLI
+  dotnet-dockcross:
+    needs: [core-dockcross,swig,version]
+    runs-on: ubuntu-24.04
+    environment: ${{ needs.version.outputs.sign_windows == 'true' && contains(matrix.arch, 'windows') && 'windows-signing' || '' }}
+    permissions:
+      contents: write
+      id-token: write          # OIDC token, required for Azure Artifact Signing
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: manylinux_2_28-x64
+            os: linux
+          - arch: windows-shared-x64-posix
+            os: windows
+    steps:
+      - uses: actions/download-artifact@v8.0.1
+        with:
+          name: casadi_source_wrapper
+      - name: Unpack source (incl. pre-generated .NET wrapper)
+        run: unzip -q casadi_source.zip
+      - uses: actions/download-artifact@v8.0.1
+        with:
+          name: core-dockcross-${{ matrix.arch }}
+      - run: tar -xzf core-dockcross-${{ matrix.arch }}.tar.gz
+      - name: Setup dockcross
+        run: |
+          docker pull ghcr.io/jgillis/${{ matrix.arch }}:production
+          docker run --rm --env DEFAULT_DOCKCROSS_IMAGE=ghcr.io/jgillis/${{ matrix.arch }}:production ghcr.io/jgillis/${{ matrix.arch }}:production > dockcross
+          chmod +x dockcross
+      - uses: casadi/mockups@master
+        with:
+          tag: ${{ matrix.arch }}
+      - name: Build casadi_dotnet
+        run: |
+          ./dockcross cmake -Bbuild -DWITH_DOTNET=ON -USWIG_IMPORT -DCMAKE_INSTALL_PREFIX=/work/install -DSKIP_CONFIG_H_GENERATION=ON -DCMAKE_PREFIX_PATH=/work/mockups/cmake -Dmxe_cmake_wrapper_please_hands_off_DCMAKE_BUILD_TYPE=1
+          ./dockcross cmake --build build --target install -v
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '8.0.x'
+      - name: Build CasADi.dll
+        run: |
+          dotnet build swig/dotnet/CasADi.csproj -c Release -nologo -p:CasadiGenerated=$PWD/swig/dotnet/gen/casadi.cs -o $RUNNER_TEMP/assembly
+          cp $RUNNER_TEMP/assembly/CasADi.dll $RUNNER_TEMP/assembly/CasADi.xml install/casadi/
+      - uses: jgillis/universal_grafter@master
+        if: matrix.os == 'linux'
+        with:
+          source_path: install/casadi
+          destination_path: install/casadi
+          dockcross: ${{ matrix.arch }}
+          bitness: 64
+      - run: ./dockcross bash -c 'cp `rustc --target=$CARGO_BUILD_TARGET --print target-libdir`/*.dll /work/install/casadi'
+        if: matrix.os == 'windows'
+      # The source archive does not carry .github
+      - uses: actions/checkout@v6.0.2
+        with:
+          sparse-checkout: .github/actions
+          path: ci
+        if: needs.version.outputs.sign_windows == 'true' && matrix.os == 'windows'
+      # Signs casadi_dotnet.dll and CasADi.dll (the core binaries come signed from core-dockcross)
+      - uses: ./ci/.github/actions/sign-windows
+        with:
+          dir: install
+        if: needs.version.outputs.sign_windows == 'true' && matrix.os == 'windows'
+      - name: Archive
+        run: |
+          test -f install/casadi/CasADi.dll
+          cd install/casadi && zip -rq ../../casadi-${{ matrix.os }}64-dotnet.zip .
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v4.4.1
+      - run: cp casadi-${{ matrix.os }}64-dotnet.zip casadi-${{ needs.version.outputs.casadi }}-${{ matrix.os }}64-dotnet.zip
+      - name: Delete old release assets
+        uses: jgillis/delete-release-assets@codex/bump-runtime-node24
+        with:
+          token: ${{ github.token }}
+          tag: nightly-${{ env.GITHUB_REF_SLUG }}
+          assets: casadi-*-${{ matrix.os }}64-dotnet.zip
+          fail-if-no-release: false
+          fail-if-no-assets: false
+        if: github.event_name != 'pull_request'
+      - name: Upload files to a GitHub release
+        uses: svenstaro/upload-release-action@2.11.5
+        with:
+          overwrite: true
+          tag: nightly-${{ env.GITHUB_REF_SLUG }}
+          file: casadi-${{ needs.version.outputs.casadi }}-${{ matrix.os }}64-dotnet.zip
+          prerelease: true
+        if: github.event_name != 'pull_request'
+      - uses: actions/upload-artifact@v7.0.1
+        with:
+          name: casadi-${{ matrix.os }}64-dotnet
+          path: casadi-${{ matrix.os }}64-dotnet.zip
+          retention-days: 5
+
+  dotnet-osx:
+    needs: [core-osx,swig,version]
+    runs-on: macos-15
+    env:
+      DEVELOPMENT_CERTIFICATE_DATA_AVAILABLE: ${{ secrets.DEVELOPMENT_CERTIFICATE_DATA != '' }}
+    steps:
+      - uses: casadi/action-setup-compiler@master
+        with:
+          cache-suffix: ''
+          target: arm64
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '8.0.x'
+      - uses: actions/download-artifact@v8.0.1
+        with:
+          name: casadi_source_wrapper
+      - name: Unpack source (incl. pre-generated .NET wrapper)
+        run: unzip -q casadi_source.zip
+      - uses: actions/download-artifact@v8.0.1
+        with:
+          name: core-osx-macos-15-arm64
+      - run: unzip -q core-osx-macos-15-arm64.zip
+      - uses: casadi/mockups@master
+        with:
+          tag: macos-15_arm64
+      - name: Build casadi_dotnet
+        run: |
+          CC=${{ env.CC }} FC=${{ env.FC }} CXX=${{ env.CXX }} cmake -DCMAKE_OSX_SYSROOT=${{env.SDKROOT}} -Bbuild -DWITH_DOTNET=ON -USWIG_IMPORT -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/install -DSKIP_CONFIG_H_GENERATION=ON -DCMAKE_PREFIX_PATH=${{ github.workspace }}/mockups/cmake
+          cmake --build build --target install -v
+      - name: Build CasADi.dll
+        run: |
+          dotnet build swig/dotnet/CasADi.csproj -c Release -nologo -p:CasadiGenerated=$PWD/swig/dotnet/gen/casadi.cs -o $RUNNER_TEMP/assembly
+          cp $RUNNER_TEMP/assembly/CasADi.dll $RUNNER_TEMP/assembly/CasADi.xml install/casadi/
+      - uses: jgillis/universal_grafter@master
+        with:
+          source_path: install/casadi
+          destination_path: install/casadi
+          search_paths: "${{env.COMPILER_LIB_SEARCH_PATH}}"
+      - uses: jgillis/import-codesign-certs@master
+        with: 
+          p12-file-base64: ${{ secrets.DEVELOPMENT_CERTIFICATE_DATA }}
+          p12-password: ${{ secrets.P12_PASSWORD }}
+          keychain-password: ${{ secrets.KEYCHAIN_PASSWORD }}
+        if: ${{ env.DEVELOPMENT_CERTIFICATE_DATA_AVAILABLE == 'true' }}
+      - name: Archive
+        run: |
+          test -f install/casadi/CasADi.dll
+          cd install/casadi && zip -rq ../../casadi-osx-arm64-dotnet.zip .
+      - run: python misc/certify.py "${{ secrets.CODESIGN_IDENTITY }}" casadi-osx-arm64-dotnet.zip "${{ secrets.APPLE_ID }}" "${{ secrets.APPLE_TEAM_ID }}" "${{ secrets.NOTARIZE_PASSWORD }}"
+        shell: bash -el {0}
+        if: ${{ env.DEVELOPMENT_CERTIFICATE_DATA_AVAILABLE == 'true' && contains(github.event.head_commit.message, '[ci:run_slow]') }}
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v4.4.1
+      - run: cp casadi-osx-arm64-dotnet.zip casadi-${{ needs.version.outputs.casadi }}-osx-arm64-dotnet.zip
+      - name: Delete old release assets
+        uses: jgillis/delete-release-assets@codex/bump-runtime-node24
+        with:
+          token: ${{ github.token }}
+          tag: nightly-${{ env.GITHUB_REF_SLUG }}
+          assets: casadi-*-osx-arm64-dotnet.zip
+          fail-if-no-release: false
+          fail-if-no-assets: false
+        if: github.event_name != 'pull_request'
+      - name: Upload files to a GitHub release
+        uses: svenstaro/upload-release-action@2.11.5
+        with:
+          overwrite: true
+          tag: nightly-${{ env.GITHUB_REF_SLUG }}
+          file: casadi-${{ needs.version.outputs.casadi }}-osx-arm64-dotnet.zip
+          prerelease: true
+        if: github.event_name != 'pull_request'
+      - uses: actions/upload-artifact@v7.0.1
+        with:
+          name: casadi-osx-arm64-dotnet
+          path: casadi-osx-arm64-dotnet.zip
+          retention-days: 5
+
+  # The distributed archives of dotnet-dockcross and dotnet-osx, as an end user gets them
+  test-dotnet:
+    if: ${{ !cancelled() && (needs.dotnet-dockcross.result == 'success' || needs.dotnet-osx.result == 'success') }}
+    needs: [dotnet-dockcross,dotnet-osx]
+    runs-on: ${{ matrix.image }}
+    env:
+      SKIP_MADNLP_TESTS: ON
+      SKIP_CCOPT_TESTS: ON
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - image: ubuntu-24.04
+            artifact: casadi-linux64-dotnet
+          - image: windows-2022
+            artifact: casadi-windows64-dotnet
+          - image: macos-15
+            artifact: casadi-osx-arm64-dotnet
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v6.0.2
+      # cl.exe for the codegen/jit tests
+      - uses: jgillis/msvc-dev-cmd@codex/bump-runtime-node24
+        if: contains(matrix.image, 'windows')
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '8.0.x'
+      - uses: actions/download-artifact@v8.0.1
+        with:
+          name: ${{ matrix.artifact }}
+      - run: unzip -q ${{ matrix.artifact }}.zip -d casadi
+      - name: C# tests
+        run: CASADI_DOTNET_TEST_TRACE=1 CASADI_DOTNET_TEST_OUT=$RUNNER_TEMP/cstest test/dotnet/run.sh casadi
+      - name: C# examples
+        run: CASADI_DOTNET_EXAMPLES_OUT=$RUNNER_TEMP/csexamples docs/examples/csharp/run_all.sh casadi
+        if: "!contains(matrix.image, 'windows')"
+      - name: C# examples (Windows; MSVC link.exe ahead of Git's coreutils link, nlp_codegen skipped as in Java)
+        run: |
+          export PATH="$(dirname "$(command -v cl)"):$PATH"
+          CASADI_DOTNET_EXAMPLES_OUT=$RUNNER_TEMP/csexamples docs/examples/csharp/run_all.sh casadi $(cd docs/examples/csharp && ls *.cs | grep -v -e ExampleRunner.cs -e nlp_codegen.cs | sed 's/\.cs$//' | sort)
+        if: contains(matrix.image, 'windows')
 
   java-osx:
     needs: [core-osx,swig,version]
@@ -924,7 +1146,7 @@ jobs:
       matrix:
         # Default mode only builds the cores consumed downstream:
         # manylinux2014-x64 (matlab-dockcross), manylinux_2_28-x64
-        # (python-dockcross nominal + docs, java/rust-dockcross),
+        # (python-dockcross nominal + docs, java/dotnet/rust-dockcross),
         # windows-shared-x64-posix (all).
         # The aarch64 / x86 cores are slow-mode-only.
         target: ${{ fromJson(contains(github.event.head_commit.message, '[ci:run_slow]') && '["manylinux2014-x64","manylinux2014-x86","manylinux2014-aarch64","manylinux_2_28-x64","manylinux_2_28-aarch64","windows-shared-x64-posix"]' || '["manylinux2014-x64","manylinux_2_28-x64","windows-shared-x64-posix"]') }}

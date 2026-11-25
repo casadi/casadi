@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- The C# assembly of the casadi .NET front-end: SWIG's casadi.cs.
+       Build: dotnet build CasADi.csproj -p:CasadiGenerated=<build>/swig/dotnet/casadi.cs
+       The native library casadi_dotnet (and casadi) must be found at run time,
+       e.g. next to the application or on LD_LIBRARY_PATH / PATH. -->
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <AssemblyName>CasADi</AssemblyName>
+    <RootNamespace>CasADi</RootNamespace>
+    <Nullable>disable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591;CS1572;CS1573;CS1587;CS8981</NoWarn>
+    <CasadiGenerated Condition="'$(CasadiGenerated)' == ''">gen/casadi.cs</CasadiGenerated>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(CasadiGenerated)" />
+  </ItemGroup>
+</Project>
