@@ -878,9 +878,17 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
       for (auto& vp : arg.primitives()) {
         // Find the variable by name
         size_t ind = find(vp.name());
-        // Add to list of replacements
+        // Add to list of replacements. A variable is a vector of its elements in row-major
+        // (FMI) order, while the ONNX import takes a tensor [d0, d1, ..., dk] as the matrix
+        // with rows d0 and columns d1*...*dk: fill it row by row.
+        MX vd = var(ind);
+        if (vd.size() != vp.size()) {
+          casadi_assert(vd.numel() == vp.numel(), "Variable '" + vp.name() + "' has "
+            + str(vd.numel()) + " elements, but the ONNX graph input has " + str(vp.numel()));
+          vd = reshape(vd, vp.size2(), vp.size1()).T();
+        }
         v.push_back(vp);
-        vdef.push_back(var(ind));
+        vdef.push_back(vd);
       }
     }
 
@@ -897,6 +905,8 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
     for (size_t i = 0; i < oracle_out.size(); ++i) {
       std::string out_name = oracle.name_out(i);
       MX expr = oracle_out[i];
+      // A residual of array equations is a column of their elements
+      if (!expr.is_column()) expr = vec(expr);
 
       // Parse the output name to determine category
       bool is_init_eq = out_name.substr(0, 8) == "init_eq[";
@@ -946,9 +956,10 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
           if (idx >= 0 && idx < static_cast<casadi_int>(input_var_names.size())) {
             std::string var_name = input_var_names[idx];
             Variable& var_ref = variable(var_name);
-            // If it's a constant, we can evaluate it
-            if (expr.is_constant()) {
-              DM dm_val = static_cast<DM>(expr);
+            // If it's known (an expression of constants), we can evaluate it; an array in
+            // row-major (FMI) order
+            if (symvar(oracle_out[i]).empty()) {
+              DM dm_val = densify(evalf(oracle_out[i]).T());
               var_ref.start = std::vector<double>(dm_val->begin(), dm_val->end());
             }
             // TODO(jgillis): Handle symbolic start expressions
