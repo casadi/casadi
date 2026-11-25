@@ -3319,5 +3319,25 @@ class GraphBuilderSymbolicTests(casadiTestCase):
     with self.assertRaisesRegex(RuntimeError, "Scan with nonzero scan_input_axes"):
       ca.GraphBuilder(path).create("f", {"symbolic": True})
 
+  @unittest.skipUnless(have_onnx, "needs the onnx python package")
+  def test_import_matmul_vector(self):
+    self.message("MatMul with a rank-1 operand: a row on the left, a column on the right")
+    double = TensorProto.DOUBLE
+    vi = lambda n, s: helper.make_tensor_value_info(n, double, s)
+    nodes = [helper.make_node("MatMul", ["A", "x"], ["Ax"]),
+             helper.make_node("MatMul", ["y", "A"], ["yA"]),
+             helper.make_node("MatMul", ["y", "y"], ["yy"]),
+             helper.make_node("MatMul", ["A", "B"], ["AB"])]
+    outputs = [("Ax", [2]), ("yA", [3]), ("yy", []), ("AB", [2, 2])]
+    path = self.save_tensor_model(nodes, [vi("A", [2, 3]), vi("x", [3]), vi("y", [2]),
+      vi("B", [3, 2])], [vi(n, s) for n, s in outputs], "matmul_vector.onnx")
+    f = ca.GraphBuilder(path).create("f", {"symbolic": True})
+    rng = numpy.random.default_rng(6)
+    A, x, y, B = rng.normal(size=(2, 3)), rng.normal(size=3), rng.normal(size=2), \
+      rng.normal(size=(3, 2))
+    for (name, _), r, v in zip(outputs, [A @ x, y @ A, y @ y, A @ B],
+                               self.tensor_call(f, A, x, y, B)):
+      self.checkarray(v, numpy.ravel(r), name, digits=12)
+
 if __name__ == '__main__':
   unittest.main()

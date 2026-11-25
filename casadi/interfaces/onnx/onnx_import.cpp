@@ -1414,6 +1414,24 @@ namespace casadi {
       return true;
     }
 
+    if (op_type == "MatMul" && !nd) {
+      // A rank-1 operand is a row on the left and a column on the right, and that axis is
+      // dropped from the result. Only for a recorded rank 1: a vector of unknown rank may be a
+      // matrix with one row or column, as in CasADi's own export.
+      bool v0 = s[0].size() == 1 && shapes_.count(node.input(0));
+      bool v1 = s[1].size() == 1 && shapes_.count(node.input(1));
+      if (!v0 && !v1) return false;
+      MX p = node_inputs[0], q = node_inputs[1];
+      if (v0) p = reshape(p, p.numel(), 1);  // [k] as [1, k], stored k x 1
+      if (v1) q = reshape(q, 1, q.numel());  // [k] as [k, 1], stored 1 x k
+      // Transpose-rep, as in process_node_operation: stored P*Q is stored Q times stored P
+      output = mtimes(q, p);
+      if (!v0) out_shape.push_back(output.size2());
+      if (!v1) out_shape.push_back(output.size1());
+      output = as_shape(output, out_shape);
+      return true;
+    }
+
     if (!nd) return false;
 
     if (is_elementwise(op_type)) {
