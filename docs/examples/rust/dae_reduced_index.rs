@@ -83,7 +83,7 @@ fn main() {
 
     let grid: ca::DM = ca::linspace(0.0, 5.0, 1000);
     let grid = grid.nonzeros();
-    let intg = ca::integrator_with("intg", "idas", &dae_se, 0.0, &grid, None);
+    let intg = ca::integrator_grid_with("intg", "idas", &dae_se, 0.0, &grid, None);
 
     // Before we can integrate, we need a consistant initial guess
     // Let's say we start at y=-0.5, dx=-0.1;
@@ -149,7 +149,7 @@ fn main() {
     // Drift is absent now.
     let (dae_reduced, _stats) = ca::dae_reduce_index_with(&dae, dict! {"baumgarte_pole" => -1});
     let (dae_se, _state_to_orig, phi) = ca::dae_map_semi_expl(&dae, &dae_reduced);
-    let intg = ca::integrator_with("intg", "idas", &dae_se, 0.0, &grid, None);
+    let intg = ca::integrator_grid_with("intg", "idas", &dae_se, 0.0, &grid, None);
     let init_gen = ca::dae_init_gen_with(&dae, &dae_reduced, "ipopt", &init_strength, None);
     let xz0 = init_gen.call(&init).unwrap();
     let sol = intg.call(&xz0).unwrap();
@@ -168,7 +168,7 @@ fn main() {
         for &precision in &precisions {
             let (dae_reduced, _stats) = ca::dae_reduce_index_with(&dae, dict! {"baumgarte_pole" => pole});
             let (dae_se, _state_to_orig, phi) = ca::dae_map_semi_expl(&dae, &dae_reduced);
-            let intg = ca::integrator_with("intg", "idas", &dae_se, 0.0, &grid,
+            let intg = ca::integrator_grid_with("intg", "idas", &dae_se, 0.0, &grid,
                 dict! {"abstol" => abstol_default * precision, "reltol" => reltol_default * precision});
             let init_gen = ca::dae_init_gen_with(&dae, &dae_reduced, "ipopt", &init_strength,
                 dict! {"ipopt.print_level" => 0, "print_time" => false});

@@ -45,7 +45,7 @@ fn main() {
     // Create an integrator instance for integrating over 7s
     let tgrid: ca::DM = ca::linspace(0.0, 7.0, 100);
     let tgrid = tgrid.nonzeros();
-    let sim = ca::integrator_with("sim", "cvodes", &dae, 0.0, &tgrid,
+    let sim = ca::integrator_grid_with("sim", "cvodes", &dae, 0.0, &tgrid,
                                   dict! {"transition" => &transition});
 
     // Simulate with initial height of 5

@@ -57,7 +57,7 @@ fn main() {
     let f_dyn = if false {
         // CVODES from the SUNDIALS suite
         let dae = dict! {"x" => &x, "p" => &u, "ode" => &xdot, "quad" => &l};
-        ca::integrator_with("F", "cvodes", &dae, 0.0, t / n as f64, None)
+        ca::integrator_grid_with("F", "cvodes", &dae, 0.0, t / n as f64, None)
     } else {
         // Fixed step Runge-Kutta 4 integrator
         let m = 4; // RK4 steps per interval

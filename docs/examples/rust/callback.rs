@@ -149,7 +149,7 @@ impl ca::CallbackImpl for Example4To3Fwd {
         // For efficiency, you may allow more seeds at once
         nfwd == 1
     }
-    fn get_forward(&self, _nfwd: i64, name: String, _inames: Vec<String>, _onames: Vec<String>, opts: std::collections::HashMap<String, ca::Value>) -> ca::Function {
+    fn get_forward(&self, _nfwd: i64, name: String, _inames: Vec<String>, _onames: Vec<String>, opts: std::collections::BTreeMap<String, ca::Value>) -> ca::Function {
         let cb = ca::Callback::from_impl(ForwardFun);
         cb.construct_with(&name, opts);
         let f = ca::Function::from(&cb);
@@ -213,7 +213,7 @@ impl ca::CallbackImpl for Example4To3Rev {
     fn has_reverse(&self, nadj: i64) -> bool {
         nadj == 1
     }
-    fn get_reverse(&self, _nadj: i64, name: String, _inames: Vec<String>, _onames: Vec<String>, opts: std::collections::HashMap<String, ca::Value>) -> ca::Function {
+    fn get_reverse(&self, _nadj: i64, name: String, _inames: Vec<String>, _onames: Vec<String>, opts: std::collections::BTreeMap<String, ca::Value>) -> ca::Function {
         let cb = ca::Callback::from_impl(ReverseFun);
         cb.construct_with(&name, opts);
         let f = ca::Function::from(&cb);
@@ -263,7 +263,7 @@ impl ca::CallbackImpl for Example4To3Jac {
     fn has_jacobian(&self) -> bool {
         true
     }
-    fn get_jacobian(&self, name: String, _inames: Vec<String>, _onames: Vec<String>, opts: std::collections::HashMap<String, ca::Value>) -> ca::Function {
+    fn get_jacobian(&self, name: String, _inames: Vec<String>, _onames: Vec<String>, opts: std::collections::BTreeMap<String, ca::Value>) -> ca::Function {
         let cb = ca::Callback::from_impl(JacFun);
         cb.construct_with(&name, opts);
         let f = ca::Function::from(&cb);

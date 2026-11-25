@@ -3,15 +3,20 @@
 
 include!(concat!(env!("CASADI_RUST_GEN"), "/casadi.rs"));
 
+mod catch;
+mod conv;
 mod eval;
 mod fmt;
 mod index;
+mod matrix;
 mod ops;
 mod opti;
 
+pub use catch::catch;
 pub use eval::{Args, Elem, EvalArgs, EvalOut, Target};
-pub use rt::{Dict, Value};
+pub use rt::{Dict, Error, Value};
 pub use index::{step, At, Idx, Index};
+pub use matrix::Matrix;
 
 // casadi is built with atomic reference counts and thread-safe evaluation
 unsafe impl Send for Function {}

@@ -51,7 +51,7 @@ fn main() {
     // Simulate
     let tgrid: ca::DM = ca::linspace(dae.start_time(), dae.stop_time(), 100);
     let tgrid = tgrid.nonzeros();
-    let sim = ca::integrator_with("sim", "cvodes", &dae.create_default(), 0.0, &tgrid,
+    let sim = ca::integrator_grid_with("sim", "cvodes", &dae.create_default(), 0.0, &tgrid,
                                   dict! {"transition" => dae.transition()});
     let simres = sim.call(&dict! {"x0" => dae.start(dae.x())}).unwrap();
 

@@ -74,7 +74,7 @@ fn main() {
         "abstol" => 1e-8, // abs. tolerance
         "reltol" => 1e-8, // rel. tolerance
     };
-    let i = ca::integrator_with("I", "cvodes", &dae, 0.0, 10.0, &opts);
+    let i = ca::integrator_grid_with("I", "cvodes", &dae, 0.0, 10.0, &opts);
 
     // The initial state
     let x_init = vec![0.0, 1.0];
@@ -117,7 +117,7 @@ fn main() {
     let tgrid = tgrid.nonzeros();
 
     // Simulator to get optimal state and control trajectories
-    let simulator = ca::integrator_with("simulator", "cvodes", &dae, 0.0, tgrid.clone(), None);
+    let simulator = ca::integrator_grid_with("simulator", "cvodes", &dae, 0.0, tgrid.clone(), None);
 
     // Simulate to get the state trajectory
     let x0_sim: Vec<f64> = x_init.iter().chain(l_init_opt.iter()).copied().collect();

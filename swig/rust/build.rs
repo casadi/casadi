@@ -12,6 +12,10 @@ fn main() {
     println!("cargo:rerun-if-changed={}/casadi.rs", gen);
     println!("cargo:rustc-link-search=native={}", lib);
     println!("cargo:rustc-link-lib=dylib=casadi_rust_wrap");
+    // Windows has no rpath: the DLLs are found on PATH
+    if std::env::var("CARGO_CFG_TARGET_OS").unwrap() == "windows" {
+        return;
+    }
     println!("cargo:rustc-link-arg=-Wl,-rpath,{}", lib);
     if let Ok(lib) = std::env::var("CASADI_LIB") {
         println!("cargo:rustc-link-arg=-Wl,-rpath,{}", lib);

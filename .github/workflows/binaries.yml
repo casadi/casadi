@@ -432,27 +432,6 @@ jobs:
             casadi-natives-${{ matrix.platform }}.jar
           retention-days: 5
 
-  rust:
-    needs: [swig, version]
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/download-artifact@v8.0.1
-        with:
-          name: casadi_source_wrapper
-      - name: Unpack source (incl. pre-generated Rust wrapper)
-        run: unzip -q casadi_source.zip
-      - name: Install Fortran toolchain (from-source solver builds)
-        run: sudo apt-get update && sudo apt-get install -y gfortran
-      - name: Build core + Rust wrapper (SWIG_IMPORT) with full solver set
-        run: |
-          # Same solver set as the julia job, so solver-dependent examples run
-          cmake -Bbuild -DCMAKE_BUILD_TYPE=Release -DWITH_RUST=ON -DSWIG_IMPORT=ON ${{ env.build_flags }} ${{ env.build_flags_julia_off }} -H.
-          cmake --build build -j$(nproc)
-      - name: Rust checks (crate tests, examples)
-        run: |
-          rustc --version
-          test/rust/check.sh build
-
   java-osx:
     needs: [core-osx,swig,version]
     runs-on: macos-15
@@ -605,8 +584,18 @@ jobs:
   rust-dockcross:
     needs: [core-dockcross,swig,version]
     runs-on: ubuntu-24.04
-    env:
-      arch: manylinux2014-x64
+    environment: ${{ needs.version.outputs.sign_windows == 'true' && matrix.os == 'windows' && 'windows-signing' || '' }}
+    permissions:
+      contents: write
+      id-token: write          # OIDC token, required for Azure Artifact Signing
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: manylinux_2_28-x64
+            os: linux
+          - arch: windows-shared-x64-posix
+            os: windows
     steps:
       - uses: actions/download-artifact@v8.0.1
         with:
@@ -615,36 +604,49 @@ jobs:
         run: unzip -q casadi_source.zip
       - uses: actions/download-artifact@v8.0.1
         with:
-          name: core-dockcross-${{ env.arch }}
-      - run: tar -xzf core-dockcross-${{ env.arch }}.tar.gz
+          name: core-dockcross-${{ matrix.arch }}
+      - run: tar -xzf core-dockcross-${{ matrix.arch }}.tar.gz
       - name: Setup dockcross
         run: |
-          docker pull ghcr.io/jgillis/${{ env.arch }}:production
-          docker run --rm --env DEFAULT_DOCKCROSS_IMAGE=ghcr.io/jgillis/${{ env.arch }}:production ghcr.io/jgillis/${{ env.arch }}:production > dockcross
+          docker pull ghcr.io/jgillis/${{ matrix.arch }}:production
+          docker run --rm --env DEFAULT_DOCKCROSS_IMAGE=ghcr.io/jgillis/${{ matrix.arch }}:production ghcr.io/jgillis/${{ matrix.arch }}:production > dockcross
           chmod +x dockcross
       - uses: casadi/mockups@master
         with:
-          tag: ${{ env.arch }}
+          tag: ${{ matrix.arch }}
       - name: Build
         run: |
           ./dockcross cmake -Bbuild -DWITH_RUST=ON -USWIG_IMPORT -DCMAKE_INSTALL_PREFIX=/work/install -DSKIP_CONFIG_H_GENERATION=ON -DCMAKE_PREFIX_PATH=/work/mockups/cmake -Dmxe_cmake_wrapper_please_hands_off_DCMAKE_BUILD_TYPE=1
           ./dockcross cmake --build build --target install -v
       - uses: jgillis/universal_grafter@master
+        if: matrix.os == 'linux'
         with:
           source_path: install/casadi
           destination_path: install/casadi
-          dockcross: ${{ env.arch }}
+          dockcross: ${{ matrix.arch }}
           bitness: 64
-      - run: cd install/casadi && zip -rq ../../casadi-linux64-rust.zip .
+      - run: ./dockcross bash -c 'cp `rustc --target=$CARGO_BUILD_TARGET --print target-libdir`/*.dll /work/install/casadi'
+        if: matrix.os == 'windows'
+      # The source archive does not carry .github
+      - uses: actions/checkout@v6.0.2
+        with:
+          sparse-checkout: .github/actions
+          path: ci
+        if: needs.version.outputs.sign_windows == 'true' && matrix.os == 'windows'
+      - uses: ./ci/.github/actions/sign-windows
+        with:
+          dir: install
+        if: needs.version.outputs.sign_windows == 'true' && matrix.os == 'windows'
+      - run: cd install/casadi && zip -rq ../../casadi-${{ matrix.os }}64-rust.zip .
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.4.1
-      - run: cp casadi-linux64-rust.zip casadi-${{ needs.version.outputs.casadi }}-linux64-rust.zip
+      - run: cp casadi-${{ matrix.os }}64-rust.zip casadi-${{ needs.version.outputs.casadi }}-${{ matrix.os }}64-rust.zip
       - name: Delete old release assets
         uses: jgillis/delete-release-assets@codex/bump-runtime-node24
         with:
           token: ${{ github.token }}
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
-          assets: casadi-*-linux64-rust.zip
+          assets: casadi-*-${{ matrix.os }}64-rust.zip
           fail-if-no-release: false
           fail-if-no-assets: false
         if: github.event_name != 'pull_request'
@@ -653,13 +655,13 @@ jobs:
         with:
           overwrite: true
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
-          file: casadi-${{ needs.version.outputs.casadi }}-linux64-rust.zip
+          file: casadi-${{ needs.version.outputs.casadi }}-${{ matrix.os }}64-rust.zip
           prerelease: true
         if: github.event_name != 'pull_request'
       - uses: actions/upload-artifact@v7.0.1
         with:
-          name: casadi-linux64-rust
-          path: casadi-linux64-rust.zip
+          name: casadi-${{ matrix.os }}64-rust
+          path: casadi-${{ matrix.os }}64-rust.zip
           retention-days: 5
 
   rust-osx:
@@ -739,16 +741,31 @@ jobs:
         include:
           - image: ubuntu-24.04
             artifact: casadi-linux64-rust
+          - image: windows-2022
+            artifact: casadi-windows64-rust
           - image: macos-15
             artifact: casadi-osx-arm64-rust
+    defaults:
+      run:
+        shell: bash
     steps:
       - uses: actions/checkout@v6.0.2
+      # The archive is built with MinGW: link with the windows-gnu toolchain
+      - run: rustup toolchain install stable-x86_64-pc-windows-gnu --profile minimal && rustup default stable-x86_64-pc-windows-gnu
+        if: contains(matrix.image, 'windows')
       - uses: actions/download-artifact@v8.0.1
         with:
           name: ${{ matrix.artifact }}
       - run: unzip -q ${{ matrix.artifact }}.zip -d casadi
-      - name: Crate examples against the unpacked zip
+      - name: Crate tests and examples against the unpacked zip
         run: test/rust/check.sh casadi
+        if: "!contains(matrix.image, 'windows')"
+      # The FMU examples package with zip; nlp_codegen skipped as in Java
+      - name: Crate tests and examples against the unpacked zip (Windows)
+        run: |
+          choco install zip -y --no-progress > /dev/null
+          test/rust/check.sh casadi $(cd docs/examples/rust && ls *.rs | sed 's/\.rs$//' | grep -v -x nlp_codegen)
+        if: contains(matrix.image, 'windows')
 
   publish-npm:
     needs: [version, javascript]
@@ -907,7 +924,7 @@ jobs:
       matrix:
         # Default mode only builds the cores consumed downstream:
         # manylinux2014-x64 (matlab-dockcross), manylinux_2_28-x64
-        # (python-dockcross nominal + docs, java-dockcross),
+        # (python-dockcross nominal + docs, java/rust-dockcross),
         # windows-shared-x64-posix (all).
         # The aarch64 / x86 cores are slow-mode-only.
         target: ${{ fromJson(contains(github.event.head_commit.message, '[ci:run_slow]') && '["manylinux2014-x64","manylinux2014-x86","manylinux2014-aarch64","manylinux_2_28-x64","manylinux_2_28-aarch64","windows-shared-x64-posix"]' || '["manylinux2014-x64","manylinux_2_28-x64","windows-shared-x64-posix"]') }}

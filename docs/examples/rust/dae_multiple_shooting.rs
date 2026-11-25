@@ -62,7 +62,7 @@ fn main() {
     // Create an integrator
     let dae = dict! {"x" => &x, "z" => &z, "p" => &u, "ode" => &f_x, "alg" => &f_z, "quad" => &f_q};
     // interval length 0.5s
-    let i = ca::integrator_with("I", "idas", &dae, 0.0, 0.5, None);
+    let i = ca::integrator_grid_with("I", "idas", &dae, 0.0, 0.5, None);
 
     // Number of intervals
     let nk = 20;

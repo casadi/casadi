@@ -134,11 +134,13 @@ macro_rules! indexing {
     ($T:ident, $get:ident, $set:ident, $get_nz:ident, $set_nz:ident) => {
         impl $T {
             /// Python's x[idx]: a linear index or a (row, column) pair
+            #[track_caller]
             pub fn at(&self, idx: impl At) -> $T {
                 let ind = idx.indices();
                 rt::out1(rt::call_or_panic(ffi::$get, args(self, &ind), 1))
             }
             /// Python's x[idx] = v
+            #[track_caller]
             pub fn set_at(&mut self, idx: impl At, v: impl ToRV) {
                 let ind = idx.indices();
                 let mut a = vec![self.to_rv(), v.to_rv(), false.to_rv()];
@@ -146,11 +148,13 @@ macro_rules! indexing {
                 rt::call_or_panic(ffi::$set, a, 1);
             }
             /// Python's x.nz[k]
+            #[track_caller]
             pub fn nz(&self, k: impl Idx) -> $T {
                 let ind = [k.index()];
                 rt::out1(rt::call_or_panic(ffi::$get_nz, args(self, &ind), 1))
             }
             /// Python's x.nz[k] = v
+            #[track_caller]
             pub fn set_nz_at(&mut self, k: impl Idx, v: impl ToRV) {
                 let ind = k.index();
                 rt::call_or_panic(ffi::$set_nz, vec![self.to_rv(), v.to_rv(), false.to_rv(), ind.to_rv()], 1);

@@ -150,7 +150,7 @@ fn main() {
     );
 
     // Create a convensional integrator for reference
-    let ref_integrator = ca::integrator_with("ref_integrator", "cvodes", &dae, 0.0, tf, None);
+    let ref_integrator = ca::integrator_grid_with("ref_integrator", "cvodes", &dae, 0.0, tf, None);
 
     // Test values
     let x0_val = vec![0.0, 1.0, 0.0];

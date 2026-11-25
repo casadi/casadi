@@ -84,7 +84,7 @@ fn main() {
         "abstol" => 1e-8, // abs. tolerance
         "reltol" => 1e-8, // rel. tolerance
     };
-    let i = ca::integrator_with("I", "cvodes", &dae, 0.0, tf / num_nodes as f64, &iopts);
+    let i = ca::integrator_grid_with("I", "cvodes", &dae, 0.0, tf / num_nodes as f64, &iopts);
 
     // Variables for the states at each shooting node
     let xx = ca::MX::sym_with("X", n_x, num_nodes + 1);
@@ -126,7 +126,7 @@ fn main() {
     let tgrid = tgrid.nonzeros();
 
     // Simulator to get optimal state and control trajectories
-    let simulator = ca::integrator_with("simulator", "cvodes", &dae, 0.0, tgrid, None);
+    let simulator = ca::integrator_grid_with("simulator", "cvodes", &dae, 0.0, tgrid, None);
 
     // Simulate to get the trajectories
     let sol = simulator.call(&dict! {"x0" => x_sol.at(0..4)}).unwrap()["xf"].clone();

@@ -125,6 +125,81 @@ fn defaults_with_none() {
     assert!(r.is_err(), "a value after None must panic");
 }
 
+#[test]
+fn catch_errors() {
+    let x = MX::sym("x");
+    let f = Function::new("f", vec![&x], vec![&x * 2.0]);
+    let e = catch(|| -> DM { f.eval((1.0, 2.0)) }).unwrap_err();
+    assert!(e.message.contains("Incorrect number of inputs"), "{}", e);
+    assert_eq!(catch(|| -> DM { f.eval((1.0,)) }).unwrap().nonzeros(), vec![2.0]);
+}
+
+#[test]
+fn dm_full() {
+    let c = DM::new(vec![vec![1.0, 2.0], vec![3.0, 4.0]]);
+    assert_eq!(c.full(), vec![vec![1.0, 2.0], vec![3.0, 4.0]]);
+    assert_eq!(DM::eye(2).full(), vec![vec![1.0, 0.0], vec![0.0, 1.0]]);
+}
+
+#[test]
+fn conversions() {
+    let a: DM = 2.0.into();
+    let b: DM = vec![1.0, 2.0].into();
+    let c: DM = vec![vec![1.0, 2.0], vec![3.0, 4.0]].into();
+    assert_eq!(c.nonzeros(), vec![1.0, 3.0, 2.0, 4.0]);
+    // numbers in a symbolic concatenation
+    let u = MX::sym("u");
+    let v: MX = vertcat(vec![u.clone(), 2.0.into(), b.into()]);
+    assert_eq!(v.size1(), 4);
+    let s: SX = (&a).into();
+    assert_eq!(s.str(), "2");
+}
+
+#[test]
+fn names() {
+    let c = DM::new(vec![vec![1.0, 2.0], vec![3.0, 4.0]]);
+    assert_eq!(sum_axis(&c, 0).nonzeros(), vec![4.0, 6.0]);
+    let x = MX::sym("x");
+    let dae = dict! {"x" => &x, "ode" => -&x};
+    assert_eq!(integrator("I", "rk", &dae).n_in(), integrator_grid("I", "rk", &dae, 0.0, 1.0).n_in());
+}
+
+#[test]
+fn named_results_ordered() {
+    let x = MX::sym("x");
+    let f = Function::named("f", vec![&x], vec![&x * 2.0, &x + 1.0], vec!["x"], vec!["z", "a"]);
+    let r: std::collections::BTreeMap<String, DM> = f.eval(dict! {"x" => 1.0});
+    assert_eq!(r.keys().collect::<Vec<_>>(), vec!["a", "z"]);
+}
+
+#[test]
+fn opti_conic() {
+    // the only constructor, its parameter defaulted
+    assert!(catch(|| Opti::new("conic")).is_ok());
+    let e = catch(|| Opti::new("lp")).err().unwrap();
+    assert!(e.message.contains("Specified problem type"), "{}", e);
+}
+
+#[test]
+fn dict_debug() {
+    let m: std::collections::BTreeMap<String, Value> = [("a".to_string(), Value::Str("b".into())), ("n".to_string(), Value::Float(0.5))].into();
+    assert_eq!(format!("{:?}", m), r#"{"a": "b", "n": 0.5}"#);
+}
+
+#[test]
+fn panic_location() {
+    thread_local!(static AT: std::cell::RefCell<Vec<String>> = Default::default());
+    let prev = std::panic::take_hook();
+    std::panic::set_hook(Box::new(|info| AT.with(|a| a.borrow_mut().push(info.location().unwrap().file().to_string()))));
+    let x = MX::sym("x");
+    let f = Function::new("f", vec![&x], vec![&x * 2.0]);
+    let r = std::panic::catch_unwind(|| f.index_in("y"));
+    let s = std::panic::catch_unwind(|| x.at(5));
+    std::panic::set_hook(prev);
+    assert!(r.is_err() && s.is_err());
+    assert_eq!(AT.with(|a| a.borrow().clone()), vec![file!(); 2]);
+}
+
 fn make_opts(h: &MX) -> Dict {
     // a dict built from locals can be returned: it owns its values
     let local = MX::sym("local");

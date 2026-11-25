@@ -80,7 +80,7 @@ impl<K: AsRef<str>, V: ToRV> EvalArgs for BTreeMap<K, V> {
 }
 
 /// Result of `Function::eval`: one matrix or number for one output, a tuple or Vec otherwise,
-/// a HashMap for named arguments
+/// a BTreeMap (ordered as Python's dict) or HashMap for named arguments
 pub trait EvalOut: Sized {
     const TARGET: Target;
     fn from_outputs(o: rt::RVRef) -> Option<Self>;
@@ -91,7 +91,7 @@ macro_rules! eval_out_single {
         impl EvalOut for $T {
             const TARGET: Target = <$T as Elem>::TARGET;
             fn from_outputs(o: rt::RVRef) -> Option<Self> {
-                assert_eq!(o.kind(), rt::LIST, "named arguments give a HashMap");
+                assert_eq!(o.kind(), rt::LIST, "named arguments give a map");
                 assert_eq!(o.len(), 1, "Function has {} outputs, a tuple or Vec is needed", o.len());
                 <$T as rt::FromRV>::from_rv(o.item(0))
             }
@@ -123,6 +123,14 @@ impl<T: Elem> EvalOut for HashMap<String, T> {
     }
 }
 
+impl<T: Elem> EvalOut for BTreeMap<String, T> {
+    const TARGET: Target = T::TARGET;
+    fn from_outputs(o: rt::RVRef) -> Option<Self> {
+        assert_eq!(o.kind(), rt::DICT, "positional arguments give a matrix, tuple or Vec");
+        rt::FromRV::from_rv(o)
+    }
+}
+
 macro_rules! tuples {
     ($n:expr; $A0:ident $($A:ident $i:tt),*) => {
         impl<$A0: ToRV, $($A: ToRV),*> EvalArgs for ($A0, $($A,)*) {
@@ -133,7 +141,7 @@ macro_rules! tuples {
         impl<$A0: Elem, $($A: Elem),*> EvalOut for ($A0, $($A,)*) {
             const TARGET: Target = $A0::TARGET;
             fn from_outputs(o: rt::RVRef) -> Option<Self> {
-                assert_eq!(o.kind(), rt::LIST, "named arguments give a HashMap");
+                assert_eq!(o.kind(), rt::LIST, "named arguments give a map");
                 assert_eq!(o.len(), $n, "Function has {} outputs, not {}", o.len(), $n);
                 Some(($A0::from_rv(o.item(0))?, $($A::from_rv(o.item($i))?,)*))
             }
@@ -151,6 +159,7 @@ tuples!(7; A B 1, C 2, D 3, E 4, F 5, G 6);
 tuples!(8; A B 1, C 2, D 3, E 4, F 5, G 6, H 7);
 
 /// Converts an argument to the symbolic type of the evaluation
+#[track_caller]
 fn coerce(v: rt::RV, target: Target) -> rt::RV {
     let (ty, new): (_, fn(Vec<rt::RV>) -> Result<Vec<rt::RV>, rt::Error>) = match target {
         Target::Num => return v,
@@ -173,6 +182,7 @@ impl $T {
     /// evaluation, and arguments are converted to it
     ///
     /// Panics on errors; `call` returns a `Result` for numeric evaluation.
+    #[track_caller]
     pub fn eval<T: EvalOut>(&self, args: impl EvalArgs) -> T {
         // args outlives the call: the converted values borrow its objects
         let arg = match args.to_args() {

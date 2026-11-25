@@ -1,5 +1,5 @@
 use casadi::*;
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 
 #[test]
 fn typed_rosenbrock() {
@@ -14,7 +14,7 @@ fn typed_rosenbrock() {
         &dict! {"x" => &xy, "f" => &f},
         &dict! {"print_time" => false, "ipopt.print_level" => 0},
     );
-    let res: HashMap<String, DM> = solver.call(&dict! {"x0" => vec![-1.0, 1.0]}).unwrap();
+    let res: BTreeMap<String, DM> = solver.call(&dict! {"x0" => vec![-1.0, 1.0]}).unwrap();
     let xopt: Vec<f64> = res["x"].nonzeros();
     assert!((xopt[0] - 1.0).abs() < 1e-6 && (xopt[1] - 1.0).abs() < 1e-6, "{:?}", xopt);
 }

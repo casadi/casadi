@@ -2068,7 +2068,7 @@ namespace casadi{
 
 
 // Extend DM with SWIG unique features
-#if !defined(SWIGWASMJS) && !defined(SWIGJAVA)
+#if !defined(SWIGWASMJS) && !defined(SWIGJAVA) && !defined(SWIGRUST)
 namespace casadi{
   %extend Matrix<double> {
     // Convert to a dense matrix
@@ -2083,7 +2083,7 @@ namespace casadi{
   }
 
 } // namespace casadi
-#elif defined(SWIGJAVA)
+#elif defined(SWIGJAVA) || defined(SWIGRUST)
 namespace casadi{
   %extend Matrix<double> {
     // Dense entries, one array per row

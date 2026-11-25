@@ -32,7 +32,7 @@ fn test_integrators(integrators: &[&str], dae: &ca::rt::Dict, tf: f64, x0: &ca::
         let opts = if *my_integrator == "collocation" { dict! {"rootfinder" => "kinsol"} } else { dict! {} };
 
         // Integrator
-        let i = ca::integrator_with("I", my_integrator, dae, 0.0, tf, &opts);
+        let i = ca::integrator_grid_with("I", my_integrator, dae, 0.0, tf, &opts);
 
         // Integrate to get results
         let res = i.call(&dict! {"x0" => x0, "p" => u0}).unwrap();

@@ -49,7 +49,7 @@ fn main() {
     let tgrid: ca::DM = ca::linspace(0.0, 4.0, 101);
     let tgrid = tgrid.nonzeros();
     let simopts = dict! {"transition" => dae.transition(), "verbose" => false, "event_tol" => 1e-12};
-    let sim = ca::integrator_with("sim", "cvodes", &dae.create_default(), 0.0, &tgrid, simopts);
+    let sim = ca::integrator_grid_with("sim", "cvodes", &dae.create_default(), 0.0, &tgrid, simopts);
 
     // Disturbance trajectory
     let mut d_traj = vec![0.0; tgrid.len()];
