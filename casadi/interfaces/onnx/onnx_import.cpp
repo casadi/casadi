@@ -235,6 +235,37 @@ namespace casadi {
     return ops.count(op_type) > 0;
   }
 
+  static bool is_reduction(const std::string& op_type) {
+    static const std::set<std::string> ops = {"ReduceSum", "ReduceMax", "ReduceMin", "ReduceL1",
+      "ReduceL2", "ReduceLogSumExp"};
+    return ops.count(op_type) > 0;
+  }
+
+  // A reduction over all elements of x
+  static MX reduce_all(const std::string& op_type, const MX& x) {
+    if (op_type == "ReduceSum") return sum1(sum2(x));
+    if (op_type == "ReduceMax") return mmax(x);
+    if (op_type == "ReduceMin") return mmin(x);
+    if (op_type == "ReduceL1") return norm_1(x);
+    if (op_type == "ReduceL2") return norm_fro(x);
+    if (op_type == "ReduceLogSumExp") return log(sum1(sum2(exp(x))));
+    casadi_error("Unsupported reduction '" + op_type + "'");
+  }
+
+  // A reduction of each column of y, as a row
+  static MX reduce_columns(const std::string& op_type, const MX& y) {
+    if (op_type == "ReduceSum") return sum1(y);
+    if (op_type == "ReduceL1") return sum1(fabs(y));
+    if (op_type == "ReduceL2") return sqrt(sum1(y * y));
+    if (op_type == "ReduceLogSumExp") return log(sum1(exp(y)));
+    casadi_assert(y.size1() > 0, op_type + " over no elements");
+    MX r = y(0, Slice());
+    for (casadi_int i = 1; i < y.size1(); ++i) {
+      r = op_type == "ReduceMax" ? fmax(r, y(i, Slice())) : fmin(r, y(i, Slice()));
+    }
+    return r;
+  }
+
   // ONNX initializers are pre-loaded constants
   void Onnx::process_graph_initializers(
       const onnx::GraphProto& graph,
@@ -1414,6 +1445,64 @@ namespace casadi {
       return true;
     }
 
+    if (is_reduction(op_type)) {
+      // Reduce along the axes (an input from opset 13 for ReduceSum and opset 18 for the
+      // others, an attribute before), all of them if there are none; keepdims keeps them as 1
+      std::vector<casadi_int> d = s[0], axes;
+      bool has_axes = axes_of(axes);
+      bool keepdims = get_int_attribute(node, "keepdims", 1) != 0;
+      bool recorded = shapes_.count(node.input(0)) > 0;
+      if (has_axes && axes.empty() && get_int_attribute(node, "noop_with_empty_axes", 0)) {
+        output = node_inputs[0];
+        out_shape = d;
+        return true;
+      }
+      // A vector of unknown rank may be a 2-D tensor with one dimension 1
+      if (!recorded && d.size() <= 1) {
+        for (casadi_int a : axes) {
+          if (a >= static_cast<casadi_int>(d.size()) || a < -static_cast<casadi_int>(d.size())) {
+            d = {node_inputs[0].size2(), node_inputs[0].size1()};
+          }
+        }
+      }
+      std::vector<bool> reduced(d.size(), axes.empty());
+      for (casadi_int a : axes) reduced[axis_in(a, d.size())] = true;
+      std::vector<casadi_int> kept, red;  // the kept and reduced axes, in order
+      for (size_t k = 0; k < d.size(); ++k) (reduced[k] ? red : kept).push_back(k);
+      for (size_t k = 0; k < d.size(); ++k) {
+        if (keepdims || !reduced[k]) out_shape.push_back(reduced[k] ? 1 : d[k]);
+      }
+      casadi_int n_kept = 1, n_red = 1;
+      for (casadi_int k : kept) n_kept *= d[k];
+      for (casadi_int k : red) n_red *= d[k];
+      if (n_kept == 1) {
+        // All elements: the result of a tensor of unknown rank stays unrecorded, as before
+        if (keepdims && !recorded) return false;
+        output = reduce_all(op_type, node_inputs[0]);
+        return true;
+      }
+      // y: the elements to reduce in the columns, one column per element of the result. In
+      // row-major order with the reduced axes last, the stored form of y is the tensor itself.
+      std::vector<casadi_int> perm = kept;
+      perm.insert(perm.end(), red.begin(), red.end());
+      MX y;
+      if (std::is_sorted(perm.begin(), perm.end())) {
+        y = reshape(densify(node_inputs[0]), n_red, n_kept);
+      } else {
+        std::vector<casadi_int> pd, ds = shape_strides(d);
+        for (casadi_int p : perm) pd.push_back(d[p]);
+        std::vector<casadi_int> ps = shape_strides(pd), pos(shape_numel(d));
+        for (casadi_int j = 0; j < static_cast<casadi_int>(pos.size()); ++j) {
+          casadi_int p = 0;
+          for (size_t k = 0; k < perm.size(); ++k) p += ((j / ps[k]) % pd[k]) * ds[perm[k]];
+          pos[j] = p;
+        }
+        y = take_elements(node_inputs[0], pos, {n_kept, n_red});
+      }
+      output = as_shape(reduce_columns(op_type, y), out_shape);
+      return true;
+    }
+
     if (op_type == "MatMul" && !nd) {
       // A rank-1 operand is a row on the left and a column on the right, and that axis is
       // dropped from the result. Only for a recorded rank 1: a vector of unknown rank may be a
@@ -1581,10 +1670,11 @@ namespace casadi {
       casadi_assert(node_inputs.size() >= 2, "Mod requires 2 inputs");
       output = fmod(node_inputs[0], node_inputs[1]);
 
-    } else if (op_type == "ReduceSum") {
-      // Sum all elements (ReduceMin/Max/L1/L2 are in the op_map table)
-      casadi_assert(node_inputs.size() >= 1, "ReduceSum requires 1 input");
-      output = sum1(sum2(node_inputs[0]));
+    } else if (is_reduction(op_type)) {
+      // Over all elements of a tensor of unknown rank, keeping the dimensions (see
+      // process_shaped_operation; ReduceMin/Max/L1/L2 are in the op_map table)
+      casadi_assert(node_inputs.size() >= 1, op_type + " requires 1 input");
+      output = reduce_all(op_type, node_inputs[0]);
 
     } else if (op_type == "Not") {
       casadi_assert(node_inputs.size() >= 1, "Not requires 1 input");
@@ -1717,11 +1807,6 @@ namespace casadi {
     } else if (op_type == "Det") {
       casadi_assert(node_inputs.size() >= 1, "Det requires 1 input");
       output = det(node_inputs[0]);
-
-    } else if (op_type == "ReduceLogSumExp") {
-      // log(sum(exp(x))) over all elements
-      casadi_assert(node_inputs.size() >= 1, "ReduceLogSumExp requires 1 input");
-      output = log(sum1(sum2(exp(node_inputs[0]))));
 
     } else if (op_type == "Constant") {
       // ONNX permits tensor, sparse tensor, and scalar/vector numeric attributes.
