@@ -130,6 +130,41 @@ namespace casadi {
   private:
     using IntegerConstants = std::map<std::string, std::vector<int64_t>>;
 
+    /** \brief ONNX shapes of imported values, by name, where known
+
+        CasADi values are 2-D. An ONNX tensor of shape [d0, d1, ..., dk] is stored as the
+        (d1*...*dk) x d0 matrix whose column-major nonzeros are the tensor's row-major elements,
+        so vec() of a stored value is the ONNX element order for every rank: rank 2 [r, c] is
+        stored as c x r, rank 1 [n] as n x 1 (or 1 x n), rank 0 as 1 x 1. The stored form of a
+        tensor of rank > 2 does not tell its shape, which is kept here. For lower ranks only the
+        rank matters: the dimensions follow from the stored form. Filled from the declared
+        shapes of each graph (inputs, value_info, outputs, initializers) and by the ops that
+        compute a shape. A Function imported from an external model takes and returns the
+        transposes, d0 x (d1*...*dk), with rank 1 as a column (see import_symbolic). */
+    std::map<std::string, std::vector<casadi_int>> shapes_;
+
+    /// Record the declared shapes of a graph in shapes_ (an unknown dimension is -1)
+    void declare_shapes(const onnx::GraphProto& graph);
+
+    /// ONNX shape of the imported value v named name (see shapes_); unknown rank: a vector is
+    /// taken as rank 1, a 1 x 1 value as rank 0
+    std::vector<casadi_int> onnx_shape(const std::string& name, const MX& v) const;
+
+    /// Pass the recorded shape of a value on to another name for it, if there is one
+    void copy_shape(const std::string& from, const std::string& to) {
+      auto it = shapes_.find(from);
+      if (it != shapes_.end()) shapes_[to] = it->second;
+    }
+
+    /** \brief Ops that need the ONNX shapes of their operands (see shapes_)
+
+        Handles the ops on tensors of rank > 2 and the reshaping ops of any rank. Returns false
+        if the node is left to process_node_operation; else sets output and its shape. */
+    bool process_shaped_operation(const std::string& op_type, const onnx::NodeProto& node,
+                                  const std::vector<MX>& node_inputs,
+                                  const IntegerConstants& integer_constants,
+                                  MX& output, std::vector<casadi_int>& out_shape);
+
     // Import helpers (graph -> MX), operating on this translator
     void process_graph_initializers(
         const onnx::GraphProto& graph,

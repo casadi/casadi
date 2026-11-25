@@ -3054,5 +3054,138 @@ class GraphBuilderSymbolicTests(casadiTestCase):
       gb.create("f", {"symbolic": True})
 
 
+  def save_tensor_model(self, nodes, inputs, outputs, name, initializers=(), opset=13):
+    model = helper.make_model(helper.make_graph(nodes, "g", inputs, outputs, list(initializers)),
+                              opset_imports=[helper.make_opsetid("", opset)])
+    model.ir_version = 8
+    onnx.checker.check_model(model)
+    folder = tempfile.TemporaryDirectory()
+    self.addCleanup(folder.cleanup)
+    path = os.path.join(folder.name, name)
+    onnx.save(model, path)
+    return path
+
+  @staticmethod
+  def tensor_call(f, *arrays):
+    """Evaluate an imported Function on ONNX tensors, the row-major elements of the results.
+    A tensor [d0, d1, ..., dk] is the d0 x (d1*...*dk) matrix x.reshape(d0, -1); rank 1 is a
+    column."""
+    args = [ca.DM(numpy.reshape(numpy.asarray(a, float), (f.size1_in(i), f.size2_in(i))))
+            for i, a in enumerate(arrays)]
+    res = f(*args)
+    res = list(res) if isinstance(res, (list, tuple)) else [res]
+    return [numpy.array(r).ravel() for r in res]
+
+  @staticmethod
+  def int_constant(name, values, shape=None):
+    values = list(numpy.ravel(values))
+    shape = [len(values)] if shape is None else shape
+    return helper.make_node("Constant", [], [name],
+                            value=helper.make_tensor(name, TensorProto.INT64, shape, values))
+
+  @unittest.skipUnless(have_onnx, "needs the onnx python package")
+  def test_import_rank3(self):
+    self.message("tensors of rank > 2 import as (d1*...*dk) x d0, vec() in row-major order")
+    double = TensorProto.DOUBLE
+    vi = lambda n, s: helper.make_tensor_value_info(n, double, s)
+    W = 1 + numpy.arange(12.).reshape(2, 3, 2) / 10
+    nodes = [
+      helper.make_node("Mul", ["B", "W"], ["BW"]),                    # a 3-D initializer
+      helper.make_node("Add", ["BW", "v"], ["Bv"]),                   # [2] along the last axis
+      helper.make_node("Sub", ["Bv", "M"], ["BM"]),                   # [3, 2] along the last two
+      self.int_constant("one", [1], []),
+      helper.make_node("Gather", ["B", "one"], ["B1"], axis=0),       # [3, 2]
+      self.int_constant("rows", [2, 0]),
+      helper.make_node("Gather", ["B", "rows"], ["Bc"], axis=1),      # [2, 2, 2]
+      helper.make_node("Transpose", ["B"], ["Bt"], perm=[2, 0, 1]),   # [2, 2, 3]
+      self.int_constant("ax", [1]),
+      helper.make_node("Unsqueeze", ["M", "ax"], ["Mu"]),             # [3, 1, 2]
+      helper.make_node("Squeeze", ["Mu", "ax"], ["Ms"]),              # [3, 2]
+      helper.make_node("Neg", ["Mu"], ["Mn"])]
+    outputs = [("BM", [2, 3, 2]), ("B1", [3, 2]), ("Bc", [2, 2, 2]), ("Bt", [2, 2, 3]),
+               ("Mu", [3, 1, 2]), ("Ms", [3, 2]), ("Mn", [3, 1, 2])]
+    path = self.save_tensor_model(nodes, [vi("B", [2, 3, 2]), vi("v", [2]), vi("M", [3, 2])],
+      [vi(n, s) for n, s in outputs], "rank3.onnx", [numpy_helper.from_array(W, "W")])
+    f = ca.GraphBuilder(path).create("f", {"symbolic": True})
+    self.checkarray(f.size_in(0), (2, 6), "[2, 3, 2] is the matrix B.reshape(2, -1)")
+    rng = numpy.random.default_rng(1)
+    B, v, M = rng.normal(size=(2, 3, 2)), rng.normal(size=2), rng.normal(size=(3, 2))
+    ref = [B * W + v - M, B[1], B[:, [2, 0], :], B.transpose(2, 0, 1), M[:, None, :], M,
+           -M[:, None, :]]
+    for (name, _), r, y in zip(outputs, ref, self.tensor_call(f, B, v, M)):
+      self.checkarray(y, r.ravel(), name, digits=12)
+    # The same element order for derivatives: d BM / d B = diag(W), row-major (vec of the
+    # transposed matrices)
+    Bt = ca.MX.sym("Bt", 6, 2)
+    J = ca.Function("J", [Bt], [ca.jacobian(ca.vec(f(Bt.T, v, M)[0].T), Bt)])
+    self.checkarray(J(0), ca.diag(ca.DM(W.ravel())), "jacobian", digits=12)
+
+  @unittest.skipUnless(have_onnx, "needs the onnx python package")
+  def test_import_slice_concat_rank1(self):
+    self.message("Slice and Concat of rank-1 tensors (columns) and of rank-3 tensors")
+    double = TensorProto.DOUBLE
+    vi = lambda n, s: helper.make_tensor_value_info(n, double, s)
+    nodes = [
+      self.int_constant("b", [1]), self.int_constant("e", [4]), self.int_constant("z", [0]),
+      helper.make_node("Slice", ["x", "b", "e", "z"], ["xs"]),                # x[1:4]
+      self.int_constant("b2", [-1]), self.int_constant("e2", [-100]), self.int_constant("m2", [-2]),
+      helper.make_node("Slice", ["x", "b2", "e2", "z", "m2"], ["xr"]),        # x[::-2]
+      helper.make_node("Concat", ["x", "xs"], ["xc"], axis=0),
+      self.int_constant("b3", [1, 0]), self.int_constant("e3", [3, 1]), self.int_constant("a3", [1, 2]),
+      helper.make_node("Slice", ["B", "b3", "e3", "a3"], ["Bs"]),             # B[:, 1:3, 0:1]
+      helper.make_node("Concat", ["B", "B"], ["Bc"], axis=1),
+      # A declared shape that is wrong: the computed one wins
+      helper.make_node("Identity", ["Bs"], ["Bi"])]
+    outputs = [("xs", [3]), ("xr", [3]), ("xc", [8]), ("Bs", [2, 2, 1]), ("Bc", [2, 6, 2]),
+               ("Bi", [1])]
+    path = self.save_tensor_model(nodes, [vi("x", [5]), vi("B", [2, 3, 2])],
+      [vi(n, s) for n, s in outputs], "slice_concat.onnx")
+    f = ca.GraphBuilder(path).create("f", {"symbolic": True})
+    rng = numpy.random.default_rng(5)
+    x, B = rng.normal(size=5), rng.normal(size=(2, 3, 2))
+    ref = [x[1:4], x[::-2], numpy.concatenate([x, x[1:4]]), B[:, 1:3, 0:1],
+           numpy.concatenate([B, B], axis=1), B[:, 1:3, 0:1]]
+    for (name, _), r, y in zip(outputs, ref, self.tensor_call(f, x, B)):
+      self.checkarray(y, r.ravel(), name, digits=12)
+
+  @unittest.skipUnless(have_onnx, "needs the onnx python package")
+  def test_import_loop_rank3(self):
+    self.message("nested Loops stack their scan outputs into a tensor of rank 3")
+    double = TensorProto.DOUBLE
+    vi = lambda n, s, t=double: helper.make_tensor_value_info(n, t, s)
+    cond = lambda n: helper.make_node("Constant", [], [n],
+                                      value=helper.make_tensor(n, TensorProto.BOOL, [], [True]))
+    # y[i, j, :] = 2 * B[i, j, :], one Loop per index, B captured by both bodies
+    inner = helper.make_graph(
+      [helper.make_node("Identity", ["c2"], ["c2_out"]),
+       helper.make_node("Gather", ["B", "i"], ["Bi"], axis=0),
+       helper.make_node("Gather", ["Bi", "j"], ["Bij"], axis=0),
+       helper.make_node("Add", ["Bij", "Bij"], ["e"])],
+      "inner", [vi("j", [], TensorProto.INT64), vi("c2", [], TensorProto.BOOL)],
+      [vi("c2_out", [], TensorProto.BOOL), vi("e", [2])])
+    outer = helper.make_graph(
+      [helper.make_node("Identity", ["c1"], ["c1_out"]),
+       self.int_constant("n2", [3], []), cond("t2"),
+       helper.make_node("Loop", ["n2", "t2"], ["row"], body=inner)],
+      "outer", [vi("i", [], TensorProto.INT64), vi("c1", [], TensorProto.BOOL)],
+      [vi("c1_out", [], TensorProto.BOOL), vi("row", [3, 2])])
+    nodes = [self.int_constant("n1", [2], []), cond("t1"),
+             helper.make_node("Loop", ["n1", "t1"], ["y"], body=outer),
+             helper.make_node("Sub", ["y", "B"], ["d"])]
+    path = self.save_tensor_model(nodes, [vi("B", [2, 3, 2])],
+      [vi("y", [2, 3, 2]), vi("d", [2, 3, 2])], "loop_rank3.onnx")
+    f = ca.GraphBuilder(path).create("f", {"symbolic": True})
+    B = numpy.random.default_rng(2).normal(size=(2, 3, 2))
+    y, d = self.tensor_call(f, B)
+    self.checkarray(y, 2 * B.ravel(), "stacked", digits=12)
+    self.checkarray(d, B.ravel(), "difference", digits=12)
+
+    # An op that has no meaning for these tensors yet gets an error
+    path = self.save_tensor_model([helper.make_node("MatMul", ["B", "B"], ["y"])],
+      [vi("B", [2, 2, 2])], [vi("y", [2, 2, 2])], "matmul_rank3.onnx")
+    with self.assertRaisesRegex(RuntimeError, "MatMul is not supported for tensors of rank > 2"):
+      ca.GraphBuilder(path).create("f", {"symbolic": True})
+
+
 if __name__ == '__main__':
   unittest.main()

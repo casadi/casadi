@@ -131,7 +131,8 @@ namespace casadi {
     for (const auto& in : model_.graph().input())
       in_rank[in.name()] = in.type().tensor_type().shape().dim_size();
     for (casadi_int i = 0; i < f.n_in(); ++i) {
-      // Rank<2 inputs are stored as columns already; only rank-2 inputs are transposed back
+      // Rank<2 inputs are stored as columns already; inputs of rank >= 2 are transposed back,
+      // so that [d0, d1, ..., dk] is the d0 x (d1*...*dk) matrix of its row-major elements
       if (in_rank[f.name_in(i)] < 2) {
         inputs.push_back(MX::sym(f.name_in(i), f.sparsity_in(i)));
         args.push_back(inputs.back());

@@ -125,21 +125,15 @@ namespace casadi {
       uout() << std::endl;
     }
 
-    // 2-D or less; higher-rank tensors are flattened to 2-D (columns absorb the extra axes).
+    // Higher-rank tensors are flattened to 2-D (columns absorb the extra axes).
     casadi_int rows = dims.size() > 0 ? dims[0] : 1;
     casadi_int cols = dims.size() > 1 ? dims[1] : 1;
-    if (dims.size() > 2) {
-      casadi_warning("ONNX tensor has " + std::to_string(dims.size()) +
-                     " dimensions, flattening to 2D");
-      cols = 1;
-      for (size_t i = 1; i < dims.size(); ++i) {
-        cols *= dims[i];
-      }
-    }
+    for (size_t i = 2; i < dims.size(); ++i) cols *= dims[i];
 
     // Transpose-rep: a 2-D ONNX tensor (c,r) holds a CasADi (r,c) value's column-major bytes, so
     // reading it back is just swapping the declared dims (the byte/fill order already matches).
-    if (dims.size() == 2) std::swap(rows, cols);
+    // Likewise, [d0, d1, ..., dk] is read as (d1*...*dk) x d0 (see Onnx::shapes_).
+    if (dims.size() >= 2) std::swap(rows, cols);
 
     DM dm(rows, cols);  // DM is always double; ONNX integer/bool/float types are converted below
 
