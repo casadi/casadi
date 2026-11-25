@@ -197,6 +197,28 @@ namespace casadi {
     return take_elements(x, pos, t);
   }
 
+  // Names a graph uses from outer scopes, including those its subgraphs use
+  static void free_names(const onnx::GraphProto& g, std::set<std::string>& names) {
+    std::set<std::string> defined;
+    for (const auto& i : g.input()) defined.insert(i.name());
+    for (const auto& t : g.initializer()) defined.insert(t.name());
+    for (const auto& t : g.sparse_initializer()) defined.insert(t.values().name());
+    for (const auto& n : g.node()) {
+      for (const auto& in : n.input()) {
+        if (!in.empty() && !defined.count(in)) names.insert(in);
+      }
+      for (const auto& a : n.attribute()) {
+        std::set<std::string> inner;
+        if (a.has_g()) free_names(a.g(), inner);
+        for (const auto& sub : a.graphs()) free_names(sub, inner);
+        for (const auto& x : inner) {
+          if (!defined.count(x)) names.insert(x);
+        }
+      }
+      for (const auto& o : n.output()) defined.insert(o);
+    }
+  }
+
   static bool is_activation(const std::string& op_type);
 
   // Elementwise ops: the result has the broadcast shape of the operands
@@ -563,32 +585,81 @@ namespace casadi {
         casadi_int num_scan_inputs = get_int_attribute(node, "num_scan_inputs", node.input_size());
         casadi_int M = node.input_size() - num_scan_inputs;  // state variables (reduce_out count)
 
-        // A body that references outer-scope names (captures) signals reduce_in
-        std::set<std::string> body_in_names, defined;
-        for (int b = 0; b < body->input_size(); ++b) {
-          body_in_names.insert(body->input(b).name());
-          defined.insert(body->input(b).name());
-        }
-        for (int nn = 0; nn < body->node_size(); ++nn)
-          for (int oo = 0; oo < body->node(nn).output_size(); ++oo)
-            defined.insert(body->node(nn).output(oo));
-        bool has_capture = false;
-        for (int nn = 0; nn < body->node_size() && !has_capture; ++nn)
-          for (int ii = 0; ii < body->node(nn).input_size(); ++ii) {
-            const std::string& in = body->node(nn).input(ii);
-            if (!in.empty() && !defined.count(in)) { has_capture = true; break; }
+        if (M == 0) {
+          // No state variables: the body is evaluated for each slice along ONNX axis 0 of the
+          // scan inputs, a CasADi map. The outer-scope values the body uses (captures) become
+          // extra inputs of the body Function that every evaluation gets unchanged (reduce_in);
+          // constant ones are baked into it, so that they can still serve as indices.
+          for (const char* a : {"scan_input_axes", "scan_input_directions", "scan_output_axes",
+                                "scan_output_directions"}) {
+            for (const auto& attr : node.attribute()) {
+              if (attr.name() != a) continue;
+              for (auto v : attr.ints()) {
+                casadi_assert(v == 0, std::string("ONNX import: Scan with nonzero ") + a
+                  + " is not supported");
+              }
+            }
           }
-
-        if (M == 0 && !has_capture) {
-          // Plain map: the 3-D lift reshapes pass through on import (CasADi is 2-D), so
-          // node_inputs are the original (rows, n*c) map inputs. Rebuild base.map(n).
-          Function base = function_from_graph(*body, op_type + "_body");
-          casadi_int n = node_inputs[0].size2() / base.size2_in(0);
-          std::vector<MX> outputs =
-              base.map(n)(std::vector<MX>(node_inputs.begin(), node_inputs.end()));
-          for (int j = 0; j < node.output_size(); ++j) value_map[node.output(j)] = outputs[j];
+          onnx::GraphProto g = *body;
+          // A scan input slice without a declared shape: the trailing dimensions of the input
+          for (casadi_int j = 0; j < num_scan_inputs; ++j) {
+            onnx::ValueInfoProto* vi = g.mutable_input(j);
+            if (vi->type().tensor_type().has_shape()) continue;
+            std::vector<casadi_int> sj = onnx_shape(node.input(M + j), node_inputs[M + j]);
+            vi->mutable_type()->mutable_tensor_type()->set_elem_type(real_type());
+            auto* shape = vi->mutable_type()->mutable_tensor_type()->mutable_shape();
+            for (size_t k = 1; k < sj.size(); ++k) shape->add_dim()->set_dim_value(sj[k]);
+          }
+          std::set<std::string> captures;
+          free_names(*body, captures);
+          BakedValues baked;
+          std::vector<MX> args;
+          for (casadi_int j = 0; j < num_scan_inputs; ++j) args.push_back(node_inputs[M + j]);
+          std::vector<bool> reduce_in(num_scan_inputs, false);
+          for (const std::string& c : captures) {
+            casadi_assert(value_map.count(c), "Unknown tensor '" + c + "' used by a Scan body");
+            const MX& v = value_map.at(c);
+            onnx::ValueInfoProto* vi = g.add_input();
+            vi->set_name(c);
+            vi->mutable_type()->mutable_tensor_type()->set_elem_type(real_type());
+            auto* shape = vi->mutable_type()->mutable_tensor_type()->mutable_shape();
+            for (casadi_int d : onnx_shape(c, v)) shape->add_dim()->set_dim_value(d);
+            if (v.is_constant()) {
+              DM dv = densify(static_cast<DM>(v));
+              baked[c] = std::vector<double>(dv->begin(), dv->end());
+            } else {
+              args.push_back(v);
+              reduce_in.push_back(true);
+            }
+          }
+          Function base = function_from_graph(g, op_type + "_body", baked);
+          // The slices of a scan input side by side: column-major, a stored [n, ...] tensor is
+          // the slices' row-major elements one after the other (see shapes_)
+          casadi_int n = -1;
+          for (casadi_int j = 0; j < num_scan_inputs; ++j) {
+            casadi_int r = base.size1_in(j), c = base.size2_in(j);
+            casadi_int nj = r * c == 0 ? 0 : args[j].numel() / (r * c);
+            casadi_assert(nj * r * c == args[j].numel() && (n < 0 || nj == n),
+              "ONNX import: Scan input " + str(j) + " (" + args[j].dim()
+              + ") does not match the body input (" + base.sparsity_in(j).dim() + ")");
+            n = nj;
+            args[j] = reshape(args[j], r, c * n);
+          }
+          bool any_reduce = std::find(reduce_in.begin(), reduce_in.end(), true) != reduce_in.end();
+          std::vector<MX> outs = (any_reduce ? base.map(n, reduce_in) : base.map(n))(args);
+          for (int j = 0; j < node.output_size(); ++j) {
+            std::vector<casadi_int> sj = onnx_shape(body->output(j).name(),
+                                                    MX::zeros(base.sparsity_out(j)));
+            casadi_int r = base.size1_out(j) * base.size2_out(j);
+            value_map[node.output(j)] = r == 1 ? outs[j] : reshape(outs[j], r, n);
+            sj.insert(sj.begin(), n);
+            shapes_[node.output(j)] = sj;
+          }
           continue;
         }
+
+        std::set<std::string> body_in_names;
+        for (int b = 0; b < body->input_size(); ++b) body_in_names.insert(body->input(b).name());
 
         // Reduce-map: the body wraps a single base call; recover base + masks and rebuild
         // base.map(n, reduce_in, reduce_out).
@@ -635,8 +706,10 @@ namespace casadi {
           if (reduce_in[j]) {
             args[j] = value_map.at(call->input(j));
           } else {
-            args[j] = node_inputs[M + r];
-            if (n == 0) n = args[j].size2() / base.size2_in(j);
+            // The slices side by side, as in the map above
+            casadi_int rj = base.size1_in(j), cj = base.size2_in(j);
+            if (n == 0 && rj * cj > 0) n = node_inputs[M + r].numel() / (rj * cj);
+            args[j] = reshape(node_inputs[M + r], rj, node_inputs[M + r].numel() / rj);
             ++r;
           }
         }
@@ -1146,6 +1219,32 @@ namespace casadi {
       return true;
     }
 
+    if (op_type == "Reshape") {
+      // The elements stay in order. A target with rank <= 2, from a value of rank <= 2, is
+      // left to process_node_operation.
+      casadi_assert(node_inputs.size() >= 2 && node_inputs[1].is_constant(),
+                    "Reshape shape must be a constant");
+      std::vector<casadi_int> t = ints(1);
+      if (!nd && t.size() <= 2) return false;
+      bool allowzero = get_int_attribute(node, "allowzero", 0) != 0;
+      casadi_int known = 1, infer = -1;
+      for (size_t k = 0; k < t.size(); ++k) {
+        if (t[k] == 0 && !allowzero) {
+          casadi_assert(k < s[0].size(), "Reshape: no dimension " + str(k) + " to copy");
+          t[k] = s[0][k];
+        }
+        if (t[k] == -1) {
+          infer = static_cast<casadi_int>(k);
+        } else {
+          known *= t[k];
+        }
+      }
+      if (infer >= 0) t[infer] = known ? node_inputs[0].numel() / known : 0;
+      out_shape = t;
+      output = as_shape(densify(node_inputs[0]), t);
+      return true;
+    }
+
     if (op_type == "Slice" && s[0].size() != 2) {
       // A rank-1 or rank > 2 tensor: the elements in the ranges along the axes (rank 2 is
       // left to process_node_operation)
@@ -1652,15 +1751,11 @@ namespace casadi {
       // PRESERVES it (a sparse operand would reshape to a flat with only nnz entries, shifting
       // every
       // downstream Gather/Scatter index). True sparsity propagates everywhere else.
-      if (shape.size() > 2) {
-        // 3-D reshape (the Map/Scan lift envelope): CasADi is 2-D, so pass through unchanged
-        output = densify(node_inputs[0]);
-      } else {
-        // Transpose-rep: the ONNX target (s0,s1) is the reverse of the CasADi target.
-        casadi_int s0 = shape.empty() ? 1 : shape[0];
-        casadi_int s1 = shape.size() > 1 ? shape[1] : 1;
-        output = reshape(densify(node_inputs[0]), s1, s0);
-      }
+      // Transpose-rep: the ONNX target (s0,s1) is the reverse of the CasADi target. A target of
+      // rank > 2 is handled by process_shaped_operation.
+      casadi_int s0 = shape.empty() ? 1 : shape[0];
+      casadi_int s1 = shape.size() > 1 ? shape[1] : 1;
+      output = reshape(densify(node_inputs[0]), s1, s0);
 
     } else if (op_type == "Concat") {
       // Transpose-rep: ONNX axis 0 is CasADi columns (horzcat), axis 1 is CasADi rows (vertcat)
