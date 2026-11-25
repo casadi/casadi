@@ -3181,9 +3181,9 @@ class GraphBuilderSymbolicTests(casadiTestCase):
     self.checkarray(d, B.ravel(), "difference", digits=12)
 
     # An op that has no meaning for these tensors yet gets an error
-    path = self.save_tensor_model([helper.make_node("MatMul", ["B", "B"], ["y"])],
-      [vi("B", [2, 2, 2])], [vi("y", [2, 2, 2])], "matmul_rank3.onnx")
-    with self.assertRaisesRegex(RuntimeError, "MatMul is not supported for tensors of rank > 2"):
+    path = self.save_tensor_model([helper.make_node("Det", ["B"], ["y"])],
+      [vi("B", [2, 2, 2])], [vi("y", [2])], "det_rank3.onnx")
+    with self.assertRaisesRegex(RuntimeError, "Det is not supported for tensors of rank > 2"):
       ca.GraphBuilder(path).create("f", {"symbolic": True})
 
 
@@ -3493,6 +3493,41 @@ class GraphBuilderSymbolicTests(casadiTestCase):
     xs = ca.MX.sym("x", 3)
     J = ca.Function("J", [xs], [ca.jacobian(f(xs, ca.DM(M), ca.DM(B.reshape(2, -1)))[0], xs)])
     self.checkarray(J(x), ca.DM(numpy.vstack([numpy.eye(3)] * 2)), "jacobian")
+
+  @unittest.skipUnless(have_onnx, "needs the onnx python package")
+  def test_import_matmul_batched(self):
+    self.message("MatMul of tensors of rank > 2: batched over the broadcast leading axes")
+    double = TensorProto.DOUBLE
+    vi = lambda n, s: helper.make_tensor_value_info(n, double, s)
+    rng = numpy.random.default_rng(10)
+    shapes = {"A": [2, 3, 4], "W": [4, 2], "C": [2, 4, 5], "D": [1, 4, 2], "E": [3, 4],
+              "v": [4], "F": [2, 1, 3, 4], "G": [5, 4, 2]}
+    values = {n: rng.normal(size=s) for n, s in shapes.items()}
+    products = [("A", "W"), ("A", "C"), ("A", "D"), ("E", "C"), ("v", "C"), ("A", "v"),
+                ("F", "G")]
+    nodes, outputs, ref = [], [], []
+    for k, (p, q) in enumerate(products):
+      r = values[p] @ values[q]
+      nodes.append(helper.make_node("MatMul", [p, q], ["y%d" % k]))
+      outputs.append(vi("y%d" % k, list(r.shape)))
+      ref.append(r)
+    path = self.save_tensor_model(nodes, [vi(n, s) for n, s in shapes.items()], outputs,
+                                  "matmul_batched.onnx")
+    arrays = list(values.values())
+    f = self.check_tensor_model(path, arrays, ref, [o.name for o in outputs])
+    # d y1 / d A: y1[i, j, l] = sum_t A[i, j, t] C[i, t, l]
+    As = ca.MX.sym("A", 2, 12)
+    args = [ca.DM(numpy.reshape(a, (f.size1_in(i), f.size2_in(i)))) for i, a in enumerate(arrays)]
+    J = ca.Function("J", [As], [ca.jacobian(f(As, *args[1:])[1], As)])
+    A, C = values["A"], values["C"]
+    ref = numpy.zeros((30, 24))
+    for i in range(2):
+      for j in range(3):
+        for l in range(5):
+          for t in range(4):
+            # input and output are the matrices A.reshape(2, -1), y1.reshape(2, -1)
+            ref[(j * 5 + l) * 2 + i, (j * 4 + t) * 2 + i] = C[i, t, l]
+    self.checkarray(J(A.reshape(2, -1)), ca.DM(ref), "jacobian", digits=12)
 
 if __name__ == '__main__':
   unittest.main()
