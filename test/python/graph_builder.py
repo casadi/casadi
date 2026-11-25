@@ -3275,6 +3275,49 @@ class GraphBuilderSymbolicTests(casadiTestCase):
     x = numpy.array([1.0, -2.0, 0.5])
     self.checkarray(self.tensor_call(f, x)[0], 2 * x, "y", digits=12)
 
+  @unittest.skipUnless(have_onnx, "needs the onnx python package")
+  def test_import_scan_captures(self):
+    self.message("a Scan body that uses outer-scope values imports as a map")
+    double = TensorProto.DOUBLE
+    vi = lambda n, s: helper.make_tensor_value_info(n, double, s)
+    # y0[t] = sin(x[t]) * w[k] + alpha * x[t] + c and y1[t, :] = alpha * P[t, :], as lacemodelica
+    # writes a for-equation: alpha, w and the constant k come from outside the body, c is an
+    # initializer of the body
+    body = helper.make_graph(
+      [helper.make_node("Sin", ["xe"], ["s"]),
+       helper.make_node("Gather", ["w", "k"], ["wk"], axis=0),
+       helper.make_node("Mul", ["s", "wk"], ["a"]),
+       helper.make_node("Mul", ["alpha", "xe"], ["b"]),
+       helper.make_node("Add", ["a", "b"], ["ab"]),
+       helper.make_node("Add", ["ab", "c"], ["y0e"]),
+       helper.make_node("Mul", ["alpha", "Pe"], ["y1e"])],
+      "body", [vi("xe", []), vi("Pe", [2])], [vi("y0e", []), vi("y1e", [2])],
+      [numpy_helper.from_array(numpy.array(0.5), "c")])
+    nodes = [self.int_constant("k", [2], []),
+             helper.make_node("Scan", ["x", "P"], ["y0", "y1"], body=body, num_scan_inputs=2)]
+    path = self.save_tensor_model(nodes, [vi("x", [4]), vi("P", [4, 2]), vi("alpha", []),
+      vi("w", [3])], [vi("y0", [4]), vi("y1", [4, 2])], "scan_captures.onnx")
+    f = ca.GraphBuilder(path).create("f", {"symbolic": True})
+    self.assertEqual(list(f.name_in()), ["x", "P", "alpha", "w"])
+    rng = numpy.random.default_rng(4)
+    x, P, alpha, w = rng.normal(size=4), rng.normal(size=(4, 2)), 0.7, rng.normal(size=3)
+    y0, y1 = self.tensor_call(f, x, P, alpha, w)
+    self.checkarray(y0, numpy.sin(x) * w[2] + alpha * x + 0.5, "y0", digits=12)
+    self.checkarray(y1, (alpha * P).ravel(), "y1", digits=12)
+    # One evaluation of the body per scan element, in a map: not unrolled
+    self.assertTrue(any(f.instruction_id(k) == ca.OP_CALL for k in range(f.n_instructions())))
+    xs = ca.MX.sym("x", 4)
+    J = ca.Function("J", [xs], [ca.jacobian(f(xs, ca.DM(P), alpha, ca.DM(w))[0], xs)])
+    self.checkarray(J(x), ca.diag(ca.DM(numpy.cos(x) * w[2] + alpha)), "jacobian", digits=12)
+
+    # A scan along another axis gets an error
+    path = self.save_tensor_model(
+      [helper.make_node("Scan", ["P"], ["y"], body=helper.make_graph(
+        [helper.make_node("Neg", ["e"], ["ye"])], "body", [vi("e", [4])], [vi("ye", [4])]),
+        num_scan_inputs=1, scan_input_axes=[1])],
+      [vi("P", [4, 2])], [vi("y", [2, 4])], "scan_axis.onnx")
+    with self.assertRaisesRegex(RuntimeError, "Scan with nonzero scan_input_axes"):
+      ca.GraphBuilder(path).create("f", {"symbolic": True})
 
 if __name__ == '__main__':
   unittest.main()
