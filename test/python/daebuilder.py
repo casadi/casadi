@@ -32,6 +32,19 @@ from helpers import casadiTestCase, memory_heavy, requires_integrator, requires_
 import glob
 import gc
 
+# The onnx python package builds test models
+try:
+  import onnx  # type: ignore
+  have_onnx = True
+except ImportError:
+  have_onnx = False
+
+# The symbolic ONNX import; absent on WITH_ONNX=OFF builds
+try:
+  have_graph_onnx = ca.has_graphmodel("onnx")
+except Exception:
+  have_graph_onnx = False
+
 class Daebuildertests(casadiTestCase):
 
   def test_reference_fmus(self):
@@ -1054,6 +1067,69 @@ class Daebuildertests(casadiTestCase):
     self.checkarray(ca.evalf(ca.substitute(h_init, dae.var('i'), 2.0)), ca.DM(-2.0), 'h = -i')
     self.checkarray(ca.evalf(i_init), ca.DM(3.0), 'i = 3')
 
+
+  @unittest.skipUnless(have_onnx and have_graph_onnx, "needs onnx and the ONNX symbolic import")
+  def test_onnx_array_variables(self):
+    """An FMU folder with an ONNX graph (fmi-ls-onnx-serialization) and array variables:
+    a variable is the vector of its elements in row-major (FMI) order"""
+    import tempfile
+    import numpy
+    from onnx import helper, numpy_helper, TensorProto
+    md = """<?xml version="1.0" encoding="UTF-8"?>
+<fmiModelDescription fmiVersion="3.0" modelName="arrays" instantiationToken="{0}">
+  <ModelExchange modelIdentifier="arrays"/>
+  <ModelVariables>
+    <Float64 name="k" valueReference="1" causality="parameter" variability="tunable" start="0.5"/>
+    <Float64 name="A" valueReference="2" causality="local" variability="continuous"
+      start="1 2 3 4 5 6"><Dimension start="2"/><Dimension start="3"/></Float64>
+    <Float64 name="der(A)" valueReference="3" causality="local" variability="continuous"
+      derivative="2"><Dimension start="2"/><Dimension start="3"/></Float64>
+    <Float64 name="B" valueReference="4" causality="local" variability="continuous">
+      <Dimension start="2"/><Dimension start="2"/><Dimension start="2"/></Float64>
+    <Float64 name="der(B)" valueReference="5" causality="local" variability="continuous"
+      derivative="4"><Dimension start="2"/><Dimension start="2"/><Dimension start="2"/></Float64>
+  </ModelVariables>
+  <ModelStructure/>
+</fmiModelDescription>
+"""
+    # der(A) = k * A * W2 and der(B) = B * W3, elementwise; B starts at Bs (an output)
+    W2 = 1 + numpy.arange(6.).reshape(2, 3)
+    W3 = 1 + numpy.arange(8.).reshape(2, 2, 2) / 10
+    Bs = numpy.arange(8.).reshape(2, 2, 2) - 3
+    vi = lambda n, s: helper.make_tensor_value_info(n, TensorProto.DOUBLE, s)
+    graph = helper.make_graph(
+      [helper.make_node("Mul", ["k", "A"], ["kA"]), helper.make_node("Mul", ["kA", "W2"], ["kAW"]),
+       helper.make_node("Sub", ["der(A)", "kAW"], ["eq[0]"]),
+       helper.make_node("Mul", ["B", "W3"], ["BW"]), helper.make_node("Sub", ["der(B)", "BW"], ["eq[1]"]),
+       helper.make_node("Identity", ["Bs"], ["start[3]"])],
+      "arrays", [vi("k", []), vi("A", [2, 3]), vi("der(A)", [2, 3]), vi("B", [2, 2, 2]),
+                 vi("der(B)", [2, 2, 2])],
+      [vi("eq[0]", [2, 3]), vi("eq[1]", [2, 2, 2]), vi("start[3]", [2, 2, 2])],
+      [numpy_helper.from_array(W2, "W2"), numpy_helper.from_array(W3, "W3"),
+       numpy_helper.from_array(Bs, "Bs")])
+    model = helper.make_model(graph, opset_imports=[helper.make_opsetid("", 18)])
+    model.ir_version = 8
+    with tempfile.TemporaryDirectory() as folder:
+      with open(os.path.join(folder, "modelDescription.xml"), "w") as f: f.write(md)
+      ls = os.path.join(folder, "extra", "org.lacemodelica.ls-onnx-serialization")
+      os.makedirs(ls)
+      onnx.save(model, os.path.join(ls, "model.onnx"))
+      dae = ca.DaeBuilder("arrays", folder)
+    self.assertEqual(dae.var("A").shape, (6, 1))
+    self.assertEqual(dae.start("A"), [1, 2, 3, 4, 5, 6])
+    self.assertEqual(dae.start("B"), list(Bs.ravel()))
+    names = ["k", "A", "der(A)", "B", "der(B)"]
+    res = ca.Function("res", [dae.var(n) for n in names], [ca.vertcat(*dae.alg())])
+    rng = numpy.random.default_rng(7)
+    k, A, B = 0.7, rng.normal(size=(2, 3)), rng.normal(size=(2, 2, 2))
+    # Zero at a solution, with the variables in row-major order
+    self.checkarray(res(k, A.ravel(), (k * A * W2).ravel(), B.ravel(), (B * W3).ravel()),
+                    ca.DM.zeros(14), "solution")
+    # and the residuals themselves away from one (0 = eq[k], so with the sign of -eq[k])
+    dA, dB = rng.normal(size=(2, 3)), rng.normal(size=(2, 2, 2))
+    r = numpy.array(res(k, A.ravel(), dA.ravel(), B.ravel(), dB.ravel())).ravel()
+    ref = numpy.concatenate([(dA - k * A * W2).ravel(), (dB - B * W3).ravel()])
+    self.checkarray(numpy.sort(r), numpy.sort(-ref), "residuals", digits=12)
 
 if __name__ == '__main__':
     unittest.main()
