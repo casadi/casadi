@@ -3379,7 +3379,9 @@ class GraphBuilderSymbolicTests(casadiTestCase):
       ("ReduceSum", "B", None, 0, numpy.sum), ("ReduceSum", "B", [2, 0], 0, numpy.sum),
       ("ReduceMax", "B", [2, 0], 0, numpy.max), ("ReduceMin", "M", [0], 0, numpy.min),
       ("ReduceMax", "M", [1], 1, numpy.max), ("ReduceL1", "B", [1], 0, l1),
-      ("ReduceL2", "B", [0, 1], 0, l2), ("ReduceLogSumExp", "M", [1], 1, lse)]
+      ("ReduceL2", "B", [0, 1], 0, l2), ("ReduceLogSumExp", "M", [1], 1, lse),
+      ("ReduceProd", "x", [0], 0, numpy.prod), ("ReduceProd", "B", [1], 0, numpy.prod),
+      ("ReduceProd", "M", [0], 1, numpy.prod), ("ReduceProd", "B", None, 1, numpy.prod)]
     values = {"B": B, "M": M, "x": x}
     for opset in [13, 18]:
       nodes, outputs, ref = [], [], []
@@ -3410,6 +3412,10 @@ class GraphBuilderSymbolicTests(casadiTestCase):
     Ms = ca.MX.sym("M", 3, 4)
     J = ca.Function("J", [Ms], [ca.jacobian(f(ca.DM(B.reshape(2, -1)), Ms, x)[3], Ms)])
     self.checkarray(J(M), ca.DM(numpy.kron(numpy.ones((1, 4)), numpy.eye(3))), "jacobian")
+    # d prod(x) / d x
+    xs = ca.MX.sym("x", 4)
+    J = ca.Function("J", [xs], [ca.jacobian(f(ca.DM(B.reshape(2, -1)), ca.DM(M), xs)[14], xs)])
+    self.checkarray(J(x), ca.DM(numpy.prod(x) / x).T, "jacobian of the product", digits=12)
 
     # Rows of a matrix summed in a Loop: y[i, :] = sum(M[[i, i], :], axis=1), as for sum(A[i, :])
     # in a for-loop of Modelica

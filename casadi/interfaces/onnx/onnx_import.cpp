@@ -236,13 +236,16 @@ namespace casadi {
   }
 
   static bool is_reduction(const std::string& op_type) {
-    static const std::set<std::string> ops = {"ReduceSum", "ReduceMax", "ReduceMin", "ReduceL1",
-      "ReduceL2", "ReduceLogSumExp"};
+    static const std::set<std::string> ops = {"ReduceSum", "ReduceProd", "ReduceMax", "ReduceMin",
+      "ReduceL1", "ReduceL2", "ReduceLogSumExp"};
     return ops.count(op_type) > 0;
   }
 
+  static MX reduce_columns(const std::string& op_type, const MX& y);
+
   // A reduction over all elements of x
   static MX reduce_all(const std::string& op_type, const MX& x) {
+    if (op_type == "ReduceProd") return reduce_columns(op_type, vec(densify(x)));
     if (op_type == "ReduceSum") return sum1(sum2(x));
     if (op_type == "ReduceMax") return mmax(x);
     if (op_type == "ReduceMin") return mmin(x);
@@ -258,10 +261,12 @@ namespace casadi {
     if (op_type == "ReduceL1") return sum1(fabs(y));
     if (op_type == "ReduceL2") return sqrt(sum1(y * y));
     if (op_type == "ReduceLogSumExp") return log(sum1(exp(y)));
+    if (op_type == "ReduceProd" && y.size1() == 0) return MX::ones(1, y.size2());
     casadi_assert(y.size1() > 0, op_type + " over no elements");
     MX r = y(0, Slice());
     for (casadi_int i = 1; i < y.size1(); ++i) {
-      r = op_type == "ReduceMax" ? fmax(r, y(i, Slice())) : fmin(r, y(i, Slice()));
+      MX yi = y(i, Slice());
+      r = op_type == "ReduceProd" ? r * yi : op_type == "ReduceMax" ? fmax(r, yi) : fmin(r, yi);
     }
     return r;
   }
