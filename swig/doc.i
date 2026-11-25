@@ -151855,6 +151855,9 @@ https://github.com/casadi/casadi/blob/main/casadi/core/tools.cpp#L44-L76 ";
 // File: namespacecasadi_1_1_0d392.xml
 
 
+// File: namespacecasadi_1_1_0d650.xml
+
+
 // File: namespacecasadi_1_1IndexReduction.xml
 
 
