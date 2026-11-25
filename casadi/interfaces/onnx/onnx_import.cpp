@@ -950,9 +950,15 @@ namespace casadi {
 
 
   // Convert a constant tensor input to a vector of integers
+  // Whether a value is known at import: a constant, or an expression of constants that is not
+  // folded, such as an index computed in an unrolled Loop
+  static bool is_known(const MX& m) {
+    return m.is_constant() || symvar(m).empty();
+  }
+
   static std::vector<casadi_int> constant_ints(const MX& m) {
-    casadi_assert(m.is_constant(), "Expected a constant integer tensor");
-    DM dm = static_cast<DM>(m);
+    casadi_assert(is_known(m), "Expected a constant integer tensor");
+    DM dm = m.is_constant() ? static_cast<DM>(m) : evalf(m);
     std::vector<casadi_int> v;
     for (casadi_int k = 0; k < dm.numel(); ++k)
       v.push_back(static_cast<casadi_int>(dm(k).scalar()));
@@ -1225,7 +1231,7 @@ namespace casadi {
       const std::vector<casadi_int>& is = s[1];
       if (d.size() < 3 && d.size() + is.size() < 4) return false;  // 2-D in and out
       casadi_int axis = axis_in(get_int_attribute(node, "axis", 0), d.size());
-      casadi_assert(node_inputs[1].is_constant(), "Gather indices must be constant");
+      casadi_assert(is_known(node_inputs[1]), "Gather indices must be constant");
       std::vector<casadi_int> idx = ints(1);
       casadi_int outer = 1, inner = 1;
       for (casadi_int k = 0; k < axis; ++k) outer *= d[k];
@@ -1242,6 +1248,70 @@ namespace casadi {
         }
       }
       output = take_elements(node_inputs[0], pos, out_shape);
+      return true;
+    }
+
+    if (op_type == "GatherND" || op_type == "ScatterND") {
+      // Index tuples: the last axis of indices holds q indices into the leading axes of data,
+      // each selecting a block of the trailing axes. The selected blocks of data, in row-major
+      // positions, are the output of GatherND and the elements ScatterND overwrites.
+      std::vector<casadi_int> d = s[0];
+      const std::vector<casadi_int>& is = s[1];
+      casadi_assert(get_int_attribute(node, "batch_dims", 0) == 0,
+        "ONNX import: GatherND with batch_dims is not supported");
+      casadi_assert(!is.empty() && is_known(node_inputs[1]),
+        "ONNX import: " + op_type + " requires constant indices of rank >= 1");
+      casadi_int q = is.back();
+      // A vector of unknown rank may be a 2-D tensor with one dimension 1
+      if (static_cast<casadi_int>(d.size()) < q && d.size() <= 1) {
+        d = {node_inputs[0].size2(), node_inputs[0].size1()};
+      }
+      casadi_assert(q >= 1 && q <= static_cast<casadi_int>(d.size()), op_type + ": "
+        + str(q) + " indices per tuple for data of shape " + shape_str(d));
+      std::vector<casadi_int> idx = ints(1), st = shape_strides(d);
+      casadi_int block = 1;
+      for (size_t k = q; k < d.size(); ++k) block *= d[k];
+      std::vector<casadi_int> pos;
+      for (size_t t = 0; t + q <= idx.size(); t += q) {
+        casadi_int p = 0;
+        for (casadi_int k = 0; k < q; ++k) {
+          casadi_int i = idx[t + k] < 0 ? idx[t + k] + d[k] : idx[t + k];
+          casadi_assert(i >= 0 && i < d[k], op_type + ": index " + str(idx[t + k])
+            + " out of range for dimension " + str(d[k]));
+          p += i * st[k];
+        }
+        for (casadi_int i = 0; i < block; ++i) pos.push_back(p + i);
+      }
+      if (op_type == "GatherND") {
+        out_shape.assign(is.begin(), is.end() - 1);
+        out_shape.insert(out_shape.end(), d.begin() + q, d.end());
+        output = take_elements(node_inputs[0], pos, out_shape);
+        return true;
+      }
+      // ScatterND: data with the updates (of shape indices[:-1] + data[q:]) written at pos.
+      // Element positions are nonzero positions of the dense stored form.
+      casadi_assert(static_cast<casadi_int>(pos.size()) == node_inputs[2].numel(),
+        "ScatterND: " + str(node_inputs[2].numel()) + " updates for " + str(pos.size())
+        + " positions");
+      MX data = densify(node_inputs[0]), upd = vec(densify(node_inputs[2]));
+      if (get_string_attribute(node, "reduction") == "add") {
+        // ADDNONZEROS: out = data with out.nz[pos] += updates, accumulating DUPLICATE pos. An
+        // addnonzeros MX cannot be built directly; it is the reverse-mode adjoint of a
+        // getnonzeros. Build g = w.nz[pos] on a dense numel-vector w, then
+        // jtimes(g, w, updates, true) is exactly the scatter-add of updates into a zero frame
+        // (duplicates summed); add it to data.
+        MX w = MX::sym("addnz_w", data.numel(), 1), g;
+        w.get_nz(g, false, Matrix<casadi_int>(pos));
+        output = data + reshape(jtimes(g, w, upd, true), data.size1(), data.size2());
+      } else {
+        casadi_assert(get_string_attribute(node, "reduction").empty()
+          || get_string_attribute(node, "reduction") == "none",
+          "ScatterND: reduction '" + get_string_attribute(node, "reduction")
+          + "' is not supported");
+        output = data;
+        output.set_nz(upd, false, Matrix<casadi_int>(pos));
+      }
+      out_shape = d;
       return true;
     }
 
@@ -1679,7 +1749,7 @@ namespace casadi {
       MX indices_mx = node_inputs[1];
       casadi_int axis = get_int_attribute(node, "axis", 0);
 
-      casadi_assert(indices_mx.is_constant(), "Gather indices must be constant");
+      casadi_assert(is_known(indices_mx), "Gather indices must be constant");
       std::vector<casadi_int> indices = input_ints(1);
 
       // Keep even scalar indices in an integer vector: Matrix's scalar constructor takes double.
@@ -1717,32 +1787,6 @@ namespace casadi {
         } else {
           output.set_nz(se_upd, false, vec(se_idx));   // runtime indices -> setnonzeros_param
         }
-      }
-
-    } else if (op_type == "ScatterND") {
-      // setnonzeros: overwrite x's cells at the given (onnx_row, onnx_col) coordinates. With x
-      // stored as x^T, coord (a,b) is CasADi cell (b,a) -> column-major position a*nrow+b, which is
-      // exactly the original nz position, so reconstruct via set_nz on the 2-D value.
-      casadi_assert(node_inputs.size() >= 3, "ScatterND requires data, indices, updates");
-      MX data = densify(node_inputs[0]);  // nz indexing is pseudo-dense -> densify the target
-      std::vector<casadi_int> coords = constant_ints(node_inputs[1]);  // [r0,c0,r1,c1,...]
-      casadi_int R = data.size1();
-      std::vector<casadi_int> pos(coords.size() / 2);
-      for (casadi_int i = 0; i < static_cast<casadi_int>(pos.size()); ++i) {
-        pos[i] = coords[2 * i] * R + coords[2 * i + 1];
-      }
-      if (get_string_attribute(node, "reduction") == "add") {
-        // ADDNONZEROS: out = data with out.nz[pos] += updates, accumulating DUPLICATE pos. An
-        // addnonzeros MX cannot be built directly; it is the reverse-mode adjoint of a getnonzeros.
-        // Build g = w.nz[pos] on a dense numel-vector w, then jtimes(g, w, updates, /*tr*/true) is
-        // exactly the scatter-add of updates into a zero frame (duplicates summed); add it to data.
-        MX w = MX::sym("addnz_w", data.numel(), 1), g;
-        w.get_nz(g, false, Matrix<casadi_int>(pos));
-        MX scatter = jtimes(g, w, vec(node_inputs[2]), true);
-        output = data + reshape(scatter, data.size1(), data.size2());
-      } else {
-        output = data;
-        output.set_nz(node_inputs[2], false, Matrix<casadi_int>(pos));
       }
 
     } else if (op_type == "Tile") {

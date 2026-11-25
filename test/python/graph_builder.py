@@ -3187,5 +3187,94 @@ class GraphBuilderSymbolicTests(casadiTestCase):
       ca.GraphBuilder(path).create("f", {"symbolic": True})
 
 
+  @unittest.skipUnless(have_onnx, "needs the onnx python package")
+  def test_import_gather_scatter_nd(self):
+    self.message("GatherND and ScatterND: index tuples into the leading axes, any rank")
+    double = TensorProto.DOUBLE
+    vi = lambda n, s: helper.make_tensor_value_info(n, double, s)
+    nodes = [
+      self.int_constant("i1", [[2], [0]], [2, 1]),
+      helper.make_node("GatherND", ["x", "i1"], ["g1"]),            # x[[2, 0]]
+      self.int_constant("i2", [1, 2]),
+      helper.make_node("GatherND", ["M", "i2"], ["g2"]),            # M[1, 2]
+      self.int_constant("i3", [[0, -1], [1, 0]], [2, 2]),
+      helper.make_node("GatherND", ["M", "i3"], ["g3"]),            # M[0, 2], M[1, 0]
+      self.int_constant("i4", [[1]], [1, 1]),
+      helper.make_node("GatherND", ["B", "i4"], ["g4"]),            # B[[1]], [1, 3, 2]
+      self.int_constant("i5", [[0, 2], [1, 1]], [2, 2]),
+      helper.make_node("GatherND", ["B", "i5"], ["g5"]),            # B[0, 2, :], B[1, 1, :]
+      self.int_constant("i6", [1, 0, 1]),
+      helper.make_node("GatherND", ["B", "i6"], ["g6"]),            # B[1, 0, 1]
+      # x with x[1] = M[1, 2], as lacemodelica writes an assignment to an element
+      self.int_constant("ax", [0]),
+      helper.make_node("Unsqueeze", ["g2", "ax"], ["u2"]),
+      self.int_constant("j1", [[1]], [1, 1]),
+      helper.make_node("ScatterND", ["x", "j1", "u2"], ["s1"]),
+      # B with B[1, 0, :] = w[0]
+      self.int_constant("j2", [[1, 0]], [1, 2]),
+      helper.make_node("ScatterND", ["B", "j2", "w"], ["s2"]),
+      # M with M[0, 1] += x[0] + x[1], twice the same index
+      self.int_constant("j3", [[0, 1], [0, 1]], [2, 2]),
+      self.int_constant("i7", [[0], [1]], [2, 1]),
+      helper.make_node("GatherND", ["x", "i7"], ["g7"]),
+      helper.make_node("ScatterND", ["M", "j3", "g7"], ["s3"], reduction="add")]
+    outputs = [("g1", [2]), ("g2", []), ("g3", [2]), ("g4", [1, 3, 2]), ("g5", [2, 2]),
+               ("g6", []), ("s1", [3]), ("s2", [2, 3, 2]), ("s3", [2, 3])]
+    path = self.save_tensor_model(nodes,
+      [vi("x", [3]), vi("M", [2, 3]), vi("B", [2, 3, 2]), vi("w", [1, 2])],
+      [vi(n, s) for n, s in outputs], "gather_scatter_nd.onnx", opset=16)
+    f = ca.GraphBuilder(path).create("f", {"symbolic": True})
+    rng = numpy.random.default_rng(3)
+    x, M, B, w = rng.normal(size=3), rng.normal(size=(2, 3)), rng.normal(size=(2, 3, 2)), \
+      rng.normal(size=(1, 2))
+    s1, s2, s3 = x.copy(), B.copy(), M.copy()
+    s1[1] = M[1, 2]
+    s2[1, 0, :] = w[0]
+    s3[0, 1] += x[0] + x[1]
+    ref = [x[[2, 0]], M[1, 2], [M[0, 2], M[1, 0]], B[[1]], B[[0, 1], [2, 1]], B[1, 0, 1],
+           s1, s2, s3]
+    for (name, _), r, y in zip(outputs, ref, self.tensor_call(f, x, M, B, w)):
+      self.checkarray(y, numpy.ravel(r), name, digits=12)
+    # Derivatives: s1 depends on M[1, 2] and not on x[1]
+    xs, Ms = ca.MX.sym("x", 3), ca.MX.sym("M", 2, 3)
+    y = f(xs, Ms, ca.DM(B.reshape(2, -1)), ca.DM(w))[6]
+    J = ca.Function("J", [xs, Ms], [ca.jacobian(y, ca.vertcat(xs, ca.vec(Ms)))])
+    ref = numpy.zeros((3, 9))
+    ref[0, 0] = ref[2, 2] = ref[1, 3 + 2 * 2 + 1] = 1  # M[1, 2] is vec(M)[5]
+    self.checkarray(J(x, M), ca.DM(ref), "jacobian")
+
+    path = self.save_tensor_model([self.int_constant("i", [[0]], [1, 1]),
+      helper.make_node("GatherND", ["M", "i"], ["y"], batch_dims=1)],
+      [vi("M", [2, 3])], [vi("y", [2])], "gather_nd_batch.onnx")
+    with self.assertRaisesRegex(RuntimeError, "batch_dims is not supported"):
+      ca.GraphBuilder(path).create("f", {"symbolic": True})
+
+  @unittest.skipUnless(have_onnx, "needs the onnx python package")
+  def test_import_loop_computed_indices(self):
+    self.message("indices computed from the iteration of an unrolled Loop are constants")
+    double = TensorProto.DOUBLE
+    vi = lambda n, s, t=double: helper.make_tensor_value_info(n, t, s)
+    # y = x, then y[i] = 2 * y[i] for i in 0:2, as lacemodelica writes a for-loop in a function
+    body = helper.make_graph(
+      [helper.make_node("Identity", ["c"], ["c_out"]),
+       self.int_constant("ax", [0]),
+       helper.make_node("Unsqueeze", ["i", "ax"], ["i1"]),
+       helper.make_node("Unsqueeze", ["i1", "ax"], ["i2"]),
+       helper.make_node("GatherND", ["y_in", "i1"], ["v"]),
+       helper.make_node("Add", ["v", "v"], ["v2"]),
+       helper.make_node("Unsqueeze", ["v2", "ax"], ["u"]),
+       helper.make_node("ScatterND", ["y_in", "i2", "u"], ["y_out"])],
+      "body", [vi("i", [], TensorProto.INT64), vi("c", [], TensorProto.BOOL), vi("y_in", [3])],
+      [vi("c_out", [], TensorProto.BOOL), vi("y_out", [3])])
+    nodes = [self.int_constant("n", [3], []),
+             helper.make_node("Constant", [], ["t"],
+                              value=helper.make_tensor("t", TensorProto.BOOL, [], [True])),
+             helper.make_node("Loop", ["n", "t", "x"], ["y"], body=body)]
+    path = self.save_tensor_model(nodes, [vi("x", [3])], [vi("y", [3])], "computed_indices.onnx")
+    f = ca.GraphBuilder(path).create("f", {"symbolic": True})
+    x = numpy.array([1.0, -2.0, 0.5])
+    self.checkarray(self.tensor_call(f, x)[0], 2 * x, "y", digits=12)
+
+
 if __name__ == '__main__':
   unittest.main()
