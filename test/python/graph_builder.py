@@ -3471,5 +3471,28 @@ class GraphBuilderSymbolicTests(casadiTestCase):
           ref[(j * 4 + k) * 2 + i, k * 2 + i] = 1
     self.checkarray(J(B.reshape(2, 4)), ca.DM(ref), "jacobian")
 
+  @unittest.skipUnless(have_onnx, "needs the onnx python package")
+  def test_import_tile(self):
+    self.message("Tile: repeats along each axis, any rank")
+    double = TensorProto.DOUBLE
+    vi = lambda n, s: helper.make_tensor_value_info(n, double, s)
+    rng = numpy.random.default_rng(9)
+    x, M, B = rng.normal(size=3), rng.normal(size=(2, 3)), rng.normal(size=(2, 1, 3))
+    nodes = [self.int_constant("r1", [2]), helper.make_node("Tile", ["x", "r1"], ["y1"]),
+             self.int_constant("r2", [2, 1]), helper.make_node("Tile", ["M", "r2"], ["y2"]),
+             self.int_constant("r3", [1, 2, 2]), helper.make_node("Tile", ["B", "r3"], ["y3"]),
+             # A fill, as lacemodelica writes it: Unsqueeze to the rank of the result, then Tile
+             self.int_constant("ax", [0, 1]), helper.make_node("Unsqueeze", ["x", "ax"], ["xu"]),
+             self.int_constant("r4", [2, 2, 1]), helper.make_node("Tile", ["xu", "r4"], ["y4"])]
+    ref = [numpy.tile(x, 2), numpy.tile(M, (2, 1)), numpy.tile(B, (1, 2, 2)),
+           numpy.tile(x, (2, 2, 1))]
+    outputs = [vi("y%d" % (k + 1), list(r.shape)) for k, r in enumerate(ref)]
+    path = self.save_tensor_model(nodes, [vi("x", [3]), vi("M", [2, 3]), vi("B", [2, 1, 3])],
+                                  outputs, "tile.onnx")
+    f = self.check_tensor_model(path, [x, M, B], ref, [o.name for o in outputs])
+    xs = ca.MX.sym("x", 3)
+    J = ca.Function("J", [xs], [ca.jacobian(f(xs, ca.DM(M), ca.DM(B.reshape(2, -1)))[0], xs)])
+    self.checkarray(J(x), ca.DM(numpy.vstack([numpy.eye(3)] * 2)), "jacobian")
+
 if __name__ == '__main__':
   unittest.main()
