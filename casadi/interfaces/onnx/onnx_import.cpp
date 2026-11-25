@@ -1518,6 +1518,31 @@ namespace casadi {
       return true;
     }
 
+    if (op_type == "Tile") {
+      // Repeat along each axis, one entry of repeats per axis (rank 2 is left to
+      // process_node_operation)
+      casadi_assert(node_inputs.size() >= 2 && is_known(node_inputs[1]),
+                    "Tile repeats must be constant");
+      std::vector<casadi_int> r = ints(1), d = s[0];
+      if (r.size() == 2 && !nd) return false;
+      // A value of unknown rank may have leading dimensions 1
+      if (!shapes_.count(node.input(0))) {
+        while (d.size() < r.size()) d.insert(d.begin(), 1);
+      }
+      casadi_assert(d.size() == r.size(), "Tile: " + str(r.size()) + " repeats for shape "
+        + shape_str(d));
+      for (size_t k = 0; k < d.size(); ++k) out_shape.push_back(d[k] * r[k]);
+      std::vector<casadi_int> ds = shape_strides(d), os = shape_strides(out_shape);
+      std::vector<casadi_int> pos(shape_numel(out_shape));
+      for (casadi_int j = 0; j < static_cast<casadi_int>(pos.size()); ++j) {
+        casadi_int p = 0;
+        for (size_t k = 0; k < d.size(); ++k) p += (((j / os[k]) % out_shape[k]) % d[k]) * ds[k];
+        pos[j] = p;
+      }
+      output = take_elements(node_inputs[0], pos, out_shape);
+      return true;
+    }
+
     if (op_type == "MatMul" && !nd) {
       // A rank-1 operand is a row on the left and a column on the right, and that axis is
       // dropped from the result. Only for a recorded rank 1: a vector of unknown rank may be a
