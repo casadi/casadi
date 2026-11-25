@@ -1598,6 +1598,52 @@ namespace casadi {
       }
       output = take_elements(node_inputs[0], pos, out_shape);
       return true;
+
+    } else if (op_type == "MatMul") {
+      // Matrix products over the last two axes, for each index of the broadcast leading axes.
+      // A rank-1 operand is a matrix with one row on the left, one column on the right, and
+      // that axis is dropped from the result.
+      std::vector<casadi_int> a = s[0], b = s[1];
+      bool va = a.size() == 1, vb = b.size() == 1;
+      if (va) a.insert(a.begin(), 1);
+      if (vb) b.push_back(1);
+      casadi_assert(a.size() >= 2 && b.size() >= 2, "MatMul of a scalar");
+      casadi_int m = a[a.size() - 2], k = a.back(), n = b.back();
+      casadi_assert(b[b.size() - 2] == k, "MatMul: shapes " + shape_str(s[0]) + " and "
+        + shape_str(s[1]) + " do not match");
+      std::vector<casadi_int> ba(a.begin(), a.end() - 2), bb(b.begin(), b.end() - 2);
+      std::vector<casadi_int> batch = broadcast_shapes(ba, bb);
+      out_shape = batch;
+      if (!va) out_shape.push_back(m);
+      if (!vb) out_shape.push_back(n);
+      // Transpose-rep: the stored form of [m, k] is k x m, so stored P*Q is stored Q * stored P
+      if (shape_numel(bb) == 1 && ba == batch) {
+        // One right operand: a single product, with the leading axes of the left one as rows
+        MX p = as_shape(node_inputs[0], {shape_numel(batch) * m, k});
+        MX q = as_shape(node_inputs[1], {k, n});
+        output = as_shape(mtimes(q, p), out_shape);
+        return true;
+      }
+      std::vector<casadi_int> bs = shape_strides(batch);
+      size_t oa = batch.size() - ba.size(), ob = batch.size() - bb.size();
+      std::vector<MX> blocks;
+      for (casadi_int j = 0; j < shape_numel(batch); ++j) {
+        // The block of each operand at batch index j, broadcast along dimensions 1
+        casadi_int ja = 0, jb = 0;
+        for (size_t t = 0; t < batch.size(); ++t) {
+          casadi_int i = (j / bs[t]) % batch[t];
+          if (t >= oa) ja = ja * ba[t - oa] + (ba[t - oa] == 1 ? 0 : i);
+          if (t >= ob) jb = jb * bb[t - ob] + (bb[t - ob] == 1 ? 0 : i);
+        }
+        std::vector<casadi_int> pa(m * k), pb(k * n);
+        for (casadi_int e = 0; e < m * k; ++e) pa[e] = ja * m * k + e;
+        for (casadi_int e = 0; e < k * n; ++e) pb[e] = jb * k * n + e;
+        MX p = take_elements(node_inputs[0], pa, {m, k});
+        MX q = take_elements(node_inputs[1], pb, {k, n});
+        blocks.push_back(vec(mtimes(q, p)));
+      }
+      output = as_shape(vertcat(blocks), out_shape);
+      return true;
     }
 
     casadi_error("ONNX import: " + op_type + " is not supported for tensors of rank > 2");
