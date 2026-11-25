@@ -97,6 +97,122 @@ namespace casadi {
     }
   }
 
+  // Tensors of any rank (see Onnx::shapes_): an ONNX shape [d0, d1, ..., dk] is stored as a
+  // (d1*...*dk) x d0 matrix, whose column-major order is the row-major ONNX element order.
+  static std::pair<casadi_int, casadi_int> stored_size(const std::vector<casadi_int>& s) {
+    if (s.empty()) return {1, 1};
+    if (s.size() == 1) return {s[0], 1};
+    casadi_int r = 1;
+    for (size_t k = 1; k < s.size(); ++k) r *= s[k];
+    return {r, s[0]};
+  }
+
+  static casadi_int shape_numel(const std::vector<casadi_int>& s) {
+    casadi_int n = 1;
+    for (casadi_int d : s) n *= d;
+    return n;
+  }
+
+  static std::string shape_str(const std::vector<casadi_int>& s) {
+    std::string r = "[";
+    for (size_t k = 0; k < s.size(); ++k) r += (k ? ", " : "") + str(s[k]);
+    return r + "]";
+  }
+
+  // Row-major strides of a shape
+  static std::vector<casadi_int> shape_strides(const std::vector<casadi_int>& s) {
+    std::vector<casadi_int> st(s.size(), 1);
+    for (casadi_int k = static_cast<casadi_int>(s.size()) - 2; k >= 0; --k) {
+      st[k] = st[k + 1] * s[k + 1];
+    }
+    return st;
+  }
+
+  // x in the stored form of shape s
+  static MX as_shape(const MX& x, const std::vector<casadi_int>& s) {
+    auto sz = stored_size(s);
+    casadi_assert(x.numel() == sz.first * sz.second, "ONNX import: " + x.dim()
+      + " value cannot have shape " + shape_str(s));
+    return x.size1() == sz.first ? x : reshape(x, sz.first, sz.second);
+  }
+
+  // The elements of x at the given row-major positions, as a tensor of shape s
+  static MX take_elements(const MX& x, const std::vector<casadi_int>& pos,
+                          const std::vector<casadi_int>& s) {
+    MX r;
+    vec(densify(x)).get_nz(r, false, Matrix<casadi_int>(pos));
+    return as_shape(r, s);
+  }
+
+  // Numpy broadcasting of two shapes
+  static bool broadcast_shapes(const std::vector<casadi_int>& a, const std::vector<casadi_int>& b,
+                               std::vector<casadi_int>& r) {
+    r.resize(std::max(a.size(), b.size()));
+    for (size_t k = 0; k < r.size(); ++k) {
+      casadi_int da = k < r.size() - a.size() ? 1 : a[k - (r.size() - a.size())];
+      casadi_int db = k < r.size() - b.size() ? 1 : b[k - (r.size() - b.size())];
+      if (da != db && da != 1 && db != 1) return false;
+      r[k] = da == 1 ? db : da;
+    }
+    return true;
+  }
+
+  static std::vector<casadi_int> broadcast_shapes(const std::vector<casadi_int>& a,
+                                                  const std::vector<casadi_int>& b) {
+    std::vector<casadi_int> r;
+    casadi_assert(broadcast_shapes(a, b, r), "ONNX import: cannot broadcast " + shape_str(a)
+      + " with " + shape_str(b));
+    return r;
+  }
+
+  // Row-major positions of the elements selected along each axis
+  static std::vector<casadi_int> selected_positions(
+      const std::vector<std::vector<casadi_int>>& sel, const std::vector<casadi_int>& strides) {
+    std::vector<casadi_int> pos = {0};
+    for (size_t k = 0; k < sel.size(); ++k) {
+      std::vector<casadi_int> next;
+      for (casadi_int p : pos) {
+        for (casadi_int i : sel[k]) next.push_back(p + i * strides[k]);
+      }
+      pos = next;
+    }
+    return pos;
+  }
+
+  // x of shape s broadcast to shape t
+  static MX broadcast_to(const MX& x, const std::vector<casadi_int>& s,
+                         const std::vector<casadi_int>& t) {
+    if (s == t) return as_shape(x, t);
+    std::vector<casadi_int> ts = shape_strides(t), ss = shape_strides(s);
+    size_t off = t.size() - s.size();
+    std::vector<casadi_int> pos(shape_numel(t));
+    for (casadi_int j = 0; j < static_cast<casadi_int>(pos.size()); ++j) {
+      casadi_int p = 0;
+      for (size_t k = off; k < t.size(); ++k) {
+        casadi_int i = (j / ts[k]) % t[k];
+        if (s[k - off] != 1) p += i * ss[k - off];
+      }
+      pos[j] = p;
+    }
+    return take_elements(x, pos, t);
+  }
+
+  static bool is_activation(const std::string& op_type);
+
+  // Elementwise ops: the result has the broadcast shape of the operands
+  static bool is_elementwise(const std::string& op_type) {
+    if (is_activation(op_type)) return true;
+    const OpMapping* m = get_op_mapping_by_name(op_type);
+    if (m) {
+      return m->arity == 2 || (m->casadi_op != OP_TRANSPOSE && m->casadi_op != OP_NORM1
+        && m->casadi_op != OP_NORM2 && m->casadi_op != OP_NORMF && m->casadi_op != OP_MMIN
+        && m->casadi_op != OP_MMAX);
+    }
+    static const std::set<std::string> ops = {"Identity", "Cast", "Not", "And", "Or", "Less",
+      "LessOrEqual", "Greater", "GreaterOrEqual", "Equal", "Min", "Max", "Mod", "Where"};
+    return ops.count(op_type) > 0;
+  }
+
   // ONNX initializers are pre-loaded constants
   void Onnx::process_graph_initializers(
       const onnx::GraphProto& graph,
@@ -178,6 +294,8 @@ namespace casadi {
           input.type().tensor_type().shape();
       casadi_int rows = get_dimension(shape, 0);
       casadi_int cols = get_dimension(shape, 1);
+      // Rank > 2: the trailing dimensions are flattened (see shapes_)
+      for (int k = 2; k < shape.dim_size(); ++k) cols *= get_dimension(shape, k);
 
       if (verbose) {
         uout() << "  Creating input: " << input_name
@@ -226,6 +344,61 @@ namespace casadi {
     return ranks;
   }
 
+  void Onnx::declare_shapes(const onnx::GraphProto& graph) {
+    for (const auto* infos : {&graph.input(), &graph.value_info(), &graph.output()}) {
+      for (const auto& info : *infos) {
+        if (!info.type().tensor_type().has_shape()) continue;
+        const onnx::TensorShapeProto& shape = info.type().tensor_type().shape();
+        std::vector<casadi_int> s;
+        for (const auto& d : shape.dim()) {
+          auto it = d.has_dim_param() ? dimension_overrides_.find(d.dim_param())
+                                      : dimension_overrides_.end();
+          s.push_back(d.has_dim_value() ? static_cast<casadi_int>(d.dim_value())
+                      : it != dimension_overrides_.end() ? it->second : -1);
+        }
+        shapes_[info.name()] = s;
+      }
+    }
+    for (const auto& tensor : graph.initializer()) {
+      shapes_[tensor.name()] = std::vector<casadi_int>(tensor.dims().begin(), tensor.dims().end());
+    }
+  }
+
+  std::vector<casadi_int> Onnx::onnx_shape(const std::string& name, const MX& v) const {
+    // A recorded shape that does not fit the value is ignored: exporters declare wrong shapes
+    // for some outputs, and subgraphs may reuse an outer name
+    auto it = shapes_.find(name);
+    if (it != shapes_.end()) {
+      const std::vector<casadi_int>& s = it->second;
+      if (s.size() > 2) {
+        // The trailing dimensions of a declared shape may be unknown; d0 is the stored columns
+        std::vector<casadi_int> r = s;
+        r[0] = v.size2();
+        casadi_int known = 1, unknown = -1, n_unknown = 0;
+        for (size_t k = 1; k < r.size(); ++k) {
+          if (r[k] >= 0) {
+            known *= r[k];
+          } else {
+            unknown = static_cast<casadi_int>(k);
+            n_unknown++;
+          }
+        }
+        if (n_unknown == 1 && known > 0) r[unknown] = v.size1() / known;
+        if (n_unknown <= 1 && shape_numel(r) == v.numel()
+            && stored_size(r).first == v.size1()) return r;
+      } else if (s.size() == 2) {
+        return {v.size2(), v.size1()};
+      } else if (s.size() == 1 && v.is_vector()) {
+        return {v.numel()};
+      } else if (s.empty() && v.is_scalar()) {
+        return {};
+      }
+    }
+    if (v.is_scalar()) return {};
+    if (v.is_vector()) return {v.numel()};
+    return {v.size2(), v.size1()};
+  }
+
   // ONNX counts a negative "axis" attribute from the end, relative to the rank of input 0
   // (OneHot, relative to the output rank, aside). CasADi values are 2-D and do not keep the ONNX
   // rank, e.g. [1, n] and [n] are both stored as (n, 1), so resolve the axis against the rank
@@ -257,6 +430,7 @@ namespace casadi {
     }
 
     std::map<std::string, casadi_int> ranks = declared_ranks(graph);
+    declare_shapes(graph);
 
     // Per-graph capture of kron operands, keyed by the exporter's node-name tag "kron<k>".
     std::map<std::string, MX> kron_operand_a_, kron_operand_b_;
@@ -273,6 +447,10 @@ namespace casadi {
       // Only direct Constant nodes and initializers retain an integer payload.
       if (op_type == "Constant" && node.output_size() == 1) {
         for (const auto& attr : node.attribute()) {
+          if (attr.name() == "value") {
+            shapes_[node.output(0)] = std::vector<casadi_int>(attr.t().dims().begin(),
+                                                              attr.t().dims().end());
+          }
           std::vector<int64_t> values;
           if (attr.name() == "value_int") {
             values = {attr.i()};
@@ -337,6 +515,8 @@ namespace casadi {
 
       // Compute output based on operation type
       MX output;
+      std::vector<casadi_int> out_shape;  // its ONNX shape, if shaped
+      bool shaped = false;
 
       // ========== Special Handling: Multi-output operations ==========
       if (op_type == "Split") {
@@ -484,14 +664,19 @@ namespace casadi {
           casadi_assert(cond.numel() == 1, "If: the condition must have one element, got "
                         + cond.dim());
           bool taken = densify(static_cast<DM>(cond)).scalar() != 0;
-          std::vector<MX> r = eval_captured_subgraph(taken ? *then_b : *else_b, value_map);
-          for (int j = 0; j < node.output_size(); ++j) value_map[node.output(j)] = r[j];
+          const onnx::GraphProto& branch = taken ? *then_b : *else_b;
+          std::vector<MX> r = eval_captured_subgraph(branch, value_map);
+          for (int j = 0; j < node.output_size(); ++j) {
+            value_map[node.output(j)] = r[j];
+            copy_shape(branch.output(j).name(), node.output(j));
+          }
           continue;
         }
         std::vector<MX> t = eval_captured_subgraph(*then_b, value_map);
         std::vector<MX> e = eval_captured_subgraph(*else_b, value_map);
         for (int j = 0; j < node.output_size(); ++j) {
           value_map[node.output(j)] = if_else(cond, t[j], e[j]);
+          copy_shape(then_b->output(j).name(), node.output(j));
         }
         continue;
 
@@ -514,6 +699,7 @@ namespace casadi {
           && n_scan >= 0 && body->output_size() == 1 + node.output_size(),
           "Loop body inputs and outputs do not match the node");
         std::vector<std::vector<MX>> scan(n_scan);
+        std::vector<std::vector<casadi_int>> scan_shape(n_scan);  // per iteration
         for (casadi_int it = 0; it < trip_count; ++it) {
           std::map<std::string, MX> scope = value_map;
           scope[body->input(0).name()] = MX(static_cast<double>(it));
@@ -528,15 +714,26 @@ namespace casadi {
             carried[j] = out[1 + j];
           }
           for (casadi_int j = 0; j < n_scan; ++j) {
-            scan[j].push_back(out[1 + carried.size() + j]);
+            const MX& e = out[1 + carried.size() + j];
+            std::vector<casadi_int> s = onnx_shape(body->output(1 + carried.size() + j).name(), e);
+            casadi_assert(it == 0 || s == scan_shape[j], "ONNX import: Loop scan output "
+              + str(j) + " changes shape from " + shape_str(scan_shape[j]) + " to " + shape_str(s));
+            scan_shape[j] = s;
+            scan[j].push_back(vec(e));
           }
         }
         for (casadi_int j = 0; j < static_cast<casadi_int>(carried.size()); ++j) {
           value_map[node.output(j)] = carried[j];
+          if (trip_count > 0) copy_shape(body->output(1 + j).name(), node.output(j));
         }
-        // Scan outputs stack along ONNX axis 0, which is CasADi columns as in Concat
+        // Scan outputs stack along a new ONNX axis 0, which is CasADi columns as in Concat: the
+        // stacked [n, ...] tensor is the n columns of the elements' row-major vec (see shapes_)
         for (casadi_int j = 0; j < n_scan; ++j) {
           value_map[node.output(carried.size() + j)] = horzcat(scan[j]);
+          if (trip_count > 0) {
+            scan_shape[j].insert(scan_shape[j].begin(), trip_count);
+            shapes_[node.output(carried.size() + j)] = scan_shape[j];
+          }
         }
         continue;
 
@@ -560,20 +757,31 @@ namespace casadi {
               *func_graph.add_node() = func_proto->node(n);
             }
 
-            // Map the function's formal inputs to the call-site values.
+            // Map the function's formal inputs to the call-site values. The body has a name
+            // scope of its own, so shapes recorded in it are dropped afterwards.
             std::map<std::string, MX> func_value_map;
+            std::map<std::string, std::vector<casadi_int>> outer_shapes = shapes_;
             for (size_t n = 0; n < node_inputs.size() && n < func_proto->input_size(); ++n) {
               func_value_map[func_proto->input(n)] = node_inputs[n];
+              shapes_[func_proto->input(n)] = onnx_shape(node.input(n), node_inputs[n]);
             }
 
             process_graph_nodes(func_graph, func_value_map, false);
 
             // Store the function outputs in the outer value_map.
+            std::vector<std::vector<casadi_int>> out_shapes;
+            for (int n = 0; n < node.output_size() && n < func_proto->output_size(); ++n) {
+              const std::string& o = func_proto->output(n);
+              out_shapes.push_back(func_value_map.count(o) ? onnx_shape(o, func_value_map[o])
+                                                           : std::vector<casadi_int>());
+            }
+            shapes_ = outer_shapes;
             for (int n = 0; n < node.output_size() && n < func_proto->output_size(); ++n) {
               std::string func_output_name = func_proto->output(n);
               casadi_assert(func_value_map.count(func_output_name),
                            "Function output '" + func_output_name + "' not found");
               value_map[node.output(n)] = func_value_map[func_output_name];
+              shapes_[node.output(n)] = out_shapes[n];
 
               if (verbose) {
                 uout() << "      -> " << node.output(n) << std::endl;
@@ -586,8 +794,27 @@ namespace casadi {
           // Fall through to error if function not found
         }
 
-        // All other (single-output) operations
-        output = process_node_operation(op_type, node, node_inputs, integer_constants);
+        // All other (single-output) operations; those that need ONNX shapes first
+        if (process_shaped_operation(op_type, node, node_inputs, integer_constants,
+                                     output, out_shape)) {
+          shaped = true;
+        } else {
+          output = process_node_operation(op_type, node, node_inputs, integer_constants);
+          // An elementwise op keeps the broadcast shape of its operands. If an operand has a
+          // recorded shape, this overrides a declared one, which exporters get wrong at times.
+          if (is_elementwise(op_type)) {
+            bool recorded = false, ok = true;
+            for (size_t j = 0; j < node_inputs.size() && ok; ++j) {
+              if (node.input(j).empty() || (op_type == "Clip" && j > 0)) continue;
+              recorded = recorded || shapes_.count(node.input(j));
+              std::vector<casadi_int> sj = onnx_shape(node.input(j), node_inputs[j]);
+              ok = j == 0 ? (out_shape = sj, true) : broadcast_shapes(out_shape, sj, out_shape);
+            }
+            auto sz = stored_size(out_shape);
+            shaped = recorded && ok && sz.first * sz.second == output.numel()
+              && (sz.first == output.size1() || out_shape.size() < 2);
+          }
+        }
       }
 
       // Store output (assume single output for now)
@@ -596,6 +823,7 @@ namespace casadi {
 
       std::string output_name = node.output(0);
       value_map[output_name] = output;
+      if (shaped) shapes_[output_name] = out_shape;
 
       if (verbose) {
         uout() << "    -> " << output_name << " " << output.dim() << std::endl;
@@ -832,6 +1060,232 @@ namespace casadi {
       return output;
     }
     casadi_error("Unsupported activation '" + op_type + "'");
+  }
+
+  bool Onnx::process_shaped_operation(const std::string& op_type, const onnx::NodeProto& node,
+                                      const std::vector<MX>& node_inputs,
+                                      const IntegerConstants& integer_constants,
+                                      MX& output, std::vector<casadi_int>& out_shape) {
+    // ONNX shapes of the inputs
+    std::vector<std::vector<casadi_int>> s(node_inputs.size());
+    bool nd = false;  // an input of rank > 2
+    for (size_t j = 0; j < node_inputs.size(); ++j) {
+      if (node.input(j).empty()) continue;
+      s[j] = onnx_shape(node.input(j), node_inputs[j]);
+      nd = nd || s[j].size() > 2;
+    }
+    auto ints = [&](size_t j) -> std::vector<casadi_int> {
+      auto it = integer_constants.find(node.input(j));
+      if (it == integer_constants.end()) return constant_ints(node_inputs[j]);
+      return std::vector<casadi_int>(it->second.begin(), it->second.end());
+    };
+    // The axes of Squeeze/Unsqueeze: an input from opset 13, an attribute before
+    auto axes_of = [&](std::vector<casadi_int>& axes) -> bool {
+      if (node_inputs.size() > 1 && !node.input(1).empty()) {
+        axes = ints(1);
+        return true;
+      }
+      for (const auto& attr : node.attribute()) {
+        if (attr.name() == "axes") {
+          axes.assign(attr.ints().begin(), attr.ints().end());
+          return true;
+        }
+      }
+      return false;
+    };
+    // An axis counted from the end
+    auto axis_in = [&](casadi_int a, size_t rank) -> casadi_int {
+      casadi_int r = static_cast<casadi_int>(rank);
+      casadi_assert(a >= -r && a < r, op_type + ": axis " + str(a) + " out of range for rank "
+        + str(r));
+      return a < 0 ? a + r : a;
+    };
+
+    if (op_type == "Unsqueeze") {
+      // Insert dimensions of size 1; the elements stay in order
+      std::vector<casadi_int> axes;
+      casadi_assert(axes_of(axes), "Unsqueeze requires axes");
+      size_t rank = s[0].size() + axes.size();
+      std::vector<bool> inserted(rank, false);
+      for (casadi_int a : axes) inserted[axis_in(a, rank)] = true;
+      auto in = s[0].begin();
+      for (size_t k = 0; k < rank; ++k) out_shape.push_back(inserted[k] ? 1 : *in++);
+      output = as_shape(node_inputs[0], out_shape);
+      return true;
+
+    } else if (op_type == "Squeeze") {
+      // Remove dimensions of size 1 (all of them, if no axes are given)
+      std::vector<casadi_int> axes;
+      std::vector<casadi_int> in = s[0];
+      bool has_axes = axes_of(axes);
+      // A vector of unknown rank may be a 2-D tensor with one dimension 1
+      if (has_axes && in.size() == 1 && !shapes_.count(node.input(0))) {
+        for (casadi_int a : axes) {
+          if ((a != 0 && a != -1) || in[0] != 1) {
+            in = {node_inputs[0].size2(), node_inputs[0].size1()};
+          }
+        }
+      }
+      std::vector<bool> removed(in.size(), !has_axes);
+      for (casadi_int a : axes) {
+        casadi_int k = axis_in(a, in.size());
+        casadi_assert(in[k] == 1, "Squeeze: dimension " + str(k) + " of " + shape_str(in)
+          + " is not 1");
+        removed[k] = true;
+      }
+      for (size_t k = 0; k < in.size(); ++k) {
+        if (!(removed[k] && in[k] == 1)) out_shape.push_back(in[k]);
+      }
+      output = as_shape(node_inputs[0], out_shape);
+      return true;
+    }
+
+    if (op_type == "Slice" && s[0].size() != 2) {
+      // A rank-1 or rank > 2 tensor: the elements in the ranges along the axes (rank 2 is
+      // left to process_node_operation)
+      const std::vector<casadi_int>& d = s[0];
+      casadi_assert(!d.empty(), "Slice of a scalar");
+      std::vector<casadi_int> starts = ints(1), ends = ints(2), axes, steps;
+      if (node_inputs.size() > 3 && !node.input(3).empty()) {
+        axes = ints(3);
+      } else {
+        for (size_t k = 0; k < starts.size(); ++k) axes.push_back(k);
+      }
+      if (node_inputs.size() > 4 && !node.input(4).empty()) {
+        steps = ints(4);
+      } else {
+        steps.assign(starts.size(), 1);
+      }
+      casadi_assert(ends.size() == starts.size() && axes.size() == starts.size()
+        && steps.size() == starts.size(), "Slice: starts, ends, axes and steps must have "
+        "equal lengths");
+      std::vector<std::vector<casadi_int>> sel(d.size());
+      for (size_t k = 0; k < d.size(); ++k) {
+        for (casadi_int i = 0; i < d[k]; ++i) sel[k].push_back(i);
+      }
+      for (size_t a = 0; a < axes.size(); ++a) {
+        casadi_int k = axis_in(axes[a], d.size()), n = d[k], st = steps[a];
+        casadi_assert(st != 0, "Slice: step must not be zero");
+        // Negative positions count from the end; then clamp as ONNX does
+        casadi_int b = starts[a] < 0 ? starts[a] + n : starts[a];
+        casadi_int e = ends[a] < 0 ? ends[a] + n : ends[a];
+        b = st > 0 ? std::min(std::max(b, casadi_int(0)), n)
+                   : std::min(std::max(b, casadi_int(-1)), n - 1);
+        e = st > 0 ? std::min(std::max(e, casadi_int(0)), n)
+                   : std::min(std::max(e, casadi_int(-1)), n - 1);
+        sel[k].clear();
+        for (casadi_int i = b; st > 0 ? i < e : i > e; i += st) sel[k].push_back(i);
+      }
+      for (const auto& v : sel) out_shape.push_back(v.size());
+      output = take_elements(node_inputs[0], selected_positions(sel, shape_strides(d)),
+                             out_shape);
+      // A rank-1 row stays a row
+      if (d.size() == 1 && node_inputs[0].size1() == 1) output = reshape(output, 1, out_shape[0]);
+      return true;
+    }
+
+    if (op_type == "Concat" && s[0].size() != 2) {
+      // Rank 1 or > 2: the inputs' elements in order along the axis (rank 2 is left to
+      // process_node_operation)
+      casadi_int axis = get_int_attribute(node, "axis", 0);
+      if (!nd && axis != 0 && axis != -1) return false;  // a vector of unknown rank
+      axis = axis_in(axis, s[0].size());
+      out_shape = s[0];
+      out_shape[axis] = 0;
+      std::vector<MX> flat;
+      std::vector<casadi_int> offset = {0};
+      bool rows = true;
+      for (size_t j = 0; j < node_inputs.size(); ++j) {
+        casadi_assert(s[j].size() == s[0].size(), "Concat: inputs of different ranks");
+        out_shape[axis] += s[j][axis];
+        flat.push_back(vec(densify(node_inputs[j])));
+        offset.push_back(offset.back() + node_inputs[j].numel());
+        rows = rows && node_inputs[j].size1() == 1;
+      }
+      casadi_int outer = 1, inner = 1;
+      for (casadi_int k = 0; k < axis; ++k) outer *= out_shape[k];
+      for (size_t k = axis + 1; k < out_shape.size(); ++k) inner *= out_shape[k];
+      std::vector<casadi_int> pos;
+      for (casadi_int o = 0; o < outer; ++o) {
+        for (size_t j = 0; j < node_inputs.size(); ++j) {
+          for (casadi_int t = 0; t < s[j][axis] * inner; ++t) {
+            pos.push_back(offset[j] + o * s[j][axis] * inner + t);
+          }
+        }
+      }
+      output = take_elements(vertcat(flat), pos, out_shape);
+      // Rank-1 rows stay a row
+      if (out_shape.size() == 1 && rows) output = reshape(output, 1, out_shape[0]);
+      return true;
+    }
+
+    if (op_type == "Gather") {
+      // out[a.., i.., b..] = data[a.., indices[i..], b..] along axis
+      const std::vector<casadi_int>& d = s[0];
+      const std::vector<casadi_int>& is = s[1];
+      if (d.size() < 3 && d.size() + is.size() < 4) return false;  // 2-D in and out
+      casadi_int axis = axis_in(get_int_attribute(node, "axis", 0), d.size());
+      casadi_assert(node_inputs[1].is_constant(), "Gather indices must be constant");
+      std::vector<casadi_int> idx = ints(1);
+      casadi_int outer = 1, inner = 1;
+      for (casadi_int k = 0; k < axis; ++k) outer *= d[k];
+      for (size_t k = axis + 1; k < d.size(); ++k) inner *= d[k];
+      out_shape.assign(d.begin(), d.begin() + axis);
+      out_shape.insert(out_shape.end(), is.begin(), is.end());
+      out_shape.insert(out_shape.end(), d.begin() + axis + 1, d.end());
+      std::vector<casadi_int> pos;
+      for (casadi_int o = 0; o < outer; ++o) {
+        for (casadi_int t : idx) {
+          if (t < 0) t += d[axis];
+          casadi_assert(t >= 0 && t < d[axis], "Gather: index " + str(t) + " out of range");
+          for (casadi_int i = 0; i < inner; ++i) pos.push_back((o * d[axis] + t) * inner + i);
+        }
+      }
+      output = take_elements(node_inputs[0], pos, out_shape);
+      return true;
+    }
+
+    if (!nd) return false;
+
+    if (is_elementwise(op_type)) {
+      // Broadcast the tensor operands to a common shape, then the 2-D op applies as is
+      std::vector<MX> args = node_inputs;
+      for (size_t j = 0; j < s.size(); ++j) {
+        if (node.input(j).empty() || (op_type == "Clip" && j > 0)) continue;
+        out_shape = out_shape.empty() && j == 0 ? s[j] : broadcast_shapes(out_shape, s[j]);
+      }
+      for (size_t j = 0; j < s.size(); ++j) {
+        if (node.input(j).empty() || (op_type == "Clip" && j > 0)) continue;
+        args[j] = broadcast_to(node_inputs[j], s[j], out_shape);
+      }
+      output = process_node_operation(op_type, node, args, integer_constants);
+      return true;
+
+    } else if (op_type == "Transpose") {
+      // Permute the axes (default: reverse them)
+      const std::vector<casadi_int>& d = s[0];
+      std::vector<casadi_int> perm;
+      for (const auto& attr : node.attribute()) {
+        if (attr.name() == "perm") perm.assign(attr.ints().begin(), attr.ints().end());
+      }
+      if (perm.empty()) {
+        for (casadi_int k = static_cast<casadi_int>(d.size()) - 1; k >= 0; --k) perm.push_back(k);
+      }
+      casadi_assert(perm.size() == d.size(), "Transpose: perm does not match the rank");
+      for (casadi_int p : perm) out_shape.push_back(d[p]);
+      std::vector<casadi_int> ds = shape_strides(d), os = shape_strides(out_shape);
+      std::vector<casadi_int> pos(shape_numel(d));
+      for (casadi_int j = 0; j < static_cast<casadi_int>(pos.size()); ++j) {
+        casadi_int p = 0;
+        for (size_t k = 0; k < perm.size(); ++k) p += ((j / os[k]) % out_shape[k]) * ds[perm[k]];
+        pos[j] = p;
+      }
+      output = take_elements(node_inputs[0], pos, out_shape);
+      return true;
+    }
+
+    casadi_error("ONNX import: " + op_type + " is not supported for tensors of rank > 2");
+    return false;
   }
 
   MX Onnx::process_node_operation(
@@ -1137,29 +1591,6 @@ namespace casadi {
         casadi_int s1 = shape.size() > 1 ? shape[1] : 1;
         output = reshape(densify(node_inputs[0]), s1, s0);
       }
-
-    } else if (op_type == "Unsqueeze") {
-      casadi_assert(!node_inputs.empty() && node_inputs[0].is_vector(),
-        "Unsqueeze: only scalar and vector operands are supported");
-      std::vector<casadi_int> axes;
-      if (node_inputs.size() > 1) {
-        axes = constant_ints(node_inputs[1]);
-      } else {
-        for (const auto& attr : node.attribute()) {
-          if (attr.name() == "axes") axes.assign(attr.ints().begin(), attr.ints().end());
-        }
-      }
-      casadi_assert(axes.size() == 1 && axes[0] >= -2 && axes[0] < 2,
-        "Unsqueeze: expected one axis for a 2-D result");
-      casadi_int axis = axes[0] < 0 ? axes[0] + 2 : axes[0];
-      output = axis == 0 ? reshape(node_inputs[0], node_inputs[0].numel(), 1) :
-        reshape(node_inputs[0], 1, node_inputs[0].numel());
-
-    } else if (op_type == "Squeeze") {
-      // Only the vector case: a 1-D tensor is a CasADi column, whichever axis had size 1
-      casadi_assert(!node_inputs.empty() && node_inputs[0].is_vector(),
-        "Squeeze: only scalar and vector operands are supported");
-      output = reshape(node_inputs[0], node_inputs[0].numel(), 1);
 
     } else if (op_type == "Concat") {
       // Transpose-rep: ONNX axis 0 is CasADi columns (horzcat), axis 1 is CasADi rows (vertcat)
