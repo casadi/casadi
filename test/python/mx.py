@@ -27,6 +27,7 @@ from numpy import inf, pi
 import casadi as c
 import numpy
 from numpy import random, array, linalg, matrix, zeros, ones, ndarray, eye
+import os
 import unittest
 import warnings
 from types import *
@@ -4171,6 +4172,18 @@ class MXtests(casadiTestCase):
 
     with self.assertInException("Not defined for ConstantFile"):
       x.to_DM()
+
+  def test_constant_from_file_closes(self):
+    fds = "/proc/self/fd" if os.path.isdir("/proc/self/fd") else "/dev/fd"
+    open("test.txt", "w").write("5.6 abc 1e-5")
+    n = len(os.listdir(fds)) if os.path.isdir(fds) else None
+    for i in range(5):
+      with self.assertInException("Failed to read a double"):
+        x = ca.MX(ca.Sparsity.lower(2), "test.txt")
+    if n is not None:
+      self.assertEqual(len(os.listdir(fds)), n)
+    # Windows: removing a file that is still open fails
+    os.remove("test.txt")
 
   def test_nonzeros_param(self):
     x = ca.MX.sym("x",2)
