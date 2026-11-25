@@ -3339,5 +3339,97 @@ class GraphBuilderSymbolicTests(casadiTestCase):
                                self.tensor_call(f, A, x, y, B)):
       self.checkarray(v, numpy.ravel(r), name, digits=12)
 
+  @staticmethod
+  def ort_call(path, *arrays):
+    """The results of onnxruntime with graph optimizations disabled, in row-major order"""
+    options = ort.SessionOptions()
+    options.graph_optimization_level = ort.GraphOptimizationLevel.ORT_DISABLE_ALL
+    session = ort.InferenceSession(path, options, providers=["CPUExecutionProvider"])
+    feed = {i.name: numpy.asarray(a, float) for i, a in zip(session.get_inputs(), arrays)}
+    return [numpy.asarray(r, float).ravel() for r in session.run(None, feed)]
+
+  def check_tensor_model(self, path, arrays, ref, names):
+    """The imported model against numpy and, if available, onnxruntime"""
+    f = ca.GraphBuilder(path).create("f", {"symbolic": True})
+    results = [self.tensor_call(f, *arrays)]
+    if has_onnxruntime:
+      results.append(self.ort_call(path, *arrays))
+    for name, r, y in zip(names, ref, results[0]):
+      self.checkarray(y, numpy.ravel(r), name, digits=12)
+    if has_onnxruntime:
+      for name, r, y in zip(names, ref, results[1]):
+        self.checkarray(y, numpy.ravel(r), name + " (onnxruntime)", digits=12)
+    return f
+
+  @unittest.skipUnless(have_onnx, "needs the onnx python package")
+  def test_import_reduce_axes(self):
+    self.message("Reduce* along axes, with keepdims, as an input (opset 18) or attribute")
+    double = TensorProto.DOUBLE
+    vi = lambda n, s: helper.make_tensor_value_info(n, double, s)
+    rng = numpy.random.default_rng(7)
+    B, M, x = rng.normal(size=(2, 3, 4)), rng.normal(size=(3, 4)), rng.normal(size=4)
+    l1 = lambda a, axis, keepdims: numpy.abs(a).sum(axis=axis, keepdims=keepdims)
+    l2 = lambda a, axis, keepdims: numpy.sqrt((a * a).sum(axis=axis, keepdims=keepdims))
+    lse = lambda a, axis, keepdims: numpy.log(numpy.exp(a).sum(axis=axis, keepdims=keepdims))
+    # op, input, axes (None: none given), keepdims, reference
+    cases = [
+      ("ReduceSum", "B", [1], 0, numpy.sum), ("ReduceSum", "B", [0, 2], 1, numpy.sum),
+      ("ReduceSum", "B", [-1], 0, numpy.sum), ("ReduceSum", "M", [1], 0, numpy.sum),
+      ("ReduceSum", "M", [0], 1, numpy.sum), ("ReduceSum", "x", [0], 0, numpy.sum),
+      ("ReduceSum", "B", None, 0, numpy.sum), ("ReduceSum", "B", [2, 0], 0, numpy.sum),
+      ("ReduceMax", "B", [2, 0], 0, numpy.max), ("ReduceMin", "M", [0], 0, numpy.min),
+      ("ReduceMax", "M", [1], 1, numpy.max), ("ReduceL1", "B", [1], 0, l1),
+      ("ReduceL2", "B", [0, 1], 0, l2), ("ReduceLogSumExp", "M", [1], 1, lse)]
+    values = {"B": B, "M": M, "x": x}
+    for opset in [13, 18]:
+      nodes, outputs, ref = [], [], []
+      for k, (op, a, axes, keepdims, fn) in enumerate(cases):
+        inputs, attrs = [a], {"keepdims": keepdims}
+        if axes is not None:
+          if opset >= 18 or op == "ReduceSum":
+            nodes.append(self.int_constant("axes%d" % k, axes))
+            inputs.append("axes%d" % k)
+          else:
+            attrs["axes"] = axes
+        nodes.append(helper.make_node(op, inputs, ["y%d" % k], **attrs))
+        r = numpy.asarray(fn(values[a], axis=None if axes is None else tuple(axes),
+                             keepdims=bool(keepdims)))
+        outputs.append(vi("y%d" % k, list(r.shape)))
+        ref.append(r)
+      # Empty axes: all of them, or none with noop_with_empty_axes
+      nodes += [helper.make_node("Constant", [], ["none"],
+                                 value=helper.make_tensor("none", TensorProto.INT64, [0], [])),
+                helper.make_node("ReduceSum", ["B", "none"], ["all"], keepdims=0),
+                helper.make_node("ReduceSum", ["B", "none"], ["noop"], noop_with_empty_axes=1)]
+      outputs += [vi("all", []), vi("noop", [2, 3, 4])]
+      ref += [B.sum(), B]
+      path = self.save_tensor_model(nodes, [vi("B", [2, 3, 4]), vi("M", [3, 4]), vi("x", [4])],
+        outputs, "reduce_axes%d.onnx" % opset, opset=opset)
+      f = self.check_tensor_model(path, [B, M, x], ref, [o.name for o in outputs])
+    # Derivatives: d sum(M, axis=1) / d M, with M the 3 x 4 input (vec column by column)
+    Ms = ca.MX.sym("M", 3, 4)
+    J = ca.Function("J", [Ms], [ca.jacobian(f(ca.DM(B.reshape(2, -1)), Ms, x)[3], Ms)])
+    self.checkarray(J(M), ca.DM(numpy.kron(numpy.ones((1, 4)), numpy.eye(3))), "jacobian")
+
+    # Rows of a matrix summed in a Loop: y[i, :] = sum(M[[i, i], :], axis=1), as for sum(A[i, :])
+    # in a for-loop of Modelica
+    vl = lambda n, s, t=double: helper.make_tensor_value_info(n, t, s)
+    body = helper.make_graph(
+      [helper.make_node("Identity", ["c"], ["c_out"]),
+       self.int_constant("ax", [0]),
+       helper.make_node("Unsqueeze", ["i", "ax"], ["i1"]),
+       helper.make_node("Concat", ["i1", "i1"], ["ii"], axis=0),
+       helper.make_node("Gather", ["M", "ii"], ["rows"], axis=0),
+       self.int_constant("ax1", [1]),
+       helper.make_node("ReduceSum", ["rows", "ax1"], ["e"], keepdims=0)],
+      "body", [vl("i", [], TensorProto.INT64), vl("c", [], TensorProto.BOOL)],
+      [vl("c_out", [], TensorProto.BOOL), vl("e", [2])])
+    nodes = [self.int_constant("n", [3], []),
+             helper.make_node("Constant", [], ["t"],
+                              value=helper.make_tensor("t", TensorProto.BOOL, [], [True])),
+             helper.make_node("Loop", ["n", "t"], ["y"], body=body)]
+    path = self.save_tensor_model(nodes, [vi("M", [3, 4])], [vi("y", [3, 2])], "loop_sum.onnx")
+    self.check_tensor_model(path, [M], [numpy.repeat(M.sum(axis=1)[:, None], 2, axis=1)], ["y"])
+
 if __name__ == '__main__':
   unittest.main()
