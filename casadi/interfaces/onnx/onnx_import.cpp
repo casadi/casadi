@@ -1508,6 +1508,16 @@ namespace casadi {
       return true;
     }
 
+    if (op_type == "Expand") {
+      // Numpy broadcasting of the input and the shape: a dimension 1 of the shape keeps the
+      // input's
+      casadi_assert(node_inputs.size() >= 2 && is_known(node_inputs[1]),
+                    "Expand requires a constant shape");
+      out_shape = broadcast_shapes(s[0], ints(1));
+      output = broadcast_to(node_inputs[0], s[0], out_shape);
+      return true;
+    }
+
     if (op_type == "MatMul" && !nd) {
       // A rank-1 operand is a row on the left and a column on the right, and that axis is
       // dropped from the result. Only for a recorded rank 1: a vector of unknown rank may be a

@@ -3437,5 +3437,39 @@ class GraphBuilderSymbolicTests(casadiTestCase):
     path = self.save_tensor_model(nodes, [vi("M", [3, 4])], [vi("y", [3, 2])], "loop_sum.onnx")
     self.check_tensor_model(path, [M], [numpy.repeat(M.sum(axis=1)[:, None], 2, axis=1)], ["y"])
 
+  @unittest.skipUnless(have_onnx, "needs the onnx python package")
+  def test_import_expand(self):
+    self.message("Expand: numpy broadcasting of a tensor and a shape")
+    double = TensorProto.DOUBLE
+    vi = lambda n, s: helper.make_tensor_value_info(n, double, s)
+    rng = numpy.random.default_rng(8)
+    x, M, B, a = rng.normal(size=3), rng.normal(size=(3, 1)), rng.normal(size=(2, 1, 4)), 0.3
+    # input, shape, result
+    cases = [("x", [2, 3], numpy.broadcast_to(x, (2, 3))),
+             ("M", [3, 4], numpy.broadcast_to(M, (3, 4))),
+             ("M", [2, 1, 1], numpy.broadcast_to(M, (2, 3, 1))),
+             ("a", [2, 2], numpy.full((2, 2), a)),
+             ("B", [3, 1], numpy.broadcast_to(B, (2, 3, 4))),
+             ("x", [1], x)]
+    nodes, outputs = [], []
+    for k, (v, shape, r) in enumerate(cases):
+      nodes += [self.int_constant("s%d" % k, shape),
+                helper.make_node("Expand", [v, "s%d" % k], ["y%d" % k])]
+      outputs.append(vi("y%d" % k, list(r.shape)))
+    path = self.save_tensor_model(nodes,
+      [vi("x", [3]), vi("M", [3, 1]), vi("B", [2, 1, 4]), vi("a", [])], outputs, "expand.onnx")
+    f = self.check_tensor_model(path, [x, M, B, a], [r for _, _, r in cases],
+                                [o.name for o in outputs])
+    # d y4 / d B: each element of B three times. Input and output are the matrices
+    # B.reshape(2, -1) and y4.reshape(2, -1), differentiated column by column.
+    Bs = ca.MX.sym("B", 2, 4)
+    J = ca.Function("J", [Bs], [ca.jacobian(f(x, M, Bs, a)[4], Bs)])
+    ref = numpy.zeros((24, 8))
+    for i in range(2):
+      for j in range(3):
+        for k in range(4):
+          ref[(j * 4 + k) * 2 + i, k * 2 + i] = 1
+    self.checkarray(J(B.reshape(2, 4)), ca.DM(ref), "jacobian")
+
 if __name__ == '__main__':
   unittest.main()
