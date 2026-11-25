@@ -4661,8 +4661,8 @@ namespace casadi {
         \lang{java}
         \doctest
         jshell> SX x = SX.sym("x"); SX y = SX.sym("y");
-        jshell> List<Object> Hg = ca.hessian(x.power(2).times(y), ca.vertcat(List.of(x, y)));
-        jshell> SX H = (SX) Hg.get(0); SX g = (SX) Hg.get(1);
+        jshell> List<SX> Hg = ca.hessian(x.power(2).times(y), ca.vertcat(List.of(x, y)));
+        jshell> SX H = Hg.get(0); SX g = Hg.get(1);
         jshell> H
         @1=(2.*x),
         [[(2.*y), @1],
@@ -4987,7 +4987,7 @@ namespace casadi {
     * \lang{java}
     * \doctest
     * jshell> SX x = SX.sym("x"); SX y = SX.sym("y");
-    * jshell> List<Object> Abc = ca.quadratic_coeff(x.power(2).plus(ca.times(2, x).times(y)).plus(ca.times(3, x)).plus(4), ca.vertcat(List.of(x, y)));
+    * jshell> List<SX> Abc = ca.quadratic_coeff(x.power(2).plus(ca.times(2, x).times(y)).plus(ca.times(3, x)).plus(4), ca.vertcat(List.of(x, y)));
     * jshell> Abc.get(0)
     * @1=2,
     * [[@1, @1],
@@ -5063,7 +5063,7 @@ namespace casadi {
     * \lang{java}
     * \doctest
     * jshell> SX x = SX.sym("x"); SX y = SX.sym("y");
-    * jshell> List<Object> Ab = ca.linear_coeff(ca.vertcat(List.of(ca.times(2, x).plus(y).plus(1), ca.times(3, y))), ca.vertcat(List.of(x, y)));
+    * jshell> List<SX> Ab = ca.linear_coeff(ca.vertcat(List.of(ca.times(2, x).plus(y).plus(1), ca.times(3, y))), ca.vertcat(List.of(x, y)));
     * jshell> Ab.get(0)
     * [[2, 1],
     *  [00, 3]]

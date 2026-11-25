@@ -265,7 +265,7 @@ namespace casadi {
 
         \lang{java}
         \doctest
-        jshell> ca.vertcat(List.of(SX.sym("x", 2), 3))
+        jshell> ca.vertcat(List.of(SX.sym("x", 2), new SX(3)))
         [x_0, x_1, 3]
         jshell> ca.vertcat(new DM(new double[][]{{1, 2}}), DM.eye(2))
         [[1, 2],

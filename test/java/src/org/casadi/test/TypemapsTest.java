@@ -639,7 +639,7 @@ public class TypemapsTest extends CasadiTestCase {
   public void test_OUTPUT() {
     message("OUTPUT typemap");
     SX a = SX.sym("A", 3, 3);
-    List<Object> r = ca.qr(a);
+    List<SX> r = ca.qr(a);
     assertEquals(2, r.size());
     assertInstanceOf(SX.class, r.get(0));
     assertInstanceOf(SX.class, r.get(1));
@@ -743,6 +743,70 @@ public class TypemapsTest extends CasadiTestCase {
   public void test_buglonglong() {
     SX x = SX.sym("x");
     ca.jacobian(x.div(1.458151064450277e-12), x);
+  }
+
+  @Test
+  public void test_concat_numbers() {
+    checkarray(ca.horzcat(1.0, 2.0), dm(new double[][] {{1, 2}}));
+    checkarray(ca.vertcat(1.0, 2.0), dm(1, 2));
+    // List concatenations only take matrices and sparsities
+    for (String f : List.of("vertcat", "horzcat", "diagcat", "veccat")) {
+      try {
+        Method m = ca.class.getMethod(f, List.class);
+        assertEquals(org.casadi.SparsityInterfaceCommon.class, m.getTypeParameters()[0].getBounds()[0], f);
+      } catch (NoSuchMethodException e) {
+        fail(f);
+      }
+    }
+  }
+
+  @Test
+  public void test_slice_helpers() {
+    DM x = dm(0, 1, 2, 3, 4);
+    checkarray(x.get(Slice.ALL), x);
+    Slice.ALL.close();
+    checkarray(x.get(Slice.ALL), x);
+    checkarray(x.get(Slice.from(1)), dm(1, 2, 3, 4));
+    checkarray(x.get(Slice.from(1, 2)), dm(1, 3));
+  }
+
+  @Test
+  public void test_rdivide_uminus() {
+    DM x = dm(2, 4);
+    checkarray(x.rdivide(2), x.div(2));
+    checkarray(ca.uminus(x), x.unaryMinus());
+    MX y = MX.sym("y");
+    assertEquals(ca.uminus(y).toString(), y.unaryMinus().toString());
+    assertEquals(y.rdivide(y).toString(), ca.rdivide(y, y).toString());
+  }
+
+  // One model for numeric and symbolic use, as a Python function on any casadi type
+  private static <M extends org.casadi.Matrix<M>> M model(M w) {
+    M r = ca.vertcat(w.get(0).sin(), w.get(1).times(2));
+    return r.times(r).plus(1);
+  }
+
+  @Test
+  public void test_generic_matrix() {
+    DM w0 = dm(0.5, 3);
+    DM r = model(w0);
+    SX x = SX.sym("x", 2);
+    MX y = MX.sym("y", 2);
+    Function fs = new Function("fs", List.of(x), List.of(model(x)));
+    Function fm = new Function("fm", List.of(y), List.of(model(y)));
+    checkarray(r, dm(Math.pow(Math.sin(0.5), 2) + 1, 37));
+    checkarray((DM) fs.invoke(w0), r);
+    checkarray((DM) fm.invoke(w0), r);
+  }
+
+  @Test
+  public void test_typed_outputs() {
+    MX x = MX.sym("x", 2);
+    List<MX> hg = ca.hessian(ca.sumsqr(x), x);
+    checkarray(ca.evalf(hg.get(0)), DM.eye(2).times(2));
+    assertEquals(2, hg.get(1).size1());
+    List<MX> abc = ca.quadratic_coeff(ca.sumsqr(x), x);
+    assertEquals(3, abc.size());
   }
 
   @Test

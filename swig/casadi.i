@@ -2083,6 +2083,20 @@ namespace casadi{
   }
 
 } // namespace casadi
+#elif defined(SWIGJAVA)
+namespace casadi{
+  %extend Matrix<double> {
+    // Dense entries, one array per row
+    std::vector< std::vector<double> > full() const {
+      std::vector<double> d($self->numel());
+      casadi::casadi_densify($self->ptr(), $self->sparsity(), casadi::get_ptr(d), false);
+      std::vector< std::vector<double> > r($self->size1(), std::vector<double>($self->size2()));
+      for (casadi_int i=0; i<$self->size1(); ++i)
+        for (casadi_int j=0; j<$self->size2(); ++j) r[i][j] = d[i + j*$self->size1()];
+      return r;
+    }
+  }
+} // namespace casadi
 #endif
 
 

@@ -13,12 +13,14 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.casadi.CasadiMeta;
 import org.casadi.DM;
@@ -305,6 +307,29 @@ public class MiscTest extends CasadiTestCase {
         assertOutput(included, excluded, () -> solver.solve(A, b));
       }
     }
+  }
+
+  /** Prints casadi's printf-formatted timings; run in a child JVM by test_locale */
+  public static class LocaleProbe {
+    public static void main(String[] args) {
+      MX x = MX.sym("x");
+      new Function("f", List.of(x), List.of(ca.power(x, 2.0)), Map.of("print_time", true)).invoke(3.0);
+    }
+  }
+
+  @Test
+  public void test_locale() throws Exception {
+    String cp = Paths.get(LocaleProbe.class.getProtectionDomain().getCodeSource().getLocation().toURI()) + File.pathSeparator
+        + Paths.get(DM.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+    ProcessBuilder pb = new ProcessBuilder(Paths.get(System.getProperty("java.home"), "bin", "java").toString(),
+        "-cp", cp, LocaleProbe.class.getName());
+    pb.environment().put("LC_ALL", "nl_BE.UTF-8");
+    pb.redirectErrorStream(true);
+    Process p = pb.start();
+    String out = new String(p.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+    assertEquals(0, p.waitFor(), out);
+    assertTrue(out.contains("t_wall"), out);
+    assertFalse(Pattern.compile("\\d,\\d").matcher(out).find(), out);
   }
 
   @Test

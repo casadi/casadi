@@ -1,0 +1,52 @@
+package org.casadi;
+
+/** DM, SX and MX as Matrix of themselves: code over any of them, as Python's duck typing, e.g. {@code <M extends Matrix<M>> M f(M w)}. */
+public interface Matrix<M extends Matrix<M>> extends GenericMatrix {
+  M plus(M y);
+  M plus(double y);
+  M minus(M y);
+  M minus(double y);
+  M times(M y);
+  M times(double y);
+  M div(M y);
+  M div(double y);
+  M power(M y);
+  M power(double y);
+  M mtimes(M y);
+  M unaryMinus();
+  M T();
+  M get(long rr);
+  M get(Slice rr);
+  M get(long rr, long cc);
+  M get(Slice rr, Slice cc);
+  M get(Slice rr, long cc);
+  M get(long rr, Slice cc);
+  M dot(M y);
+  M fmin(M y);
+  M fmax(M y);
+  M atan2(M x);
+  M sin();
+  M cos();
+  M tan();
+  M asin();
+  M acos();
+  M atan();
+  M sinh();
+  M cosh();
+  M tanh();
+  M exp();
+  M log();
+  M sqrt();
+  M abs();
+  M floor();
+  M ceil();
+  M sign();
+  M sum1();
+  M sum2();
+  M sumsqr();
+  M norm_1();
+  M norm_2();
+  M norm_inf();
+  M mmin();
+  M mmax();
+}

@@ -1,7 +1,7 @@
 package org.casadi;
 
 /** Implemented by the matrix types DM, SX and MX: what they have in common, for code over any of them. */
-public interface GenericMatrix {
+public interface GenericMatrix extends SparsityInterfaceCommon {
   long size1();
   long size2();
   long numel();

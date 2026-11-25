@@ -11,6 +11,8 @@
  // Java type of a casadi-typemapped C++ type (parameters, returns, outputs, directors)
 %define %java_type(xJava, xDesc, xType...)
 %typemap(jstype) xType, const xType, const xType&, xType &OUTPUT, xType &INOUT xJava
+// OUTPUT1..6 copied OUTPUT before Java types were known
+%typemap(jstype) xType &OUTPUT1, xType &OUTPUT2, xType &OUTPUT3, xType &OUTPUT4, xType &OUTPUT5, xType &OUTPUT6 xJava
 %java_type_director(xDesc, xType)
 %enddef
  // ... whose parameters also take the Java types in xWiden

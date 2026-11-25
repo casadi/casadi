@@ -2078,7 +2078,7 @@ public class MX2Test extends CasadiTestCase {
   }
 
   private static List<Object> separateLinear(org.casadi.GenericMatrix e, org.casadi.GenericMatrix x, org.casadi.GenericMatrix p) {
-    return e instanceof MX ? ca.separate_linear((MX) e, (MX) x, (MX) p) : ca.separate_linear((SX) e, (SX) x, (SX) p);
+    return new ArrayList<>(e instanceof MX ? ca.separate_linear((MX) e, (MX) x, (MX) p) : ca.separate_linear((SX) e, (SX) x, (SX) p));
   }
 
   private static boolean isLinear(Object e, Object x) {
@@ -2299,8 +2299,8 @@ public class MX2Test extends CasadiTestCase {
       System.out.println("  lin " + c[2]);
       System.out.println("  nonlin " + c[3]);
 
-      List<Object> r = ca.separate_linear(c[0], List.of(x, y), List.of(p));
-      MX expr_const = (MX) r.get(0), expr_lin = (MX) r.get(1), expr_nonlin = (MX) r.get(2);
+      List<MX> r = ca.separate_linear(c[0], List.of(x, y), List.of(p));
+      MX expr_const = r.get(0), expr_lin = r.get(1), expr_nonlin = r.get(2);
       System.out.println("actual");
       System.out.println("  const " + expr_const);
       System.out.println("  lin " + expr_lin);
@@ -2762,9 +2762,9 @@ public class MX2Test extends CasadiTestCase {
 
     MX e = ((MX) g.invoke(((MX) f.invoke(x.div(y), x.times(2).times(y))).times(x))).div(x.plus(y));
 
-    List<Object> res = ca.extract(List.of(e), Map.of("lift_shared", false, "lift_calls", true));
+    List<List<MX>> res = ca.extract(List.of(e), Map.of("lift_shared", false, "lift_calls", true));
 
-    List<MX> vexpr = (List<MX>) res.get(0), v = (List<MX>) res.get(1), vdef = (List<MX>) res.get(2);
+    List<MX> vexpr = res.get(0), v = res.get(1), vdef = res.get(2);
 
     System.out.println(vexpr);
     System.out.println(v);

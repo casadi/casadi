@@ -7,6 +7,7 @@
 %fragment(SWIG_From_frag(long long));
 %fragment(SWIG_From_frag(double));
 %{
+  #include <clocale>
   namespace casadi {
     inline jclass java_class(const char* name) {
       JNIEnv* e = SWIG_JavaGuestEnvChecked();
@@ -70,6 +71,8 @@
   } // namespace casadi
 %}
 %init %{
+  // The JVM sets the locale from the environment; printf must not write decimal commas
+  setlocale(LC_NUMERIC, "C");
   casadi::Logger::writeFun = casadi::javalogger;
   casadi::Logger::flush = casadi::javaflush;
   casadi::InterruptHandler::checkInterrupted = casadi::javacheckinterrupted;
@@ -101,10 +104,10 @@
   public static final double nan = Double.NaN;
   public static final double pi = Math.PI;
 
-  public static <T> T vertcat(java.util.List<T> x) { return x.isEmpty() ? caJNI.swigCast(new DM(0, 1)) : swigVertcat(x); }
-  public static <T> T horzcat(java.util.List<T> x) { return x.isEmpty() ? caJNI.swigCast(new DM(1, 0)) : swigHorzcat(x); }
-  public static <T> T diagcat(java.util.List<T> x) { return x.isEmpty() ? caJNI.swigCast(new DM(0, 0)) : swigDiagcat(x); }
-  public static <T> T veccat(java.util.List<T> x) { return x.isEmpty() ? caJNI.swigCast(new DM(0, 1)) : swigVeccat(x); }
+  public static <T extends SparsityInterfaceCommon> T vertcat(java.util.List<T> x) { return x.isEmpty() ? caJNI.swigCast(new DM(0, 1)) : swigVertcat(x); }
+  public static <T extends SparsityInterfaceCommon> T horzcat(java.util.List<T> x) { return x.isEmpty() ? caJNI.swigCast(new DM(1, 0)) : swigHorzcat(x); }
+  public static <T extends SparsityInterfaceCommon> T diagcat(java.util.List<T> x) { return x.isEmpty() ? caJNI.swigCast(new DM(0, 0)) : swigDiagcat(x); }
+  public static <T extends SparsityInterfaceCommon> T veccat(java.util.List<T> x) { return x.isEmpty() ? caJNI.swigCast(new DM(0, 1)) : swigVeccat(x); }
 
   public static DM vertcat() { return new DM(0, 1); }
   public static DM horzcat() { return new DM(1, 0); }
@@ -127,10 +130,24 @@
   public static DM veccat(DM... x) { return veccat(java.util.Arrays.asList(x)); }
   public static SX veccat(SX... x) { return veccat(java.util.Arrays.asList(x)); }
   public static MX veccat(MX... x) { return veccat(java.util.Arrays.asList(x)); }
+  // Varargs over a type variable, e.g. M extends Matrix<M>
+  @SafeVarargs
+  public static <T extends SparsityInterfaceCommon> T vertcat(T... x) { return vertcat(java.util.Arrays.asList(x)); }
+  @SafeVarargs
+  public static <T extends SparsityInterfaceCommon> T horzcat(T... x) { return horzcat(java.util.Arrays.asList(x)); }
+  // A row or column of numbers, as Python's horzcat(1, 2)
+  public static DM vertcat(double... x) { return new DM(x); }
+  public static DM horzcat(double... x) { return new DM(new double[][] {x}); }
+
+  public static DM uminus(DM x) { return x.unaryMinus(); }
+  public static SX uminus(SX x) { return x.unaryMinus(); }
+  public static MX uminus(MX x) { return x.unaryMinus(); }
 %}
-// Merged overloads over the matrix types take <T extends GenericMatrix>
-%feature("java:typebound", "GenericMatrix");
-%typemap(javainterfaces) casadi::Matrix<double>, casadi::Matrix<casadi::SXElem>, casadi::MX "AutoCloseable, GenericMatrix"
+// Merged overloads over the matrix types take <T extends GenericMatrix>, with Sparsity <T extends SparsityInterfaceCommon>
+%feature("java:typebound", "GenericMatrix, SparsityInterfaceCommon");
+%typemap(javainterfaces) casadi::Matrix<double> "AutoCloseable, GenericMatrix, Matrix<DM>"
+%typemap(javainterfaces) casadi::Matrix<casadi::SXElem> "AutoCloseable, GenericMatrix, Matrix<SX>"
+%typemap(javainterfaces) casadi::MX "AutoCloseable, GenericMatrix, Matrix<MX>"
 
 %java_type("String", "Ljava/lang/String;", std::string)
 %java_type("java.util.List<String>", "Ljava/util/List;", std::vector<std::string>)
@@ -210,6 +227,17 @@
 %ignore casadi::Slice::Slice(casadi_int i, bool ind1);
 %extend casadi::Slice {
   Slice(casadi_int i) { return new casadi::Slice(i); }
+  %proxycode %{
+  /** All entries, as Python's x[:]; shared, so it cannot be deleted */
+  public static final Slice ALL = new Slice() {
+    @Override
+    public synchronized void delete() {}
+  };
+  /** From start to the end, as Python's x[start:] */
+  public static Slice from(long start) { return new Slice(start, Long.MAX_VALUE); }
+  /** From start to the end in steps, as Python's x[start::step] */
+  public static Slice from(long start, long step) { return new Slice(start, Long.MAX_VALUE, step); }
+  %}
 }
 // Interface-internal macros
 %ignore CASADI_INT_TYPE_STR; %ignore MNAME; %ignore L_INT; %ignore L_BOOL; %ignore LL; %ignore LR;

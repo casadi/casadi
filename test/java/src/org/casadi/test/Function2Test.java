@@ -2599,8 +2599,8 @@ public class Function2Test extends CasadiTestCase {
             Function f = new Function("f", List.of(x, C), List.of(ySin, ca.jacobian(ySin, x), ca.gradient(ySin, x)));
             Function fcse = new Function("fcse", List.of(x, C), List.of(ySin, ca.jacobian(ySin, x), ca.gradient(ySin, x)), opts("cse", true));
             checkfunctionLight(f, fcse, List.of(x0, data));
-            List<Object> hs = ca.hessian(ySin, x);
-            List<MX> outs = new ArrayList<>(List.of(ySin, ca.jacobian(ySin, x), ca.gradient(ySin, x), (MX) hs.get(0), (MX) hs.get(1)));
+            List<MX> hs = ca.hessian(ySin, x);
+            List<MX> outs = new ArrayList<>(List.of(ySin, ca.jacobian(ySin, x), ca.gradient(ySin, x), hs.get(0), hs.get(1)));
             Function f2 = new Function("f", List.of(x, C), outs);
             Function fcse2 = new Function("fcse", List.of(x, C), outs, opts("cse", true));
             checkfunctionLight(f2, fcse2, List.of(x0, data));

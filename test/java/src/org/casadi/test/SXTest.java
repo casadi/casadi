@@ -1526,7 +1526,7 @@ public class SXTest extends CasadiTestCase {
       SX xy = vcat(x, y);
       SX base = x.power(2).plus(ca.times(3.0, y.power(2))).plus(ca.times(0.5, x).times(y));
       SX z = base.plus(ca.times(7.0, x)).plus(ca.times(6.0, y)).plus(7);
-      List<Object> ABc = ca.quadratic_coeff(z, xy);
+      List<SX> ABc = ca.quadratic_coeff(z, xy);
       assertInException("non-quadratic", () -> ca.quadratic_coeff(z.plus(ca.sin(x)), xy));
       assertInException("scalar", () -> ca.quadratic_coeff(xy, x));
 
@@ -1542,7 +1542,7 @@ public class SXTest extends CasadiTestCase {
       assertInException("vector", () -> ca.linear_coeff(ca.blockcat(List.of(List.of(x, y), List.of(y, x))), x));
 
       SX z3 = vcat(ca.times(7.0, x).plus(ca.times(6.0, y)).plus(7), ca.minus(5.0, p.times(y)));
-      List<Object> Ab = ca.linear_coeff(z3, xy);
+      List<SX> Ab = ca.linear_coeff(z3, xy);
       e = ca.mtimes((SX) Ab.get(0), xy).plus((SX) Ab.get(1));
       f = new Function("f", List.of(xy, p), List.of(z3));
       f2 = new Function("f", List.of(xy, p), List.of(e));
@@ -1577,7 +1577,7 @@ public class SXTest extends CasadiTestCase {
       MX xy = vcat(x, y);
       MX base = x.power(2).plus(ca.times(3.0, y.power(2))).plus(ca.times(0.5, x).times(y));
       MX z = base.plus(ca.times(7.0, x)).plus(ca.times(6.0, y)).plus(7);
-      List<Object> ABc = ca.quadratic_coeff(z, xy);
+      List<MX> ABc = ca.quadratic_coeff(z, xy);
       assertInException("non-quadratic", () -> ca.quadratic_coeff(z.plus(ca.sin(x)), xy));
       assertInException("scalar", () -> ca.quadratic_coeff(xy, x));
 
@@ -1593,7 +1593,7 @@ public class SXTest extends CasadiTestCase {
       assertInException("vector", () -> ca.linear_coeff(ca.blockcat(List.of(List.of(x, y), List.of(y, x))), x));
 
       MX z3 = vcat(ca.times(7.0, x).plus(ca.times(6.0, y)).plus(7), ca.minus(5.0, p.times(y)));
-      List<Object> Ab = ca.linear_coeff(z3, xy);
+      List<MX> Ab = ca.linear_coeff(z3, xy);
       e = ca.mtimes((MX) Ab.get(0), xy).plus((MX) Ab.get(1));
       f = new Function("f", List.of(xy, p), List.of(z3));
       f2 = new Function("f", List.of(xy, p), List.of(e));
