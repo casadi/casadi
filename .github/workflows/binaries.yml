@@ -2286,10 +2286,10 @@ jobs:
           pip install numpy scipy pandas looseversion pyright
         shell: pwsh
         if: contains(matrix.image, 'windows')
-      - run: pip install onnx onnxruntime || true
+      - run: pip install --no-deps --require-hashes -r test/python/requirements_onnx.txt && pip install coloredlogs flatbuffers packaging protobuf sympy typing_extensions ml_dtypes || true
         shell: bash -el {0}
         if: "!contains(matrix.image, 'windows')"
-      - run: pip install onnx onnxruntime; exit 0
+      - run: pip install --no-deps --require-hashes -r test/python/requirements_onnx.txt; pip install coloredlogs flatbuffers packaging protobuf sympy typing_extensions ml_dtypes; exit 0
         shell: pwsh
         if: contains(matrix.image, 'windows')
       - env:
