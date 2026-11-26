@@ -27,7 +27,7 @@ import casadi as c
 import numpy
 import unittest
 from types import *
-from helpers import casadiTestCase, codegen_check_digits, memory_heavy, requires_nlpsol
+from helpers import casadiTestCase, codegen_check_digits, memory_heavy, requires_nlpsol, requires_conic
 
 import os
             
@@ -280,6 +280,41 @@ class OCPtests(casadiTestCase):
     self.assertAlmostEqual(-solver_out["f"][0],(2*y0-ca.log(yc0**2/p0+1))/2-ca.log(ca.cos(ca.arctan(yc0/ca.sqrt(p0))+ca.sqrt(p0)*te)),7,"Cost")
     self.assertAlmostEqual(ca.fmax(-solver_out["lam_x"],0)[0],0,8,"Constraint is supposed to be unactive")
     self.assertAlmostEqual(ca.fmax(-solver_out["lam_x"],0)[1],0,8,"Constraint is supposed to be unactive")
+
+  @requires_conic("fatrop")
+  def test_fatrop_conic_multistage_cost(self):
+    # Tracking cost with a linear term in every stage.
+    # Fatrop <= 1.1.8 only evaluated the stage-0 cost gradient in its
+    # per-stage fallback, so the structured conic solve returned a
+    # feasible but wrong optimum.
+    N = 8
+    dt = 0.1
+    ref = numpy.vstack((numpy.sin(numpy.linspace(0, 2, N+1)), numpy.cos(numpy.linspace(0, 2, N+1))))
+    solutions = {}
+    for solver, options in [("qrqp", {"print_iter": False, "print_header": False}),
+                            ("fatrop", {"structure_detection": "none"}),
+                            ("fatrop", {"structure_detection": "auto"})]:
+      opti = ca.Opti('conic')
+      X = opti.variable(4)
+      obj = 0
+      for k in range(N):
+        U = opti.variable(2)
+        X_next = opti.variable(4)
+        opti.subject_to(X_next == ca.vertcat(X[:2] + dt*X[2:] + dt**2/2*U, X[2:] + dt*U))
+        if k == 0:
+          opti.subject_to(X == ca.vertcat(ref[:, 0], 0, 0))
+        opti.subject_to(opti.bounded(-3, X, 3))
+        opti.subject_to(opti.bounded(-10, U, 10))
+        obj += ca.sumsqr(X[:2]-ref[:, k])
+        X = X_next
+      obj += ca.sumsqr(X[:2]-ref[:, N])
+      opti.subject_to(opti.bounded(-3, X, 3))
+      opti.minimize(obj)
+      opti.solver(solver, options)
+      sol = opti.solve()
+      solutions[solver+str(options.get("structure_detection"))] = sol.value(opti.f)
+    for k, v in solutions.items():
+      self.assertAlmostEqual(v, solutions["qrqpNone"], 6, k)
 
   @requires_nlpsol("fatrop")
   @requires_nlpsol("ipopt")
