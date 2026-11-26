@@ -1,10 +1,22 @@
 [package]
 name = "casadi"
-version = "0.1.0"
+version = "3.8.2"
 edition = "2021"
 description = "Rust interface to CasADi, a tool for nonlinear optimization and algorithmic differentiation"
 license = "LGPL-3.0-or-later"
 repository = "https://github.com/casadi/casadi"
+documentation = "https://web.casadi.org/docs/"
+exclude = ["casadi.rs", "gen/", "tests/", "examples", "CMakeLists.txt", "*.i"]
+
+[features]
+from-source = ["casadi-sys/from-source"]
+ipopt = ["casadi-sys/ipopt"]
+osqp = ["casadi-sys/osqp"]
+highs = ["casadi-sys/highs"]
+daqp = ["casadi-sys/daqp"]
+hpipm = ["casadi-sys/hpipm"]
+fatrop = ["casadi-sys/fatrop"]
 
 [dependencies]
-
+casadi-sys = { path = "casadi-sys", version = "=3.8.2" }
+libloading = "0.8"

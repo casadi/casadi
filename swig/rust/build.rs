@@ -1,23 +1,8 @@
 fn main() {
-    // Build tree: CASADI_RUST_GEN holds casadi.rs and the wrapper; installed: casadi.rs here, the libraries one up
-    println!("cargo:rerun-if-env-changed=CASADI_RUST_GEN");
-    let (gen, lib) = match std::env::var("CASADI_RUST_GEN") {
-        Ok(gen) => (gen.clone(), gen),
-        Err(_) => {
-            let dir = std::path::PathBuf::from(std::env::var("CARGO_MANIFEST_DIR").unwrap());
-            (dir.display().to_string(), dir.parent().unwrap().display().to_string())
-        }
-    };
+    // casadi-sys: where casadi.rs and libcasadi_rust_wrap are
+    let gen = std::env::var("DEP_CASADI_RUST_GEN").expect("casadi-sys provided no casadi.rs (docs.rs builds offline)");
+    let lib = std::env::var("DEP_CASADI_LIB").unwrap();
     println!("cargo:rustc-env=CASADI_RUST_GEN={}", gen);
+    println!("cargo:rustc-env=CASADI_LIB_DIR={}", lib);
     println!("cargo:rerun-if-changed={}/casadi.rs", gen);
-    println!("cargo:rustc-link-search=native={}", lib);
-    println!("cargo:rustc-link-lib=dylib=casadi_rust_wrap");
-    // Windows has no rpath: the DLLs are found on PATH
-    if std::env::var("CARGO_CFG_TARGET_OS").unwrap() == "windows" {
-        return;
-    }
-    println!("cargo:rustc-link-arg=-Wl,-rpath,{}", lib);
-    if let Ok(lib) = std::env::var("CASADI_LIB") {
-        println!("cargo:rustc-link-arg=-Wl,-rpath,{}", lib);
-    }
 }

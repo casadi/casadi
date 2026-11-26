@@ -1,0 +1,26 @@
+[package]
+name = "casadi-sys"
+version = "3.8.2"
+edition = "2021"
+description = "CasADi native libraries for the casadi crate: prebuilt download, or built from the CasADi source archive"
+license = "LGPL-3.0-or-later"
+repository = "https://github.com/casadi/casadi"
+links = "casadi"
+build = "build.rs"
+
+[features]
+# Build CasADi from casadi-source-v<version>.zip with cmake instead of downloading prebuilt libraries
+from-source = []
+# Plugins of a source build (prebuilt libraries carry all of them)
+ipopt = ["from-source"]
+osqp = ["from-source"]
+highs = ["from-source"]
+daqp = ["from-source"]
+hpipm = ["from-source"]
+fatrop = ["from-source"]
+
+[build-dependencies]
+cmake = "0.1"
+sha2 = "0.10"
+ureq = "3"
+zip = { version = "2", default-features = false, features = ["deflate"] }

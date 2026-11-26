@@ -93,3 +93,48 @@
 %typemap(out, doc="DM", tsstub_out="DM", noblock=1, fragment="casadi_all") casadi::native_DM {
   if(!($result = swig::from< casadi::DM >($1))) SWIG_exception_fail(SWIG_TypeError,"Failed to convert output to type 'DM'.");
 }
+
+// Plugins and headers next to libcasadi_rust_wrap (as the .NET and Java front-ends)
+%{
+#ifdef _WIN32
+#include <windows.h>
+#else
+#include <dlfcn.h>
+#endif
+#include <sys/stat.h>
+namespace casadi {
+  static std::string rust_library_directory() {
+    std::string path;
+#ifdef _WIN32
+    HMODULE h = 0;
+    char buf[MAX_PATH];
+    if (GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+                           reinterpret_cast<LPCSTR>(&rust_library_directory), &h)
+        && GetModuleFileNameA(h, buf, MAX_PATH)) path = buf;
+#else
+    Dl_info info;
+    if (dladdr(reinterpret_cast<void*>(&rust_library_directory), &info) && info.dli_fname) path = info.dli_fname;
+#endif
+    size_t k = path.find_last_of("/\\");
+    return k == std::string::npos ? std::string() : path.substr(0, k);
+  }
+  static bool rust_is_dir(const std::string& p) {
+    struct stat s;
+    return stat(p.c_str(), &s) == 0 && (s.st_mode & S_IFDIR);
+  }
+} // namespace casadi
+%}
+%init %{
+  {
+    std::string dir = casadi::rust_library_directory();
+    if (!dir.empty()) {
+      casadi::GlobalOptions::setCasadiPath(dir);
+      for (const char* rel : {"/include", "/../include"}) {
+        if (casadi::rust_is_dir(dir + rel)) {
+          casadi::GlobalOptions::setCasadiIncludePath(dir + rel);
+          break;
+        }
+      }
+    }
+  }
+%}

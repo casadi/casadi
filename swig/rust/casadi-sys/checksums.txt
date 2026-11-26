@@ -1,0 +1,1 @@
+# SHA256 of the release assets casadi-sys downloads, written by the publish job

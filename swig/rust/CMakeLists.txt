@@ -4,8 +4,8 @@ cmake_minimum_required(VERSION 3.10.2)
 #   SWIG_EXPORT  -- run SWIG only; emit casadiRUST_wrap.cxx + casadi.rs into gen/
 #   SWIG_IMPORT  -- compile the pre-generated wrapper against an already-built core
 #   neither      -- run SWIG inline, then build
-# The crate (Cargo.toml here) builds against the directory holding casadi.rs and
-# libcasadi_rust_wrap: CASADI_RUST_GEN=<build>/swig/rust.
+# The crate (Cargo.toml here) gets casadi.rs and libcasadi_rust_wrap from casadi-sys; in a build
+# tree, CASADI_RUST_GEN=<build>/swig/rust. -dynamic: the crate loads the wrapper at run time.
 
 set(_iface    ${PROJECT_SOURCE_DIR}/swig/casadi.i)
 set(_wrap_dir ${CMAKE_CURRENT_SOURCE_DIR}/gen)
@@ -34,7 +34,7 @@ if(NOT SWIG_IMPORT)
   configure_file(../swig_config.h.cmake "${CMAKE_CURRENT_BINARY_DIR}/swig_config.h" ESCAPE_QUOTES)
   add_custom_command(
     OUTPUT  ${_swig_cpp} ${_swig_rs}
-    COMMAND ${SWIG_EXECUTABLE} -rust -c++ ${CMAKE_SWIG_FLAGS} -w524,503 ${MAYBE_WERROR}
+    COMMAND ${SWIG_EXECUTABLE} -rust -dynamic -c++ ${CMAKE_SWIG_FLAGS} -w524,503 ${MAYBE_WERROR}
             -I${CMAKE_CURRENT_BINARY_DIR}
             -I${PROJECT_SOURCE_DIR}
             -I${PROJECT_SOURCE_DIR}/swig
@@ -67,4 +67,6 @@ add_custom_command(TARGET casadi_rust POST_BUILD
 install(TARGETS casadi_rust DESTINATION ${LIB_PREFIX})
 install(FILES ${_swig_rs} Cargo.toml build.rs DESTINATION ${LIB_PREFIX}/rust)
 install(DIRECTORY src DESTINATION ${LIB_PREFIX}/rust)
+install(FILES casadi-sys/Cargo.toml casadi-sys/build.rs casadi-sys/checksums.txt DESTINATION ${LIB_PREFIX}/rust/casadi-sys)
+install(DIRECTORY casadi-sys/src DESTINATION ${LIB_PREFIX}/rust/casadi-sys)
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/docs/examples/rust/ DESTINATION ${LIB_PREFIX}/rust/examples FILES_MATCHING PATTERN "*.rs")
