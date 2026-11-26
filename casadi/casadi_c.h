@@ -26,6 +26,8 @@
 #ifndef CASADI_C_H
 #define CASADI_C_H
 
+#include <cstdint>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -39,7 +41,7 @@ extern "C" {
 
 /* Integer type */
 #ifndef casadi_int
-#define casadi_int long long int
+#define casadi_int int64_t
 #endif /* casadi_int */
 
 #endif /* CASADI_CASADI_HPP */
