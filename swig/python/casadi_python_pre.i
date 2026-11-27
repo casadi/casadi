@@ -1,10 +1,26 @@
 // Overrides of stock fragments; fragments are first-registration-wins, so this precedes stl.i
 
+// Descriptor of p if p is a DM, SX or MX but not a subclass, else 0; these define no conversion hooks
+%fragment("casadi_exact_type", "header") {
+namespace casadi {
+  SWIGINTERN swig_type_info* exact_type(PyObject* p) {
+    static swig_type_info* const types[] = {$descriptor(casadi::Matrix<double>*),
+      $descriptor(casadi::Matrix<casadi::SXElem>*), $descriptor(casadi::MX*)};
+    for (swig_type_info* t : types) {
+      SwigPyClientData* cd = static_cast<SwigPyClientData*>(t->clientdata);
+      if (cd && reinterpret_cast<PyObject*>(Py_TYPE(p)) == cd->klass) return t;
+    }
+    return 0;
+  }
+} // namespace casadi
+}
+
 // New reference to p.item() for a size-1 numpy-like object, else 0 (no error left set)
-%fragment("casadi_np_item", "header") {
+%fragment("casadi_np_item", "header", fragment="casadi_exact_type") {
 namespace casadi {
   SWIGINTERN PyObject* np_item(PyObject* p) {
     if (PyErr_Occurred()) PyErr_Clear();
+    if (exact_type(p)) return 0;
     if (!PyObject_HasAttrString(p, "__array__")) return 0;
     PyObject* sz = PyObject_GetAttrString(p, "size");
     if (!sz) { PyErr_Clear(); return 0; }
@@ -255,7 +271,7 @@ SWIG_Python_AppendOutput_Tuple(PyObject* result, PyObject* obj, int is_void) {
 %fragment("casadi_containers", "header", fragment="casadi_aux", fragment="StdVectorTraits",
           fragment="casadi_map_traits", fragment="StdPairTraits", fragment=SWIG_Traits_frag(bool),
           fragment=SWIG_Traits_frag(long long), fragment=SWIG_Traits_frag(double),
-          fragment=SWIG_Traits_frag(std::string)) {
+          fragment=SWIG_Traits_frag(std::string), fragment="casadi_exact_type") {
   namespace swig {
     template<class T, class A> struct traits<std::vector<T, A> > {
       typedef pointer_category category;
@@ -284,6 +300,7 @@ SWIG_Python_AppendOutput_Tuple(PyObject* result, PyObject* obj, int is_void) {
     // Not a sequence: str/bytes/dict/set, objects with a conversion hook, non-1-D shape
     inline bool casadi_not_a_sequence(PyObject* p) {
       if (PyList_CheckExact(p) || PyTuple_CheckExact(p)) return false;
+      if (casadi::exact_type(p)) return true;
       if (PyDict_Check(p) || PyBytes_Check(p) || PySet_Check(p) || PyUnicode_Check(p)) return true;
       if (PyObject_HasAttrString(p, "__MX__") || PyObject_HasAttrString(p, "__SX__")
           || PyObject_HasAttrString(p, "__DM__")) return true;
@@ -417,7 +434,7 @@ SWIG_Python_AppendOutput_Tuple(PyObject* result, PyObject* obj, int is_void) {
 // Host conversions: is_null, full/sparse, casadi_host_conv overloads
 %fragment("casadi_map_traits", "header") {} // Python converts std::map in casadi_containers
 
-%fragment("casadi_host", "header", fragment="casadi_decl") {
+%fragment("casadi_host", "header", fragment="casadi_decl", fragment="casadi_exact_type") {
   namespace casadi {
     bool is_null(GUESTOBJECT *p) {
       return p == Py_None;
@@ -547,6 +564,24 @@ SWIG_Python_AppendOutput_Tuple(PyObject* result, PyObject* obj, int is_void) {
     inline bool casadi_ok(bool ok) {
       if (!ok && PyErr_Occurred()) PyErr_Clear();
       return ok;
+    }
+
+    // An exact DM, SX or MX converts or not by its type alone
+    inline int casadi_host_conv_early(GUESTOBJECT* p, casadi::DM* m) {
+      swig_type_info* t = casadi::exact_type(p);
+      return t && t != $descriptor(casadi::Matrix<double>*) ? casadi_ok(false) : -1;
+    }
+
+    inline int casadi_host_conv_early(GUESTOBJECT* p, casadi::SX* m) {
+      return casadi::exact_type(p) == $descriptor(casadi::MX*) ? casadi_ok(false) : -1;
+    }
+
+    inline int casadi_host_conv_early(GUESTOBJECT* p, casadi::MX* m) {
+      return casadi::exact_type(p) == $descriptor(casadi::Matrix<casadi::SXElem>*) ? casadi_ok(false) : -1;
+    }
+
+    inline int casadi_host_conv_early(GUESTOBJECT* p, casadi::Sparsity* m) {
+      return casadi::exact_type(p) ? casadi_ok(false) : -1;
     }
 
     inline int casadi_host_conv(GUESTOBJECT* p, casadi::Slice* m) {

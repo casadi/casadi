@@ -302,9 +302,22 @@ namespace std {
 
 %fragment("casadi_aux", "header", fragment="casadi_host", fragment="StdTraits") {
   namespace swig {
+    // Host conversions, overloaded per target in casadi_host: 1 converted, 0 rejected, -1 not handled
+    template<class M> int casadi_host_conv_early(GUESTOBJECT*, M*) { return -1; }
+    template<class M> int casadi_host_conv(GUESTOBJECT*, M*) { return -1; }
+    template<class M> int casadi_host_conv_late(GUESTOBJECT*, M*) { return -1; }
+    template<class M> GUESTOBJECT* casadi_host_from(const M&) { return 0; }
+
     // Proxy pointer (SWIG_OLDOBJ) or a new object filled by conv (SWIG_NEWOBJ); m==0: check only
     template<class M> int casadi_asptr(GUESTOBJECT* p, M** m, swig_type_info* desc, bool (*conv)(GUESTOBJECT*, M*)) {
       if (casadi::is_null(p)) return SWIG_ERROR;
+      int early = casadi_host_conv_early(p, static_cast<M*>(0));
+      if (early == 0) return SWIG_ERROR;
+      if (early > 0) {
+        if (!m) return SWIG_OK;
+        casadi_host_conv_early(p, *m = new M());
+        return SWIG_NEWOBJ;
+      }
       if (desc) {
         void* vp = 0;
         if (SWIG_IsOK(SWIG_ConvertPtr(p, m ? &vp : 0, desc, 0))) {
@@ -326,6 +339,8 @@ namespace std {
     // Same, with asref semantics: *m is redirected to the proxy or conv fills **m in place
     template<class M> bool casadi_in_place(GUESTOBJECT* p, M** m, swig_type_info* desc, bool (*conv)(GUESTOBJECT*, M*)) {
       if (casadi::is_null(p)) return false;
+      int early = casadi_host_conv_early(p, static_cast<M*>(0));
+      if (early >= 0) return early && casadi_host_conv_early(p, *m) > 0;
       if (desc) {
         void* vp = 0;
         if (SWIG_IsOK(SWIG_ConvertPtr(p, &vp, desc, 0))) {
@@ -335,11 +350,6 @@ namespace std {
       }
       return conv && CASADI_OK(conv(p, *m));
     }
-
-    // Host conversions, overloaded per target in casadi_host: 1 converted, 0 rejected, -1 not handled
-    template<class M> int casadi_host_conv(GUESTOBJECT*, M*) { return -1; }
-    template<class M> int casadi_host_conv_late(GUESTOBJECT*, M*) { return -1; }
-    template<class M> GUESTOBJECT* casadi_host_from(const M&) { return 0; }
   } // namespace swig
 }
 
