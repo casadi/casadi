@@ -434,7 +434,8 @@ SWIG_Python_AppendOutput_Tuple(PyObject* result, PyObject* obj, int is_void) {
 // Host conversions: is_null, full/sparse, casadi_host_conv overloads
 %fragment("casadi_map_traits", "header") {} // Python converts std::map in casadi_containers
 
-%fragment("casadi_host", "header", fragment="casadi_decl", fragment="casadi_exact_type") {
+%fragment("casadi_host", "header", fragment="casadi_decl", fragment="casadi_exact_type",
+          fragment=SWIG_AsVal_frag(double)) {
   namespace casadi {
     bool is_null(GUESTOBJECT *p) {
       return p == Py_None;
@@ -566,17 +567,38 @@ SWIG_Python_AppendOutput_Tuple(PyObject* result, PyObject* obj, int is_void) {
       return ok;
     }
 
-    // An exact DM, SX or MX converts or not by its type alone
+    // A float or int, but not a subclass, that fits in a double
+    inline bool casadi_exact_scalar(GUESTOBJECT* p, double* d) {
+      if (!PyFloat_CheckExact(p) && !PyLong_CheckExact(p)) return false;
+      return casadi_ok(SWIG_IsOK(SWIG_AsVal(double)(p, d)));
+    }
+
+    // An exact float, int, DM, SX or MX converts or not by its type alone
     inline int casadi_host_conv_early(GUESTOBJECT* p, casadi::DM* m) {
+      double d;
+      if (casadi_exact_scalar(p, &d)) {
+        if (m) *m = d;
+        return true;
+      }
       swig_type_info* t = casadi::exact_type(p);
       return t && t != $descriptor(casadi::Matrix<double>*) ? casadi_ok(false) : -1;
     }
 
     inline int casadi_host_conv_early(GUESTOBJECT* p, casadi::SX* m) {
+      double d;
+      if (casadi_exact_scalar(p, &d)) {
+        if (m) *m = casadi::DM(d);
+        return true;
+      }
       return casadi::exact_type(p) == $descriptor(casadi::MX*) ? casadi_ok(false) : -1;
     }
 
     inline int casadi_host_conv_early(GUESTOBJECT* p, casadi::MX* m) {
+      double d;
+      if (casadi_exact_scalar(p, &d)) {
+        if (m) *m = casadi::DM(d);
+        return true;
+      }
       return casadi::exact_type(p) == $descriptor(casadi::Matrix<casadi::SXElem>*) ? casadi_ok(false) : -1;
     }
 
