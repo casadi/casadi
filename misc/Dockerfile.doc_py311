@@ -1,0 +1,15 @@
+# ghcr.io/casadi/ci-doc:py311 -- ci-doc (Dockerfile.doc, Ubuntu 22.04) with a Python 3.11 venv ahead of the
+# system 3.10, since casadi's python build is cp311-abi3
+FROM ghcr.io/casadi/ci-doc@sha256:60c474fe1802c04e633458ea6fc58aeae80243c44cc98bcc03c76455ff85e3e4
+
+RUN sudo apt-get update && sudo apt install software-properties-common -y && sudo add-apt-repository -y ppa:deadsnakes/ppa \
+    && sudo apt-get update && sudo apt install python3.11 python3.11-venv python3.11-dev -y && sudo rm -rf /var/lib/apt/lists/*
+RUN python3.11 -m venv /home/developer/venv
+ENV PATH="/home/developer/venv/bin:${PATH}"
+
+COPY doc_constraints.txt /tmp/constraints.txt
+COPY doc_requirements.txt /tmp/requirements.txt
+RUN cd /tmp && pip install --no-cache-dir -c constraints.txt numpy scipy matplotlib nbconvert ipython ipykernel jupytext pydot lxml ipdb texttable OMPython OMSimulator python-baseconv \
+    && pip install --no-cache-dir -c constraints.txt -r requirements.txt
+
+RUN ipython kernel install --name "python3" --user

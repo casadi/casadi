@@ -7,6 +7,7 @@ docker push ghcr.io/casadi/build-wasm:latest
 #docker build -t ghcr.io/casadi/coinbuild:latest -f Dockerfile.coinbuild .
 #cp ../docs/users_guide/requirements.txt doc_requirements.txt
 #docker build -t ghcr.io/casadi/ci-doc:latest -f Dockerfile.doc .
+#docker build -t ghcr.io/casadi/ci-doc:py311 -f Dockerfile.doc_py311 .
 
 docker build -t ghcr.io/casadi/web:latest -f Dockerfile.web .
 # docker push
