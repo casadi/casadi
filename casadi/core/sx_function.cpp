@@ -1391,6 +1391,10 @@ namespace casadi {
                   if (m.res[offset+j]>=0) w[m.res[offset+j]] = ret[k];
                   k++;
                 }
+              } else {
+                for (casadi_int j=0;j<m.f_nnz_out[i];++j) {
+                  if (m.res[offset+j]>=0) w[m.res[offset+j]] = 0;
+                }
               }
               offset += m.f_nnz_out[i];
             }

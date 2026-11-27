@@ -2175,6 +2175,20 @@ class SXtests(casadiTestCase):
     n = F(x0)
     print(n + Ff(x0,n,x-x0))
     print(ca.taylor(y,x,x0))
+
+  def test_call_non_diff_out_fwd(self):
+    # Forward sweep left a stale sensitivity for an is_diff_out=false call output
+    x = ca.SX.sym("x", 2)
+    F = ca.Function("F", [x], [x[0]*x[1], ca.sin(x[0])+x[1]],
+                    {"is_diff_out": [True, False], "never_inline": True})
+    G = F(x)[1]
+    e = G**3 + x[0]*G
+    x0 = ca.DM([1, 2])
+    ref = ca.horzcat(ca.sin(1)+2, 0)
+    for opts in [{"allow_reverse": False}, {"allow_forward": False}]:
+      J = ca.Function("J", [x], [ca.jacobian(e, x, opts)])
+      self.checkarray(J(x0), ref)
+
   def test_numpy_style_methods(self):
     # The %pythoncode method spellings (x.sin(), x.fmod(y), ...) mirror the
     # free functions; fmod used to call a non-existent _casadi.mod.
