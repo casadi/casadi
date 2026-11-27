@@ -284,7 +284,7 @@ static int ComputeStepROBUST(Mat3 A, SDPConeVec *Q, int m, SDPConeVec W, SDPCone
 
   DSDPFunctionBegin;
 
-  memset((void*)darray,0,m*m*sizeof(double));
+  memset((void*)darray,0,(size_t)m*m*sizeof(double));
   if (A->type==1){
     for (i=0; i<m; i++){ darray[i*m+i]=-1.0;}
   } else {

@@ -2460,7 +2460,7 @@ returnValue SQProblemSchur::backsolveSchurQR( int_t dimS, const real_t* const rh
     TRTRS( "U", "N", "N", &M, &NRHS, R_, &LDA, sol, &LDC, &INFO QPOASES_BLAS_CALL_LEN_3);
     if ( INFO != 0 )
     {
-        MyPrintf("TRTRS returns INFO = %d\n", INFO);
+        MyPrintf("TRTRS returns INFO = %d\n", (int)INFO);
         return RET_QR_FACTORISATION_FAILED;
     }
 

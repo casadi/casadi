@@ -204,7 +204,7 @@ static int CreateEigenLocker(Eigen **EE,int iptr[], int neigs, int n){
 
     DSDPCALLOC1(&E,Eigen,&info);DSDPCHKERR(info);
     DSDPCALLOC2(&E->eigval,double,neigs,&info);DSDPCHKERR(info);
-    DSDPCALLOC2(&E->an,double,n*neigs,&info);DSDPCHKERR(info);
+    DSDPCALLOC2(&E->an,double,(size_t)n*neigs,&info);DSDPCHKERR(info);
     E->neigs=neigs;
     E->cols=0;
     E->nnz=0;
@@ -512,13 +512,13 @@ static int VechMatComputeEigs(vechmat* AA,double DD[], int nn0, double W[], int 
     DSDPCALLOC2(&dmatarray,double,(nsub*nsub),&info); DSDPCHKERR(info);
     ownarray1=1;
   }
-  memset((void*)dmatarray,0,nsub*nsub*sizeof(double));
+  memset((void*)dmatarray,0,(size_t)nsub*nsub*sizeof(double));
   if (nsub*nsub>nn2){
     DSDPCALLOC2(&dworkarray,double,(nsub*nsub),&info); DSDPCHKERR(info);
     ownarray2=1;
   }
 
-  if (nsub*nsub*sizeof(long int)>nn0*sizeof(double)){
+  if ((size_t)nsub*nsub*sizeof(long int)>nn0*sizeof(double)){
     DSDPCALLOC2(&i2darray,long int,(nsub*nsub),&info); DSDPCHKERR(info);
     ownarray3=1;
   }
@@ -537,7 +537,7 @@ static int VechMatComputeEigs(vechmat* AA,double DD[], int nn0, double W[], int 
   info=DSDPGetEigs(dmatarray,nsub,dworkarray,nsub*nsub,i2darray,nsub*nsub,
 		   W,nsub,WORK,n1,iiptr+3*n,n2-3*n);
   if (info){
-    memset((void*)dmatarray,0,nsub*nsub*sizeof(double));
+    memset((void*)dmatarray,0,(size_t)nsub*nsub*sizeof(double));
     for (i=0,k=0; k<nonzeros; k++){
       getij(ind[k]-ishift,n,&i,&j);
       dmatarray[perm[i]*nsub+perm[j]] += val[k];

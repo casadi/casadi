@@ -218,7 +218,7 @@ static int SMatInverseAddP(void *S, double alpha, double v[], int nn, int n){
 
 static int SMatInverseAddU(void *S, double alpha, double v[], int nn, int n){
   spmat* SS=(spmat*)S;
-  ffinteger n2=n*n,ione=1;
+  ffinteger n2=(ffinteger)n*n,ione=1;
   double *x,*b,*ss=SS->sinv;
   int i,j,k=0;
 
@@ -312,7 +312,7 @@ static int dcholmatcreate(int n, char UPLQ, chfac *sp,
 static int dcholmatsinverse(int n, spmat *S1, spmat *S2){
   int info;
   double *ssinv;
-  DSDPCALLOC2(&ssinv,double,n*n,&info);
+  DSDPCALLOC2(&ssinv,double,(size_t)n*n,&info);
   S1->sinv=ssinv; S2->sinv=ssinv; S2->dsinv=1;
   return 0;
 }

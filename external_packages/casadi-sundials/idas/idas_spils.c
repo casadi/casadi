@@ -356,7 +356,7 @@ int IDASpilsGetWorkSpace(void *ida_mem, long int *lenrwLS, long int *leniwLS)
   switch(ils_type) {
   case SPILS_SPGMR:
     maxl = idaspils_mem->s_maxl;
-    *lenrwLS = lrw1*(maxl + 6) + maxl*(maxl + 4) + 1;
+    *lenrwLS = lrw1*(maxl + 6) + (long int)maxl*(maxl + 4) + 1;
     *leniwLS = liw1*(maxl + 6);
     break;
   case SPILS_SPBCG:

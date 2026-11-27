@@ -438,7 +438,7 @@ void KINInfoHandler(const char *module, const char *function,
  */
 
 #define INFO_RETVAL    "Return value: %d"
-#define INFO_ADJ       "no. of lambda adjustments = %ld"
+#define INFO_ADJ       "no. of lambda adjustments = %d"
 
 #if defined(SUNDIALS_EXTENDED_PRECISION)
 

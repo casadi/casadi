@@ -302,9 +302,9 @@ returnValue readFromFile(   real_t* data, int_t nrow, int_t ncol,
         for( j=0; j<ncol; ++j )
         {
             #ifdef __USE_SINGLE_PRECISION__
-            if ( fscanf( datafile, "%f ", &float_data ) == 0 )
+            if ( fscanf( datafile, "%f ", &float_data ) != 1 )
             #else
-            if ( fscanf( datafile, "%lf ", &float_data ) == 0 )
+            if ( fscanf( datafile, "%lf ", &float_data ) != 1 )
             #endif /* __USE_SINGLE_PRECISION__ */
             {
                 fclose( datafile );
@@ -365,9 +365,9 @@ returnValue readFromFile(   int_t* data, int_t n,
     for( i=0; i<n; ++i )
     {
         #ifdef __USE_LONG_INTEGERS__
-        if ( fscanf( datafile, "%ld\n", &(data[i]) ) == 0 )
+        if ( fscanf( datafile, "%ld\n", &(data[i]) ) != 1 )
         #else
-        if ( fscanf( datafile, "%d\n", &(data[i]) ) == 0 )
+        if ( fscanf( datafile, "%d\n", &(data[i]) ) != 1 )
         #endif
         {
             fclose( datafile );

@@ -3302,7 +3302,7 @@ int CVodeGetQuadDky(void *cvode_mem, realtype t, int k, N_Vector dkyQ)
   tp = tn - hu - tfuzz;
   tn1 = tn + tfuzz;
   if ((t-tp)*(t-tn1) > ZERO) {
-    cvProcessError(cv_mem, CV_BAD_T, "CVODES", "CVodeGetQuadDky", MSGCV_BAD_T);
+    cvProcessError(cv_mem, CV_BAD_T, "CVODES", "CVodeGetQuadDky", MSGCV_BAD_T, t, tn-hu, tn);
     return(CV_BAD_T);
   }
   
@@ -3466,7 +3466,7 @@ int CVodeGetSensDky1(void *cvode_mem, realtype t, int k, int is, N_Vector dkyS)
   tp = tn - hu - tfuzz;
   tn1 = tn + tfuzz;
   if ((t-tp)*(t-tn1) > ZERO) {
-    cvProcessError(cv_mem, CV_BAD_T, "CVODES", "CVodeGetSensDky1", MSGCV_BAD_T);
+    cvProcessError(cv_mem, CV_BAD_T, "CVODES", "CVodeGetSensDky1", MSGCV_BAD_T, t, tn-hu, tn);
     return(CV_BAD_T);
   }
   
@@ -3605,7 +3605,7 @@ int CVodeGetQuadSensDky1(void *cvode_mem, realtype t, int k, int is, N_Vector dk
   tp = tn - hu - tfuzz;
   tn1 = tn + tfuzz;
   if ((t-tp)*(t-tn1) > ZERO) {
-    cvProcessError(cv_mem, CV_BAD_T, "CVODES", "CVodeGetQuadSensDky1", MSGCV_BAD_T);
+    cvProcessError(cv_mem, CV_BAD_T, "CVODES", "CVodeGetQuadSensDky1", MSGCV_BAD_T, t, tn-hu, tn);
     return(CV_BAD_T);
   }
   
@@ -4073,8 +4073,8 @@ static booleantype cvSensAllocVectors(CVodeMem cv_mem, N_Vector tmpl)
   }
 
   /* Update solver workspace lengths */
-  lrw += (qmax + 6)*Ns*lrw1 + Ns;
-  liw += (qmax + 6)*Ns*liw1 + Ns;
+  lrw += (long int)(qmax + 6)*Ns*lrw1 + Ns;
+  liw += (long int)(qmax + 6)*Ns*liw1 + Ns;
   
   /* Store the value of qmax used here */
   cv_mem->cv_qmax_allocS = qmax;
@@ -4105,8 +4105,8 @@ static void cvSensFreeVectors(CVodeMem cv_mem)
   free(pbar); pbar = NULL;
   free(plist); plist = NULL;
 
-  lrw -= (maxord + 6)*Ns*lrw1 + Ns;
-  liw -= (maxord + 6)*Ns*liw1 + Ns;
+  lrw -= (long int)(maxord + 6)*Ns*lrw1 + Ns;
+  liw -= (long int)(maxord + 6)*Ns*liw1 + Ns;
 
   if (cv_mem->cv_VabstolSMallocDone) {
     N_VDestroyVectorArray(VabstolS, Ns);
@@ -4187,8 +4187,8 @@ static booleantype cvQuadSensAllocVectors(CVodeMem cv_mem, N_Vector tmpl)
   }
 
   /* Update solver workspace lengths */
-  lrw += (qmax + 5)*Ns*lrw1Q;
-  liw += (qmax + 5)*Ns*liw1Q;
+  lrw += (long int)(qmax + 5)*Ns*lrw1Q;
+  liw += (long int)(qmax + 5)*Ns*liw1Q;
 
   /* Store the value of qmax used here */
   cv_mem->cv_qmax_allocQS = qmax;
@@ -4217,8 +4217,8 @@ static void cvQuadSensFreeVectors(CVodeMem cv_mem)
   
   for (j=0; j<=maxord; j++) N_VDestroyVectorArray(znQS[j], Ns);  
 
-  lrw -= (maxord + 5)*Ns*lrw1Q;
-  liw -= (maxord + 5)*Ns*liw1Q;
+  lrw -= (long int)(maxord + 5)*Ns*lrw1Q;
+  liw -= (long int)(maxord + 5)*Ns*liw1Q;
 
   if (cv_mem->cv_VabstolQSMallocDone) {
     N_VDestroyVectorArray(VabstolQS, Ns);

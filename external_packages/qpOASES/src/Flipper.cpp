@@ -144,10 +144,10 @@ returnValue Flipper::get(   Bounds* const _bounds,
         *_constraints = constraints;
 
     if ( ( _R != 0 ) && ( R != 0 ) )
-        memcpy( _R,R, nV*nV*sizeof(real_t) );
+        memcpy( _R,R, (size_t)nV*nV*sizeof(real_t) );
 
     if ( ( _Q != 0 ) && ( Q != 0 ) )
-        memcpy( _Q,Q, nV*nV*sizeof(real_t) );
+        memcpy( _Q,Q, (size_t)nV*nV*sizeof(real_t) );
 
     if ( ( _T != 0 ) && ( T != 0 ) )
         memcpy( _T,T, getDimT()*sizeof(real_t) );
@@ -177,7 +177,7 @@ returnValue Flipper::set(   const Bounds* const _bounds,
         if ( R == 0 )
             R = new real_t[nV*nV];
 
-        memcpy( R,_R, nV*nV*sizeof(real_t) );
+        memcpy( R,_R, (size_t)nV*nV*sizeof(real_t) );
     }
 
     if ( _Q != 0 )
@@ -185,7 +185,7 @@ returnValue Flipper::set(   const Bounds* const _bounds,
         if ( Q == 0 )
             Q = new real_t[nV*nV];
 
-        memcpy( Q,_Q, nV*nV*sizeof(real_t) );
+        memcpy( Q,_Q, (size_t)nV*nV*sizeof(real_t) );
     }
 
     if ( _T != 0 )

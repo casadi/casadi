@@ -1113,8 +1113,8 @@ returnValue SparseMatrix::times(const Indexlist* const irows, const Indexlist* c
 
     // First, work with full, unordered copy of y and store matrix times x in there
     const int_t yfullLength = nRows;
-    real_t* ytmp = new real_t[xN*yfullLength];
-    for (k = 0; k < xN*yfullLength; k++)
+    real_t* ytmp = new real_t[(long)xN*yfullLength];
+    for (k = 0; k < (long)xN*yfullLength; k++)
         ytmp[k] = 0.0;
 
     if (icols!=0)

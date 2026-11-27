@@ -341,9 +341,10 @@ int DSDPCGSetup(DSDPCG *sles,DSDPVec X){
 #define __FUNCT__ "DSDPCGDestroy"
 int DSDPCGDestroy(DSDPCG **ssles){
   int info;
-  DSDPCG *sles=*ssles;
+  DSDPCG *sles;
   DSDPFunctionBegin;
-  if (ssles==0 || sles==0){DSDPFunctionReturn(0);}
+  if (ssles==0 || *ssles==0){DSDPFunctionReturn(0);}
+  sles=*ssles;
   if (sles->setup2==1){
     info = DSDPVecDestroy(&sles->R); DSDPCHKERR(info);
     info = DSDPVecDestroy(&sles->P); DSDPCHKERR(info);

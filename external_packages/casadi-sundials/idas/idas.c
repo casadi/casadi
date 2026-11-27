@@ -3657,8 +3657,8 @@ static booleantype IDASensAllocVectors(IDAMem IDA_mem, N_Vector tmpl)
   }
 
   /* Update solver workspace lengths */
-  lrw += maxcol*Ns*lrw1;
-  liw += maxcol*Ns*liw1;
+  lrw += (long int)maxcol*Ns*lrw1;
+  liw += (long int)maxcol*Ns*liw1;
 
   /* Allocate space for pbar and plist */
 
@@ -3801,8 +3801,8 @@ static booleantype IDAQuadSensAllocVectors(IDAMem IDA_mem, N_Vector tmpl)
   }
 
   /* Update solver workspace lengths */
-  lrw += (maxcol + 5)*Ns*lrw1Q;
-  liw += (maxcol + 5)*Ns*liw1Q;
+  lrw += (long int)(maxcol + 5)*Ns*lrw1Q;
+  liw += (long int)(maxcol + 5)*Ns*liw1Q;
 
   return(TRUE);
 }
@@ -3828,8 +3828,8 @@ static void IDAQuadSensFreeVectors(IDAMem IDA_mem)
 
   for (j=0; j<=maxcol; j++) N_VDestroyVectorArray(phiQS[j], Ns);  
 
-  lrw -= (maxcol + 5)*Ns*lrw1Q;
-  liw -= (maxcol + 5)*Ns*liw1Q;
+  lrw -= (long int)(maxcol + 5)*Ns*lrw1Q;
+  liw -= (long int)(maxcol + 5)*Ns*liw1Q;
 
   if (IDA_mem->ida_VatolQSMallocDone) {
     N_VDestroyVectorArray(VatolQS, Ns);
@@ -3907,7 +3907,7 @@ int IDAInitialSetup(IDAMem IDA_mem)
     retval = rhsQ(tn, phi[0], phi[1], phiQ[1], user_data);
     nrQe++;
     if (retval < 0) {
-      IDAProcessError(IDA_mem, IDA_QRHS_FAIL, "IDAS", "IDAInitialSetup", MSG_QRHSFUNC_FAILED);
+      IDAProcessError(IDA_mem, IDA_QRHS_FAIL, "IDAS", "IDAInitialSetup", MSG_QRHSFUNC_FAILED, tn);
       return(IDA_QRHS_FAIL);
     } else if (retval > 0) {
       IDAProcessError(IDA_mem, IDA_FIRST_QRHS_ERR, "IDAS", "IDAInitialSetup", MSG_QRHSFUNC_FIRST);
@@ -3957,8 +3957,8 @@ int IDAInitialSetup(IDAMem IDA_mem)
     retval = rhsQS(Ns, tn, phi[0], phi[1], phiS[0], phiS[1], phiQ[1], phiQS[1], user_dataQS, tmpS1, tmpS2, tmpS3);
     nrQSe++;
     if (retval < 0) {
-      IDAProcessError(IDA_mem, IDA_QSRHS_FAIL, "IDAS", "IDAInitialSetup", MSG_QSRHSFUNC_FAILED);
-      return(IDA_QRHS_FAIL);
+      IDAProcessError(IDA_mem, IDA_QSRHS_FAIL, "IDAS", "IDAInitialSetup", MSG_QSRHSFUNC_FAILED, tn);
+      return(IDA_QSRHS_FAIL);
     } else if (retval > 0) {
       IDAProcessError(IDA_mem, IDA_FIRST_QSRHS_ERR, "IDAS", "IDAInitialSetup", MSG_QSRHSFUNC_FIRST);
       return(IDA_FIRST_QSRHS_ERR);

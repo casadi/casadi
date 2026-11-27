@@ -850,7 +850,7 @@ static int DTRUMatOuterProduct(void* AA, double alpha, double x[], int n){
 
 static int DenseSymPSDNormF2(void* AA, int n, double *dddot){
   dtrumat* A=(dtrumat*) AA;
-  ffinteger ione=1,nn=A->n*A->n;
+  ffinteger ione=1,nn=(ffinteger)A->n*A->n;
   double dd,tt=sqrt(0.5),*val=A->val;
   int info;
   info=DTRUMatScaleDiagonal(AA,tt);
@@ -1060,7 +1060,7 @@ static int DTRUMatGetRowAdd(void* AA, int nrow, double ytmp, double row[], int n
   ffinteger i,nnn=n;
   double *v=A->val;
 
-  nnn=nrow*n;
+  nnn=(ffinteger)nrow*n;
   for (i=0;i<=nrow;i++){
     row[i]+=ytmp*v[nnn+i];
   }
@@ -1191,7 +1191,7 @@ static int CreateEigenLocker(Eigen **EE,int neigs, int n){
 
   DSDPCALLOC1(&E,Eigen,&info);DSDPCHKERR(info);
   DSDPCALLOC2(&E->eigval,double,neigs,&info);DSDPCHKERR(info);
-  DSDPCALLOC2(&E->an,double,n*neigs,&info);DSDPCHKERR(info);
+  DSDPCALLOC2(&E->an,double,(size_t)n*neigs,&info);DSDPCHKERR(info);
   E->neigs=neigs;
   *EE=E;
   return 0;
@@ -1329,14 +1329,14 @@ static int DvecumatComputeEigs(dvecumat* AA,double DD[], int nn0, double W[], in
     DSDPCALLOC2(&dmatarray,double,(n*n),&info); DSDPCHKERR(info);
     ownarray1=1;
   }
-  memcpy((void*)dmatarray,(void*)val,n*n*sizeof(double));
+  memcpy((void*)dmatarray,(void*)val,(size_t)n*n*sizeof(double));
 
   if (n*n>nn2){
     DSDPCALLOC2(&dworkarray,double,(n*n),&info); DSDPCHKERR(info);
     ownarray2=1;
   }
 
-  if (n*n*sizeof(long int)>nn0*sizeof(double)){
+  if ((size_t)n*n*sizeof(long int)>nn0*sizeof(double)){
     DSDPCALLOC2(&i2darray,long int,(n*n),&info); DSDPCHKERR(info);
     ownarray3=1;
   }
@@ -1346,7 +1346,7 @@ static int DvecumatComputeEigs(dvecumat* AA,double DD[], int nn0, double W[], in
   info=DSDPGetEigs(dmatarray,n,dworkarray,n*n,i2darray,n*n,
 		   W,n,WORK,n1,iiptr,n2);
   if (info){
-    memcpy((void*)dmatarray,(void*)val,n*n*sizeof(double));
+    memcpy((void*)dmatarray,(void*)val,(size_t)n*n*sizeof(double));
     info=DSDPGetEigs2(dmatarray,n,dworkarray,n*n,i2darray,n*n,
 		      W,n,WORK,n1,iiptr+3*n,n2-3*n); DSDPCHKERR(info);
   } 

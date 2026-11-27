@@ -139,9 +139,9 @@ static int KSDPConeComputeSS(void *K, DSDPVec Y, DSDPDualFactorMatrix flag, DSDP
       info=DSDPDualMatCholeskyFactor(SS,&psdefinite); DSDPCHKBLOCKERR(kk,info);
       if (psdefinite == DSDP_FALSE){
 	if (flag==DUAL_FACTOR){
-	  DSDPLogInfo(0,2,"Dual SDP Block %2.0f not PSD\n",kk);
+	  DSDPLogInfo(0,2,"Dual SDP Block %d not PSD\n",kk);
 	} else {
-	  DSDPLogInfo(0,2,"Primal SDP Block %2.0f not PSD\n",kk);
+	  DSDPLogInfo(0,2,"Primal SDP Block %d not PSD\n",kk);
 	}
       }
       break;

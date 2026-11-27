@@ -827,7 +827,7 @@ static int DvechmatView(void* AA){
 static int CreateEigenLocker(Eigen *E,int neigs, int n){
   int info;
   DSDPCALLOC2(&E->eigval,double,neigs,&info);DSDPCHKERR(info);
-  DSDPCALLOC2(&E->an,double,n*neigs,&info);DSDPCHKERR(info);
+  DSDPCALLOC2(&E->an,double,(size_t)n*neigs,&info);DSDPCHKERR(info);
   E->neigs=neigs;
   return 0;
 }
@@ -966,14 +966,14 @@ static int DvechmatComputeEigs(dvechmat* AA,double DD[], int nn0, double W[], in
     DSDPCALLOC2(&dmatarray,double,(n*n),&info); DSDPCHKERR(info);
     ownarray1=1;
   }
-  memset((void*)dmatarray,0,n*n*sizeof(double));
+  memset((void*)dmatarray,0,(size_t)n*n*sizeof(double));
 
   if (n*n>nn2){
     DSDPCALLOC2(&dworkarray,double,(n*n),&info); DSDPCHKERR(info);
     ownarray2=1;
   }
 
-  if (n*n*sizeof(long int)>nn0*sizeof(double)){
+  if ((size_t)n*n*sizeof(long int)>nn0*sizeof(double)){
     DSDPCALLOC2(&i2darray,long int,(n*n),&info); DSDPCHKERR(info);
     ownarray3=1;
   }

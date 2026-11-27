@@ -150,7 +150,7 @@ int SDPConeComputeX3(SDPCone sdpcone, int blockj, double mu, DSDPVec Y,DSDPVec D
   info=DSDPDualMatSetArray(SS,X); DSDPCHKBLOCKERR(blockj,info);
   info=DSDPDualMatCholeskyFactor(SS,&psdefinite1); DSDPCHKBLOCKERR(blockj,info);
   if (psdefinite1 == DSDP_FALSE){
-    DSDPLogInfo(0,2,"Primal SDP Block %2.0f not PSD\n",blockj);
+    DSDPLogInfo(0,2,"Primal SDP Block %d not PSD\n",blockj);
   }
   info=DSDPDualMatInvert(SS);DSDPCHKBLOCKERR(blockj,info);
   info=SDPConeComputeXX(sdpcone,blockj,DY,mu,SS,X);DSDPCHKBLOCKERR(blockj,info);

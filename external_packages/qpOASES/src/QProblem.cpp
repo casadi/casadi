@@ -1217,7 +1217,7 @@ returnValue QProblem::copy( const QProblem& rhs
     if ( rhs.Q != 0 )
     {
         Q = new real_t[_nV*_nV];
-        memcpy( Q,rhs.Q,_nV*_nV*sizeof(real_t) );
+        memcpy( Q,rhs.Q,(size_t)_nV*_nV*sizeof(real_t) );
     }
     else
         Q = 0;
