@@ -238,6 +238,10 @@ void casadi_uno_solve(casadi_uno_data<T1>* d) {
     uno_set_constraints_upper_bounds(d->model, d_nlp->ubz + nx);
   }
   uno_set_initial_primal_iterate(d->model, d_nlp->x0);
+  // Initial constraint multipliers: lam_g0, zero if not given.
+  // Same sign convention as CasADi (UNO_MULTIPLIER_POSITIVE).
+  // Always set, so a warm start of an earlier solve does not linger in the model.
+  if (ng > 0) uno_set_initial_dual_iterate(d->model, d_nlp->lam + nx);
 
   uno_optimize(d->solver, d->model);
 
