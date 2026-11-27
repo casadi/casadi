@@ -132,6 +132,11 @@ jobs:
         prerelease: true
       if: github.event_name != 'pull_request'
     - run: python setup.py sdist && ls && ls dist
+    - uses: actions/upload-artifact@v7.0.1
+      with:
+        name: sdist
+        path: dist/*.tar.gz
+        retention-days: 5
     - name: Delete old release assets
       uses: jgillis/delete-release-assets@codex/bump-runtime-node24
       with:
@@ -1058,6 +1063,51 @@ jobs:
         working-directory: casadi-wasm
         run: npm publish --provenance --access public --tag '${{ steps.npmver.outputs.tag }}'
 
+  # The wheels and sdist this run built, uploaded with PEP 740 attestations
+  publish-pypi:
+    needs: [version, swig, python-dockcross, python-osx]
+    runs-on: ubuntu-24.04
+    environment:
+      name: pypi
+      url: https://pypi.org/p/casadi
+    if: ${{ contains(github.ref, 'release-') && github.event_name != 'pull_request' }}
+    permissions:
+      contents: read
+      id-token: write          # OIDC token, required for PyPI Trusted Publishing
+    steps:
+      - uses: actions/download-artifact@v8.0.1
+        with:
+          pattern: wheel-*
+          merge-multiple: true
+          path: dist
+      - uses: actions/download-artifact@v8.0.1
+        with:
+          name: sdist
+          path: dist
+      - name: Check the version and the files
+        run: |
+          v='${{ needs.version.outputs.wheel }}'
+          [[ "$v" =~ ^[0-9]+\.[0-9]+\.[0-9]+([.]?(a|b|rc|alpha|beta)[.]?[0-9]+)?$ ]] || { echo "refusing to publish: '$v' is not a release version"; exit 1; }
+          ls -l dist
+          test -f "dist/casadi-$v.tar.gz" || { echo "no sdist casadi-$v.tar.gz (CASADI_IS_RELEASE not set?)"; exit 1; }
+          for f in dist/*; do case "$(basename "$f")" in casadi-$v-*.whl|casadi-$v.tar.gz) ;; *) echo "unexpected file $f"; exit 1;; esac; done
+      - name: Smoke test a wheel before publishing
+        run: |
+          python3 -m venv venv
+          venv/bin/pip install -q dist/casadi-${{ needs.version.outputs.wheel }}-cp311-abi3-manylinux_2_28_x86_64.whl
+          cd venv && bin/python -c '
+          import casadi as ca
+          x = ca.MX.sym("x", 2)
+          S = ca.nlpsol("S", "ipopt", {"x": x, "f": ca.sumsqr(x), "g": x[0] + x[1] - 10},
+                        {"print_time": False, "ipopt.print_level": 0, "ipopt.sb": "yes"})
+          sol = S(lbg=0, ubg=0)
+          assert abs(sol["x"] - 5).full().max() < 1e-6, sol["x"]
+          print("smoke OK:", sol["x"])
+          '
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          skip-existing: true
+
   test-python-source-package:
     if: ${{ contains(github.event.head_commit.message, '[ci:run_slow]') }}
     runs-on: ${{ matrix.image }}
@@ -1368,6 +1418,12 @@ jobs:
           pip install abi3audit
           abi3audit --strict --report ${{ steps.wheel.outputs.wheel }}
         shell: bash -el {0}
+      # publish-pypi uploads the wheels of this run
+      - uses: actions/upload-artifact@v7.0.1
+        with:
+          name: wheel-${{ steps.wheel.outputs.wheel }}
+          path: ${{ steps.wheel.outputs.wheel }}
+          retention-days: 5
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.4.1
       - name: Delete old release assets
@@ -1755,6 +1811,12 @@ jobs:
           pip install abi3audit
           abi3audit --strict --report ${{ steps.wheel.outputs.wheel }}
         shell: bash -el {0}
+      # publish-pypi uploads the wheels of this run
+      - uses: actions/upload-artifact@v7.0.1
+        with:
+          name: wheel-${{ steps.wheel.outputs.wheel }}
+          path: ${{ steps.wheel.outputs.wheel }}
+          retention-days: 5
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.4.1
       - name: Delete old release assets
