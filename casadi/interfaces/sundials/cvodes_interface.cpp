@@ -311,6 +311,8 @@ void CvodesInterface::impulseB(IntegratorMemory* mem,
     THROWING(CVodeInitB, m->mem, m->whichB, rhsB, m->t, m->v_adj_xz);
     THROWING(CVodeSStolerancesB, m->mem, m->whichB, reltol_, abstol_);
     THROWING(CVodeSetUserDataB, m->mem, m->whichB, m);
+    THROWING(CVodeSetMaxNumStepsB, m->mem, m->whichB, max_num_steps_);
+    if (max_order_) THROWING(CVodeSetMaxOrdB, m->mem, m->whichB, max_order_);
     if (newton_scheme_==SD_DIRECT) {
       // Direct scheme
       CVodeMem cv_mem = static_cast<CVodeMem>(m->mem);
