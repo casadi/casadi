@@ -15,7 +15,7 @@ permissions:
   contents: read
 
 env:
-  cache-suffix: v4
+  cache-suffix: v5
   # Native-runner override-OFF set for the julia job, appended after build_flags:
   # MATLAB_IPC (no MATLAB on runner) + SPRAL (Fortran-module parallel-build race,
   # also OFF in build_flags_mac/aarch64). Everything else in build_flags builds
