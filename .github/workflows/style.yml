@@ -2,6 +2,9 @@ name: style
 
 on: [push, pull_request]
 
+permissions:
+  contents: read
+
 jobs:
   main:
     if: ${{ !contains(github.event.head_commit.message, '[skip-ci:style]') }}

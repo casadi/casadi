@@ -7,6 +7,9 @@ on:
         description: 'Branch'     
         required: true
     
+permissions:
+  contents: read
+
 jobs:
   dev-release:
     runs-on: ubuntu-latest

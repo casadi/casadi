@@ -2,6 +2,9 @@ name: compilers
 
 on: [push, pull_request]
 
+permissions:
+  contents: read
+
 env:
   cache-suffix: v11
   build_flags: "-DWITH_COMMON=OFF -DWITH_THREAD=ON -DWITH_WERROR=ON -DWITH_EXTRA_WARNINGS=ON"
