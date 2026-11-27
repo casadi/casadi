@@ -2023,6 +2023,7 @@ jobs:
           git config --local user.name "casadibot"
           # If there are changes, commit them
           git commit -a -m "automated commit by docs target [skip ci]" || true
+        if: github.event_name != 'pull_request'
       - name: Push changes
         uses: ad-m/github-push-action@v1.1.0
         with:
@@ -2361,18 +2362,19 @@ jobs:
         with:
           version: tags/nightly-${{ env.GITHUB_REF_SLUG }}
           file: casadi-${{ needs.version.outputs.wheel }}-cp${{ matrix.py2 == '312' && '311' || matrix.py2 }}-${{ fromJSON(matrix.py2 == '312' && '311' || matrix.py2) >= 311 && 'abi3' || 'none' }}-${{env.platform}}.whl
+        if: github.event_name != 'pull_request'
       - run: |
           pip install -vvv casadi-${{ needs.version.outputs.wheel }}-cp${{ matrix.py2 == '312' && '311' || matrix.py2 }}-${{ fromJSON(matrix.py2 == '312' && '311' || matrix.py2) >= 311 && 'abi3' || 'none' }}-${{env.platform}}.whl
           cd test/python
           python function.py
         shell: bash -el {0}
-        if: "!contains(matrix.image, 'windows')"
+        if: "github.event_name != 'pull_request' && !contains(matrix.image, 'windows')"
       - run: |
           pip install -vvv casadi-${{ needs.version.outputs.wheel }}-cp${{ matrix.py2 == '312' && '311' || matrix.py2 }}-${{ fromJSON(matrix.py2 == '312' && '311' || matrix.py2) >= 311 && 'abi3' || 'none' }}-${{env.platform}}.whl
           cd test/python
           python function.py
         shell: pwsh
-        if: contains(matrix.image, 'windows')
+        if: github.event_name != 'pull_request' && contains(matrix.image, 'windows')
       # Type-check a small user program against the generated stubs, with
       # casadi installed as a wheel exactly as a user has it.  mypy silences
       # errors *inside* a PEP 561 package, so this cannot police stub quality
@@ -2390,7 +2392,7 @@ jobs:
           cd test/python
           python -m mypy --no-incremental mypy_probe.py
         shell: bash -el {0}
-        if: "!contains(matrix.image, 'windows')"
+        if: "github.event_name != 'pull_request' && !contains(matrix.image, 'windows')"
       - name: mypy against the installed stubs
         timeout-minutes: 10
         run: |
@@ -2398,7 +2400,7 @@ jobs:
           cd test/python
           python -m mypy --no-incremental mypy_probe.py
         shell: pwsh
-        if: contains(matrix.image, 'windows')
+        if: github.event_name != 'pull_request' && contains(matrix.image, 'windows')
       # stubtest cross-checks casadi.pyi against the installed runtime module
       # (every symbol both ways, parameter names, defaults, read-only
       # properties) -- the typeshed/numpy/scipy-stubs way of keeping a stub
@@ -2413,7 +2415,7 @@ jobs:
           cat stubtest_rest.log
           test ! -s stubtest_rest.log
         shell: bash -el {0}
-        if: "!contains(matrix.image, 'windows')"
+        if: "github.event_name != 'pull_request' && !contains(matrix.image, 'windows')"
       - name: stubtest against the installed stubs
         timeout-minutes: 10
         run: |
@@ -2427,7 +2429,7 @@ jobs:
           # GitHub appends `exit $LASTEXITCODE` to pwsh steps; stubtest's 1 must not leak.
           if ($rest.Count -gt 0) { exit 1 } else { exit 0 }
         shell: pwsh
-        if: contains(matrix.image, 'windows')
+        if: github.event_name != 'pull_request' && contains(matrix.image, 'windows')
       # Lint the installed stub with ruff's flake8-pyi rules: quoted
       # annotations, implicit aliases, __eq__ operands, __future__ imports,
       # undefined names -- the checklist of issue #4407, as reported by users
@@ -2442,14 +2444,14 @@ jobs:
           pip install ruff
           python -m ruff check --isolated --no-cache --target-version py39 --select F,PYI,UP037,RUF036 --ignore PYI021,PYI063 "$(python -c 'import casadi, os; print(os.path.dirname(casadi.__file__))')/casadi.pyi"
         shell: bash -el {0}
-        if: "!contains(matrix.image, 'windows')"
+        if: "github.event_name != 'pull_request' && !contains(matrix.image, 'windows')"
       - name: ruff against the installed stubs
         timeout-minutes: 10
         run: |
           pip install ruff
           python -m ruff check --isolated --no-cache --target-version py39 --select F,PYI,UP037,RUF036 --ignore PYI021,PYI063 "$(python -c 'import casadi, os; print(os.path.dirname(casadi.__file__))')/casadi.pyi"
         shell: pwsh
-        if: contains(matrix.image, 'windows')
+        if: github.event_name != 'pull_request' && contains(matrix.image, 'windows')
 
         
       - env:
