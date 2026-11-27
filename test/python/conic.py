@@ -1588,7 +1588,8 @@ class XpressSpecificTests(casadiTestCase):
     x = ca.MX.sym("x", 3)
     # Binary MILP: minimise -sum(x) s.t. x[0]+x[1]+x[2] <= 2
     # Optimal: any two of the three = 1, cost = -2
-    logfile = tempfile.mktemp(suffix=".log")
+    fd, logfile = tempfile.mkstemp(suffix=".log")
+    os.close(fd)
     try:
       solver = ca.qpsol("s", "xpress",
                      {"x": x, "f": -ca.sum1(x), "g": x[0] + x[1] + x[2]},
