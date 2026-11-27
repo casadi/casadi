@@ -2196,7 +2196,7 @@ jobs:
           sudo apt update
           sudo apt install -y valgrind
           cd test
-          python internal/test_pytest.py python -skipfiles="alltests.py nlp.py feasiblesqpmethod.py helpers.py complexity.py speed.py debug_fatrop.py mypy_probe.py graph_builder.py" -skipdirs="hock_schittkowski" -memcheck -passoptions="--ignore_memory_heavy"
+          python internal/test_pytest.py python -skipfiles="alltests.py nlp.py feasiblesqpmethod.py helpers.py complexity.py speed.py debug_fatrop.py mypy_probe.py" -skipdirs="hock_schittkowski" -memcheck -passoptions="--ignore_memory_heavy"
         shell: bash -el {0}
         if: contains(matrix.image, 'ubuntu')
       - name: docs/api/examples
