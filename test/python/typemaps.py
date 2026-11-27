@@ -1293,6 +1293,12 @@ class typemaptests(casadiTestCase):
     with self.assertRaises(TypeError if systemswig else NotImplementedError):
       ca.Function("tmp", [x],[Foo()])  # pyright: ignore[reportCallIssue,reportArgumentType]
 
+  def test_index_overflow(self):
+    self.message("an index beyond casadi_int is rejected, not wrapped")
+    for x in [ca.DM([1, 2]), ca.SX.sym("x", 2), ca.MX.sym("x", 2)]:
+      with self.assertRaises((TypeError, NotImplementedError)):
+        x[10**400]
+
   def test_shape_attr_no_refleak(self):
     self.message("the 1-D shape probe must not leak its shape tuple")
     # to_ptr(vector) reads .shape to reject 2-D operands; it used to Py_DECREF

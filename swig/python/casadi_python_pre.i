@@ -552,8 +552,10 @@ SWIG_Python_AppendOutput_Tuple(PyObject* result, PyObject* obj, int is_void) {
     inline int casadi_host_conv(GUESTOBJECT* p, casadi::Slice* m) {
       // Python casadi_int
       if (PyLong_Check(p)) {
+        casadi_int i = PyLong_AsLongLong(p);
+        if (i == -1 && PyErr_Occurred()) return casadi_ok(false);
         if (m) {
-          m->start = PyLong_AsLong(p);
+          m->start = i;
           m->stop = m->start+1;
           if (m->stop==0) m->stop = std::numeric_limits<casadi_int>::max();
         }
