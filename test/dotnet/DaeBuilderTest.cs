@@ -718,8 +718,8 @@ public class DaeBuilderTest : CasadiTestCase {
     foreach (double[] x_test in new[] { new[] { 1.0, 2.0 }, new[] { 0.0, 0.0 }, new[] { 2.5, 1.5 }, new[] { -1.0, 3.0 } })
       checkfunctionLight(f_bmo, f_sym, dms(ca.DM(x_test)), 1e-10);
 
-    // Java globs DerVariable.bmo.*.temp in the cwd, i.e. next to the .bmo file (test/data is the cwd's ../data)
-    string[] temp_dirs = Directory.GetDirectories(DataDir, "DerVariable.bmo.*.temp");
+    // the temp dir is created in the cwd, not next to the .bmo file
+    string[] temp_dirs = Directory.GetDirectories(".", "DerVariable.bmo.*.temp");
     assertEquals(1, temp_dirs.Length);
     string temp_dir = temp_dirs[0];
 
