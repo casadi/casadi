@@ -1173,8 +1173,14 @@ namespace casadi {
 
   template<>
   SX CASADI_EXPORT SX::hessian(const SX &ex, const SX &arg, const Dict& opts) {
-    SX g;
-    return hessian(ex, arg, g, opts);
+    Dict all_opts = opts;
+    if (!opts.count("symmetric")) all_opts["symmetric"] = true;
+    casadi_assert(ex.is_scalar(), "'hessian' only defined for scalar outputs.");
+    // The gradient is not returned, so terms that only shift it by a constant can be dropped
+    Function h("hess_helper", {arg}, {ex}, {{"allow_free", true}});
+    std::vector<std::vector<SX> > asens;
+    h.get<SXFunction>()->ad_reverse({{SX::ones(ex.sparsity())}}, asens, true);
+    return jacobian(project(asens.at(0).at(0), arg.sparsity()), arg, all_opts);
   }
 
   template<>

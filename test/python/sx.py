@@ -1202,6 +1202,22 @@ class SXtests(casadiTestCase):
 
     self.checkarray(h_out[0].nonzeros(),H.nonzeros())
 
+  def test_hessian_affine_terms(self):
+    x = ca.SX.sym("x", 3)
+    y = ca.SX.sym("y")
+    a, b, c = x[0], x[1], x[2]
+    u = ca.SX.sym("u")
+    call = ca.Function("call", [u], [u * ca.sin(u)], {"never_inline": True})
+    t = 2*a + y*b
+    for e in [t, y*(3*(a*b)), (a*b)/y + y/a, ca.sin(2*a + b)*(3*c + y), y*t + t*t,
+              -(a*b) + (a*c + a*c), a**b + c**3, ca.fmin(a*b, c), ca.if_else(y > 0, a*b, c),
+              y*call(a*b)]:
+      # Function.factory takes the pruned path; ca.hessian also returns the gradient
+      H = ca.Function("L", [x, y], [e]).factory("H", ["i0", "i1"], ["hess:o0:i0:i0"])
+      H_ref = ca.Function("H_ref", [x, y], [ca.hessian(e, x)[0]])
+      self.assertTrue(H.sparsity_out(0)==H_ref.sparsity_out(0))
+      self.checkarray(H([1.1, 0.7, 1.9], 0.3), H_ref([1.1, 0.7, 1.9], 0.3))
+
   def test_mxnulloutput(self):
      a = ca.SX(5,0)
      b = ca.SX.sym("x",2)

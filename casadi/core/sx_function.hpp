@@ -99,9 +99,12 @@ class CASADI_EXPORT SXFunction :
 
   /** \brief Calculate reverse mode directional derivatives
 
+      With hessian_only, for seeds independent of the inputs, terms that only
+      shift asens by a constant are dropped
+
       \identifier{uh} */
   void ad_reverse(const std::vector<std::vector<SX> >& aseed,
-                            std::vector<std::vector<SX> >& asens) const;
+                            std::vector<std::vector<SX> >& asens, bool hessian_only=false) const;
 
   /** \brief  Check if smooth
 
