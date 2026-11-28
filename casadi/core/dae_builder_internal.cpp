@@ -676,6 +676,7 @@ DaeBuilderInternal::DaeBuilderInternal(const std::string& name, const std::strin
   ignore_time_ = false;
   enable_ls_dae_ = true;
   enable_ls_serialization_ = true;
+  explicit_equations_ = true;
   // Read options
   for (auto&& op : opts) {
     if (op.first=="debug") {
@@ -692,6 +693,8 @@ DaeBuilderInternal::DaeBuilderInternal(const std::string& name, const std::strin
       enable_ls_dae_ = op.second;
     } else if (op.first=="enable_ls_serialization") {
       enable_ls_serialization_ = op.second;
+    } else if (op.first=="explicit_equations") {
+      explicit_equations_ = op.second;
     } else {
       casadi_error("No such option: " + op.first);
     }
@@ -906,7 +909,10 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
       casadi_assert(out_name.substr(0, 11) != "delay_expr[",
         "The delay operator is not supported by DaeBuilder");
 
-      if (is_dyn_eq || is_init_eq) {
+      if ((is_dyn_eq || is_init_eq) && !explicit_equations_) {
+        // Keep the residual as it is: an implicit equation, or an initial equation residual
+        if (!expr.is_empty()) add_residual(expr, is_init_eq);
+      } else if (is_dyn_eq || is_init_eq) {
         // Equation residual: (lhs - rhs) = 0. Read it as var = rhs if that is what it is, keeping
         // in mind that expression simplification has been at work: x - 0 is x, x - (-y) is x + y,
         // and a product or a call with two arguments is no difference at all.
@@ -991,6 +997,9 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
       }
     }
 
+    // Residual form: no FMU binary calculates the dependent variables
+    if (!explicit_equations_) residual_categories();
+
     symbolic_ = true;
   }
 
@@ -1010,6 +1019,8 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
   if (fmi_desc.has_child("equ:DynamicEquations")) {
     symbolic_ = true;
     import_dynamic_equations(fmi_desc["equ:DynamicEquations"]);
+    // Residual form: no FMU binary calculates the dependent variables
+    if (!explicit_equations_) residual_categories();
   }
 
   // Ensure model equations are available, binary or symbolic
@@ -2288,8 +2299,10 @@ std::vector<MX> DaeBuilderInternal::outputs(Category ind) const {
       for (size_t v : indices(cat)) {
         const Variable& x = variable(v);
         if (x.der >= 0) {
-          // Derivative variable
-          ret.push_back(variable(variable(x.der).bind).v);
+          // Derivative variable: its binding equation, or the variable itself, an algebraic
+          // variable of a residual form (explicit_equations false)
+          const Variable& xdot = variable(x.der);
+          ret.push_back(xdot.has_beq() ? variable(xdot.bind).v : xdot.v);
         } else if (x.variability == Variability::DISCRETE) {
           // Discrete variable - derivative is zero
           ret.push_back(MX::zeros(x.v.sparsity()));
@@ -3651,6 +3664,19 @@ void DaeBuilderInternal::eq(const MX& lhs, const MX& rhs, const Dict& opts) {
       casadi_error("Mismatched dimensions: " + str(lhs.size1()) + " vs " + str(rhs.size1()));
     }
   }
+  // Keep the equation as written: the residual lhs - rhs, the derivatives in it being
+  // algebraic variables and their states differential states
+  if (!explicit_equations_) {
+    MX res = lhs - rhs;
+    for (size_t i : find(symvar(res))) {
+      const Variable& v = variable(i);
+      if (v.parent < 0) continue;
+      const Variable& x = variable(v.parent);
+      if (x.der == v.index && x.category == Category::Z) categorize(x.index, Category::X);
+    }
+    add_residual(res);
+    return;
+  }
   // Make sure right-hand-side only depends on known model variables
   std::vector<size_t> rhs_vars = find(symvar(rhs));
   // If right-hand-side contains a time derivative that hasn't been defined yet,
@@ -3737,10 +3763,7 @@ void DaeBuilderInternal::eq(const MX& lhs, const MX& rhs, const Dict& opts) {
     }
   } else {
     // Implicit equation: Create residual variable
-    Variable& alg = add(unique_name("__alg__"), Causality::LOCAL, Variability::CONTINUOUS,
-      lhs - rhs, {{"dimension", std::vector<casadi_int>{lhs.size1()}}});
-    categorize(alg.index, Category::CALCULATED);
-    indices(Category::ALG).push_back(alg.index);
+    add_residual(lhs - rhs);
   }
   // Do not allow any quadrature states in the right-hand-sides
   for (size_t rhs : rhs_vars) {
@@ -3809,6 +3832,23 @@ Variable& DaeBuilderInternal::reinit(const std::string& name, const MX& val) {
   v.parent = variable(name).index;
   // Return the variable name
   return v;
+}
+
+Variable& DaeBuilderInternal::add_residual(const MX& res, bool initial) {
+  Variable& r = add(unique_name(initial ? "__ialg__" : "__alg__"), Causality::LOCAL,
+    Variability::CONTINUOUS, vec(res), {{"dimension", std::vector<casadi_int>{res.numel()}}});
+  categorize(r.index, Category::CALCULATED);
+  (initial ? ialg_ : indices(Category::ALG)).push_back(r.index);
+  return r;
+}
+
+void DaeBuilderInternal::residual_categories() {
+  // What no equation defines is an algebraic variable (z), the derivatives of the states
+  // included, as in the DAE layered standard
+  for (size_t i = 0; i < n_variables(); ++i) {
+    Variable& v = variable(i);
+    if (v.category == Category::W && !v.has_beq()) categorize(v.index, Category::Z);
+  }
 }
 
 void DaeBuilderInternal::set_init(const std::string& name, const MX& init_rhs) {
