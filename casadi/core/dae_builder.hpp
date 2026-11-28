@@ -4145,6 +4145,52 @@ class CASADI_EXPORT DaeBuilder
   ///@}
 
   ///@{
+  /** \brief Get/set an attribute given by an expression
+
+      The `"min"`, `"max"`, `"nominal"` or `"start"` attribute of a variable when it is an
+      expression of other variables, typically parameters, as `h_b` in the Base Modelica
+      declaration `Real h(min = h_b)`: one element per element of the variable. Empty for an
+      attribute without expression, given by `attribute` instead. The import of a `.bmo` model
+      gives a constant attribute with `set_attribute` and any other with
+      `set_attribute_expr`; `set_attribute` removes the expression.
+
+      \sa attribute, set_attribute */
+  MX attribute_expr(const std::string& a, const std::string& name) const;
+  void set_attribute_expr(const std::string& a, const std::string& name, const MX& val);
+  ///@}
+
+  /** \brief Is an attribute given, rather than defaulted?
+
+      Whether the `"min"`, `"max"`, `"nominal"` or `"start"` attribute of a variable is given,
+      by a number or by an expression (`attribute_expr`), as opposed to having its default
+      value: `-inf`, `inf`, `1` and `0`. True when the model (the `modelDescription.xml` of an
+      FMU, a `.bmo` model), an option of `add` or `set_attribute`/`set_attribute_expr` gives
+      it, so that `nominal = 1` in the model is told from no nominal.
+
+      \sa attribute, attribute_expr, add */
+  bool has_attribute(const std::string& a, const std::string& name) const;
+
+  ///@{
+  /** \brief Get/set the annotations of a variable
+
+      The vendor annotations of a variable, which carry information that has no FMI attribute,
+      from the `Annotations` element of the variable in an FMI 3.0 model description: one
+      entry per `Annotation` element, keyed by its `type` attribute. Its value is a Dict with
+      an entry per child element of the `Annotation`, keyed by the element name; that entry is
+      a Dict of the XML attributes of the element (strings) and, the same way, of its own child
+      elements (Dicts). Text inside the elements is not kept, and of child elements with the
+      same name, the last one. Empty without annotations.
+
+      lacemodelica writes the Modelica attribute `fixed` of a `.bmo` model this way, which
+      gives `{"org.lacemodelica.modelica": {"Attributes": {"fixed": "true"}}}` for
+      `Real u(fixed = true)`.
+
+      \sa initial */
+  Dict annotations(const std::string& name) const;
+  void set_annotations(const std::string& name, const Dict& val);
+  ///@}
+
+  ///@{
   /** \brief Get/set the type
 
       The variable type in FMI 3 naming (`"Float64"`, `"Float32"`, `"Int32"`, `"Boolean"`,

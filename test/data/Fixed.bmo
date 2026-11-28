@@ -1,0 +1,13 @@
+//! base 0.1.0
+package 'Fixed'
+  model 'Fixed' "The Modelica attribute fixed"
+    input Real 'u'(fixed = true);
+    Real 'x'(start = 1.0, fixed = true);
+    Real 'y'(start = 2.0, fixed = false);
+    Real 'z';
+  equation
+    der('x') = 'u' - 'x';
+    der('y') = 'x' - 'y';
+    'z' = 'y';
+  end 'Fixed';
+end 'Fixed';

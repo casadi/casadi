@@ -1004,6 +1004,90 @@ class Daebuildertests(casadiTestCase):
     self.checkarray(ca.vertcat(*f(3, 4, 5, 6, 7)), ca.DM([0, 0, 0, 2]))
 
   @requires_modelicaparser('lacemodelica')
+  def test_basemodelica_attribute_expr(self):
+    """min, max, nominal and start given by expressions; no start value is no start value."""
+    import math
+    dae = ca.DaeBuilder('m', '../data/ExpressionAttributes.bmo')
+    p = dae.var('p')
+    def at(e, val=2.0):
+      return float(ca.evalf(ca.substitute(e, p, val)))
+    self.assertEqual(at(dae.attribute_expr('min', 'x')), 2)
+    self.assertEqual(at(dae.attribute_expr('max', 'x')), 4)
+    self.assertTrue(ca.is_equal(dae.attribute_expr('nominal', 'x'), dae.var('q')))
+    self.assertEqual(at(dae.attribute_expr('start', 'x')), 3)
+    self.assertEqual(at(dae.attribute_expr('start', 'q')), 6)
+    # Numbers stay numbers
+    self.assertTrue(dae.attribute_expr('min', 'y').is_empty())
+    self.assertEqual(dae.min('y'), 0)
+    self.assertEqual(dae.start('y'), [4])
+    self.assertEqual(dae.start('p'), [2])
+    # No start value: r (a parameter left to the user) and z
+    self.assertTrue(math.isnan(dae.start('r')[0]))
+    self.assertTrue(math.isnan(dae.start('z')[0]))
+
+  def test_has_attribute(self):
+    dae = ca.DaeBuilder('m')
+    dae.add('x', dict(nominal=1, min=-ca.inf))
+    dae.add('y')
+    self.assertEqual([dae.has_attribute(a, 'x') for a in ['min', 'max', 'nominal', 'start']],
+                     [True, False, True, False])
+    self.assertFalse(any(dae.has_attribute(a, 'y') for a in ['min', 'max', 'nominal', 'start']))
+    dae.set_attribute('start', 'y', 0)
+    self.assertTrue(dae.has_attribute('start', 'y'))
+    p = dae.add('p', 'parameter', 'tunable')
+    dae.set_attribute_expr('max', 'y', p)
+    self.assertTrue(dae.has_attribute('max', 'y'))
+    with self.assertRaisesRegex(RuntimeError, 'has_attribute not available for value'):
+      dae.has_attribute('value', 'y')
+
+  @requires_modelicaparser('lacemodelica')
+  def test_basemodelica_has_attribute(self):
+    """An attribute given with its default value is given."""
+    dae = ca.DaeBuilder('m', '../data/GivenAttributes.bmo')
+    attrs = ['min', 'max', 'nominal', 'start']
+    self.assertEqual([dae.has_attribute(a, 'x') for a in attrs], [True, False, True, True])
+    self.assertEqual(dae.nominal('x'), 1)
+    self.assertEqual([dae.has_attribute(a, 'y') for a in attrs], [False, False, True, False])
+    self.assertEqual([dae.has_attribute(a, 'z') for a in attrs], [False] * 4)
+    self.assertTrue(dae.has_attribute('start', 'p'))
+    self.assertEqual([dae.has_attribute(a, 'n') for a in attrs], [False, False, False, True])
+    self.assertEqual([dae.has_attribute(a, 'm') for a in attrs], [True, True, False, True])
+
+  def test_attribute_expr(self):
+    dae = ca.DaeBuilder('m')
+    p = dae.add('p', 'parameter', 'tunable')
+    x = dae.add('x', dict(dimension=[2]))
+    self.assertTrue(dae.attribute_expr('min', 'x').is_empty())
+    dae.set_attribute_expr('min', 'x', 2 * p)
+    self.checkarray(ca.evalf(ca.substitute(dae.attribute_expr('min', 'x'), p, 3)), ca.DM([6, 6]))
+    dae.set_attribute_expr('start', 'x', ca.vertcat(p, -p))
+    self.assertEqual(dae.attribute_expr('start', 'x').shape, (2, 1))
+    # A number replaces the expression
+    dae.set_attribute('min', 'x', 0)
+    self.assertTrue(dae.attribute_expr('min', 'x').is_empty())
+    with self.assertRaisesRegex(RuntimeError, 'must be scalar or have 2 elements'):
+      dae.set_attribute_expr('max', 'x', ca.vertcat(p, p, p))
+    with self.assertRaisesRegex(RuntimeError, 'No expression for attribute value'):
+      dae.set_attribute_expr('value', 'x', p)
+
+  def test_annotations(self):
+    dae = ca.DaeBuilder('m')
+    dae.add('x')
+    self.assertEqual(dae.annotations('x'), {})
+    a = {'org.example': {'Attributes': {'flag': 'true'}, 'Nested': {'Inner': {'v': '1'}}}}
+    dae.set_annotations('x', a)
+    self.assertEqual(dae.annotations('x'), a)
+
+  @requires_modelicaparser('lacemodelica')
+  def test_basemodelica_fixed(self):
+    # lacemodelica gives fixed as the FMI initial attribute, for an input as an annotation
+    dae = ca.DaeBuilder('m', '../data/Fixed.bmo')
+    self.assertEqual([dae.initial(n) for n in ['x', 'y', 'z']], ['exact', 'approx', 'calculated'])
+    self.assertEqual(dae.annotations('u'),
+                     {'org.lacemodelica.modelica': {'Attributes': {'fixed': 'true'}}})
+    self.assertEqual(dae.annotations('z'), {})
+
+  @requires_modelicaparser('lacemodelica')
   def test_basemodelica(self):
     """Test loading .bmo files via the LaceModelica plugin."""
     # Load from BMO file

@@ -379,6 +379,10 @@ void Variable::get_attribute(Attribute a, std::string* val) const {
 }
 
 void Variable::set_attribute(Attribute a, double val) {
+  // A number replaces an expression
+  attribute_expr.erase(a);
+  if (a == Attribute::MIN || a == Attribute::MAX || a == Attribute::NOMINAL
+      || a == Attribute::START) given.insert(a);
   // Handle attributes
   switch (a) {
     case Attribute::MIN:
@@ -403,6 +407,7 @@ void Variable::set_attribute(Attribute a, double val) {
 }
 
 void Variable::set_attribute(Attribute a, const std::vector<double>& val) {
+  attribute_expr.erase(a);
   // Quick return if scalar
   if (val.size() == 1) {
     set_attribute(a, val.front());
@@ -895,6 +900,9 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
     // Substitute expressions in oracle outputs
     oracle_out = substitute(oracle_out, v, vdef);
 
+    // Variables given a start value by an output start[N]
+    std::set<size_t> given_start;
+
     // Process each output based on its category
     // Output naming convention from Lace Modelica:
     //   eq[N]      - equation residual (lhs - rhs = 0)
@@ -902,6 +910,7 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
     //   start[N]   - start value for variable at input index N
     //   min[N]     - minimum bound for variable at input index N
     //   max[N]     - maximum bound for variable at input index N
+    //   nominal[N] - nominal value for variable at input index N
     for (size_t i = 0; i < oracle_out.size(); ++i) {
       std::string out_name = oracle.name_out(i);
       MX expr = oracle_out[i];
@@ -947,59 +956,53 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
           // Anything else (e.g., m*c_p*der(T) - h): use implicit residual form
           eq(MX(0), expr, Dict());
         }
-      } else if (out_name.substr(0, 6) == "start[") {
-        // Start value: start[N] where N is the input index
+      } else {
+        // Attribute of the variable at input index N: start[N], min[N], max[N] or nominal[N]
         size_t bracket_pos = out_name.find('[');
         size_t close_pos = out_name.find(']');
-        if (bracket_pos != std::string::npos && close_pos != std::string::npos) {
-          casadi_int idx = std::stoi(out_name.substr(bracket_pos + 1, close_pos - bracket_pos - 1));
-          if (idx >= 0 && idx < static_cast<casadi_int>(input_var_names.size())) {
-            std::string var_name = input_var_names[idx];
-            Variable& var_ref = variable(var_name);
-            // If it's known (an expression of constants), we can evaluate it; an array in
-            // row-major (FMI) order
-            if (symvar(oracle_out[i]).empty()) {
-              DM dm_val = densify(evalf(oracle_out[i]).T());
-              var_ref.start = std::vector<double>(dm_val->begin(), dm_val->end());
+        if (bracket_pos == std::string::npos || close_pos == std::string::npos) continue;
+        std::string a_name = out_name.substr(0, bracket_pos);
+        if (a_name != "start" && a_name != "min" && a_name != "max" && a_name != "nominal") {
+          continue;
+        }
+        Attribute a = to_enum<Attribute>(a_name);
+        casadi_int idx = std::stoi(out_name.substr(bracket_pos + 1, close_pos - bracket_pos - 1));
+        if (idx < 0 || idx >= static_cast<casadi_int>(input_var_names.size())) continue;
+        Variable& var_ref = variable(input_var_names[idx]);
+        if (var_ref.numel == 0) continue;
+        // The elements in row-major (FMI) order, as the variable keeps them
+        expr = vec(oracle_out[i].T());
+        // A number if it is one (an expression of constants), as the attribute in the model
+        // description would be
+        if (symvar(expr).empty()) {
+          std::vector<double> val = evalf(densify(expr)).nonzeros();
+          bool uniform = std::all_of(val.begin(), val.end(),
+            [&](double e) { return e == val.front(); });
+          if (a == Attribute::START || uniform) {
+            if (uniform) val.resize(1);
+            var_ref.set_attribute(a, val);
+            if (a == Attribute::START) {
+              var_ref.value = var_ref.start;
+              given_start.insert(var_ref.index);
             }
-            // TODO(jgillis): Handle symbolic start expressions
+            continue;
           }
         }
-      } else if (out_name.substr(0, 4) == "min[") {
-        // Minimum bound: min[N] where N is the input index
-        size_t bracket_pos = out_name.find('[');
-        size_t close_pos = out_name.find(']');
-        if (bracket_pos != std::string::npos && close_pos != std::string::npos) {
-          casadi_int idx = std::stoi(out_name.substr(bracket_pos + 1, close_pos - bracket_pos - 1));
-          if (idx >= 0 && idx < static_cast<casadi_int>(input_var_names.size())) {
-            std::string var_name = input_var_names[idx];
-            Variable& var_ref = variable(var_name);
-            // If it's a constant, we can evaluate it
-            if (expr.is_constant()) {
-              DM dm_val = static_cast<DM>(expr);
-              var_ref.min = static_cast<double>(dm_val);
-            }
-            // TODO(jgillis): Handle symbolic min expressions
-          }
-        }
-      } else if (out_name.substr(0, 4) == "max[") {
-        // Maximum bound: max[N] where N is the input index
-        size_t bracket_pos = out_name.find('[');
-        size_t close_pos = out_name.find(']');
-        if (bracket_pos != std::string::npos && close_pos != std::string::npos) {
-          casadi_int idx = std::stoi(out_name.substr(bracket_pos + 1, close_pos - bracket_pos - 1));
-          if (idx >= 0 && idx < static_cast<casadi_int>(input_var_names.size())) {
-            std::string var_name = input_var_names[idx];
-            Variable& var_ref = variable(var_name);
-            // If it's a constant, we can evaluate it
-            if (expr.is_constant()) {
-              DM dm_val = static_cast<DM>(expr);
-              var_ref.max = static_cast<double>(dm_val);
-            }
-            // TODO(jgillis): Handle symbolic max expressions
-          }
-        }
+        // Otherwise an expression of other variables
+        set_attribute_expr(a, var_ref.name, expr);
+        if (a == Attribute::START) given_start.insert(var_ref.index);
       }
+    }
+
+    // A variable without start value in the model has none: not the default 0
+    for (const XmlNode& vnode : fmi_desc["ModelVariables"].children) {
+      if (vnode.has_attribute("start")) continue;
+      auto it = varind_.find(vnode.attribute<std::string>("name"));
+      if (it == varind_.end() || given_start.count(it->second)) continue;
+      Variable& v = variable(it->second);
+      if (v.causality == Causality::INDEPENDENT) continue;
+      std::fill(v.start.begin(), v.start.end(), nan);
+      std::fill(v.value.begin(), v.value.end(), nan);
     }
 
     symbolic_ = true;
@@ -3248,6 +3251,7 @@ Variable& DaeBuilderInternal::add(const std::string& name, Causality causality,
   std::vector<casadi_int> dimension = {1};
   double min = -casadi::inf, max = casadi::inf, nominal = 1;
   std::vector<double> start;
+  std::set<Attribute> given;
   // Read options
   for (auto&& op : opts) {
     if (op.first=="dimension") {
@@ -3260,11 +3264,15 @@ Variable& DaeBuilderInternal::add(const std::string& name, Causality causality,
       display_unit = op.second.to_string();
     } else if (op.first=="min") {
       min = op.second.to_double();
+      given.insert(Attribute::MIN);
     } else if (op.first=="max") {
       max = op.second.to_double();
+      given.insert(Attribute::MAX);
     } else if (op.first=="nominal") {
       nominal = op.second.to_double();
+      given.insert(Attribute::NOMINAL);
     } else if (op.first=="start") {
+      given.insert(Attribute::START);
       if (op.second.can_cast_to(OT_DOUBLE)) {
         start.resize(1, op.second.to_double());
       } else {
@@ -3330,6 +3338,7 @@ Variable& DaeBuilderInternal::add(const std::string& name, Causality causality,
   if (min != -casadi::inf) v.min = min;
   if (max != casadi::inf) v.max = max;
   v.nominal = nominal;
+  v.given = given;
   // Handle different categories
   switch (causality) {
     case Causality::PARAMETER:
@@ -3882,6 +3891,15 @@ void DaeBuilderInternal::import_model_exchange(const XmlNode& n) {
   }
 }
 
+// The content of an XML element as in DaeBuilder::annotations: its attributes (strings) and,
+// recursively, its child elements (Dicts), by name
+static Dict annotation_content(const XmlNode& n) {
+  Dict r;
+  for (auto& a : n.attributes) r[a.first] = a.second;
+  for (const XmlNode& c : n.children) r[c.name] = annotation_content(c);
+  return r;
+}
+
 // Start value(s) of a Boolean, integer or enumeration variable, as doubles: whitespace separated
 // numbers, or 'true' and 'false'. Empty if the node has no start attribute.
 static std::vector<double> read_discrete_start(const XmlNode& n) {
@@ -3945,6 +3963,9 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
     // Dimension of the variable
     std::vector<casadi_int> dimension;
 
+    // Vendor annotations
+    Dict annotations;
+
     // Type specific properties
     Dict opts;
     Type type = Type::NUMEL;
@@ -3965,7 +3986,12 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
         } else if (c.name == "Alias") {
           // Aliases currently ignored
         } else if (c.name == "Annotations") {
-          // Annotations currently ignored
+          // By type, the child elements of each annotation
+          for (const XmlNode& an : c.children) {
+            Dict content;
+            for (const XmlNode& e : an.children) content[e.name] = annotation_content(e);
+            annotations[an.attribute<std::string>("type")] = content;
+          }
         } else if (c.name == "Start") {
           // Start currently ignored
         } else {
@@ -3979,10 +4005,13 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
         // Floating point valued variables
         opts["unit"] = vnode.attribute<std::string>("unit", "");
         opts["display_unit"] = vnode.attribute<std::string>("displayUnit", "");
-        opts["min"] = vnode.attribute<double>("min", -inf);
-        opts["max"] = vnode.attribute<double>("max", inf);
-        opts["nominal"] = vnode.attribute<double>("nominal", 1.);
-        opts["start"] = vnode.attribute<std::vector<double>>("start", std::vector<double>{0.});
+        // Only attributes given, which has_attribute tells
+        for (const char* a : {"min", "max", "nominal"}) {
+          if (vnode.has_attribute(a)) opts[a] = vnode.attribute<double>(a);
+        }
+        if (vnode.has_attribute("start")) {
+          opts["start"] = vnode.attribute<std::vector<double>>("start");
+        }
         derivative = vnode.attribute<casadi_int>("derivative", -1);
         break;
       case Type::INT8:  // fall-through
@@ -3994,8 +4023,9 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
       case Type::INT64:  // fall-through
       case Type::UINT64:  // fall-through
         // Integer valued variables
-        opts["min"] = vnode.attribute<double>("min", -inf);
-        opts["max"] = vnode.attribute<double>("max", inf);
+        for (const char* a : {"min", "max"}) {
+          if (vnode.has_attribute(a)) opts[a] = vnode.attribute<double>(a);
+        }
         break;
       default:
         break;
@@ -4013,16 +4043,16 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
         const XmlNode& props = vnode["Real"];
         opts["unit"] = props.attribute<std::string>("unit", "");
         opts["display_unit"] = props.attribute<std::string>("displayUnit", "");
-        opts["min"] = props.attribute<double>("min", -inf);
-        opts["max"] = props.attribute<double>("max", inf);
-        opts["nominal"] = props.attribute<double>("nominal", 1.);
-        opts["start"] = props.attribute<double>("start", 0.);
+        for (const char* a : {"min", "max", "nominal", "start"}) {
+          if (props.has_attribute(a)) opts[a] = props.attribute<double>(a);
+        }
         derivative = props.attribute<casadi_int>("derivative", -1);
       } else if (vnode.has_child("Integer")) {
         type = Type::INT32;
         const XmlNode& props = vnode["Integer"];
-        opts["min"] = props.attribute<double>("min", -inf);
-        opts["max"] = props.attribute<double>("max", inf);
+        for (const char* a : {"min", "max"}) {
+          if (props.has_attribute(a)) opts[a] = props.attribute<double>(a);
+        }
         std::vector<double> start = read_discrete_start(props);
         if (!start.empty()) opts["start"] = start;
       } else if (vnode.has_child("Boolean")) {
@@ -4093,6 +4123,9 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
     if (variability == Variability::DISCRETE) {
       categorize(var.index, Category::NUMEL);
     }
+
+    // Vendor annotations
+    var.annotations = annotations;
 
     // Derivative attribute
     var.der_of = derivative;
@@ -4760,6 +4793,35 @@ std::vector<double> DaeBuilderInternal::attribute(Attribute a,
     r.insert(r.end(), r1.begin(), r1.end());
   }
   return r;
+}
+
+MX DaeBuilderInternal::attribute_expr(Attribute a, const std::string& name) const {
+  const Variable& v = variable(name);
+  auto it = v.attribute_expr.find(a);
+  return it == v.attribute_expr.end() ? MX() : it->second;
+}
+
+void DaeBuilderInternal::set_attribute_expr(Attribute a, const std::string& name,
+    const MX& val) {
+  casadi_assert(a == Attribute::MIN || a == Attribute::MAX || a == Attribute::NOMINAL
+    || a == Attribute::START, "No expression for attribute " + to_string(a));
+  Variable& v = variable(name);
+  if (val.is_empty()) {
+    v.attribute_expr.erase(a);
+    return;
+  }
+  casadi_assert(val.is_scalar() || val.numel() == v.numel, "Attribute " + to_string(a)
+    + " of " + name + " must be scalar or have " + str(v.numel) + " elements");
+  // Only model variables in the expression
+  (void)find(symvar(val));
+  v.given.insert(a);
+  v.attribute_expr[a] = val.is_scalar() ? repmat(val, v.numel, 1) : vec(val);
+}
+
+bool DaeBuilderInternal::has_attribute(Attribute a, const std::string& name) const {
+  casadi_assert(a == Attribute::MIN || a == Attribute::MAX || a == Attribute::NOMINAL
+    || a == Attribute::START, "has_attribute not available for " + to_string(a));
+  return variable(name).given.count(a) > 0;
 }
 
 void DaeBuilderInternal::set_attribute(Attribute a, const std::string& name, double val) {

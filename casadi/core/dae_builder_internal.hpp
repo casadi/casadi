@@ -26,6 +26,8 @@
 #ifndef CASADI_DAE_BUILDER_INTERNAL_HPP
 #define CASADI_DAE_BUILDER_INTERNAL_HPP
 
+#include <map>
+#include <set>
 #include <unordered_map>
 
 #include "dae_builder.hpp"
@@ -137,6 +139,9 @@ struct CASADI_EXPORT Variable {
   // Does it appear in any right-hand-side?
   bool in_rhs;
 
+  /// Vendor annotations, by annotation type, cf. DaeBuilder::annotations
+  Dict annotations;
+
   /// Numerical value (also for booleans, integers, enums)
   std::vector<double> value;
 
@@ -157,6 +162,12 @@ struct CASADI_EXPORT Variable {
 
   /// Initial equation (to be removed and moved to a separate dependent variable)
   MX ieq;
+
+  /// Attributes given by an expression (min, max, nominal, start), one element per element
+  std::map<Attribute, MX> attribute_expr;
+
+  /// Attributes given (min, max, nominal, start), by a number or an expression
+  std::set<Attribute> given;
 
   /// Total number of elements for a particular attribute
   casadi_int size(Attribute a) const;
@@ -738,6 +749,15 @@ protected:
   double attribute(Attribute a, const std::string& name) const;
   std::vector<double> attribute(Attribute a, const std::vector<std::string>& name) const;
   ///@}
+
+  ///@{
+  /// Attribute given by an expression, empty if none
+  MX attribute_expr(Attribute a, const std::string& name) const;
+  void set_attribute_expr(Attribute a, const std::string& name, const MX& val);
+  ///@}
+
+  /// Is an attribute given, by a number or an expression, rather than defaulted?
+  bool has_attribute(Attribute a, const std::string& name) const;
 
   ///@{
   /// Set by attribute name

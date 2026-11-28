@@ -560,6 +560,50 @@ void DaeBuilder::set_value_reference(const std::string& name, casadi_int val) {
   (*this)->variable(name).value_reference = val;
 }
 
+MX DaeBuilder::attribute_expr(const std::string& a, const std::string& name) const {
+  try {
+    return (*this)->attribute_expr(to_enum<Attribute>(a), name);
+  } catch (std::exception& e) {
+    THROW_ERROR("attribute_expr", e.what());
+    return MX();  // never reached
+  }
+}
+
+void DaeBuilder::set_attribute_expr(const std::string& a, const std::string& name,
+    const MX& val) {
+  try {
+    (*this)->set_attribute_expr(to_enum<Attribute>(a), name, val);
+  } catch (std::exception& e) {
+    THROW_ERROR("set_attribute_expr", e.what());
+  }
+}
+
+bool DaeBuilder::has_attribute(const std::string& a, const std::string& name) const {
+  try {
+    return (*this)->has_attribute(to_enum<Attribute>(a), name);
+  } catch (std::exception& e) {
+    THROW_ERROR("has_attribute", e.what());
+    return false;  // never reached
+  }
+}
+
+Dict DaeBuilder::annotations(const std::string& name) const {
+  try {
+    return (*this)->variable(name).annotations;
+  } catch (std::exception& e) {
+    THROW_ERROR("annotations", e.what());
+    return Dict();  // never reached
+  }
+}
+
+void DaeBuilder::set_annotations(const std::string& name, const Dict& val) {
+  try {
+    (*this)->variable(name).annotations = val;
+  } catch (std::exception& e) {
+    THROW_ERROR("set_annotations", e.what());
+  }
+}
+
 std::string DaeBuilder::description(const std::string& name) const {
   return (*this)->variable(name).description;
 }
