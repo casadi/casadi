@@ -1,0 +1,10 @@
+//! base 0.1.0
+package 'Delay'
+  model 'Delay' "A delayed input"
+    parameter Real 'd' = 2.0;
+    input Real 'u';
+    Real 'y';
+  equation
+    'y' = 2.0 * delay('u', 'd', 'd');
+  end 'Delay';
+end 'Delay';
